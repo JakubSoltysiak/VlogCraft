@@ -62,7 +62,9 @@ class StudioTests(unittest.TestCase):
         audio=server.default_clip(a,.0,'audio');audio['end']=1.;audio['volume']=.2;a2['clips']=[audio]
         out=self.root/'edited.mp4'
         with tempfile.TemporaryDirectory(dir=self.root) as tmp:
-            engine.render(state,out,tmp)
+            def bounded(command,cwd):
+                subprocess.run(command,cwd=cwd,capture_output=True,check=True,timeout=20)
+            engine.render(state,out,tmp,popen=bounded)
         info=server.probe(out)
         self.assertEqual(info['width'],320);self.assertTrue(info['hasAudio'])
         self.assertGreater(out.stat().st_size,10000)

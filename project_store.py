@@ -42,10 +42,14 @@ def save(path, state, validate):
     if path.exists():
         previous = path.read_bytes()
         try:
-            validate(json.loads(previous))
+            previous_state=json.loads(previous)
+            validate(previous_state)
         except (ValueError, KeyError, TypeError):
             # Preserve the last valid backup when repairing a damaged primary.
             pass
         else:
+            if state.get('version')==4 and previous_state.get('version',0)<4:
+                migration=path.with_name(path.name+'.v3.bak')
+                if not migration.exists():atomic_write(migration,previous)
             atomic_write(backup_path(path), previous)
     atomic_write(path, data)

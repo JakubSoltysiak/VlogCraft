@@ -162,6 +162,8 @@ def run(project):
     try:
         webview.start(gui='edgechromium', private_mode=False, storage_path=str(cache / 'webview'))
     finally:
+        import audio_cache
+        audio_cache.cancel()
         with server.JOB_LOCK:
             server.PROXY_QUEUE.clear()
             for key, process in server.CURRENT_PROCESS.items():

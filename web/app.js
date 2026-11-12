@@ -187,11 +187,13 @@ const gradeFilters={neutral:'',warm:'sepia(.17) saturate(1.12)',cool:'hue-rotate
 function getActiveClips(){const vis=[];for(const t of [...programTracks].reverse())if(t.type==='video'&&!t.hidden)for(const c of clipsIn(t,playhead,playhead))vis.push({c,t});return vis;}
 function makePlayer(c,t,z){const a=assetById(c.assetId);if(!a)return null;const wrap=document.createElement('div');wrap.className='preview-layer';wrap.dataset.previewId=c.id;wrap.style.zIndex=z;
  if(c.kind==='title')return null;
- const media=document.createElement(a.kind==='image'?'img':'video');media.src=a.kind==='image'?`/media/${a.id}`:seekUrl(a.id);if(media.tagName==='VIDEO'){media.preload='metadata';media.playsInline=true;media.autoplay=false;media.muted=false;media.disablePictureInPicture=true;}media.style.objectFit=c.fit==='cover'?'cover':'contain';wrap.appendChild(media);$('previewLayers').appendChild(wrap);return {media,wrap,clipId:c.id,aId:a.id};}
+ const prepared=waitingPlayers.get(c.id);waitingPlayers.delete(c.id);
+ const media=a.kind==='image'?document.createElement('img'):(prepared?.media||sourceVideo(c));
+ if(a.kind==='image')media.src='/media/'+a.id;if(media.tagName==='VIDEO'){media.preload='metadata';media.playsInline=true;media.autoplay=false;media.muted=false;media.disablePictureInPicture=true;}media.style.objectFit=c.fit==='cover'?'cover':'contain';wrap.appendChild(media);$('previewLayers').appendChild(wrap);return {media,wrap,clipId:c.id,aId:a.id};}
 function syncPreview(force=false){if(!state)return;if(force)referenceChanged();const active=getActiveClips();$('emptyPreview').hidden=state.tracks.some(t=>t.clips.length);
  const activeIds=new Set(active.map(x=>x.c.id));
  for(const [id,p] of activePlayers)if(!activeIds.has(id)||p.type!=='video'){
-  p.media?.pause?.();releaseStrip(p.media);p.wrap?.remove();activePlayers.delete(id);
+  recycleVideo(p);p.wrap?.remove();activePlayers.delete(id);
  }
  let z=1;
  for(const {c,t} of active){
@@ -216,13 +218,13 @@ function syncPreview(force=false){if(!state)return;if(force)referenceChanged();c
     else if(!isPlaying&&!m.paused)m.pause();
   }
  }
- syncAudio(force);
+ syncAudio(force);warmPlayers();
 }
 const audioPlayers=new Map();
 function syncAudio(force=false){const active=[];
  for(const t of programTracks)if(t.type==='audio'&&audible(t))for(const c of clipsIn(t,playhead,playhead))active.push({t,c});
  const keys=new Set(active.map(x=>x.c.id));for(const [id,p] of audioPlayers)if(!keys.has(id)){p.pause();releaseStrip(p);p.remove();audioPlayers.delete(id);}
- for(const {t,c} of active){if(!c.assetId)continue;let m=audioPlayers.get(c.id);if(!m){m=document.createElement('audio');m.src=seekUrl(c.assetId);m.preload='metadata';document.body.appendChild(m);audioPlayers.set(c.id,m);}
+ for(const {t,c} of active){if(!c.assetId)continue;let m=audioPlayers.get(c.id);if(!m){m=document.createElement('audio');m.src=audioUrl(c.assetId);m.preload='metadata';document.body.appendChild(m);audioPlayers.set(c.id,m);}
   let target=c.start+(playhead-c.position)*c.speed;syncMediaTime(m,target,c.speed,force);
   const elapsed=playhead-c.position,remaining=endOf(c)-playhead;const ai=c.fadeIn?Math.min(1,elapsed/c.fadeIn):1,ao=c.fadeOut?Math.min(1,remaining/c.fadeOut):1;
   mixSource(m,c,t.volume*animated(c,'volume')*Math.min(ai,ao));
@@ -287,12 +289,12 @@ function beginJobPoll(which,onDone){clearInterval(renderPoll);renderPoll=setInte
  if(['done','error','cancelled'].includes(j.status)){clearInterval(renderPoll);renderPoll=null;$('startRender').disabled=false;$('cancelRender').hidden=true;if(which==='export'&&j.status==='done')toast('Export saved: '+j.path);if(j.status==='error')toast(j.error||'Render failed',true);onDone?.(j);}
  }catch(e){clearInterval(renderPoll);renderPoll=null;toast(e.message,true);}},900);}
 function proposalText(){let t=$('proposalJson').value.trim();if(t.startsWith('```'))t=t.replace(/^```(?:json)?\s*/,'').replace(/\s*```$/,'');return JSON.parse(t);}
-async function makeReviewPack(){try{await flushSave();$('reviewStatus').textContent='Rendering program frames locally…';const r=await request('review','POST',{});$('reviewPackLink').href=r.url;$('reviewPackLink').hidden=false;$('reviewStatus').textContent=`Review ZIP ready: ${r.frames} frames, ${fileSize(r.bytes)}. No full-size footage included.`;}catch(e){$('reviewStatus').textContent=e.message;}}
+async function makeReviewPack(){try{await flushSave();$('reviewStatus').textContent='Rendering program frames locally…';const r=await request('review','POST',$('reviewCurrentFrame').checked?{frames:[Math.min(frameIndex(playhead),Math.max(0,frameIndex(duration())-1))]}:{});$('reviewPackLink').href=r.url;$('reviewPackLink').hidden=false;$('reviewStatus').textContent=`Review ZIP ready: ${r.frames} frames, ${fileSize(r.bytes)}. No full-size footage included.`;}catch(e){$('reviewStatus').textContent=e.message;}}
 async function makeReviewVideo(){try{await flushSave();$('reviewVideoLink').hidden=true;$('reviewStatus').textContent='Rendering a compressed 720p review MP4…';const r=await request('review/video','POST',{});beginJobPoll('export',status=>{if(status.status==='done'){$('reviewVideoLink').href=r.url;$('reviewVideoLink').hidden=false;$('reviewStatus').textContent='Review ready — attach this MP4 here in ChatGPT.';}else $('reviewStatus').textContent=status.error||status.message;});}catch(e){$('reviewStatus').textContent=e.message;}}
 async function analyzeAi(){const b=$('analyzeBtn');b.disabled=true;$('aiResults').textContent='Sending up to 8 sampled JPEG frames and project manifest to OpenAI API. Original video files stay local.';try{await flushSave();let r=await request('ai/analyze','POST',{apiKey:$('apiKey').value,goal:$('aiGoal').value});$('proposalJson').value=JSON.stringify(r,null,2);proposalToken=null;$('applyAiBtn').disabled=true;$('aiResults').textContent=`${r.summary||''}\n\n${(r.suggestions||[]).map(x=>'• '+x).join('\n')}\n\n${r.shotsSent} frames sent. Review changes before applying.`;}catch(e){$('aiResults').textContent='AI error: '+e.message;}finally{b.disabled=false;}}
 async function previewAi(){try{await flushSave();const p=proposalText();const r=await request('ai/preview','POST',{proposal:p});proposalToken=r.approvalToken;proposalSnapshot=$('proposalJson').value;$('applyAiBtn').disabled=!r.count;$('aiResults').textContent=`${r.summary||'AI edit plan'}\n\n${r.changes.map(c=>'• '+c).join('\n')||'Advice only — no automatic edits.'}\n\nReview the track and clip changes above before approving.`;}catch(e){$('aiResults').textContent=e.message;}}
-async function applyAi(){if(!proposalToken||proposalSnapshot!==$('proposalJson').value)return toast('Preview the exact proposal first',true);if(!confirm('Apply the previewed edits to this timeline?'))return;try{await flushSave();const r=await request('ai/apply','POST',{proposal:proposalText(),approvalToken:proposalToken});state=r.state;selectedId=null;undoStack=[];redoStack=[];proposalToken=null;$('applyAiBtn').disabled=true;redraw();$('aiResults').textContent='Applied '+r.changes.length+' edits. Use Undo Last AI Apply to revert.';}catch(e){$('aiResults').textContent=e.message;}}
-async function undoAi(){if(!confirm('Undo last AI changes?'))return;try{const r=await request('ai/undo','POST',{});state=r.state;selectedId=null;undoStack=[];redoStack=[];redraw();$('aiResults').textContent='AI edits undone.';}catch(e){$('aiResults').textContent=e.message;}}
+async function applyAi(){if(!proposalToken||proposalSnapshot!==$('proposalJson').value)return toast('Preview the exact proposal first',true);if(!confirm('Apply the previewed edits to this timeline?'))return;try{await flushSave();const r=await request('ai/apply','POST',{proposal:proposalText(),approvalToken:proposalToken});snapshot();state=r.state;selectedId=null;proposalToken=null;$('applyAiBtn').disabled=true;redraw();$('aiResults').textContent='Applied '+r.changes.length+' edits. Use Undo Last AI Apply to revert.';}catch(e){$('aiResults').textContent=e.message;}}
+async function undoAi(){if(!confirm('Undo last AI changes?'))return;try{const r=await request('ai/undo','POST',{});redoStack.push(structuredClone({tracks:state.tracks,name:state.name,output:state.output}));undoStack.pop();state=r.state;selectedId=null;redraw();$('aiResults').textContent='AI edits undone. Ctrl+Y restores the approved edits.';}catch(e){$('aiResults').textContent=e.message;}}
 function setup(){
  setupReference();$('editCommands').onclick=commandDialog;
  let pendingScroll=false;

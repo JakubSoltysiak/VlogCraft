@@ -215,6 +215,8 @@ def relink_asset(aid,path):
 def cache_media(asset):
     create_thumbnail(asset)
     if asset.get('hasAudio'):
+        import audio_cache
+        audio_cache.build(asset,THUMBS/(cache_id(asset)+'.flac'))
         import waveform
         waveform.build(asset,THUMBS/(cache_id(asset)+'.wave.png'))
 
@@ -460,9 +462,20 @@ def run_export(snapshot,path,review=False):
         job_status('export',duration=engine.sequence_duration(snapshot))
 
         job_status('export',status='rendering',percent=1,message='Preparing timeline…',path=None,error=None)
-        engine.render(snapshot,dest,temp,review=review,cancelled=CANCEL['export'].is_set,
-                      popen=lambda c,d:exec_process(c,d,'export'),
-                      on_progress=lambda pct,msg:job_status('export',percent=pct,message=msg))
+        def deliver():
+            return engine.render(snapshot,dest,temp,review=review,cancelled=CANCEL['export'].is_set,
+                                 popen=lambda c,d:exec_process(c,d,'export'),
+                                 on_progress=lambda pct,msg:job_status('export',percent=pct,message=msg))
+        try:
+            deliver()
+        except Exception:
+            chosen=snapshot['output'].get('encoder','libx264')
+            if review or CANCEL['export'].is_set() or chosen.split('_')[-1] not in encoders.BACKENDS:raise
+            replacement=encoders.CODECS[chosen.split('_')[0]][0]
+            snapshot['output']['encoder']=replacement
+            fallback=' · used '+encoders.NAMES[replacement]+' after hardware encoder failure'
+            job_status('export',percent=1,message='Hardware encoder failed. Retrying with '+encoders.NAMES[replacement])
+            deliver()
         job_status('export',status='done',percent=100,path=str(dest),message='Export completed'+fallback)
     except Exception as ex:
         job_status('export',status='cancelled' if CANCEL['export'].is_set() else 'error',error=str(ex),message='Export stopped')
@@ -599,7 +612,7 @@ def prepare_proposal(proposal,base):
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version='VlogCraftStudio/3.2'
+    server_version='VlogCraftStudio/3.3'
     protocol_version='HTTP/1.1'
     def handle(self):
         try:super().handle()
@@ -667,8 +680,17 @@ class Handler(BaseHTTPRequestHandler):
             if path=='/api/encoders':return self.json_response(encoders.available())
             if path=='/api/jobs':
                 with JOB_LOCK:jobs=deepcopy(JOBS);jobs['proxy']['queued']=len(PROXY_QUEUE)
-                with LOCK:jobs['readyProxies']=[a['id'] for a in STATE['assets'] if proxy_path(a).is_file()]
+                with LOCK:
+                    jobs['readyProxies']=[a['id'] for a in STATE['assets'] if proxy_path(a).is_file()]
+                    jobs['readyAudio']=[a['id'] for a in STATE['assets'] if (THUMBS/(cache_id(a)+'.flac')).is_file()]
                 return self.json_response(jobs)
+            if path.startswith('/audio/'):
+                aid=path.rsplit('/',1)[-1]
+                with LOCK:a=next((a for a in STATE['assets'] if a['id']==aid),None)
+                if not a:return self.json_response({'error':'Missing audio'},404)
+                cached=THUMBS/(cache_id(a)+'.flac')
+                if not cached.is_file():return self.json_response({'error':'Audio cache is being prepared'},404)
+                return self.file_response(cached,'audio/flac')
             if path=='/api/motion/frame':
                 asset,clip=motion_source(parse_qs(parsed.query).get('clip',[''])[0])
                 cmd=['ffmpeg','-nostdin','-v','error','-ss',str(clip['start']),'-i',asset['path'],
@@ -707,7 +729,7 @@ class Handler(BaseHTTPRequestHandler):
                 if not target.exists():target=EXPORTS/name
                 return self.file_response(target)
             if path=='/' or path=='/index.html':return self.file_response(WEB/'index.html','text/html; charset=utf-8')
-            if path in ('/app.js','/studio.js','/animation.js','/motion.js','/timeline.js','/timebase.js','/edit_ops.js','/edit_commands.js','/monitor.js','/effects.js','/grade.js','/audio.js','/nesting.js','/source_frames.js','/style.css'):
+            if path in ('/app.js','/studio.js','/animation.js','/motion.js','/timeline.js','/timebase.js','/edit_ops.js','/edit_commands.js','/monitor.js','/playback_cache.js','/effects.js','/grade.js','/audio.js','/nesting.js','/source_frames.js','/style.css'):
                 return self.file_response(WEB/path.lstrip('/'))
             return self.json_response({'error':'Not found'},404)
         except (BrokenPipeError,ConnectionAbortedError,ConnectionResetError):return
@@ -894,6 +916,7 @@ class Handler(BaseHTTPRequestHandler):
                 if kind not in ('export','proxy','motion'):raise ValueError('Invalid job')
                 CANCEL[kind].set()
                 with JOB_LOCK:
+                    if kind=='proxy':PROXY_QUEUE.clear()
                     p=CURRENT_PROCESS[kind]
                     if p and p.poll() is None:p.terminate()
                 return self.json_response({'cancelRequested':True})

@@ -1,17 +1,51 @@
-# Architecture audit and implementation order
+# Architecture and continuation
 
-The 3.0 archive is preserved at the Git tag studio-3.0-original. Its server owns a single global dictionary, reads a broken project as a new empty project and shares jobs and caches between requests. Uploads already stream through bounded buffers and HTTP Range uses Python integers. Browser drops create a second copy. A nominal 50 TiB cap, track and clip ceilings and a four-hour limit are separate application restrictions.
+Development continues from the current 3.2 source snapshot, preserved at studio-3.2-source. The 3.1 Windows qualification remains at studio-3.1-verified. The extracted archive is at studio-3.0-original.
 
-The HTML editor supports layered browser playback, independent audio, trim, split, local undo, titles and grades. Its timing model stores decimal seconds. Snapping includes the candidate itself in the minimum-distance comparison. The monitor uses independent HTML media clocks with periodic correction and CSS grading. It cannot serve as the reference compositor. The timeline rebuilds all clips on selection and playback scans every track. The interface hides the inspector at narrow widths.
+## Retained architecture
 
-FFmpeg already probes original sources, creates proxies and composites overlapping tracks. Each cut starts a new encode and AAC priming can accumulate across joins. The baseline fails both export tests with FFmpeg 9, which removed filter_complex_script. A segment render is practical for offline delivery but has no continuous audio clock for interactive preview. MLT's producer/playlist/tractor/consumer architecture is a candidate for shared playback and export. Adopting it requires testing Windows codec packaging, timestamp mapping and effect parity. OpenCV is suitable for feature analysis in background workers, with results stored in the project and rendered separately.
+Each WebView2 window owns a loopback service, project cache and exclusive Windows file lock. Native drop paths link originals. Browser upload streams bounded chunks with 64-bit offsets. Local workers create thumbnails, waveforms, proxies and preview audio. FFmpeg processes render and encode original sources. Existing project commands, media relinking, offline review and explicit AI approval remain the product entry points.
 
-Keep the existing 3.0 UI, import endpoints, compatible project documents and the optional AI bridge while building the desktop host. Use WebView2 for the editing surface and native Windows drops. Keep FFmpeg and FFprobe in separate processes. The optional online bridge remains opt-in. Core regression uses only local fixtures.
+The archive's decimal timeline, unvalidated recovery, independent media clocks and fragmented browser playback needed repair before further interface expansion. Replacing the host would introduce unrelated compatibility work. A continuous native producer/compositor remains the next major transport change, with MLT as one candidate requiring a Windows packaging and color/timestamp parity prototype.
 
-## Delivery order
+## Timing and edit transactions
 
-1. Repair and measure render timing. Validate a real, allocated large source and 4K60 output.
-2. Add durable saves with recoverable revisions and failure tests. Expose relinking and versioned project operations.
-3. Wrap the editor in a Windows desktop host. Link Explorer drops to originals, keep browser chunk upload as a fallback, automate proxies and expose source/proxy selection.
-4. Build a private per-user installer and test installation, desktop launch and removal in an isolated test data directory.
-5. Advance frame-based edits, timeline controls, shared preview/effect evaluation and regression coverage. Qualify larger changes with the feature matrix before release.
+timing.py stores exact Fraction rates. Schema 4 includes integer sequence-frame positions and source ticks with per-asset time bases. Readable seconds remain for API compatibility. Versions 2 and 3 migrate in memory. The first rational save preserves .v3.bak, while normal .bak publication retains recovery behavior.
+
+source_frames.py streams original presentation timestamps into an atomic disk index and binary-searches it through mmap. Source frame stepping uses original ticks, including held VFR frames. Out marks use the following PTS. Rendering retains a held picture at a non-frame boundary, evaluates output cadence before effects, and budgets 48 kHz audio samples at absolute sequence-frame boundaries.
+
+web/edit_ops.js clones, validates and commits a whole command. Locks, source handles and linked partners constrain operations. Roll, slip, slide, source insertion, overwrite, multiselection and linked camera audio share these primitives. Nested trees project into namespaced playback/render tracks. Expand restores child tracks for editing. Inline pass-through nesting preserves track order and gain but lacks a reusable sequence-reference graph.
+
+## Playback and shared reference
+
+The interactive transport uses AudioContext as its clock, soft rate correction for small media drift and hard seeks for larger drift. Original-media reference frames and paused scopes use the same segment compositor as export.
+
+3.3 adds four pooled video elements and up to four prepared upcoming clips. Eviction disconnects audio nodes and releases media sources. The timeline uses interval indices and viewport culling. Independent audio tracks select a lossless stereo FLAC preview cache, avoiding redundant full-video reads. Cache extraction streams through FFmpeg and publishes by rename. Shutdown cancels active cache processes. Export always reads originals.
+
+Browser playback remains the architectural performance limit. Rapid cuts still produce visible stalls, and original 4K60 can drop frames. Live CSS color/geometry and WebAudio processors differ from the FFmpeg reference. Preview caches do not alter export settings. Sample locking, uninterrupted short-cut decoding and managed display color require a shared continuous transport.
+
+## Compositing, color and motion
+
+Animation expressions share source-time coordinates across trims, speed changes and render segments. Animated alpha, rotation, scale and primary controls, chroma key, ellipse masks and directional wipes run through video_effects.py. grading.py embeds validated SDR cube assets and compiles RGB/master curves and tonal-wheel balance into an FFmpeg LUT. The live monitor samples the same table at reduced spatial resolution. Paused scopes measure the composited reference image.
+
+Motion analysis uses reduced original frames, forward/backward flow validation and feature consensus. Optional robust partial-affine estimation adds camera roll. The application stores source-time correction keys and zoom compensation. Synthetic tests establish known-displacement/roll behavior. Field footage and complex occlusion remain unqualified.
+
+## Rendering and hardware
+
+FFmpeg composites segments on CPU and encodes using a tested local backend. PCM intermediate audio avoids repeated AAC priming. Final muxing encodes AAC once and atomically replaces the requested destination. Original media paths are protected from export replacement.
+
+Runtime probes exercise actual encoders. AMD AMF output is decoded and checked. QSV and NVENC appear only when their probes pass. A failing hardware export retries once with the corresponding CPU codec while retaining project settings and destination atomicity. Tests inject device failure and verify fallback. Complete hardware decoding/filtering is outstanding.
+
+Windows PDH counters collect process-tree GPU engine utilization alongside CPU, working set and I/O. Near-zero driver counters do not establish a GPU-free processing path. Actual selected encoder, valid output and throughput are reported separately. CPU composition remains explicit.
+
+## Offline AI and consent
+
+review_packet.py exports a complete nested manifest and original-media program frames. The user can select the playhead frame. timeline_proposal.py resolves explicit sequence paths and track/clip IDs, validates properties and protects locked ancestors. A digest binds approval to the exact project and proposal. Applying saves a durable undo record. Approved edits also enter ordinary undo/redo.
+
+The optional legacy online connector is preserved at the user's request. Its main-track scope is stated in README and the feature matrix. No live or paid request is part of qualification. Migrating that connector requires a separate integration change.
+
+## Verification and remaining work
+
+VERIFICATION.md is the release report. Test tools preserve logs and measurement JSON under build/qa. Windows lifecycle tests hash project/settings documents through upgrade, removal and reinstall. A subprocess deliberately exits before project replacement to check crash recovery. Large native tests use actual allocated media and additional NTFS hard-link paths.
+
+Priority work is a continuous playback prototype, a real camera acceptance corpus, one-hour synchronization, cache eviction, cancellable probing, clean-Windows and multiple-GPU validation, then HDR/interchange and professional finishing. The current release retains these blockers in FEATURES.md.

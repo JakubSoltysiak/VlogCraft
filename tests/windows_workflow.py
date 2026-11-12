@@ -3,6 +3,7 @@ import argparse
 import ctypes
 import json
 import io
+import zipfile
 from PIL import Image,ImageChops,ImageStat
 from performance import Resources
 import os
@@ -182,6 +183,16 @@ def test(executable, source, results, record_visual=False):
                 proposal=page.evaluate("""()=>({schema:'vlogcraft.timeline/1',actions:[{type:'edit_clip',
                     trackId:sel().track.id,clipId:sel().clip.id,set:{grade:'warm'}}]})""")
                 page.locator('#aiBtn').click()
+                page.locator('#reviewCurrentFrame').check()
+                page.locator('#reviewPackBtn').click()
+                page.wait_for_function("!document.querySelector('#reviewPackLink').hidden")
+                href=page.locator('#reviewPackLink').get_attribute('href')
+                packet=context.request.get(page.url.rstrip('/')+href).body()
+                with zipfile.ZipFile(io.BytesIO(packet)) as archive:
+                    manifest=json.loads(archive.read('multitrack_manifest.json'))
+                    assert len(manifest['tracks'])==len(page.evaluate('state.tracks'))
+                    assert len([n for n in archive.namelist() if n.startswith('frames/')])==1
+                summary['selected_frame_multitrack_pack']=True
                 page.locator('#proposalJson').fill(json.dumps(proposal))
                 page.locator('#previewAiBtn').click()
                 page.wait_for_function("!document.querySelector('#applyAiBtn').disabled")
@@ -192,9 +203,30 @@ def test(executable, source, results, record_visual=False):
                 page.locator('#undoAiBtn').click()
                 page.wait_for_function("state.tracks.flatMap(t=>t.clips)[0].grade==='neutral'")
                 page.locator('[data-close="aiModal"]').first.click()
+                # Ctrl+Y restores the last approved edit after the explicit AI undo.
+                page.locator('#redoBtn').click()
+                page.wait_for_function("state.tracks.flatMap(t=>t.clips)[0].grade==='warm'")
+                page.locator('#undoBtn').click()
+                page.evaluate('flushSave()')
                 page.reload()
                 page.wait_for_function("state?.assets.length===1 && state.tracks.flatMap(t=>t.clips).length===1")
                 assert page.evaluate("Math.abs(state.tracks.flatMap(t=>t.clips)[0].start-4.6)<1e-6")
+                assert not errors,errors
+                # Distinct native paths share this allocated test fixture through NTFS hard links.
+                # The editor must link both paths and must never copy their multi-GB contents.
+                batch_meter=Resources(p.pid)
+                batch_paths=[Path(testdir)/'second-camera.mov',Path(testdir)/'third-camera.mov']
+                for path in batch_paths:os.link(source,path)
+                multi_drop={'items':[],'files':[str(path) for path in batch_paths],'dragOperationsMask':1}
+                for event in ('dragEnter','dragOver','drop'):
+                    dev.send('Input.dispatchDragEvent',{'type':event,'x':390,'y':210,'data':multi_drop})
+                page.wait_for_function('state.assets.length===3 && state.tracks.flatMap(t=>t.clips).length===3')
+                assert not list((project.parent/(project.name+'.data')/'media').iterdir())
+                page.evaluate("request('job/cancel','POST',{job:'proxy'})")
+                page.wait_for_function("(async()=>{const j=await request('jobs');return j.proxy.status!=='rendering'&&j.proxy.queued===0;})()")
+                page.evaluate("(async()=>{for(const a of state.assets.slice(1))await request('proxy','POST',{assetId:a.id});})()")
+                page.wait_for_function('readyProxies.size===3',timeout=120000)
+                summary.update(ai_redo=True,multiple_large_native_paths=True,proxy_cancel_retry=True,batch_resources=batch_meter.finish())
                 assert not errors,errors
                 summary.update(installed_motion_apply_undo=True,offline_proposal_approve_undo=True,
                                source_monitor=True,project_reload=True)
@@ -212,7 +244,9 @@ def test(executable, source, results, record_visual=False):
                 return True
             callback=ctypes.WINFUNCTYPE(ctypes.c_bool,ctypes.c_void_p,ctypes.c_void_p)(close_window)
             ctypes.windll.user32.EnumWindows(callback,0)
-            try:p.wait(timeout=12)
+            try:
+                p.wait(timeout=12)
+                assert p.returncode==0,('Native host exit',p.returncode)
             except subprocess.TimeoutExpired:
                 p.terminate()
                 p.wait()

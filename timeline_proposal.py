@@ -2,7 +2,7 @@
 from copy import deepcopy
 
 SCHEMA='vlogcraft.timeline/1'
-PROPERTIES={'start','end','position','speed','opacity','volume','scale','x','y','fadeIn','fadeOut','grade','fit','keys','rotation','brightness','contrast','saturation','pan','bass','treble','compress','mask','maskRadius','feather','chroma','keyColor','keyBlend','similarity'}
+PROPERTIES={'start','end','position','speed','opacity','volume','scale','x','y','fadeIn','fadeOut','grade','fit','keys','rotation','brightness','contrast','saturation','pan','bass','treble','compress','mask','maskRadius','feather','chroma','keyColor','keyBlend','similarity','look','lutId','wipe','wipeDuration'}
 
 
 def apply(proposal,state,validate):
@@ -41,7 +41,7 @@ def apply(proposal,state,validate):
         for name,value in props.items():
             if name in ('muted','hidden','chroma'):
                 if type(value) is not bool:raise ValueError('Track switches require a boolean')
-            elif name not in ('grade','fit','keys','mask','keyColor') and type(value) not in (int,float):
+            elif name not in ('grade','fit','keys','mask','keyColor','look','lutId','wipe') and type(value) not in (int,float):
                 raise ValueError('Expected a numeric value')
             old=obj.get(name)
             obj[name]=deepcopy(value)

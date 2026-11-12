@@ -125,7 +125,7 @@ def segment_command(state, start, end, target, jobdir, quality='final'):
     nframes=timing.frame_at(end,fps)-timing.frame_at(start,fps)
     samples=timing.sample_at(timing.frame_at(end,fps),fps)-timing.sample_at(timing.frame_at(start,fps),fps)
     video,audio=active_clips(state,start,end)
-    cmd=['ffmpeg','-hide_banner','-nostdin','-loglevel','error','-filter_complex_threads','4','-y',
+    cmd=['ffmpeg','-hide_banner','-nostdin','-loglevel','error','-filter_complex_threads','1','-y',
          '-f','lavfi','-i',f'color=c=0x10131a:s={w}x{h}:r={fps}:d={_num(duration)}',
          '-f','lavfi','-i',f'anullsrc=channel_layout=stereo:sample_rate=48000:d={_num((samples+2)/48000)}']
     filters=['[0:v]format=yuv420p[back0]']; last='back0'; audio_labels=['1:a']; count=0

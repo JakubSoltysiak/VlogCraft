@@ -1,6 +1,7 @@
 /* Desktop commands and media job feedback. The server owns paths and cache state. */
 let linking = false;
-let readyProxies = new Set();
+let readyProxies = new Set(),readyAudio=new Set();
+function audioUrl(id){return readyAudio.has(id)?'/audio/'+id+'?v='+(assetById(id)?.cacheId||id):seekUrl(id);}
 let useProxies = localStorage.getItem('useProxies') !== 'false';
 
 async function importNative(paths) {
@@ -37,6 +38,7 @@ async function importNative(paths) {
 }
 
 function refreshPlayers() {
+  clearPlaybackCache();
   for (const player of activePlayers.values()) {
     player.media?.pause?.();releaseStrip(player.media);
     player.wrap.remove();
@@ -51,6 +53,10 @@ async function watchMediaJobs() {
   try {
     const jobs = await request('jobs');
     const proxy = jobs.proxy;
+    const audio=new Set(jobs.readyAudio||[]),audioChanged=[...audio].some(id=>!readyAudio.has(id));
+    readyAudio=audio;
+    if(audioChanged)for(const [id,media] of audioPlayers){const c=programTracks.flatMap(t=>t.clips).find(c=>c.id===id);
+      if(c&&readyAudio.has(c.assetId)){media.src=audioUrl(c.assetId);syncPreview(true);}}
     if(jobs.motion.status==='rendering' && $('motionInfo'))$('motionInfo').textContent='Analyzing source frames · '+jobs.motion.percent+'%';
     const ready = new Set(jobs.readyProxies);
     const changed = [...ready].some(id => !readyProxies.has(id)) || ready.size !== readyProxies.size;
