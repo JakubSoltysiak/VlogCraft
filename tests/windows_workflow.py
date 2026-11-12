@@ -23,7 +23,7 @@ def probe(path, *args):
     return json.loads(subprocess.check_output(['ffprobe','-v','error',*args,'-of','json',str(path)]))
 
 
-def test(executable, source, results, record_visual=False):
+def test(executable, source, results, record_visual=False, second_source=None):
     results.mkdir(parents=True,exist_ok=True)
     with tempfile.TemporaryDirectory(prefix='workflow-', dir=results, ignore_cleanup_errors=True) as testdir:
         project = Path(testdir)/(Path(testdir).name+'.vlogcraft')
@@ -216,7 +216,7 @@ def test(executable, source, results, record_visual=False):
                 # The editor must link both paths and must never copy their multi-GB contents.
                 batch_meter=Resources(p.pid)
                 batch_paths=[Path(testdir)/'second-camera.mov',Path(testdir)/'third-camera.mov']
-                for path in batch_paths:os.link(source,path)
+                for i,path in enumerate(batch_paths):os.link(second_source if second_source and i==0 else source,path)
                 multi_drop={'items':[],'files':[str(path) for path in batch_paths],'dragOperationsMask':1}
                 for event in ('dragEnter','dragOver','drop'):
                     dev.send('Input.dispatchDragEvent',{'type':event,'x':390,'y':210,'data':multi_drop})
@@ -226,7 +226,7 @@ def test(executable, source, results, record_visual=False):
                 page.wait_for_function("(async()=>{const j=await request('jobs');return j.proxy.status!=='rendering'&&j.proxy.queued===0;})()")
                 page.evaluate("(async()=>{for(const a of state.assets.slice(1))await request('proxy','POST',{assetId:a.id});})()")
                 page.wait_for_function('readyProxies.size===3',timeout=120000)
-                summary.update(ai_redo=True,multiple_large_native_paths=True,proxy_cancel_retry=True,batch_resources=batch_meter.finish())
+                summary.update(ai_redo=True,multiple_large_native_paths=True,batch_independent_source=bool(second_source),proxy_cancel_retry=True,batch_resources=batch_meter.finish())
                 assert not errors,errors
                 summary.update(installed_motion_apply_undo=True,offline_proposal_approve_undo=True,
                                source_monitor=True,project_reload=True)
@@ -259,5 +259,6 @@ if __name__=='__main__':
     parser.add_argument('source',type=Path)
     parser.add_argument('results',type=Path)
     parser.add_argument('--record-visual',action='store_true')
+    parser.add_argument('--second-source',type=Path)
     args=parser.parse_args()
-    test(args.executable.resolve(),args.source.resolve(),args.results.resolve(),args.record_visual)
+    test(args.executable.resolve(),args.source.resolve(),args.results.resolve(),args.record_visual,args.second_source.resolve() if args.second_source else None)

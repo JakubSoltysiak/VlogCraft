@@ -3,6 +3,7 @@ import argparse
 import ctypes
 import json
 import os
+import psutil
 from pathlib import Path
 import socket
 import subprocess
@@ -30,10 +31,50 @@ def fixtures(folder):
     return files
 
 
-MEASURE = "async seconds=>{\n  const frames=[],drifts=[],audioDrifts=[],callbackGaps=[],gaps=[];\n  let last=performance.now(),active=true,total=0,dropped=0;\n  const quality=new Map(),subscriptions=new WeakMap();\n  function observe(v){\n    if(quality.has(v))return;\n    quality.set(v,v.getVideoPlaybackQuality());\n    const token={};subscriptions.set(v,token);let prev=null;\n    const report=(now,meta)=>{\n      if(!active||!v.isConnected||subscriptions.get(v)!==token)return;\n      if(prev!==null)callbackGaps.push(now-prev);prev=now;\n      frames.push(meta.mediaTime);v.requestVideoFrameCallback(report);\n    };v.requestVideoFrameCallback(report);\n  }\n  function count(v){const q=quality.get(v),end=v.getVideoPlaybackQuality();\n    total+=Math.max(0,end.totalVideoFrames-q.totalVideoFrames);\n    dropped+=Math.max(0,end.droppedVideoFrames-q.droppedVideoFrames);quality.set(v,end);}\n  const tick=()=>{\n    if(!active)return;\n    for(const [v] of quality)if(!v.isConnected){count(v);quality.delete(v);}\n    const now=performance.now();gaps.push(now-last);last=now;\n    for(const p of activePlayers.values())if(p.media?.tagName==='VIDEO'){\n      observe(p.media);\n      const clip=programTracks.flatMap(t=>t.clips).find(c=>c.id===p.clipId);\n      if(clip&&!p.media.seeking)drifts.push(Math.abs(p.media.currentTime-(clip.start+(playhead-clip.position)*clip.speed)));\n    }\n    for(const [id,media] of audioPlayers){\n      const clip=programTracks.flatMap(t=>t.clips).find(c=>c.id===id);\n      if(clip&&!media.seeking)audioDrifts.push(Math.abs(media.currentTime-(clip.start+(playhead-clip.position)*clip.speed)));\n    }requestAnimationFrame(tick);\n  };requestAnimationFrame(tick);\n  await new Promise(resolve=>setTimeout(resolve,seconds*1000));active=false;\n  const p95=a=>{a.sort((x,y)=>x-y);return a.length?a[Math.floor((a.length-1)*.95)]:null;};\n  for(const [v] of quality)count(v);\n  return {measured_seconds:seconds,video_frame_callbacks:frames.length,callbacks_per_second:frames.length/seconds,\n    decoded_frames:total,dropped_video_frames:dropped,ui_animation_fps:gaps.length/seconds,\n    ui_frame_gap_p95_ms:p95(gaps),video_callback_gap_p95_ms:p95(callbackGaps),\n    media_clock_drift_p95_ms:drifts.length?p95(drifts)*1000:null,\n    audio_clock_drift_p95_ms:audioDrifts.length?p95(audioDrifts)*1000:null,\n    context_state:mixer?.state,peak_meter_db:Number($('masterMeter').value)};\n}"
+MEASURE = """async seconds=>{
+  const frames=[],drifts=[],audioDrifts=[],callbackGaps=[],gaps=[];
+  let last=performance.now(),active=true,total=0,dropped=0;
+  const quality=new Map(),subscriptions=new WeakMap();
+  function observe(v){
+    if(quality.has(v))return;
+    quality.set(v,v.getVideoPlaybackQuality());
+    const token={};subscriptions.set(v,token);let prev=null;
+    const report=(now,meta)=>{
+      if(!active||!v.isConnected||subscriptions.get(v)!==token)return;
+      if(prev!==null)callbackGaps.push(now-prev);prev=now;
+      frames.push(meta.mediaTime);v.requestVideoFrameCallback(report);
+    };v.requestVideoFrameCallback(report);
+  }
+  function count(v){const q=quality.get(v),end=v.getVideoPlaybackQuality();
+    total+=Math.max(0,end.totalVideoFrames-q.totalVideoFrames);
+    dropped+=Math.max(0,end.droppedVideoFrames-q.droppedVideoFrames);quality.set(v,end);}
+  const tick=()=>{
+    if(!active)return;
+    for(const [v] of quality)if(!v.isConnected){count(v);quality.delete(v);}
+    const now=performance.now();gaps.push(now-last);last=now;
+    for(const p of activePlayers.values())if(p.media?.tagName==='VIDEO'){
+      observe(p.media);
+      const clip=programTracks.flatMap(t=>t.clips).find(c=>c.id===p.clipId);
+      if(clip&&!p.media.seeking)drifts.push(Math.abs(p.media.currentTime-(clip.start+(playhead-clip.position)*clip.speed)));
+    }
+    for(const [id,media] of audioPlayers){
+      const clip=programTracks.flatMap(t=>t.clips).find(c=>c.id===id);
+      if(clip&&!media.seeking)audioDrifts.push(Math.abs(media.currentTime-(clip.start+(playhead-clip.position)*clip.speed)));
+    }requestAnimationFrame(tick);
+  };requestAnimationFrame(tick);
+  await new Promise(resolve=>setTimeout(resolve,seconds*1000));active=false;
+  const p95=a=>{a.sort((x,y)=>x-y);return a.length?a[Math.floor((a.length-1)*.95)]:null;};
+  for(const [v] of quality)count(v);
+  return {measured_seconds:seconds,video_frame_callbacks:frames.length,callbacks_per_second:frames.length/seconds,
+    decoded_frames:total,dropped_video_frames:dropped,ui_animation_fps:gaps.length/seconds,
+    ui_frame_gap_p95_ms:p95(gaps),video_callback_gap_p95_ms:p95(callbackGaps),
+    media_clock_drift_p95_ms:drifts.length?p95(drifts)*1000:null,
+    audio_clock_drift_p95_ms:audioDrifts.length?p95(audioDrifts)*1000:null,
+    context_state:mixer?.state,peak_meter_db:Number($('masterMeter').value)};
+}"""
 
 
-def run(executable, folder, results):
+def run(executable, folder, results,scenario=None):
     media = fixtures(folder)
     results.mkdir(parents=True, exist_ok=True)
     records = []
@@ -69,8 +110,13 @@ def run(executable, folder, results):
                 page.evaluate('assets=>{state.assets=assets;useProxies=false}', response['assets'])
                 page.wait_for_function("(async()=>{const jobs=await request('jobs');return jobs.readyAudio.length===3;})()")
                 scenarios = [('1080p60', 0, 1, 7), ('4k30', 1, 1, 7), ('4k60', 2, 1, 7),
-                             ('4k60-3video-3audio-effects', 2, 3, 9), ('1080p60-stabilized', 0, 1, 7), ('10minute-1500clips', 0, 1, 70)]
+                             ('4k60-3video-3audio-effects', 2, 3, 9), ('1080p60-stabilized', 0, 1, 7), ('10minute-1500clips', 0, 1, 70), ('4k60-3video-3audio-proxy', 2, 3, 9)]
                 for name, index, layers, seconds in scenarios:
+                    if scenario and name!=scenario:continue
+                    if name.endswith('-proxy'):
+                        page.evaluate("(async()=>{for(const a of state.assets)await request('proxy','POST',{assetId:a.id});})()")
+                        page.wait_for_function('readyProxies.size===3',timeout=180000)
+                    page.evaluate('enabled=>{useProxies=enabled;refreshPlayers()}',name.endswith('-proxy'))
                     page.evaluate("""({index,layers,long})=>{
                       stopPlayback();state.output.fps=60;
                       const trackTemplate=(type,n)=>({id:uid(),type,name:type+' '+n,volume:1,hidden:false,muted:false,solo:false,locked:false,clips:[]});
@@ -127,10 +173,14 @@ def run(executable, folder, results):
                 page.evaluate('flushSave()')
         finally:
             # Close the window of this isolated benchmark, with no other editor affected.
+            try:family={process.pid,*[p.pid for p in psutil.Process(process.pid).children(recursive=True)]}
+            except psutil.Error:family={process.pid}
             def close(hwnd, _):
+                owner=ctypes.c_ulong()
+                ctypes.windll.user32.GetWindowThreadProcessId(hwnd,ctypes.byref(owner))
                 title=ctypes.create_unicode_buffer(256)
                 ctypes.windll.user32.GetWindowTextW(hwnd,title,len(title))
-                if title.value=='VlogCraft Studio • '+project.stem:
+                if owner.value in family and title.value=='VlogCraft Studio • '+project.stem:
                     ctypes.windll.user32.PostMessageW(hwnd,0x10,0,0)
                 return True
             callback=ctypes.WINFUNCTYPE(ctypes.c_bool,ctypes.c_void_p,ctypes.c_void_p)(close)
@@ -145,5 +195,6 @@ if __name__ == '__main__':
     parser.add_argument('executable',type=Path)
     parser.add_argument('media',type=Path)
     parser.add_argument('results',type=Path)
+    parser.add_argument('--scenario')
     args=parser.parse_args()
-    run(args.executable.resolve(),args.media.resolve(),args.results.resolve())
+    run(args.executable.resolve(),args.media.resolve(),args.results.resolve(),args.scenario)

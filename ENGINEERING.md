@@ -22,7 +22,7 @@ The interactive transport uses AudioContext as its clock, soft rate correction f
 
 3.3 adds four pooled video elements and up to four prepared upcoming clips. Eviction disconnects audio nodes and releases media sources. The timeline uses interval indices and viewport culling. Independent audio tracks select a lossless stereo FLAC preview cache, avoiding redundant full-video reads. Cache extraction streams through FFmpeg and publishes by rename. Shutdown cancels active cache processes. Export always reads originals.
 
-Browser playback remains the architectural performance limit. Rapid cuts still produce visible stalls, and original 4K60 can drop frames. Live CSS color/geometry and WebAudio processors differ from the FFmpeg reference. Preview caches do not alter export settings. Sample locking, uninterrupted short-cut decoding and managed display color require a shared continuous transport.
+Browser playback remains the architectural performance limit. The installed rapid-cut run averaged 57.6 presentation callbacks/s over 70 seconds. Original 4K60 drops frames and multiple original-media layers can stall. Live CSS color/geometry and WebAudio processors differ from the FFmpeg reference. Preview caches do not alter export settings. Sample locking, uninterrupted short-cut decoding and managed display color require a shared continuous transport.
 
 ## Compositing, color and motion
 
@@ -32,7 +32,7 @@ Motion analysis uses reduced original frames, forward/backward flow validation a
 
 ## Rendering and hardware
 
-FFmpeg composites segments on CPU and encodes using a tested local backend. PCM intermediate audio avoids repeated AAC priming. Final muxing encodes AAC once and atomically replaces the requested destination. Original media paths are protected from export replacement.
+FFmpeg composites segments on CPU and encodes using a tested local backend. A single complex-filter worker avoids a reproduced FFmpeg 9 scheduling stall with titles and mixed audio. PCM intermediate audio avoids repeated AAC priming. Final muxing encodes AAC once and atomically replaces the requested destination. Original media paths are protected from export replacement.
 
 Runtime probes exercise actual encoders. AMD AMF output is decoded and checked. QSV and NVENC appear only when their probes pass. A failing hardware export retries once with the corresponding CPU codec while retaining project settings and destination atomicity. Tests inject device failure and verify fallback. Complete hardware decoding/filtering is outstanding.
 
@@ -46,6 +46,6 @@ The optional legacy online connector is preserved at the user's request. Its mai
 
 ## Verification and remaining work
 
-VERIFICATION.md is the release report. Test tools preserve logs and measurement JSON under build/qa. Windows lifecycle tests hash project/settings documents through upgrade, removal and reinstall. A subprocess deliberately exits before project replacement to check crash recovery. Large native tests use actual allocated media and additional NTFS hard-link paths.
+VERIFICATION.md is the release report. Test tools preserve logs and measurement JSON under build/qa. Windows lifecycle tests hash project/settings documents through upgrade, removal and reinstall. A subprocess deliberately exits before project replacement to check crash recovery. Large native tests use actual allocated media and additional NTFS paths into two independently allocated large sources.
 
 Priority work is a continuous playback prototype, a real camera acceptance corpus, one-hour synchronization, cache eviction, cancellable probing, clean-Windows and multiple-GPU validation, then HDR/interchange and professional finishing. The current release retains these blockers in FEATURES.md.
