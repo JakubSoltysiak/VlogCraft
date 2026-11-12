@@ -28,9 +28,9 @@ class ContinuousPreviewTests(unittest.TestCase):
             s['tracks'][0]['clips']=[title]
             segmented=root/'reference.mp4';engine.render(s,segmented,root/'reference')
             continuous=root/'continuous.mp4';work=root/'continuous';work.mkdir()
-            command=engine.segment_command(s,0,1,continuous,work,'preview')
-            self.assertEqual(sum(arg==str(source) for arg in command),2,'Matching AV ranges should share their decoder')
-            subprocess.run(command,cwd=work,capture_output=True,check=True,timeout=20)
+            command=engine.segment_command(s,0,1,continuous,work,'preview','video')
+            self.assertEqual(sum(arg==str(source) for arg in command),2,'Matching ranges share decoders within each stream type')
+            engine.render_range(s,0,1,continuous,work,'preview',lambda c,w:subprocess.run(c,cwd=w,capture_output=True,check=True,timeout=20))
             def video(path):
                 raw=subprocess.check_output(['ffmpeg','-v','error','-i',str(path),'-an','-pix_fmt','rgb24','-f','rawvideo','-'])
                 return np.frombuffer(raw,np.uint8).reshape(-1,72,128,3).astype(float)

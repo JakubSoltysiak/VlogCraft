@@ -42,7 +42,7 @@ class PreviewCache:
             stat=path.stat() if path.is_file() else None
             files.append([asset['id'],str(path),stat.st_size if stat else None,
                           stat.st_mtime_ns if stat else None,original.st_mtime_ns if original else None])
-        revision=hashlib.sha256(json.dumps(['program-preview/3.4/1',identity,files,width],sort_keys=True).encode()).hexdigest()
+        revision=hashlib.sha256(json.dumps(['program-preview/3.4/2',identity,files,width],sort_keys=True).encode()).hexdigest()
         block=round(float(rate)*8)
         first=frame//block*block
         last=min(first+block,total)
@@ -85,30 +85,8 @@ class PreviewCache:
         try:
             with tempfile.TemporaryDirectory(dir=self.folder,prefix='range-') as directory:
                 work=Path(directory);dest=work/'program.mp4'
-                command=render_engine.segment_command(state,job['start'],job['end'],dest,work,'preview')
-                command=[command[0],'-progress','pipe:1',*command[1:]]
-                with tempfile.TemporaryFile() as errors:
-                    with self.guard:
-                        if job['cancel'].is_set():return
-                        process=subprocess.Popen(command,cwd=work,stdout=subprocess.PIPE,stderr=errors,
-                                                 creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
-                        job['process']=process
-                    try:
-                        for line in process.stdout:
-                            if line.startswith(b'out_time_us='):
-                                try:seconds=int(line.split(b'=')[1])/1e6
-                                except ValueError:continue
-                                with self.guard:job['percent']=min(99,round(100*seconds/(job['end']-job['start'])))
-                        result=process.wait()
-                        if job['cancel'].is_set():return
-                        if result:
-                            errors.seek(0,2);errors.seek(max(0,errors.tell()-1600))
-                            raise RuntimeError(errors.read().decode(errors='replace'))
-                    finally:
-                        if process.poll() is None:
-                            process.kill();process.wait()
-                        process.stdout.close()
-                        with self.guard:job['process']=None
+                render_engine.render_range(state,job['start'],job['end'],dest,work,'preview',
+                                           lambda command,cwd:self._execute(job,command,cwd))
                 with self.guard:
                     if job['cancel'].is_set():return
                     os.replace(dest,job['path']);job.update(status='ready',percent=100)
@@ -116,6 +94,35 @@ class PreviewCache:
         except Exception as error:
             with self.guard:
                 if not job['cancel'].is_set():job.update(status='error',error=str(error))
+
+    def _execute(self,job,command,cwd):
+        stage=job.get('_stage',0)
+        offsets=(0,85,95);weights=(85,10,4)
+        command=[command[0],'-progress','pipe:1',*command[1:]]
+        with tempfile.TemporaryFile() as errors:
+            with self.guard:
+                if job['cancel'].is_set():raise RuntimeError('Preview cancelled')
+                process=subprocess.Popen(command,cwd=cwd,stdout=subprocess.PIPE,stderr=errors,
+                                         creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
+                job['process']=process
+            try:
+                for line in process.stdout:
+                    if line.startswith(b'out_time_us='):
+                        try:seconds=int(line.split(b'=')[1])/1e6
+                        except ValueError:continue
+                        percent=offsets[stage]+weights[stage]*seconds/(job['end']-job['start'])
+                        with self.guard:job['percent']=min(99,round(percent))
+                result=process.wait()
+                if job['cancel'].is_set():raise RuntimeError('Preview cancelled')
+                if result:
+                    errors.seek(0,2);errors.seek(max(0,errors.tell()-1600))
+                    raise RuntimeError(errors.read().decode(errors='replace'))
+                job['_stage']=stage+1
+            finally:
+                if process.poll() is None:
+                    process.kill();process.wait()
+                process.stdout.close()
+                with self.guard:job['process']=None
 
     def _prune(self):
         # Account for complete cache files left by earlier application sessions.
@@ -144,7 +151,7 @@ class PreviewCache:
         with self.guard:
             job=self.jobs.get(key)
             if not job:raise ValueError('Preview range expired')
-            return {k:v for k,v in job.items() if k not in ('cancel','process','path')}|{'url':'/preview/'+key+'.mp4'}
+            return {k:v for k,v in job.items() if k not in ('cancel','process','path') and not k.startswith('_')}|{'url':'/preview/'+key+'.mp4'}
 
     def path(self,key):
         with self.guard:

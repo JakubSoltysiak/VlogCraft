@@ -102,11 +102,14 @@ def _add_audio(filters, input_idx, track, clip, start, end, dur, label):
                    f"volume='{_num(track.get('volume',1))}*{gain}':eval=frame{afades},apad,"
                    f'atrim=duration={_num(dur)},asetpts=PTS-STARTPTS[{label}]')
 
-def _media_input(cmd, path, kind, at, speed, dur, fps):
+def _media_input(cmd, path, kind, at, speed, dur, fps, media_type):
     if kind=='image':
         cmd.extend(['-loop','1','-framerate',str(fps),'-i',str(path)])
     else:
-        cmd.extend(['-ss',_num(math.ceil(at*1_000_000-1e-8)/1_000_000),'-noaccurate_seek','-i',str(path)])
+        # Serial decoding avoids a reproduced multi-input FFmpeg drain stall.
+        # Keep preroll intact so held VFR and fractional-frame cuts remain correct.
+        cmd.extend(['-ss',_num(math.ceil(at*1_000_000-1e-8)/1_000_000),'-noaccurate_seek',
+                    '-threads','1','-an' if media_type=='video' else '-vn','-i',str(path)])
 
 def _fade_video(clip, start, dur):
     fi=float(clip.get('fadeIn',0)); fo=float(clip.get('fadeOut',0))
@@ -117,7 +120,7 @@ def _fade_video(clip, start, dur):
     fade+=',setpts=PTS-STARTPTS'
     return fade
 
-def segment_command(state, start, end, target, jobdir, quality='final'):
+def segment_command(state, start, end, target, jobdir, quality='final', stream=None):
     state=sequences.playback(state)
     assets={a['id']:a for a in state['assets']}
     w=int(state['output']['width']); h=int(state['output']['height']); fps=timing.rate(state['output']['fps'])
@@ -125,25 +128,29 @@ def segment_command(state, start, end, target, jobdir, quality='final'):
     nframes=timing.frame_at(end,fps)-timing.frame_at(start,fps)
     samples=timing.sample_at(timing.frame_at(end,fps),fps)-timing.sample_at(timing.frame_at(start,fps),fps)
     video,audio=active_clips(state,start,end)
+    if stream=='video':audio=[]
+    if stream=='audio':video=[]
+    background_size='16x16' if stream=='audio' else f'{w}x{h}'
     cmd=['ffmpeg','-hide_banner','-nostdin','-loglevel','error','-filter_complex_threads','1','-y',
-         '-f','lavfi','-i',f'color=c=0x10131a:s={w}x{h}:r={fps}:d={_num(duration)}',
+         '-f','lavfi','-i',f'color=c=0x10131a:s={background_size}:r={fps}:d={_num(duration)}',
          '-f','lavfi','-i',f'anullsrc=channel_layout=stereo:sample_rate=48000:d={_num((samples+2)/48000)}']
     filters=['[0:v]format=yuv420p[back0]']; last='back0'; audio_labels=['1:a']; count=0
-    # Reuse source inputs only when the same clip appears in both video and audio.
+    # Demux audio and video separately to avoid cross-stream drain deadlocks.
+    # Reuse each stream's source/seek/speed across matching clips.
     inputs={}; source_index=2
     continuous=quality=='preview'
     def first_time(c):
         return max(start,float(timing.frame_at(c['position'],fps)/fps)) if continuous else start
     def last_time(c):
         return min(end,float(timing.frame_at(clip_finish(c),fps)/fps)) if continuous else end
-    def get_input(c):
+    def get_input(c,media_type):
         nonlocal source_index
         a=assets[c['assetId']]
         pos_offset=max(0,first_time(c)-float(c['position']))
         seek=float(c['start'])+pos_offset*float(c.get('speed',1))
-        key=(c['assetId'],seek,c.get('speed',1)) if continuous else c['id']
+        key=(c['assetId'],seek,c.get('speed',1),media_type)
         if key not in inputs:
-            _media_input(cmd,a['path'],a['kind'],seek,float(c.get('speed',1)),duration,fps)
+            _media_input(cmd,a['path'],a['kind'],seek,float(c.get('speed',1)),duration,fps,media_type)
             inputs[key]=source_index;source_index+=1
         return inputs[key]
 
@@ -183,7 +190,7 @@ def segment_command(state, start, end, target, jobdir, quality='final'):
             last=f'back{count}'
             continue
         a=assets[c['assetId']]
-        inp=get_input(c)
+        inp=get_input(c,'video')
         count+=1
         zoom=1 if c.get('keys',{}).get('scale') else float(c.get('scale',1)); targetw=max(2,round(w*zoom)//2*2);targeth=max(2,round(h*zoom)//2*2)
         scalemode='increase' if c.get('fit')=='cover' else 'decrease'
@@ -218,7 +225,7 @@ def segment_command(state, start, end, target, jobdir, quality='final'):
         if c['id'] in audio_seen:continue
         a=assets[c['assetId']]
         if a['kind']=='image' or not a.get('hasAudio'):continue
-        inp=get_input(c)
+        inp=get_input(c,'audio')
         label=f'a{len(audio_labels)}'
         if continuous:
             clip_start=first_time(c);clip_end=last_time(c)
@@ -237,9 +244,13 @@ def segment_command(state, start, end, target, jobdir, quality='final'):
         filters.append(f'[1:a]atrim=end_sample={samples}[mixed]')
 
     filters.append(f'[{last}]trim=end_frame={nframes},format=yuv420p[finished]')
-    if quality=='frame':filters.append('[mixed]anullsink')
+    if quality=='frame' or stream=='video':filters.append('[mixed]anullsink')
+    if stream=='audio':filters.append('[finished]nullsink')
     script=jobdir/f'graph_{target.stem}.txt'
     script.write_text(';\n'.join(filters)+'\n',encoding='utf-8')
+    if stream=='audio':
+        return cmd+['-/filter_complex',str(script),'-map','[mixed]','-vn','-t',_num(duration),
+                    '-c:a','pcm_s16le','-ac','2','-ar','48000',str(target)]
     if quality=='frame':
         return cmd+['-/filter_complex',str(script),'-map','[finished]','-frames:v','1','-threads','1','-c:v','png',str(target)]
     crf='26' if quality in ('review','preview') else str(state['output'].get('crf',20))
@@ -247,10 +258,28 @@ def segment_command(state, start, end, target, jobdir, quality='final'):
     encoder='libx264' if quality in ('review','preview') else state['output'].get('encoder','libx264')
     bitrate=0 if quality in ('review','preview') else state['output'].get('bitrate',0)
     video_options=encoders.options(encoder,preset,crf,bitrate)
+    if stream=='video':
+        return cmd+['-/filter_complex',str(script),'-map','[finished]','-an','-t',_num(duration),
+                    '-r',str(fps),*video_options,'-pix_fmt','yuv420p','-threads','4',
+                    '-movie_timescale','120000','-video_track_timescale','120000','-movflags','+faststart',str(target)]
     cmd+=['-/filter_complex',str(script),'-map','[finished]','-map','[mixed]',
-          '-t',_num(duration),'-shortest','-r',str(fps),*video_options,'-pix_fmt','yuv420p','-c:a','aac' if continuous else 'pcm_s16le',
+          '-t',_num(duration),'-r',str(fps),*video_options,'-pix_fmt','yuv420p','-c:a','aac' if continuous else 'pcm_s16le',
           '-threads','4','-ac','2','-ar','48000','-movie_timescale','120000','-video_track_timescale','120000','-movflags','+faststart',str(target)]
     return cmd
+
+def render_range(state,start,end,target,jobdir,quality='final',runner=None):
+    """Drain video and audio independently before muxing complete streams."""
+    runner=runner or _run
+    video=jobdir/(target.stem+'_video'+target.suffix)
+    audio=jobdir/(target.stem+'_audio.wav')
+    runner(segment_command(state,start,end,video,jobdir,quality,'video'),str(jobdir))
+    runner(segment_command(state,start,end,audio,jobdir,quality,'audio'),str(jobdir))
+    codec=['-c:a','aac','-b:a','192k'] if quality=='preview' else ['-c:a','copy']
+    runner(['ffmpeg','-hide_banner','-nostdin','-loglevel','error','-y','-i',str(video),'-i',str(audio),
+            '-map','0:v:0','-map','1:a:0','-c:v','copy',*codec,'-movie_timescale','120000',
+            '-video_track_timescale','120000','-movflags','+faststart',str(target)],str(jobdir))
+    video.unlink(missing_ok=True);audio.unlink(missing_ok=True)
+
 
 def render(state, output, work, *, review=False, on_progress=None, cancelled=lambda:False, popen=None):
     """Export a sequence using a bounded-memory segment renderer.
@@ -273,7 +302,7 @@ def render(state, output, work, *, review=False, on_progress=None, cancelled=lam
         suffix='mp4' if ('av1' in state['output'].get('encoder','') and not review) else 'mov'
         target=jobdir/f'segment_{idx:05d}.{suffix}'
         if on_progress:on_progress(round(3+start/duration*91),f'Rendering scene {idx+1} / {len(segments)}')
-        runner(segment_command(state,start,end,target,jobdir,'review' if review else 'final'),str(jobdir))
+        render_range(state,start,end,target,jobdir,'review' if review else 'final',runner)
         parts.append(target)
     files=jobdir/'concat.txt'
     entries=[]
