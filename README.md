@@ -1,5 +1,7 @@
 # VlogCraft Studio 3.3 for Windows
 
+> **[MASTER TO-DO LIST & PRODUCT ROADMAP](TODO.md)** — shared living backlog for the owner, Codex and ChatGPT. Check priorities and update it with each feature PR.
+
 Private Windows 11 x64 development release. Run **release/VlogCraft-Studio-3.3-x64.msi**. The installer adds VlogCraft Studio to the Start menu and offers a desktop shortcut. Python, FFmpeg, FFprobe and OpenCV are bundled. WebView2 is required and was present on the qualification machine.
 
 ## Editing
