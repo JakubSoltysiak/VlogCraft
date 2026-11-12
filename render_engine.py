@@ -7,6 +7,7 @@ Source files are always read-only. Heavy operations run in a worker thread.
 from __future__ import annotations
 import math
 import animation
+import timing
 import encoders
 import os
 import shutil
@@ -35,37 +36,42 @@ def sequence_duration(state):
 
 def active_clips(state, start, finish):
     """Bottom to top for image compositing. Muted tracks remain visible."""
-    fps=state['output']['fps']
-    first,last=round(start*fps),round(finish*fps)
+    fps=timing.rate(state['output']['fps'])
+    first,last=timing.frame_at(start,fps),timing.frame_at(finish,fps)
     solo=any(t.get('solo') for t in state['tracks'])
     video, audio = [], []
     for t in reversed(state['tracks']):
         if t['type'] != 'video' or t.get('hidden'): continue
         for c in sorted(t['clips'], key=lambda z: z['position']):
-            if round(clip_finish(c)*fps)>first and round(c['position']*fps)<last:
+            if timing.frame_at(clip_finish(c),fps)>first and timing.frame_at(c['position'],fps)<last:
                 video.append((t,c))
                 if c.get('assetId') and not t.get('muted') and (not solo or t.get('solo')) and (c.get('volume',1)>0 or c.get('keys',{}).get('volume')):
                     audio.append((t,c))
     for t in state['tracks']:
         if t['type'] != 'audio' or t.get('muted') or (solo and not t.get('solo')): continue
         for c in t['clips']:
-            if round(clip_finish(c)*fps)>first and round(c['position']*fps)<last:
+            if timing.frame_at(clip_finish(c),fps)>first and timing.frame_at(c['position'],fps)<last:
                 audio.append((t,c))
     return video, audio
 
-def boundaries(state, fps):
+def frame_spans(state, fps):
     # Partition on integer frame boundaries, including fractional-second edits.
     marks={0}
     for track in state['tracks']:
         if track.get('hidden'):continue
         for clip in track['clips']:
-            marks.add(round(clip['position']*fps))
-            marks.add(round(clip_finish(clip)*fps))
+            marks.add(timing.frame_at(clip['position'],fps))
+            marks.add(timing.frame_at(clip_finish(clip),fps))
     points=sorted(marks)
-    return [(a/fps,b/fps) for a,b in zip(points,points[1:])]
+    return list(zip(points,points[1:]))
 
 
-def _num(v): return f'{float(v):.5f}'
+def boundaries(state,fps):
+    rate=timing.rate(fps)
+    return [(float(a/rate),float(b/rate)) for a,b in frame_spans(state,rate)]
+
+
+def _num(v): return f'{float(v):.9f}'
 
 def _atempo(speed):
     effects=[]
@@ -87,7 +93,7 @@ def _add_audio(filters, input_idx, track, clip, start, end, dur, label):
     if fo:afades+=f',afade=t=out:st={_num(max(0,clip_length(clip)-fo))}:d={_num(fo)}'
     afades+=',asetpts=PTS-STARTPTS'
     gain=animation.expression(clip,'volume',start)
-    filters.append(f'[{input_idx}:a]aresample=48000,aformat=channel_layouts=stereo,'
+    filters.append(f'[{input_idx}:a]atrim=start=0,aresample=48000,aformat=channel_layouts=stereo,'
                    f'asetpts=PTS-STARTPTS,{_atempo(float(clip.get("speed",1)) )},'
                    f"volume='{_num(track.get('volume',1))}*{gain}':eval=frame{afades},apad,"
                    f'atrim=duration={_num(dur)},asetpts=PTS-STARTPTS[{label}]')
@@ -96,7 +102,7 @@ def _media_input(cmd, path, kind, at, speed, dur, fps):
     if kind=='image':
         cmd.extend(['-loop','1','-framerate',str(fps),'-i',str(path)])
     else:
-        cmd.extend(['-ss',_num(at),'-i',str(path)])
+        cmd.extend(['-ss',_num(math.ceil(at*1_000_000-1e-8)/1_000_000),'-noaccurate_seek','-i',str(path)])
 
 def _fade_video(clip, start, dur):
     fi=float(clip.get('fadeIn',0)); fo=float(clip.get('fadeOut',0))
@@ -109,12 +115,14 @@ def _fade_video(clip, start, dur):
 
 def segment_command(state, start, end, target, jobdir, quality='final'):
     assets={a['id']:a for a in state['assets']}
-    w=int(state['output']['width']); h=int(state['output']['height']); fps=int(state['output']['fps'])
+    w=int(state['output']['width']); h=int(state['output']['height']); fps=timing.rate(state['output']['fps'])
     duration=end-start
+    nframes=timing.frame_at(end,fps)-timing.frame_at(start,fps)
+    samples=timing.sample_at(timing.frame_at(end,fps),fps)-timing.sample_at(timing.frame_at(start,fps),fps)
     video,audio=active_clips(state,start,end)
     cmd=['ffmpeg','-hide_banner','-nostdin','-loglevel','error','-filter_complex_threads','4','-y',
          '-f','lavfi','-i',f'color=c=0x10131a:s={w}x{h}:r={fps}:d={_num(duration)}',
-         '-f','lavfi','-i',f'anullsrc=channel_layout=stereo:sample_rate=48000:d={_num(duration)}']
+         '-f','lavfi','-i',f'anullsrc=channel_layout=stereo:sample_rate=48000:d={_num((samples+2)/48000)}']
     filters=['[0:v]format=yuv420p[back0]']; last='back0'; audio_labels=['1:a']; count=0
     # Reuse source inputs only when the same clip appears in both video and audio.
     inputs={}; source_index=2
@@ -171,8 +179,8 @@ def segment_command(state, start, end, target, jobdir, quality='final'):
         hdr=(a.get('hdr') is True or a.get('colorTransfer') in ('smpte2084','arib-std-b67'))
         hdr_filters=('zscale=t=linear:npl=100,format=gbrpf32le,'
                      'tonemap=hable:desat=0,zscale=t=bt709:m=bt709:p=bt709:r=tv,format=yuv420p,') if hdr else ''
-        expr=(f'[{inp}:v]setpts=(PTS-STARTPTS)/{_num(c.get("speed",1))},'
-              f'fps={fps},'+hdr_filters+
+        expr=(f'[{inp}:v]setpts=PTS/{_num(c.get("speed",1))},'
+              f'fps={fps}:start_time=0:round=up,'+hdr_filters+
               f'scale={targetw}:{targeth}:force_original_aspect_ratio={scalemode}')
         if c.get('fit')=='cover':
             expr+=f',crop={targetw}:{targeth}'
@@ -201,11 +209,11 @@ def segment_command(state, start, end, target, jobdir, quality='final'):
     if len(audio_labels)>1:
         flabels=''.join('['+x+']' for x in audio_labels)
         filters.append(f'{flabels}amix=inputs={len(audio_labels)}:duration=first:normalize=0,'
-                       f'atrim=duration={_num(duration)}[mixed]')
+                       f'atrim=end_sample={samples}[mixed]')
     else:
-        filters.append(f'[1:a]anull[mixed]')
+        filters.append(f'[1:a]atrim=end_sample={samples}[mixed]')
 
-    filters.append(f'[{last}]format=yuv420p[finished]')
+    filters.append(f'[{last}]trim=end_frame={nframes},format=yuv420p[finished]')
     script=jobdir/f'graph_{target.stem}.txt'
     script.write_text(';\n'.join(filters)+'\n',encoding='utf-8')
     crf='26' if quality=='review' else str(state['output'].get('crf',20))
@@ -215,7 +223,7 @@ def segment_command(state, start, end, target, jobdir, quality='final'):
     video_options=encoders.options(encoder,preset,crf,bitrate)
     cmd+=['-/filter_complex',str(script),'-map','[finished]','-map','[mixed]',
           '-t',_num(duration),'-r',str(fps),*video_options,'-pix_fmt','yuv420p','-c:a','pcm_s16le',
-          '-threads','4','-ac','2','-ar','48000','-movie_timescale','48000','-video_track_timescale','48000','-movflags','+faststart',str(target)]
+          '-threads','4','-ac','2','-ar','48000','-movie_timescale','120000','-video_track_timescale','120000','-movflags','+faststart',str(target)]
     return cmd
 
 def render(state, output, work, *, review=False, on_progress=None, cancelled=lambda:False, popen=None):
@@ -226,7 +234,8 @@ def render(state, output, work, *, review=False, on_progress=None, cancelled=lam
     duration=sequence_duration(state)
     if duration<=0:raise ValueError('Add at least one clip to the timeline')
     jobdir=Path(work);jobdir.mkdir(parents=True,exist_ok=True)
-    segments=boundaries(state,int(state['output']['fps']))
+    fps=timing.rate(state['output']['fps'])
+    segments=boundaries(state,fps)
     if any(Path(a['path']).resolve() == Path(output).resolve() for a in state['assets']):
         raise ValueError('Choose a destination different from source media')
     if not segments:raise ValueError('No usable frames in the timeline')
@@ -239,7 +248,12 @@ def render(state, output, work, *, review=False, on_progress=None, cancelled=lam
         if on_progress:on_progress(round(3+start/duration*91),f'Rendering scene {idx+1} / {len(segments)}')
         runner(segment_command(state,start,end,target,jobdir,'review' if review else 'final'),str(jobdir))
         parts.append(target)
-    files=jobdir/'concat.txt';files.write_text(''.join(f"file '{p.name}'\n" for p in parts),encoding='utf-8')
+    files=jobdir/'concat.txt'
+    entries=[]
+    for part,(start,end) in zip(parts,segments):
+        us=round(end*1_000_000)-round(start*1_000_000)
+        entries.append(f"file '{part.name}'\nduration {us/1e6:.6f}\n")
+    files.write_text(''.join(entries),encoding='utf8')
     if on_progress:on_progress(96,'Joining rendered scenesâ€¦')
     target=Path(output)
     target.parent.mkdir(parents=True,exist_ok=True)

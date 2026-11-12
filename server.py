@@ -29,6 +29,8 @@ from urllib.parse import parse_qs, urlparse
 from concurrent.futures import ThreadPoolExecutor
 import project_store
 import animation
+import timing
+import source_frames
 import encoders
 import timeline_proposal
 import ai_bridge
@@ -38,6 +40,7 @@ ROOT=Path(__file__).resolve().parent
 WEB=ROOT/'web'
 WORK=Path(os.environ.get('VLOGCRAFT_WORK',ROOT/'workspace'))
 PROJECT=Path(os.environ.get('VLOGCRAFT_PROJECT',WORK/'project.json'))
+FRAME_INDEX=source_frames.FrameIndex(WORK/'frame-index')
 CACHE_WORKERS=ThreadPoolExecutor(max_workers=2,thread_name_prefix='media-cache')
 MEDIA=WORK/'media'; THUMBS=WORK/'thumbnails'; PROXIES=WORK/'proxies'; REVIEWS=WORK/'reviews'; EXPORTS=WORK/'exports'
 AI_UNDO=WORK/'ai_undo.json'
@@ -122,13 +125,15 @@ def save_state(candidate=None):
         new=deepcopy(STATE if candidate is None else candidate)
         if PROJECT.is_file() and new==STATE and not RECOVERED:return
         new['updated']=int(time.time())
-        project_store.save(PROJECT,new,validate_document)
+        document=timing.encode(new)
+        timing.decode(document)  # Reject an empty tick interval before publishing.
+        project_store.save(PROJECT,document,validate_document)
         STATE.clear()
         STATE.update(new)
 
 def probe(path):
     p=subprocess.run(['ffprobe','-v','error','-show_entries',
-                      'format=duration:stream=codec_type,codec_name,width,height,r_frame_rate,channels,color_transfer,color_primaries,color_space,pix_fmt',
+                      'format=duration,start_time:stream=time_base,start_pts,duration_ts,avg_frame_rate,codec_type,codec_name,width,height,r_frame_rate,channels,color_transfer,color_primaries,color_space,pix_fmt',
                       '-of','json',str(path)],capture_output=True,text=True,timeout=75)
     if p.returncode:raise ValueError(f'FFprobe could not read {Path(path).name}: {p.stderr[-500:]}')
     info=json.loads(p.stdout);streams=info.get('streams',[])
@@ -141,7 +146,10 @@ def probe(path):
         numerator,denominator=map(float,rate.split('/'))
         fps=round(numerator/denominator,3) if denominator else 0
     except (ValueError,ZeroDivisionError):fps=0
-    return {'duration':round(duration,3),'width':(v or {}).get('width') or 0,
+    return {'duration':duration,'timeBase':(v or a or {}).get('time_base','1/1000000000'),
+            'nominalRate':rate,'averageRate':(v or {}).get('avg_frame_rate','0/1'),
+            'formatStart':info.get('format',{}).get('start_time','0'),'streamStartPts':(v or a or {}).get('start_pts',0),
+            'width':(v or {}).get('width') or 0,
             'height':(v or {}).get('height') or 0,'hasAudio':bool(a),
             'codec':(v or a or {}).get('codec_name','unknown'),'fps':fps,
             'colorTransfer':(v or {}).get('color_transfer','unknown'),
@@ -292,10 +300,10 @@ def validate_state(d, base=None):
         new.append(out)
     result['tracks']=new
     output=d.get('output',base['output'])
-    w=int(output.get('width',3840));fps=int(output.get('fps',30));crf=int(output.get('crf',20))
+    w=int(output.get('width',3840));fps=timing.persisted_rate(output.get('fps',30));crf=int(output.get('crf',20))
     preset=output.get('preset','medium')
     h=int(output.get('height',w*9//16))
-    if min(w,h)<16 or max(w,h)>16384 or w%2 or h%2 or fps not in (24,25,30,50,60):raise ValueError('Invalid export resolution or FPS')
+    if min(w,h)<16 or max(w,h)>16384 or w%2 or h%2:raise ValueError('Invalid export resolution or FPS')
     if crf<15 or crf>30 or preset not in ('ultrafast','veryfast','fast','medium','slow'):
         raise ValueError('Invalid quality or encoder preset')
     encoder=output.get('encoder','libx264')
@@ -306,6 +314,7 @@ def validate_state(d, base=None):
 
 def validate_document(document):
     if not isinstance(document,dict):raise ValueError('Invalid project document')
+    if document.get('version')==4:document=timing.decode(document)
     if document.get('version')==2:document=migrate_v2(document)
     if document.get('version')!=3:raise ValueError('Unsupported project version')
     assets=document.get('assets')
@@ -604,6 +613,8 @@ class Handler(BaseHTTPRequestHandler):
                 snapshot['desktop']=DESKTOP_ACTION is not None
                 snapshot['recovered']=RECOVERED
                 return self.json_response(snapshot)
+            if path=='/api/source/status':
+                return self.json_response(FRAME_INDEX.status(parse_qs(parsed.query).get('assetId',[''])[0]))
             if path=='/api/encoders':return self.json_response(encoders.available())
             if path=='/api/jobs':
                 with JOB_LOCK:jobs=deepcopy(JOBS);jobs['proxy']['queued']=len(PROXY_QUEUE)
@@ -647,7 +658,7 @@ class Handler(BaseHTTPRequestHandler):
                 if not target.exists():target=EXPORTS/name
                 return self.file_response(target)
             if path=='/' or path=='/index.html':return self.file_response(WEB/'index.html','text/html; charset=utf-8')
-            if path in ('/app.js','/studio.js','/animation.js','/motion.js','/timeline.js','/style.css'):
+            if path in ('/app.js','/studio.js','/animation.js','/motion.js','/timeline.js','/timebase.js','/source_frames.js','/style.css'):
                 return self.file_response(WEB/path.lstrip('/'))
             return self.json_response({'error':'Not found'},404)
         except (BrokenPipeError,ConnectionAbortedError,ConnectionResetError):return
@@ -716,6 +727,20 @@ class Handler(BaseHTTPRequestHandler):
                 with UPLOAD_LOCK:u=UPLOADS.pop(uid,None)
                 if u:Path(u['tmp']).unlink(missing_ok=True)
                 return self.json_response({'cancelled':bool(u)})
+            if path=='/api/source/cancel':
+                FRAME_INDEX.cancel(str(data.get('assetId','')))
+                return self.json_response({'cancelled':True})
+            if path=='/api/source/frame':
+                aid=data.get('assetId')
+                with LOCK:asset=next((deepcopy(a) for a in STATE['assets'] if a['id']==aid),None)
+                if not asset or asset['kind']!='video':raise ValueError('Choose a video source')
+                if not asset.get('timeBase'):asset.update(probe(Path(asset['path'])))
+                position=_number(data.get('seconds',0),'Source position',0,1e12)
+                step=data.get('step',0)
+                if type(step) is not int or step not in (-1,0,1):raise ValueError('Invalid frame step')
+                frame=FRAME_INDEX.locate(asset,position,step)
+                frame['image']=source_frames.preview(asset,frame)
+                return self.json_response(frame)
             if path=='/api/motion':
                 import motion
                 asset,clip=motion_source(data.get('clipId'))

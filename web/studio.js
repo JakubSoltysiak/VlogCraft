@@ -132,7 +132,7 @@ async function openExport(){
   $('customDimensions').hidden=preset;
   $('exportResolution').onchange=e=>{$('customDimensions').hidden=e.target.value!=='custom';};
   $('outputWidth').value=out.width;$('outputHeight').value=out.height;
-  $('exportFps').value=out.fps;$('exportCrf').value=out.crf||20;$('exportPreset').value=out.preset||'medium';
+  $('exportFps').innerHTML=rateOptions(out.fps);$('exportCrf').value=out.crf||20;$('exportPreset').value=out.preset||'medium';
   $('outputBitrate').value=out.bitrate||0;
   $('exportEstimate').textContent=out.width+' × '+out.height+' · '+out.fps+' fps · '+duration().toFixed(2)+' seconds';
   const choice=$('encoderChoice');

@@ -89,7 +89,7 @@ def run(project):
             document['name'] = destination.stem
             with destination.open('xb') as handle:
                 try:
-                    handle.write(json.dumps(document, ensure_ascii=False).encode('utf8'))
+                    handle.write(json.dumps(server.timing.encode(document), ensure_ascii=False).encode('utf8'))
                     handle.flush()
                     os.fsync(handle.fileno())
                 except Exception:

@@ -67,5 +67,6 @@ function sourceMonitor(a) {
     if(!t||t.locked)return toast('Unlock a compatible destination track',true);
     addAsset(a,t);if(!still)Object.assign(sel().clip,marks);redraw();save();dlg.close();
   };
+  if(a.kind==='video')preciseSource(dlg,a,media);
   dlg.showModal();
 }

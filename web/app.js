@@ -7,7 +7,6 @@ const uid = () => (crypto.randomUUID?.() ?? (Date.now().toString(16)+Math.random
 const round = v => Math.round(v*1000)/1000;
 const clamp = (v,lo,hi) => Math.max(lo,Math.min(hi,Number(v)));
 const format = t => {t=Math.max(0,t||0);let s=Math.floor(t);return `${String(Math.floor(s/3600)).padStart(2,'0')}:${String(Math.floor(s%3600/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;};
-const timecode = t => {const fps=state?.output?.fps||30,frames=Math.round(t*fps);return format(Math.floor(frames/fps))+':'+String(frames%fps).padStart(2,'0');};
 const fileSize = b => b>=1024**3?(b/1024**3).toFixed(2)+' GB':b>=1024**2?(b/1024**2).toFixed(0)+' MB':(b/1024).toFixed(0)+' KB';
 const seekUrl = aid => `/media/${encodeURIComponent(aid)}?proxy=${useProxies?1:0}&v=${encodeURIComponent(assetById(aid)?.cacheId||aid)}`;
 const assetMap = () => Object.fromEntries((state?.assets||[]).map(a=>[a.id,a]));
@@ -31,14 +30,14 @@ function sel(){for(const t of state.tracks){const c=t.clips.find(c=>c.id===selec
 function trackById(id){return state.tracks.find(t=>t.id===id);}
 function assetById(id){return state.assets.find(a=>a.id===id);}
 function defaultTrack(kind){return [...state.tracks].reverse().find(t=>t.type===kind);}
-function clipFromAsset(a,pos=0,trackType=null){const kind=trackType==='audio'?'audio':a.kind;return {id:uid(),assetId:a.id,kind,position:round(pos),start:0,end:a.kind==='image'?5:Math.max(.04,a.duration||5),speed:1,volume:1,opacity:1,scale:1,x:0,y:0,grade:'neutral',fit:'contain',fadeIn:0,fadeOut:0,locked:false};}
+function clipFromAsset(a,pos=0,trackType=null){const kind=trackType==='audio'?'audio':a.kind;return {id:uid(),assetId:a.id,kind,position:round(pos),start:0,end:a.kind==='image'?5:Math.max(1/sequenceRate(),a.duration||5),speed:1,volume:1,opacity:1,scale:1,x:0,y:0,grade:'neutral',fit:'contain',fadeIn:0,fadeOut:0,locked:false};}
 function canPlace(a,track){return track&&((track.type==='audio'&&a.kind!=='image')||(track.type==='video'&&a.kind!=='audio'));}
 function addAsset(a,track,pos){if(!track)track=defaultTrack(a.kind==='audio'?'audio':'video');if(!canPlace(a,track)){toast('That file type cannot go on this track',true);return;}if(track.locked){toast('Track is locked',true);return;}snapshot();const c=clipFromAsset(a,pos??Math.max(0,...track.clips.map(endOf)),track.type);track.clips.push(c);selectedId=c.id;playhead=c.position;redraw();save();toast('Added '+a.name+' to '+track.name);}
 function renderAssets(){const filter=$('assetFilter').value;const search=$('searchAssets').value.toLowerCase().trim();const list=state.assets.filter(a=>(filter==='all'||a.kind===filter)&&a.name.toLowerCase().includes(search));$('mediaCount').textContent=state.assets.length+' ASSETS';$('assetList').innerHTML=list.length?list.map(a=>`<article class="asset-card" draggable="true" data-asset="${a.id}" title="Drag to a timeline track, or double-click to add"><div class="asset-thumb">${a.kind==='audio'?svg('music'):`<img loading="lazy" src="/thumb/${a.id}?v=${a.cacheId||a.id}" onerror="this.style.display='none'">`}<span class="asset-badge">${a.missing?'OFFLINE':a.kind.toUpperCase()}</span>${a.hdr?'<span class="hdr-badge">HDR</span>':''}${a.kind!=='image'?`<span class="asset-duration">${format(a.duration)}</span>`:''}</div><div class="asset-text"><div class="asset-name">${esc(a.name)}</div><div class="asset-sub"><span>${fileSize(a.size)}</span><button class="text-button" data-source="${a.id}" title="Source monitor">Source</button>${a.missing?`<button data-relink="${a.id}" class="text-button">RELINK</button>`:""}<button class="asset-plus" title="Add to timeline" data-add="${a.id}">+</button></div></div></article>`).join(''):'<div class="empty-media">No matching files. <br>Drop MP4, MOV, MKV, audio or images to import.</div>';
  $('assetList').querySelectorAll('[draggable="true"]').forEach(el=>{el.ondragstart=e=>{e.dataTransfer.setData('application/x-vlogcraft',el.dataset.asset);e.dataTransfer.effectAllowed='copy';};el.ondblclick=()=>{const a=assetById(el.dataset.asset);addAsset(a);};});
  $('assetList').querySelectorAll('[data-source]').forEach(b=>b.onclick=()=>sourceMonitor(assetById(b.dataset.source)));
  $('assetList').querySelectorAll('[data-add]').forEach(el=>el.onclick=e=>{e.stopPropagation();const a=assetById(el.dataset.add);addAsset(a);});}
-function renderProjectInspector(){const out=state.output;return `<div class="section-label">SEQUENCE</div><div class="property"><label>Project name</label><input data-proj="name" value="${esc(state.name)}" maxlength="160"></div><div class="property"><label>Sequence length</label><div class="prop-time">${format(duration())}</div></div><div class="section-label">DELIVERY</div><div class="property"><label>Frame dimensions</label><select data-proj="width"><option value="1280" ${out.width===1280?'selected':''}>1280 × 720</option><option value="1920" ${out.width===1920?'selected':''}>1920 × 1080</option><option value="2560" ${out.width===2560?'selected':''}>2560 × 1440</option><option value="3840" ${out.width===3840?'selected':''}>3840 × 2160 (4K)</option></select></div><div class="property"><label>Frames per second</label><select data-proj="fps">${[24,25,30,50,60].map(v=>`<option ${out.fps===v?'selected':''}>${v}</option>`).join('')}</select></div><div class="section-label">NOTES</div><p class="dialog-note">All editing is non-destructive. Preview may use 720p proxies; export always renders from originals in the selected resolution.</p>`;}
+function renderProjectInspector(){const out=state.output;return `<div class="section-label">SEQUENCE</div><div class="property"><label>Project name</label><input data-proj="name" value="${esc(state.name)}" maxlength="160"></div><div class="property"><label>Sequence length</label><div class="prop-time">${format(duration())}</div></div><div class="section-label">DELIVERY</div><div class="property"><label>Frame dimensions</label><select data-proj="width"><option value="1280" ${out.width===1280?'selected':''}>1280 × 720</option><option value="1920" ${out.width===1920?'selected':''}>1920 × 1080</option><option value="2560" ${out.width===2560?'selected':''}>2560 × 1440</option><option value="3840" ${out.width===3840?'selected':''}>3840 × 2160 (4K)</option></select></div><div class="property"><label>Frames per second</label><select data-proj="fps">${rateOptions(out.fps)}</select></div><div class="section-label">NOTES</div><p class="dialog-note">All editing is non-destructive. Preview may use 720p proxies; export always renders from originals in the selected resolution.</p>`;}
 const field=(label,key,value,min,max,step=.1)=>`<div class="property"><label>${label}</label><input data-prop="${key}" type="number" min="${min}" max="${max}" step="${step}" value="${round(value)}"></div>`;
 const range=(label,key,value,min,max,step=.05,percent=true)=>`<div class="property"><label>${label}</label><div class="range-line"><input data-prop="${key}" type="range" min="${min}" max="${max}" step="${step}" value="${value}"><output>${percent?Math.round(value*100)+'%':round(value)}</output></div></div>`;
 function renderInspector(){let html='';if(insTab==='project'){html=renderProjectInspector();}else{
@@ -46,7 +45,7 @@ function renderInspector(){let html='';if(insTab==='project'){html=renderProject
  else{
  const {clip:c,track:t}=current,a=assetById(c.assetId);const kind=c.kind;
  html=`<div class="prop-asset">${a&&a.kind!=='audio'?`<img class="prop-thumb" src="/thumb/${a.id}?v=${a.cacheId||a.id}" onerror="this.style.visibility='hidden'">`:`<div class="prop-thumb" style="display:grid;place-items:center">${kind==='title'?'T':svg('music')}</div>`}<div class="prop-text"><div class="prop-name">${esc(a?.name || 'Title graphic')}</div><div class="prop-time">${esc(t.name)} · ${format(lengthOf(c))}</div></div></div>`;
- html+='<div class="section-label">TIMING</div><div class="prop-row">'+field('Timeline start (sec)','position',c.position,0,1e12,.01)+field('Clip duration (sec)','duration',lengthOf(c),1/state.output.fps,1e12,.01)+'</div>';
+ html+='<div class="section-label">TIMING</div><div class="prop-row">'+field('Timeline start (sec)','position',c.position,0,1e12,.01)+field('Clip duration (sec)','duration',lengthOf(c),1/sequenceRate(),1e12,.01)+'</div>';
  if(a && a.kind!=='image'){html+='<div class="prop-row">'+field('Source in','start',c.start,0,36000,.01)+field('Source out','end',c.end,.04,36000,.01)+'</div>';html+=range('Playback speed','speed',c.speed,.25,4,.05,false);}
  if(t.type==='video'&&kind!=='title'){
  html+='<div class="section-label">COMPOSITION</div>'+range('Opacity','opacity',c.opacity,0,1,.01)+range('Scale','scale',c.scale,.1,3,.05,false);
@@ -63,14 +62,14 @@ function renderInspector(){let html='';if(insTab==='project'){html=renderProject
  html+='<div class="property-actions"><button id="rippleDeleteBtn" class="button secondary">RIPPLE DELETE</button><button id="deleteClipInspector" class="button secondary">'+svg('trash')+' REMOVE CLIP</button><button id="duplicateClipInspector" class="button secondary">'+svg('copy')+' DUPLICATE</button></div>';
  }}
  $('inspectorContent').innerHTML=html;
- $('inspectorContent').querySelectorAll('[data-proj]').forEach(el=>el.onchange=()=>{snapshot();let key=el.dataset.proj;if(key==='name'){state.name=el.value||'Untitled';}else if(key==='width'){state.output.width=Number(el.value);state.output.height=state.output.width*9/16;}else if(key==='fps')state.output.fps=Number(el.value);redraw();save();});
+ $('inspectorContent').querySelectorAll('[data-proj]').forEach(el=>el.onchange=()=>{snapshot();let key=el.dataset.proj;if(key==='name'){state.name=el.value||'Untitled';}else if(key==='width'){state.output.width=Number(el.value);state.output.height=state.output.width*9/16;}else if(key==='fps')state.output.fps=rateChoice(el.value);redraw();save();});
  $('inspectorContent').querySelectorAll('[data-prop]').forEach(el=>{const action=()=>{
   const cur=sel();if(!cur || cur.track.locked || cur.clip.locked)return;const c=cur.clip,k=el.dataset.prop;
   const old=c[k];let v=el.type==='number'||el.type==='range'?Number(el.value):el.value;
-  if(k==='duration'){v=clamp(v,1/state.output.fps,1e12);c.end=c.start+v*c.speed;}
+  if(k==='duration'){v=clamp(v,1/sequenceRate(),1e12);c.end=c.start+v*c.speed;}
   else if(k==='position')c.position=frameTime(Math.max(0,v));
-  else if(k==='end')c.end=Math.max(c.start+.04,v);
-  else if(k==='start')c.start=Math.min(v,c.end-.04);
+  else if(k==='end')c.end=Math.max(c.start+c.speed/sequenceRate(),v);
+  else if(k==='start')c.start=Math.min(v,c.end-c.speed/sequenceRate());
   else if(['volume','opacity','scale','speed','x','y','fadeIn','fadeOut','fontScale'].includes(k))c[k]=v;
   else c[k]=v;
   if(c.assetId){const a=assetById(c.assetId);if(a.kind!=='image')c.end=Math.min(c.end,a.duration);}
@@ -89,7 +88,7 @@ function renderTimeline(scrollOnly=false){if(!scrollOnly)rebuildIndex();const to
  const viewport=$('timelineScroller');
  const viewStart=Math.max(0,(viewport.scrollLeft-600)/zoom),viewEnd=(viewport.scrollLeft+viewport.clientWidth+600)/zoom;
  viewport.dataset.first=viewStart;viewport.dataset.last=viewEnd;
- let html=`<div class="ruler-row"><div class="ruler-left">TIME / ${state.output.fps} FPS</div><div class="ruler-lane" data-ruler style="width:${canvas}px;min-width:${canvas}px">`;
+ let html=`<div class="ruler-row"><div class="ruler-left">TIME / ${rateLabel(state.output.fps)} FPS</div><div class="ruler-lane" data-ruler style="width:${canvas}px;min-width:${canvas}px">`;
  for(let i=Math.floor(viewStart/step)*step;i<=Math.min(total,viewEnd);i+=step){html+=`<div class="ruler-tick" style="left:${i*zoom}px">${format(i).slice(3)}</div>`;}
  html+='</div></div>';
  for(const t of state.tracks){html+=`<div class="track-row ${t.type==='audio'?'audio-row':''}" style="height:${t.height||67}px" data-track-row="${t.id}"><div class="track-head"><div class="track-color" style="background:${t.color || (t.type==='audio'?'#ad95da':'#79b4de')}"></div><div class="track-info"><div class="track-name" title="${esc(t.name)}">${esc(t.name)}</div><div class="track-actions"><button class="track-action" data-track-settings="${t.id}" title="Track settings">⋯</button><button class="track-action ${t.muted?'on':''}" data-track-action="muted" data-track="${t.id}" title="Mute track">${svg('volume')}</button>${t.type==='video'?`<button class="track-action ${t.hidden?'on':''}" data-track-action="hidden" data-track="${t.id}" title="Hide video">${svg('eye')}</button>`:''}<button class="track-action ${t.locked?'on':''}" data-track-action="locked" data-track="${t.id}" title="Lock track">${svg('lock')}</button></div></div></div><div class="track-lane" data-lane="${t.id}" style="width:${canvas}px;min-width:${canvas}px">`;
@@ -119,7 +118,6 @@ function renderTimeline(scrollOnly=false){if(!scrollOnly)rebuildIndex();const to
  });
 }
 function positionPlayhead(){const p=$('timelinePlayhead');if(p)p.style.left=(151+playhead*zoom)+'px';$('playheadTime').textContent=timecode(playhead);$('totalTime').textContent=timecode(duration());}
-function frameTime(t){return Math.round(t*state.output.fps)/state.output.fps;}
 function seek(t){playhead=clamp(frameTime(t),0,Math.max(0,duration()));if(isPlaying){playAt=playhead;playStart=performance.now();}positionPlayhead();syncPreview(true);}
 function snapTo(value,ignore=null){value=Math.max(0,value);if(!snap)return frameTime(value);const others=[0,playhead];for(const t of state.tracks)for(const c of t.clips)if(c.id!==ignore)others.push(c.position,endOf(c));const nearest=others.reduce((best,v)=>Math.abs(v-value)<Math.abs(best-value)?v:best,Infinity);return frameTime(Math.abs(nearest-value)<=Math.max(.08,9/zoom)?nearest:value);}
 function startClipGesture(e){if(e.button!==0)return;const el=e.currentTarget,cid=el.dataset.clip,t=trackById(el.dataset.parent),c=t.clips.find(c=>c.id===cid);if(!c||t.locked||c.locked)return;
@@ -141,11 +139,11 @@ function startClipGesture(e){if(e.button!==0)return;const el=e.currentTarget,cid
   if(mode==='move')next.position=snap&&!ev.shiftKey?snapTo(baseline.position+dx,c.id):frameTime(Math.max(0,baseline.position+dx));
   else if(mode==='right'){
    if(c.kind==='image'||c.kind==='title')next.end=Math.max(.05,round(baseline.end+dx));
-   else next.end=clamp(baseline.end+dx*baseline.speed,baseline.start+baseline.speed/state.output.fps,assetById(c.assetId).duration);
+   else next.end=clamp(baseline.end+dx*baseline.speed,baseline.start+baseline.speed/sequenceRate(),assetById(c.assetId).duration);
   }else{
-   const offset=clamp(dx,-baseline.position,lengthOf(baseline)-1/state.output.fps);
+   const offset=clamp(dx,-baseline.position,lengthOf(baseline)-1/sequenceRate());
    if(c.kind==='image'||c.kind==='title'){next.position=round(baseline.position+offset);next.end=round(baseline.end-offset*baseline.speed);}
-   else {next.start=clamp(baseline.start+offset*baseline.speed,0,baseline.end-baseline.speed/state.output.fps);next.position=round(baseline.position+(next.start-baseline.start)/baseline.speed);}
+   else {next.start=clamp(baseline.start+offset*baseline.speed,0,baseline.end-baseline.speed/sequenceRate());next.position=round(baseline.position+(next.start-baseline.start)/baseline.speed);}
   }
   if(next.position<0)next.position=0;
   if(JSON.stringify(next)!==JSON.stringify(baseline)||newTrack){snapshot();Object.assign(c,next);if(newTrack&&newTrack.id!==t.id){const a=assetById(c.assetId);t.clips.splice(t.clips.indexOf(c),1);c.kind=c.kind==='title'?'title':newTrack.type==='audio'?'audio':a.kind;newTrack.clips.push(c);}
@@ -158,7 +156,7 @@ function splitSelected(){
  const item=sel();if(!item){toast('Select a clip to split',true);return;}
  const {clip:c,track:t}=item;if(t.locked||c.locked)return toast('Track or clip is locked',true);
  const beforeEnd=endOf(c),beforeDuration=lengthOf(c);
- if(Math.round(playhead*state.output.fps)<=Math.round(c.position*state.output.fps)||Math.round(playhead*state.output.fps)>=Math.round(beforeEnd*state.output.fps))return toast('Place playhead within selected clip',true);
+ if(Math.round(playhead*sequenceRate())<=Math.round(c.position*sequenceRate())||Math.round(playhead*sequenceRate())>=Math.round(beforeEnd*sequenceRate()))return toast('Place playhead within selected clip',true);
  snapshot();const right=structuredClone(c);right.id=uid();playhead=frameTime(playhead);right.position=playhead;
  if(c.kind==='title'||c.kind==='image'){
   c.end=round((playhead-c.position)*c.speed);
@@ -234,7 +232,7 @@ function syncAudio(force=false){const active=[];
 function stopPlayback(){isPlaying=false;$('playBtn').innerHTML=svg('play');for(const p of activePlayers.values())p.media?.pause?.();for(const p of audioPlayers.values())p.pause();}
 function playPause(){if(isPlaying){stopPlayback();return;}if(duration()<=0)return toast('Add footage first',true);if(playhead>=duration()-.001)playhead=0;isPlaying=true;playAt=playhead;playStart=performance.now();$('playBtn').innerHTML=svg('pause');syncPreview(true);requestAnimationFrame(animate);}
 function animate(){if(!isPlaying)return;playhead=playAt+(performance.now()-playStart)/1000;if(playhead>=duration()){seek(duration());stopPlayback();return;}positionPlayhead();syncPreview(false);const p=$('timelinePlayhead');if(p){const scroller=$('timelineScroller');const edge=151+playhead*zoom;if(edge>scroller.scrollLeft+scroller.clientWidth-50)scroller.scrollLeft=edge-200;}requestAnimationFrame(animate);}
-function redraw(){if(!state)return;rebuildIndex();$('projectTitle').textContent=state.name;$('renderRes').textContent=`${state.output.width} × ${state.output.height} · ${state.output.fps} FPS`;$('exportEstimate').textContent=`${state.output.width===3840?'4K UHD':state.output.width+'p'} · ${state.output.fps} FPS · H.264`;
+function redraw(){if(!state)return;rebuildIndex();$('projectTitle').textContent=state.name;$('renderRes').textContent=`${state.output.width} × ${state.output.height} · ${rateLabel(state.output.fps)} FPS`;$('exportEstimate').textContent=`${state.output.width===3840?'4K UHD':state.output.width+'p'} · ${rateLabel(state.output.fps)} FPS · H.264`;
  document.querySelector('.export-feature strong').textContent=state.name;sizeMonitor();renderAssets();renderTimeline(true);renderInspector();$('timelineStatus').textContent=`${state.tracks.length} TRACKS · ${state.tracks.reduce((n,t)=>n+t.clips.length,0)} CLIPS`;
  syncPreview(true);
 }
@@ -275,7 +273,7 @@ async function startExport(){
   const bitrate=$('outputBitrate').valueAsNumber;
   if(![w,h].every(v=>Number.isInteger(v)&&v>=16&&v<=16384&&v%2===0))throw Error('Choose even dimensions between 16 and 16384 pixels');
   if(!Number.isFinite(bitrate)||bitrate<0||bitrate>2000)throw Error('Invalid output bitrate');
-  Object.assign(state.output,{width:w,height:h,fps:Number($('exportFps').value),crf:Number($('exportCrf').value),preset:$('exportPreset').value,encoder:$('encoderChoice').value,bitrate});
+  Object.assign(state.output,{width:w,height:h,fps:rateChoice($('exportFps').value),crf:Number($('exportCrf').value),preset:$('exportPreset').value,encoder:$('encoderChoice').value,bitrate});
   redraw();save();await flushSave();
   const res=await request('export','POST',{});
   if(res.cancelled)return;
@@ -306,7 +304,7 @@ function setup(){
  $('searchAssets').oninput=renderAssets;$('assetFilter').onchange=renderAssets;
  $('aiBtn').onclick=()=>openModal('aiModal');$('exportBtn').onclick=openExport;$('helpBtn').onclick=()=>openModal('helpModal');
  document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>closeModal(b.dataset.close));document.querySelectorAll('.modal-overlay').forEach(m=>m.onclick=e=>{if(e.target===m)m.hidden=true;});
- $('playBtn').onclick=playPause;$('stepBack').onclick=()=>seek(playhead-1/state.output.fps);$('stepForward').onclick=()=>seek(playhead+1/state.output.fps);$('jumpStart').onclick=()=>seek(0);
+ $('playBtn').onclick=playPause;$('stepBack').onclick=()=>seek(playhead-1/sequenceRate());$('stepForward').onclick=()=>seek(playhead+1/sequenceRate());$('jumpStart').onclick=()=>seek(0);
  $('undoBtn').onclick=()=>restoreHistory(undoStack,redoStack);$('redoBtn').onclick=()=>restoreHistory(redoStack,undoStack);
  $('splitBtn').onclick=splitSelected;$('duplicateBtn').onclick=duplicateSelected;$('deleteBtn').onclick=removeSelected;
  $('snapBtn').onclick=()=>{snap=!snap;$('snapBtn').classList.toggle('active',snap);};
@@ -327,8 +325,8 @@ function setup(){
   if(e.key.toLowerCase()==='s'&&!e.ctrlKey){e.preventDefault();splitSelected();return;}
   if(e.key==='Delete'||e.key==='Backspace'){e.preventDefault();if(e.shiftKey)rippleDelete();else removeSelected();return;}
   if(e.code==='Space'){e.preventDefault();playPause();return;}
-  if(e.key==='ArrowLeft'){e.preventDefault();seek(playhead-1/state.output.fps);}
-  if(e.key==='ArrowRight'){e.preventDefault();seek(playhead+1/state.output.fps);}
+  if(e.key==='ArrowLeft'){e.preventDefault();seek(playhead-1/sequenceRate());}
+  if(e.key==='ArrowRight'){e.preventDefault();seek(playhead+1/sequenceRate());}
  });
  // Browser Files never expose original filesystem paths; chunked local streaming
  // is essential for 4.5+ GB drag-and-drop without whole-file buffering.
