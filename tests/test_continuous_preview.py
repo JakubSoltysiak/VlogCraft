@@ -22,11 +22,14 @@ class ContinuousPreviewTests(unittest.TestCase):
             first['keys']={'rotation':[{'time':.125,'value':-5,'mode':'linear'},{'time':.625,'value':5,'mode':'linear'}]}
             second=server.default_clip(a);second.update(position=.75,start=.25,end=.5,grade='warm',volume=.2)
             s['tracks'][1]['clips']=[first,second]
+            linked_audio=server.default_clip(a,.25,'audio');linked_audio.update(start=.125,end=.625,volume=.1)
+            s['tracks'][2]['clips']=[linked_audio]
             title=server.default_title(.125);title.update(end=.5,text='Preview',fadeIn=.25,fadeOut=.125)
             s['tracks'][0]['clips']=[title]
             segmented=root/'reference.mp4';engine.render(s,segmented,root/'reference')
             continuous=root/'continuous.mp4';work=root/'continuous';work.mkdir()
             command=engine.segment_command(s,0,1,continuous,work,'preview')
+            self.assertEqual(sum(arg==str(source) for arg in command),2,'Matching AV ranges should share their decoder')
             subprocess.run(command,cwd=work,capture_output=True,check=True,timeout=20)
             def video(path):
                 raw=subprocess.check_output(['ffmpeg','-v','error','-i',str(path),'-an','-pix_fmt','rgb24','-f','rawvideo','-'])

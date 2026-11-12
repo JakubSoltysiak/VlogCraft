@@ -1,3 +1,96 @@
+# VlogCraft Studio 3.4 development qualification
+
+12 November 2026. Local Windows build **3.4.1**, delivered as release/VlogCraft-Studio-3.4-x64.msi. SHA-256 **33F010F973F8472272B80DCA984F64CF2930972CB15E27A619CFE8003A040F0F**. The installed application passed the native workflow. This remains a development build with an experimental buffered playback mode.
+
+## GitHub integration and publication audit
+
+The public repository is [JakubSoltysiak/VlogCraft](https://github.com/JakubSoltysiak/VlogCraft). Git Credential Manager and the connector both verified JakubSoltysiak before writes. Future commits use JakubSoltysiak and 255693@edu.p.lodz.pl.
+
+main preserves the verified 3.3 history plus the publication audit at 3db1d2d85a9911cc1710b08368f9cea9acee3811. All four baseline tags were published with their original hashes. studio-3.3-verified remains ddb8b553da3223337691f6ac25cae95430cbbc93. A fresh mirror clone passed full Git fsck. The 3.4 work is on feature/studio-3.4-playback in [draft pull request 1](https://github.com/JakubSoltysiak/VlogCraft/pull/1).
+
+The initial audit inspected all 11 commits and 154 distinct file-content versions, including archived images. There were no credential-pattern hits, tracked editing projects, personal footage, installers or dependency binaries. Ignore rules now cover local credentials, environments, projects and media. PUBLICATION_AUDIT.md and THIRD_PARTY.md document scope and provenance. No new project license was granted. Corresponding-source review for bundled dependencies remains a public binary-distribution task.
+
+## Implemented and tested changes
+
+- Exact 100, 120/1 and 120000/1001 sequence rates, including the 119.88 alias, use the existing rational frame/tick model.
+- Constant-speed editing extends to 10% speed, supporting 20% 120→24 slow motion. Speed ramps and synthesized optical-flow interpolation remain missing.
+- 8K UHD is available in the project and export presets.
+- A continuous FFmpeg range graph composes the visible clips and mixed audio in one process over an eight-second window. Matching source/seek/speed inputs share decoding.
+- The optional Composited preview monitor plays one combined audio/video stream, prepares the next range, reports progress and supports cancellation, obsolete-state invalidation and selectable preview resolutions.
+- The new mode defaults to 540p. Live layers stays the initial interactive mode. Complete preview files have a twelve-file/512 MiB cache budget. Crash remnants and full cache-management tooling need more work.
+- Decoded range/export comparisons cover clip appearance/disappearance, title fades, animated rotation, shared source inputs and delayed audio. A cache regression checks reuse, edit invalidation and cancellation.
+
+**All 33 Python regression tests passed in 49.209 seconds, and all six JavaScript timeline tests passed.** Evidence is build/qa/regression34-shared.log and build/qa/node34-shared.log. The packaged render_engine, preview_cache, server and timing code were structurally compared to compiled current source and matched. build/qa/bundled-source34.json records those checks.
+
+## Installed 4K60 editing and endurance measurements
+
+The tested 4K60 sources are real decoded H.264/AAC moving test patterns. They are generated stress fixtures. The layered scene contains three video layers with animated transforms and three independent audio tracks. The endurance sequence has 1,500 clips across 600 seconds and was played for 70 seconds.
+
+Both cases below use 720p source proxies and the 540p continuous-range compositor. The monitor presents the fully composed result through one video element. These are proxy-assisted, reduced-resolution figures.
+
+| Installed scene | Measured s | Presented composite FPS | Dropped / decoded frames | Buffering s | Initial preparation s | Three seek latencies ms, range | Peak summed working set MiB | Peak process GPU memory MiB, dedicated / shared |
+|---|---|---|---|---|---|---|---|---|
+| 4k60-3video-3audio-proxy | 9 | 58.44 | 1 / 537 | 0.019 | 8.469 | 62–125 | 1051.0 | 3.34 / 368.86 |
+| 4k60-1500clips-proxy | 70 | 59.54 | 8 / 4164 | 0.119 | 3.985 | 62–203 | 2023.4 | 3.56 / 292.96 |
+
+The endurance playhead advanced 69.928 seconds during 70 seconds of measurement. Its UI animation rate was 60.00 callbacks/s and p95 video callback gap was 17.00 ms. The layered run averaged 4.63% of machine CPU, and endurance averaged 5.06%. Process I/O and GPU counter samples are in build/qa/composited34-installed/playback.json and build/qa/endurance34-installed/playback.json.
+
+FPS counts presentation callbacks, while decoded frames and drops come from browser counters accumulated across player replacement. Audio meter activity was observed in both cases. The media clock owns this combined stream, so an independent HTML audio-element drift figure is inapplicable. Container A/V duration and delayed audio placement have decoded tests. Physical output latency, sample-locked range handoff and one-hour drift remain unqualified.
+
+An earlier 720p buffered prototype waited until four seconds remained to prepare the next range. It paused at the boundary and averaged 47.6 callbacks/s. Preparation now starts earlier, the default render size is 540p, and matching inputs share decoding. The source prototype then reached 59.8 composite FPS with one drop and no measured buffering over nine seconds. Installed results above qualify the delivered build. Initial preparation remains several seconds.
+
+The 3.3 native-layer benchmarks are retained below. Native-resolution original-media multitrack performance has not been newly qualified as real time. The new figures establish buffered presentation and parity for this fixture, with explicit preparation cost. They do not guarantee real-time performance for arbitrary masks, LUTs, layers or codecs.
+
+## 4K120 support
+
+The test creates a real 3840×2160 H.264/AAC source at 120000/1001. Import metadata is checked. Native-resolution output is then encoded at 120000/1001 and 120/1, with slower playback into 60, 30 and 24 fps timelines. Every output is decoded, and frame counts and rate metadata are verified. Rational project serialization/reopen and sample arithmetic are checked at 100, 120 and 119.88.
+
+The source is approximately 0.1001 seconds. This proves the tested short import/edit/export path and constant slow motion. Long 4K120 footage, native real-time 120 fps presentation, variable-speed ramps, interpolation, and every hardware/codec combination remain unqualified.
+
+## 8K60 support
+
+The test creates a real 7680×4320 H.264 source at 60000/1001, verifies native import dimensions, trims the middle four frames and exports them at the original resolution and rational rate. It decodes the result, checks frame count/dimensions/rate and compares the first delivered picture against its selected original.
+
+This is a six-frame source and four-frame delivery. Longer 8K60 tests, a 60/1 native-resolution acceptance case, HEVC/AV1 and 10-bit combinations, camera footage, storage stress and hardware encode limits remain open. A selected resolution in the interface is not counted as qualification.
+
+## GPU acceleration and architecture selection
+
+A local D3D11VA prototype decoded 360 original 4K60 H.264 frames and explicitly downloaded GPU surfaces to NV12 for the CPU path. It completed successfully. The software comparison took 0.969 seconds wall time, versus 1.843 seconds for D3D11VA plus download. FFmpeg reported 0.906/1.230 seconds internal runtime and about 154/474 MiB peak RSS respectively. D3D11VA used less CPU time. This single short fixture favored software for the current CPU-composited pipeline, so automatic hardware decoding has not been enabled.
+
+Actual GPU encoding through AMD AMF is preserved, with software fallback on failure. The 3.3 six-encoder matrix is retained below. GPU composition and a native zero-copy decoder/render path remain missing. NVIDIA and Intel driver qualification remains open.
+
+PDH now records dedicated/shared GPU process-memory counters. Those sums can count shared allocations across processes. The integrated Radeon uses shared system memory, so these figures are not a complete physical VRAM inventory. Video/3D utilization counters still report near zero in cases where AMF/D3D11VA completed. Their occupancy interpretation remains unqualified. Raw decode diagnostics are in ignored build/qa/decode34.json.
+
+MLT's service architecture was reviewed as a candidate. The measured prototype reuses the existing FFmpeg effect and audio evaluator to preserve reference/export behavior. MLT was not integrated or performance-qualified.
+
+## Windows installer, large files and recovery
+
+The 3.3→3.4.0 upgrade passed, followed by 3.4.0→3.4.1. The final installer upgrade, uninstall and reinstall each returned zero. Shortcuts were removed and restored correctly, and the controlled project-retention sentinel survived. That profile had no pre-existing user project/settings documents in the scanned directory. A populated long-lived profile still needs qualification.
+
+The final installed app passed the complete native workflow with two independently allocated 4,977,125,566-byte MOVs exposed through native paths. It linked originals without populating its media-copy folder, sought beyond 4 GiB, split/trimmed/moved and exercised undo/redo. Its delivery contains 24 frames at 3840×2160/60 with 0.400000-second audio/video. First-frame RGB error against the selected original was 0.891 levels at 96×54.
+
+That workflow also passed original-frame stepping, proxy cancellation/retry, source monitor, grading/reference/scopes, linked audio, nesting/expand/undo, selected-frame multitrack review, motion apply/undo, AI approval/undo/redo, project reload and the single-stream composited monitor. Browser errors were empty and the host exited normally. build/qa/lifecycle34-final/lifecycle.json and build/qa/installed34-final/windows-workflow.json retain the results.
+
+Recovery and previous-format compatibility passed the complete existing regressions. Native high-DPI changes remain unqualified. The earlier WebView2 DPI-emulation attempt timed out. No manual user test is being counted as acceptance.
+
+## GitHub CI/CD
+
+Windows Actions checks all reachable history for credential patterns and forbidden generated files, dependency compatibility, Python/JavaScript syntax, Python regressions, JavaScript commands, application packaging and MSI lifecycle. Official action revisions are pinned and the FFmpeg archive checksum is verified.
+
+The initial hosted run found two assertions that compared an 8.3 temporary path with its canonical Windows spelling. Those assertions now compare resolved paths. Subsequent hosted Windows regression and packaging passed, including the [compositor CI run](https://github.com/JakubSoltysiak/VlogCraft/actions/runs/43294828178). Final branch checks may run again after report commits. Their live status is shown on pull request 1.
+
+CI does not publish a stable GitHub release or bundled installer artifact. Exact dependency source/redistribution material still needs review for public binaries. The local development installer remains available.
+
+## Known limitations and next priorities
+
+The buffered mode has startup/cache-miss latency and range handoff overhead. It is an experimental transport, and live-layer preview remains available. Full continuous native/MSE playback, sample-locked audio, hour-long endurance, high-DPI changes, camera acceptance media, GPU composition and broad HFR/8K qualification remain production blockers.
+
+Offline review/proposals remain multitrack-aware and consent-bound. The optional online AI connector retains its existing legacy scope. No paid call was required and no footage was sent to an external service. Public GitHub publication includes source and reviewed demonstration images.
+
+The next work is to remove range handoff gaps with an uninterrupted transport, reduce first-play preparation, qualify longer HFR/8K camera material and mixed codecs, and add a measured zero-copy GPU path. Professional masks, managed HDR, corrective tracking, audio mastering, multicam and interchange gaps remain listed in FEATURES.md.
+
+---
+
 # VlogCraft Studio 3.3 release qualification
 
 12 November 2026. Private Windows development release. The qualified MSI is release/VlogCraft-Studio-3.3-x64.msi, 206,409,324 bytes. SHA-256 is **566D077D2FFD2972B59DCA6B03D77C3A845E35C4F844FE2333FFBA15A93D0AA2**. Version 3.3 remains installed with Start menu and desktop shortcuts.

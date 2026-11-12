@@ -6,7 +6,6 @@ import hashlib
 import json
 import os
 from pathlib import Path
-import shutil
 import subprocess
 import tempfile
 import threading
@@ -119,6 +118,17 @@ class PreviewCache:
                 if not job['cancel'].is_set():job.update(status='error',error=str(error))
 
     def _prune(self):
+        # Account for complete cache files left by earlier application sessions.
+        managed={job['path'] for job in self.jobs.values()}
+        orphaned=[p for p in self.folder.glob('*.mp4') if p not in managed and len(p.stem)==64 and all(c in '0123456789abcdef' for c in p.stem)]
+        disk_files=[p for p in self.folder.glob('*.mp4') if len(p.stem)==64 and all(c in '0123456789abcdef' for c in p.stem)]
+        total_bytes=sum(p.stat().st_size for p in disk_files)
+        for path in sorted(orphaned,key=lambda p:p.stat().st_mtime):
+            if len(disk_files)<=12 and total_bytes<=512*1024**2:break
+            try:
+                size=path.stat().st_size;path.unlink()
+            except PermissionError:continue
+            disk_files.remove(path);total_bytes-=size
         finished=[j for j in self.jobs.values() if j['status'] not in ('queued','rendering')]
         bytes_total=sum(j['path'].stat().st_size for j in finished if j['path'].is_file())
         for job in finished:

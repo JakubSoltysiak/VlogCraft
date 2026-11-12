@@ -58,7 +58,7 @@ MEASURE = """async seconds=>{
     if(renderedEnabled()&&(renderedLoading||!renderedCurrent||renderedCurrent.media.readyState<3))bufferMs+=now-last;
     last=now;
     for(const p of players())if(p.media?.tagName==='VIDEO'){
-      observe(p.media);
+      observe(p.media);count(p.media);
       const clip=programTracks.flatMap(t=>t.clips).find(c=>c.id===p.clipId);
       if(clip&&!p.media.seeking)drifts.push(Math.abs(p.media.currentTime-(clip.start+(playhead-clip.position)*clip.speed)));
     }
@@ -115,7 +115,7 @@ def run(executable, folder, results,scenario=None,engine='interactive'):
                 page.evaluate('assets=>{state.assets=assets;useProxies=false}', response['assets'])
                 page.wait_for_function("(async()=>{const jobs=await request('jobs');return jobs.readyAudio.length===3;})()")
                 scenarios = [('1080p60', 0, 1, 7), ('4k30', 1, 1, 7), ('4k60', 2, 1, 7),
-                             ('4k60-3video-3audio-effects', 2, 3, 9), ('1080p60-stabilized', 0, 1, 7), ('10minute-1500clips', 0, 1, 70), ('4k60-3video-3audio-proxy', 2, 3, 9)]
+                             ('4k60-3video-3audio-effects', 2, 3, 9), ('1080p60-stabilized', 0, 1, 7), ('10minute-1500clips', 0, 1, 70), ('4k60-3video-3audio-proxy', 2, 3, 9), ('4k60-1500clips-proxy', 2, 1, 70)]
                 for name, index, layers, seconds in scenarios:
                     if scenario and name!=scenario:continue
                     if name.endswith('-proxy'):
@@ -142,7 +142,7 @@ def run(executable, folder, results,scenario=None,engine='interactive'):
                         for(let i=0;i<1500;i++){const c=clipFromAsset(a,i*.4,'video');c.start=2;c.end=2.4;t.clips.push(c);}
                       }
                       selectedId=null;playhead=0;redraw();
-                    }""", {'index': index, 'layers': layers, 'long': name.startswith('10minute')})
+                    }""", {'index': index, 'layers': layers, 'long': '1500clips' in name})
                     if name.endswith('-stabilized'):
                         page.evaluate('save();flushSave()')
                         page.evaluate("""(async()=>{

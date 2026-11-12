@@ -1,14 +1,15 @@
-# VlogCraft Studio 3.3 for Windows
+# VlogCraft Studio 3.4 for Windows
 
-Private Windows 11 x64 development release. Run **release/VlogCraft-Studio-3.3-x64.msi**. The installer adds VlogCraft Studio to the Start menu and offers a desktop shortcut. Python, FFmpeg, FFprobe and OpenCV are bundled. WebView2 is required and was present on the qualification machine.
+Windows 11 x64 development project. The local development installer is **release/VlogCraft-Studio-3.4-x64.msi**, currently version 3.4.1. The installer adds VlogCraft Studio to the Start menu and offers a desktop shortcut. Python, FFmpeg, FFprobe and OpenCV are bundled. WebView2 is required and was present on the qualification machine. Source and preserved tags are on the public repository, with 3.4 development reviewed in pull request 1. [GitHub repository](https://github.com/JakubSoltysiak/VlogCraft), [development PR](https://github.com/JakubSoltysiak/VlogCraft/pull/1).
 
 ## Editing
 
 - Drag files from Explorer into the editor to link their original paths. **Link files** opens the native picker. Multiple files are processed with progress and cancellation. The library **+** and browser-only drops create local copies through bounded chunks. There is no application file-size ceiling.
 - Open a library item's **Source** monitor to mark a range. **Inspect frame**, **Previous frame**, **Next frame**, **I** and **O** use original presentation timestamps. The out-point excludes the following frame. Place a range using append, insert or overwrite.
-- Choose exact sequence rates in project settings, including **24000/1001**, **30000/1001** and **60000/1001**. Timecode uses a non-drop frame counter.
+- Choose exact sequence rates in project settings, including **24000/1001**, **30000/1001**, **60000/1001** and **120000/1001**, plus integer rates through 120 fps. Timecode uses a non-drop frame counter.
 - Ctrl-click clips to select across tracks. **Edit…** provides rolling, slip, slide, selection movement, camera-audio separation and linking, and nesting. Linked timing edits move both partners. Expand a nested sequence to edit its child tracks. Track **⋯** controls naming, color, gain, solo, height and order.
 - The inspector contains transforms, fades, directional entrance wipes, chroma key, an ellipse mask, curves, color wheels, SDR cube LUT import and audio controls. Keyframe animation supports position, scale, rotation, opacity, gain, mask radius and primary effect parameters. Motion analysis creates editable source-time keys for point tracking or translation/rotation stabilization.
+- **Composited preview** buffers eight-second program ranges through the export compositor and plays one combined audio/video stream. It renders ahead, reuses matching source decoders, cancels obsolete work and limits complete cache files. The default is 540p. Preparation and cache misses can pause playback. Live layers remains the initial interactive mode.
 - **Reference** renders a paused program frame with the export compositor. Paused scopes display that same frame. Interactive playback uses browser compositing, automatic 720p proxies, an audio master clock and bounded decoder reuse. Effects and audio processors have approximation differences during interactive playback.
 - Audio channel strips provide gain, pan, low/high shelves, compression and a master peak meter. Peak normalization and dialogue-track-driven music ducking measure original audio and write editable gain changes. A 48 kHz, 16-bit stereo FLAC preview cache avoids reading an entire video container for each independent audio track.
 - **Export film** renders original media to SDR MP4 and AAC. Select dimensions, exact frame rate, CPU encoder or an accelerator that passes a real local encode probe. Hardware failure automatically retries the corresponding software encoder. The compositor remains CPU-based.
@@ -29,7 +30,7 @@ The existing optional API connection continues to use its legacy main-track anal
 
 Read **FEATURES.md** for implementation and qualification status, **VERIFICATION.md** for measured tests and release blockers, and **ENGINEERING.md** for architecture and continuation work. This remains a development release. Sustained full-quality multitrack playback, managed HDR and professional interchange need further engineering.
 
-Git preserves studio-3.0-original, studio-3.1-verified and studio-3.2-source. The extracted README_EN.md, README_PL.md and QA_SUMMARY.txt describe the original archive.
+Git preserves studio-3.0-original, studio-3.1-verified, studio-3.2-source and studio-3.3-verified. See CONTRIBUTING.md for build/test commands, PUBLICATION_AUDIT.md for the publication review and THIRD_PARTY.md for dependency provenance. No new project redistribution license has been granted. The extracted README_EN.md, README_PL.md and QA_SUMMARY.txt describe the original archive.
 
 Build with Python 3.11 x64, packaging/requirements.txt, FFmpeg/FFprobe 9 and WiX 3.14.1. Run python packaging/build_windows.py --wix <WiX-directory>. The MSI is in release and the self-contained application directory is dist/VlogCraftStudio. Keep its files together.
 

@@ -614,7 +614,7 @@ def prepare_proposal(proposal,base):
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version='VlogCraftStudio/3.3'
+    server_version='VlogCraftStudio/3.4'
     protocol_version='HTTP/1.1'
     def handle(self):
         try:super().handle()

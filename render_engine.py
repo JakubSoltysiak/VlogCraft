@@ -138,11 +138,11 @@ def segment_command(state, start, end, target, jobdir, quality='final'):
         return min(end,float(timing.frame_at(clip_finish(c),fps)/fps)) if continuous else end
     def get_input(c):
         nonlocal source_index
-        key=c['id']
+        a=assets[c['assetId']]
+        pos_offset=max(0,first_time(c)-float(c['position']))
+        seek=float(c['start'])+pos_offset*float(c.get('speed',1))
+        key=(c['assetId'],seek,c.get('speed',1)) if continuous else c['id']
         if key not in inputs:
-            a=assets[c['assetId']]
-            pos_offset=max(0,first_time(c)-float(c['position']))
-            seek=float(c['start'])+pos_offset*float(c.get('speed',1))
             _media_input(cmd,a['path'],a['kind'],seek,float(c.get('speed',1)),duration,fps)
             inputs[key]=source_index;source_index+=1
         return inputs[key]

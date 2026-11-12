@@ -8,7 +8,7 @@ function invalidateRendered(){
   renderedEpoch++;renderedRequest++;renderedLoading=false;
   releaseProgram(renderedCurrent);releaseProgram(renderedNext);renderedCurrent=renderedNext=null;
 }
-function renderedClock(){return renderedCurrent&&!renderedCurrent.media.seeking?renderedCurrent.start+renderedCurrent.media.currentTime:playhead;}
+function renderedClock(){return renderedCurrent&&!renderedCurrent.media.seeking?Math.min(renderedCurrent.end,renderedCurrent.start+renderedCurrent.media.currentTime):playhead;}
 function pauseRendered(){renderedCurrent?.media.pause();}
 async function fetchProgram(at,epoch){
   if(modified>persisted)await flushSave();
