@@ -46,6 +46,8 @@ FRAME_INDEX=source_frames.FrameIndex(WORK/'frame-index')
 CACHE_WORKERS=ThreadPoolExecutor(max_workers=2,thread_name_prefix='media-cache')
 MEDIA=WORK/'media'; THUMBS=WORK/'thumbnails'; PROXIES=WORK/'proxies'; REVIEWS=WORK/'reviews'; EXPORTS=WORK/'exports'
 AI_UNDO=WORK/'ai_undo.json'
+import preview_cache
+PROGRAM_PREVIEW=preview_cache.PreviewCache(WORK/'preview-cache')
 LOCK=threading.RLock(); UPLOAD_LOCK=threading.RLock(); JOB_LOCK=threading.RLock()
 VIDEO={'.mp4','.mov','.mkv','.m4v','.avi','.wmv','.webm','.mpg','.mpeg','.mts','.m2ts'}
 IMAGE={'.jpg','.jpeg','.png','.webp','.bmp','.tif','.tiff'}
@@ -675,6 +677,11 @@ class Handler(BaseHTTPRequestHandler):
         try:
             if path=='/api/state':
                 return self.json_response(client_state())
+            if path=='/api/preview/status':
+                return self.json_response(PROGRAM_PREVIEW.status(parse_qs(parsed.query).get('id',[''])[0]))
+            if path.startswith('/preview/'):
+                key=path.rsplit('/',1)[-1].removesuffix('.mp4')
+                return self.file_response(PROGRAM_PREVIEW.path(key),'video/mp4')
             if path=='/api/source/status':
                 return self.json_response(FRAME_INDEX.status(parse_qs(parsed.query).get('assetId',[''])[0]))
             if path=='/api/encoders':return self.json_response(encoders.available())
@@ -729,7 +736,7 @@ class Handler(BaseHTTPRequestHandler):
                 if not target.exists():target=EXPORTS/name
                 return self.file_response(target)
             if path=='/' or path=='/index.html':return self.file_response(WEB/'index.html','text/html; charset=utf-8')
-            if path in ('/app.js','/studio.js','/animation.js','/motion.js','/timeline.js','/timebase.js','/edit_ops.js','/edit_commands.js','/monitor.js','/playback_cache.js','/effects.js','/grade.js','/audio.js','/nesting.js','/source_frames.js','/style.css'):
+            if path in ('/app.js','/studio.js','/animation.js','/motion.js','/timeline.js','/timebase.js','/edit_ops.js','/edit_commands.js','/monitor.js','/rendered_preview.js','/playback_cache.js','/effects.js','/grade.js','/audio.js','/nesting.js','/source_frames.js','/style.css'):
                 return self.file_response(WEB/path.lstrip('/'))
             return self.json_response({'error':'Not found'},404)
         except (BrokenPipeError,ConnectionAbortedError,ConnectionResetError):return
@@ -797,6 +804,13 @@ class Handler(BaseHTTPRequestHandler):
                 with UPLOAD_LOCK:u=UPLOADS.pop(uid,None)
                 if u:Path(u['tmp']).unlink(missing_ok=True)
                 return self.json_response({'cancelled':bool(u)})
+            if path=='/api/preview/cancel':
+                PROGRAM_PREVIEW.cancel()
+                return self.json_response({'cancelRequested':True})
+            if path=='/api/preview':
+                with LOCK:snap=deepcopy(STATE)
+                proxies={a['id']:proxy_path(a) for a in snap['assets'] if proxy_path(a).is_file()} if data.get('proxies',True) else {}
+                return self.json_response(PROGRAM_PREVIEW.prepare(snap,data.get('frame'),data.get('width',1280),proxies))
             if path=='/api/lut/import':
                 ident,entry=grading.import_cube(data['text'],str(data.get('name','LUT')))
                 with LOCK:
@@ -985,5 +999,7 @@ def main():
     if not args.no_browser:threading.Timer(.6,lambda:webbrowser.open(url)).start()
     try:server.serve_forever(.25)
     except KeyboardInterrupt:pass
-    finally:server.server_close()
+    finally:
+        PROGRAM_PREVIEW.close()
+        server.server_close()
 if __name__=='__main__':main()

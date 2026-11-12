@@ -38,6 +38,7 @@ async function importNative(paths) {
 }
 
 function refreshPlayers() {
+  invalidateRendered();
   clearPlaybackCache();
   for (const player of activePlayers.values()) {
     player.media?.pause?.();releaseStrip(player.media);

@@ -164,6 +164,7 @@ def run(project):
     finally:
         import audio_cache
         audio_cache.cancel()
+        server.PROGRAM_PREVIEW.close()
         with server.JOB_LOCK:
             server.PROXY_QUEUE.clear()
             for key, process in server.CURRENT_PROCESS.items():

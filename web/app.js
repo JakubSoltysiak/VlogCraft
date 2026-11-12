@@ -24,8 +24,8 @@ function save(){modified++;setSaveStatus('UNSAVED CHANGES');clearTimeout(saveTim
 async function flushSave(){clearTimeout(saveTimer);saveTimer=null;let s=structuredClone(state);if(s){delete s.luts;delete s.assets;}let rev=modified;
  const next=saveInFlight.catch(()=>{}).then(async()=>{if(!state)return;const saved=await request('state','POST',s);persisted=Math.max(rev,persisted);if(persisted>=modified)setSaveStatus('ALL CHANGES SAVED');return saved;});
  saveInFlight=next;try{await next;}catch(e){setSaveStatus('SAVE ERROR');toast('Could not save: '+e.message,true);}return next;}
-function snapshot(){undoStack.push(structuredClone({tracks:state.tracks,name:state.name,output:state.output}));if(undoStack.length>80)undoStack.shift();redoStack=[];}
-function restoreHistory(from,to){if(!from.length)return;to.push(structuredClone({tracks:state.tracks,name:state.name,output:state.output}));const s=from.pop();state.tracks=s.tracks;state.name=s.name;state.output=s.output;selectedId=null;playhead=Math.min(playhead,duration());redraw();save();}
+function snapshot(){invalidateRendered();undoStack.push(structuredClone({tracks:state.tracks,name:state.name,output:state.output}));if(undoStack.length>80)undoStack.shift();redoStack=[];}
+function restoreHistory(from,to){if(!from.length)return;invalidateRendered();to.push(structuredClone({tracks:state.tracks,name:state.name,output:state.output}));const s=from.pop();state.tracks=s.tracks;state.name=s.name;state.output=s.output;selectedId=null;playhead=Math.min(playhead,duration());redraw();save();}
 function sel(){for(const t of state.tracks){const c=t.clips.find(c=>c.id===selectedId);if(c)return {clip:c,track:t};}return null;}
 function trackById(id){return state.tracks.find(t=>t.id===id);}
 function assetById(id){return state.assets.find(a=>a.id===id);}
@@ -190,7 +190,7 @@ function makePlayer(c,t,z){const a=assetById(c.assetId);if(!a)return null;const 
  const prepared=waitingPlayers.get(c.id);waitingPlayers.delete(c.id);
  const media=a.kind==='image'?document.createElement('img'):(prepared?.media||sourceVideo(c));
  if(a.kind==='image')media.src='/media/'+a.id;if(media.tagName==='VIDEO'){media.preload='metadata';media.playsInline=true;media.autoplay=false;media.muted=false;media.disablePictureInPicture=true;}media.style.objectFit=c.fit==='cover'?'cover':'contain';wrap.appendChild(media);$('previewLayers').appendChild(wrap);return {media,wrap,clipId:c.id,aId:a.id};}
-function syncPreview(force=false){if(!state)return;if(force)referenceChanged();const active=getActiveClips();$('emptyPreview').hidden=state.tracks.some(t=>t.clips.length);
+function syncPreview(force=false){if(!state)return;if(renderedPreview(force))return;if(force)referenceChanged();const active=getActiveClips();$('emptyPreview').hidden=state.tracks.some(t=>t.clips.length);
  const activeIds=new Set(active.map(x=>x.c.id));
  for(const [id,p] of activePlayers)if(!activeIds.has(id)||p.type!=='video'){
   recycleVideo(p);p.wrap?.remove();activePlayers.delete(id);
@@ -231,10 +231,10 @@ function syncAudio(force=false){const active=[];
   if(isPlaying&&m.paused)m.play().catch(()=>{});else if(!isPlaying&&!m.paused)m.pause();
  }
 }
-function stopPlayback(){isPlaying=false;$('masterMeter').value=-60;referenceChanged();$('playBtn').innerHTML=svg('play');for(const p of activePlayers.values())p.media?.pause?.();for(const p of audioPlayers.values())p.pause();}
+function stopPlayback(){isPlaying=false;pauseRendered();$('masterMeter').value=-60;referenceChanged();$('playBtn').innerHTML=svg('play');for(const p of activePlayers.values())p.media?.pause?.();for(const p of audioPlayers.values())p.pause();}
 async function playPause(){if(isPlaying){stopPlayback();return;}if(duration()<=0)return toast('Add footage first',true);if(playhead>=duration()-.001)playhead=0;try{await initializeMixer();transportClock=mixer.state==='running'?mixer:null;}catch{transportClock=null;}
  isPlaying=true;playAt=playhead;playStart=transportNow();$('playBtn').innerHTML=svg('pause');syncPreview(true);requestAnimationFrame(animate);}
-function animate(){if(!isPlaying)return;updateMeter();playhead=playAt+(transportNow()-playStart)/1000;if(playhead>=duration()){seek(duration());stopPlayback();return;}positionPlayhead();syncPreview(false);const p=$('timelinePlayhead');if(p){const scroller=$('timelineScroller');const edge=151+playhead*zoom;if(edge>scroller.scrollLeft+scroller.clientWidth-50)scroller.scrollLeft=edge-200;}requestAnimationFrame(animate);}
+function animate(){if(!isPlaying)return;updateMeter();playhead=renderedEnabled()?renderedClock():playAt+(transportNow()-playStart)/1000;if(playhead>=duration()){seek(duration());stopPlayback();return;}positionPlayhead();syncPreview(false);const p=$('timelinePlayhead');if(p){const scroller=$('timelineScroller');const edge=151+playhead*zoom;if(edge>scroller.scrollLeft+scroller.clientWidth-50)scroller.scrollLeft=edge-200;}requestAnimationFrame(animate);}
 function redraw(){if(!state)return;rebuildIndex();$('projectTitle').textContent=state.name;$('renderRes').textContent=`${state.output.width} × ${state.output.height} · ${rateLabel(state.output.fps)} FPS`;$('exportEstimate').textContent=`${state.output.width===3840?'4K UHD':state.output.width+'p'} · ${rateLabel(state.output.fps)} FPS · H.264`;
  document.querySelector('.export-feature strong').textContent=state.name;sizeMonitor();renderAssets();renderTimeline(true);renderInspector();$('timelineStatus').textContent=`${state.tracks.length} TRACKS · ${state.tracks.reduce((n,t)=>n+t.clips.length,0)} CLIPS`;
  syncPreview(true);
@@ -296,7 +296,7 @@ async function previewAi(){try{await flushSave();const p=proposalText();const r=
 async function applyAi(){if(!proposalToken||proposalSnapshot!==$('proposalJson').value)return toast('Preview the exact proposal first',true);if(!confirm('Apply the previewed edits to this timeline?'))return;try{await flushSave();const r=await request('ai/apply','POST',{proposal:proposalText(),approvalToken:proposalToken});snapshot();state=r.state;selectedId=null;proposalToken=null;$('applyAiBtn').disabled=true;redraw();$('aiResults').textContent='Applied '+r.changes.length+' edits. Use Undo Last AI Apply to revert.';}catch(e){$('aiResults').textContent=e.message;}}
 async function undoAi(){if(!confirm('Undo last AI changes?'))return;try{const r=await request('ai/undo','POST',{});redoStack.push(structuredClone({tracks:state.tracks,name:state.name,output:state.output}));undoStack.pop();state=r.state;selectedId=null;redraw();$('aiResults').textContent='AI edits undone. Ctrl+Y restores the approved edits.';}catch(e){$('aiResults').textContent=e.message;}}
 function setup(){
- setupReference();$('editCommands').onclick=commandDialog;
+ setupRenderedPreview();setupReference();$('editCommands').onclick=commandDialog;
  let pendingScroll=false;
  $('timelineScroller').onscroll=()=>{
    if(pendingScroll||!state)return;pendingScroll=true;

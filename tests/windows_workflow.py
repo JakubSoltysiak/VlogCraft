@@ -212,6 +212,16 @@ def test(executable, source, results, record_visual=False, second_source=None):
                 page.wait_for_function("state?.assets.length===1 && state.tracks.flatMap(t=>t.clips).length===1")
                 assert page.evaluate("Math.abs(state.tracks.flatMap(t=>t.clips)[0].start-4.6)<1e-6")
                 assert not errors,errors
+                page.locator('#playbackEngine').select_option('rendered')
+                page.wait_for_function("renderedCurrent?.media.readyState>=2 && !renderedLoading",timeout=60000)
+                assert page.locator('.rendered-program:not([hidden])').is_visible()
+                assert page.evaluate('activePlayers.size===0 && audioPlayers.size===0')
+                page.locator('#playBtn').click()
+                page.wait_for_function('!isPlaying && playhead>=duration()-.001')
+                assert page.evaluate("renderedCurrent.media.getVideoPlaybackQuality().totalVideoFrames>10")
+                page.locator('#playbackEngine').select_option('interactive')
+                page.evaluate('seek(0)')
+                summary['single_stream_composited_playback']=True
                 # Distinct native paths share this allocated test fixture through NTFS hard links.
                 # The editor must link both paths and must never copy their multi-GB contents.
                 batch_meter=Resources(p.pid)
