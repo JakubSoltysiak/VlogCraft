@@ -1,0 +1,22 @@
+VLOGCRAFT STUDIO 3.0 - QA REPORT
+2026-11-12
+
+PASS  Python source syntax (py_compile)
+PASS  JavaScript source syntax (node --check)
+PASS  Python unittest: short 320x180 multitrack video+music+title FFmpeg export
+PASS  Python unittest: project schema validation and source preservation
+PASS  Python unittest: local HTTP chunk transfer and MP4 export pipeline
+PASS  Python unittest: HTTP byte ranges at offsets > 4 GiB
+PASS  Python unittest: streamed PUT body at offsets > 4 GiB (sparse-file simulation)
+PASS  Headless Chromium static app: no JavaScript exceptions (empty + mock loaded)
+PASS  Headless Chromium app: select, split, undo, redo, split title, move clip
+PASS  HDR-tagged input short transcoding to SDR H.264 (synthetic test)
+
+NOT TESTED  Full transfer of an actual 4.5+ GB camera video
+NOT TESTED  Windows 11 installation and launch
+NOT TESTED  Long 4K/60 export and HEVC/HDR phone or DJI source playback
+NOT TESTED  All codecs and mixed-framerate professional workflows
+NOT INCLUDED  Professional Premiere features: nested sequences, tracking, stabilization, LUT scopes, keyframes, GPU encoding
+
+Tests use local dependencies only (Python, FFmpeg, standard browser APIs).
+No sample original footage or private project file included in the archive.
