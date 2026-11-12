@@ -294,7 +294,7 @@ def validate_state(d, base=None):
             if asset and asset['kind']!='image' and end>float(asset['duration'])+.12:
                 raise ValueError('Clip exceeds source duration: '+asset['name'])
             if kind in ('image','title') and start!=0:raise ValueError('Still/title in-point must be zero')
-            speed=_number(src.get('speed',1),'Playback speed',.25,4)
+            speed=_number(src.get('speed',1),'Playback speed',.1,4)
             c={'id':cid,'assetId':assetId,'kind':kind,
                'position':_number(src.get('position',0),'Position',0,1e12),'start':start,'end':end,
                'speed':speed,'volume':_number(src.get('volume',1),'Clip volume',0,3),
