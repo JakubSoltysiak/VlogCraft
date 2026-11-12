@@ -1,7 +1,8 @@
 """Source-time animation for parameters shared by the monitor and renderer."""
 import math
 
-LIMITS = {'x':(-2,2), 'y':(-2,2), 'volume':(0,3)}
+LIMITS = {'x':(-2,2), 'y':(-2,2), 'volume':(0,3), 'scale':(.1,3), 'rotation':(-360,360), 'opacity':(0,1),
+          'brightness':(-1,1), 'contrast':(0,2), 'saturation':(0,3), 'maskRadius':(.01,1)}
 MODES = ('linear','hold','ease-in','ease-out','bezier')
 
 

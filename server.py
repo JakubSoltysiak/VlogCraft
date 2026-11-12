@@ -287,6 +287,20 @@ def validate_state(d, base=None):
                'fadeIn':_number(src.get('fadeIn',0),'Fade in',0,30),
                'fadeOut':_number(src.get('fadeOut',0),'Fade out',0,30),
                'locked':bool(src.get('locked',False))}
+            for prop,default in [('rotation',0),('brightness',0),('contrast',1),('saturation',1),('maskRadius',.5)]:
+                c[prop]=_number(src.get(prop,default),prop,*animation.LIMITS[prop])
+            c['mask']=src.get('mask','none')
+            if c['mask'] not in ('none','ellipse'):raise ValueError('Unknown clip mask')
+            c['feather']=_number(src.get('feather',.1),'Mask feather',0,1)
+            c['chroma']=bool(src.get('chroma',False))
+            c['keyColor']=src.get('keyColor','#00ff00')
+            if not isinstance(c['keyColor'],str) or not re.fullmatch(r'#[a-fA-F0-9]{6}',c['keyColor']):raise ValueError('Invalid key color')
+            c['similarity']=_number(src.get('similarity',.16),'Key similarity',.01,1)
+            c['keyBlend']=_number(src.get('keyBlend',.08),'Key blend',0,1)
+            if src.get('linkId'):
+                if not isinstance(src['linkId'],str) or not re.fullmatch(r'[\w-]{1,64}',src['linkId']):raise ValueError('Invalid link group')
+                c['linkId']=src['linkId']
+            if kind=='video' and src.get('audioDetached'):c['audioDetached']=True
             if 'keys' in src:c['keys']=animation.validate(src['keys'])
             if c['grade'] not in engine.GRADES:raise ValueError('Invalid color grade')
             if c['fit'] not in ('contain','cover'):raise ValueError('Invalid fit')
@@ -658,7 +672,7 @@ class Handler(BaseHTTPRequestHandler):
                 if not target.exists():target=EXPORTS/name
                 return self.file_response(target)
             if path=='/' or path=='/index.html':return self.file_response(WEB/'index.html','text/html; charset=utf-8')
-            if path in ('/app.js','/studio.js','/animation.js','/motion.js','/timeline.js','/timebase.js','/source_frames.js','/style.css'):
+            if path in ('/app.js','/studio.js','/animation.js','/motion.js','/timeline.js','/timebase.js','/edit_ops.js','/edit_commands.js','/monitor.js','/effects.js','/source_frames.js','/style.css'):
                 return self.file_response(WEB/path.lstrip('/'))
             return self.json_response({'error':'Not found'},404)
         except (BrokenPipeError,ConnectionAbortedError,ConnectionResetError):return
@@ -727,6 +741,21 @@ class Handler(BaseHTTPRequestHandler):
                 with UPLOAD_LOCK:u=UPLOADS.pop(uid,None)
                 if u:Path(u['tmp']).unlink(missing_ok=True)
                 return self.json_response({'cancelled':bool(u)})
+            if path=='/api/program/frame':
+                with LOCK:snap=deepcopy(STATE)
+                fps=timing.rate(snap['output']['fps'])
+                frame=data.get('frame')
+                if type(frame) is not int or frame<0:raise ValueError('Invalid sequence frame')
+                total=timing.frame_at(engine.sequence_duration(snap),fps)
+                if frame>=total:raise ValueError('Seek inside the sequence')
+                out=snap['output'];scale=min(1,960/max(out['width'],out['height']))
+                out.update(width=max(2,round(out['width']*scale/2)*2),height=max(2,round(out['height']*scale/2)*2))
+                with tempfile.TemporaryDirectory(prefix='monitor-',dir=WORK) as directory:
+                    jobdir=Path(directory);dest=jobdir/'program.png'
+                    cmd=engine.segment_command(snap,float(frame/fps),float((frame+1)/fps),dest,jobdir,'frame')
+                    engine._run(cmd,str(jobdir))
+                    import base64
+                    return self.json_response({'frame':frame,'image':'data:image/png;base64,'+base64.b64encode(dest.read_bytes()).decode('ascii')})
             if path=='/api/source/cancel':
                 FRAME_INDEX.cancel(str(data.get('assetId','')))
                 return self.json_response({'cancelled':True})

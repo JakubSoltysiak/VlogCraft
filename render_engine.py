@@ -7,6 +7,7 @@ Source files are always read-only. Heavy operations run in a worker thread.
 from __future__ import annotations
 import math
 import animation
+import video_effects
 import timing
 import encoders
 import os
@@ -45,7 +46,7 @@ def active_clips(state, start, finish):
         for c in sorted(t['clips'], key=lambda z: z['position']):
             if timing.frame_at(clip_finish(c),fps)>first and timing.frame_at(c['position'],fps)<last:
                 video.append((t,c))
-                if c.get('assetId') and not t.get('muted') and (not solo or t.get('solo')) and (c.get('volume',1)>0 or c.get('keys',{}).get('volume')):
+                if c.get('assetId') and not c.get('audioDetached') and not t.get('muted') and (not solo or t.get('solo')) and (c.get('volume',1)>0 or c.get('keys',{}).get('volume')):
                     audio.append((t,c))
     for t in state['tracks']:
         if t['type'] != 'audio' or t.get('muted') or (solo and not t.get('solo')): continue
@@ -147,7 +148,7 @@ def segment_command(state, start, end, target, jobdir, quality='final'):
             ty=animation.expression(c,'y',start)
             fontsize=max(15,int(w*float(c.get('fontScale',0.048))))
             color=c.get('color','white')
-            alpha=float(c.get('opacity',1))
+            alpha=animation.expression(c,'opacity',start)
             # drawtext evaluates alpha each frame; fade timing remains correct
             # across split render segments, unlike a fade applied to the whole canvas.
             local_offset=max(0,start-float(c['position']))
@@ -157,22 +158,22 @@ def segment_command(state, start, end, target, jobdir, quality='final'):
                 alpha_terms.append(f'min(1\\,max(0\\,(t+{_num(local_offset)})/{_num(c["fadeIn"])}))')
             if c.get('fadeOut',0)>0:
                 alpha_terms.append(f'min(1\\,max(0\\,({_num(left)}-t)/{_num(c["fadeOut"])}))')
-            alpha_expr='*'.join(alpha_terms) if alpha_terms else '1'
+            alpha_expr='*'.join([alpha,*alpha_terms])
             font_option=''
             if os.name=='nt':
                 font=jobdir/'title-font.ttf'
                 if not font.exists():shutil.copyfile(Path(os.environ['WINDIR'])/'Fonts'/'segoeui.ttf',font)
                 font_option='fontfile=title-font.ttf:'
-            filters.append(f'[{last}]drawtext={font_option}textfile={f.name}:fontcolor={color}@{alpha:.3f}:'
+            filters.append(f'[{last}]drawtext={font_option}textfile={f.name}:fontcolor={color}:'
                            f"expansion=none:fontsize={fontsize}:x='(w-text_w)/2+w*({tx})':y='{text_y}+h*({ty})':" 
-                           f'alpha={alpha_expr}:box=1:boxcolor=black@0.35:boxborderw=14'
+                           f"alpha='{alpha_expr}':box=1:boxcolor=black@0.35:boxborderw=14"
                            f'[back{count}]')
             last=f'back{count}'
             continue
         a=assets[c['assetId']]
         inp=get_input(c)
         count+=1
-        zoom=float(c.get('scale',1)); targetw=max(2,round(w*zoom)//2*2);targeth=max(2,round(h*zoom)//2*2)
+        zoom=1 if c.get('keys',{}).get('scale') else float(c.get('scale',1)); targetw=max(2,round(w*zoom)//2*2);targeth=max(2,round(h*zoom)//2*2)
         scalemode='increase' if c.get('fit')=='cover' else 'decrease'
         # HDR10/HDR10+ / HLG -> SDR BT.709 tone mapping for normal TVs and web.
         # Export is SDR H.264; original 10-bit/HDR source is not modified.
@@ -185,7 +186,7 @@ def segment_command(state, start, end, target, jobdir, quality='final'):
         if c.get('fit')=='cover':
             expr+=f',crop={targetw}:{targeth}'
         expr+=(GRADES.get(c.get('grade','neutral'), '')+
-               f',format=rgba,colorchannelmixer=aa={_num(c.get("opacity",1))}'
+               video_effects.filters(c,start,count,jobdir)
                +_fade_video(c,start,duration)+f'[lay{count}]')
         filters.append(expr)
         # Expressions are evaluated per frame; positions are in relative canvas units.
@@ -214,8 +215,11 @@ def segment_command(state, start, end, target, jobdir, quality='final'):
         filters.append(f'[1:a]atrim=end_sample={samples}[mixed]')
 
     filters.append(f'[{last}]trim=end_frame={nframes},format=yuv420p[finished]')
+    if quality=='frame':filters.append('[mixed]anullsink')
     script=jobdir/f'graph_{target.stem}.txt'
     script.write_text(';\n'.join(filters)+'\n',encoding='utf-8')
+    if quality=='frame':
+        return cmd+['-/filter_complex',str(script),'-map','[finished]','-frames:v','1','-threads','1','-c:v','png',str(target)]
     crf='26' if quality=='review' else str(state['output'].get('crf',20))
     preset='veryfast' if quality=='review' else str(state['output'].get('preset','medium'))
     encoder='libx264' if quality=='review' else state['output'].get('encoder','libx264')

@@ -45,7 +45,7 @@ function sourceMonitor(a) {
   if(a.missing)return toast('Relink the missing source first',true);
   const dlg=document.createElement('dialog');dlg.className='motion-dialog';
   const still=a.kind==='image';
-  dlg.innerHTML='<h2>Source monitor</h2><p class="source-name"></p><div class="source-media"></div><div class="source-marks"></div><div class="property-actions"><button class="button secondary close-source">Close</button><button class="button primary insert-source">Append to timeline</button></div>';
+  dlg.innerHTML='<h2>Source monitor</h2><p class="source-name"></p><div class="source-media"></div><div class="source-marks"></div><div class="property-actions"><button class="button secondary close-source">Close</button><select class="compact-select" aria-label="Placement" id="sourcePlacement"><option value="append">Append</option><option value="insert">Insert at playhead</option><option value="overwrite">Overwrite at playhead</option></select><button class="button primary insert-source">Place clip</button></div>';
   document.body.appendChild(dlg);dlg.querySelector('.source-name').textContent=a.name;
   const media=document.createElement(still?'img':a.kind==='audio'?'audio':'video');
   media.src=seekUrl(a.id);if(!still)media.controls=true;dlg.querySelector('.source-media').appendChild(media);
@@ -63,9 +63,14 @@ function sourceMonitor(a) {
       marks={start:$('sourceIn').valueAsNumber,end:$('sourceOut').valueAsNumber};
       if(!Number.isFinite(marks.start)||!Number.isFinite(marks.end)||marks.start<0||marks.end>a.duration+.001||marks.end<=marks.start)return toast('Choose in and out points within the source',true);
     }
-    const t=defaultTrack(a.kind==='audio'?'audio':'video');
+    const chosen=sel()?.track;
+    const t=chosen&&canPlace(a,chosen)?chosen:defaultTrack(a.kind==='audio'?'audio':'video');
     if(!t||t.locked)return toast('Unlock a compatible destination track',true);
-    addAsset(a,t);if(!still)Object.assign(sel().clip,marks);redraw();save();dlg.close();
+    const placement=$('sourcePlacement').value;
+    const clip=clipFromAsset(a,0,t.type);
+    if(!still)Object.assign(clip,marks);
+    const at=placement==='append'?Math.max(0,...t.clips.map(c=>frameIndex(endOf(c)))):frameIndex(playhead);
+    if(commitEdit(placement==='append'?'insert':placement,{trackId:t.id,at,clip},[]))dlg.close();
   };
   if(a.kind==='video')preciseSource(dlg,a,media);
   dlg.showModal();

@@ -1,6 +1,6 @@
 let animationProperty = 'x';
 let copiedCurve = null;
-const parameterLimits = {x:[-2,2], y:[-2,2], volume:[0,3]};
+const parameterLimits = {x:[-2,2], y:[-2,2], volume:[0,3],scale:[.1,3],opacity:[0,1],rotation:[-360,360],maskRadius:[.01,1],brightness:[-1,1],contrast:[0,2],saturation:[0,3]};
 function sourceClock(clip) {
   return clip.start + (playhead - clip.position) * clip.speed;
 }
@@ -31,14 +31,16 @@ function curveValue(keys, fallback, at) {
   return a.value + (b.value-a.value)*u;
 }
 function animated(c, prop) {
-  return curveValue(c.keys?.[prop], c[prop], sourceClock(c));
+  const def={x:0,y:0,scale:1,opacity:1,rotation:0,maskRadius:.5,brightness:0,contrast:1,saturation:1,volume:1};
+  return curveValue(c.keys?.[prop], c[prop]??def[prop], sourceClock(c));
 }
 function animationControls(c) {
-  const properties = c.kind === 'audio' ? ['volume'] : assetById(c.assetId)?.hasAudio ? ['x','y','volume'] : ['x','y'];
+  const properties=c.kind==='audio'?['volume']:c.kind==='title'?['x','y','opacity']:
+    ['x','y','scale','rotation','opacity','brightness','contrast','saturation',...(c.mask==='ellipse'?['maskRadius']:[]),...(assetById(c.assetId)?.hasAudio?['volume']:[])];
   if (!properties.includes(animationProperty)) animationProperty=properties[0];
   const keys = c.keys?.[animationProperty] || [];
   const key = keys.find(k=>Math.abs(k.time-sourceClock(c))<.00001);
-  const labels={x:'Horizontal position',y:'Vertical position',volume:'Audio gain'};
+  const labels={x:'Horizontal position',y:'Vertical position',volume:'Audio gain',scale:'Scale',rotation:'Rotation (degrees)',opacity:'Opacity',maskRadius:'Mask radius',brightness:'Brightness',contrast:'Contrast',saturation:'Saturation'};
   const [lo,hi]=parameterLimits[animationProperty];
   return `<details id="animationPanel" ${sessionStorage.curvesOpen==='yes'?'open':''}><summary>Keyframe animation</summary>
     <div class="property"><label>Parameter</label><select id="curveProperty">${properties.map(p=>`<option value="${p}" ${p===animationProperty?'selected':''}>${labels[p]}</option>`).join('')}</select></div>
@@ -60,7 +62,7 @@ function bindAnimation() {
   const y=v=>h-5-(v-lo)/(hi-lo)*(h-10);
   ctx.fillStyle='#0b131b';ctx.fillRect(0,0,w,h);
   ctx.lineWidth=2;ctx.strokeStyle='#82cdbd';ctx.beginPath();
-  for(let i=0;i<w;i++){const v=curveValue(keys,c[prop],c.start+(c.end-c.start)*i/(w-1));if(i===0)ctx.moveTo(i,y(v));else ctx.lineTo(i,y(v));}
+  for(let i=0;i<w;i++){const v=curveValue(keys,animated(c,prop),c.start+(c.end-c.start)*i/(w-1));if(i===0)ctx.moveTo(i,y(v));else ctx.lineTo(i,y(v));}
   ctx.stroke();ctx.fillStyle='#f4bb80';
   for(const k of keys){ctx.fillRect((k.time-c.start)/(c.end-c.start)*(w-1)-3,y(k.value)-3,6,6);}
   plot.onclick=e=>{

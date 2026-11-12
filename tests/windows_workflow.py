@@ -93,9 +93,9 @@ def test(executable, source, results, record_visual=False):
                 assert sample>20, 'Program monitor failed to decode the selected frame'
                 page.locator('#splitBtn').click()
                 assert page.evaluate("state.tracks.flatMap(t=>t.clips).length")==2
-                page.evaluate("const tr=sel().track;const right=sel().clip;select(tr.clips[0].id);removeSelected();right.position=0;seek(0);save();redraw()")
+                page.evaluate("const tr=sel().track;const right=sel().clip.id;select(tr.clips[0].id);removeSelected();select(right);commitEdit('move',{frames:-frameIndex(sel().clip.position)});seek(0);save();redraw()")
                 page.locator('#undoBtn').click()
-                assert page.evaluate("state.tracks.flatMap(t=>t.clips).length")==2
+                assert page.evaluate("frameIndex(state.tracks.flatMap(t=>t.clips)[0].position)===276")
                 page.locator('#redoBtn').click()
                 page.evaluate('flushSave()')
                 page.evaluate("select(state.tracks.flatMap(t=>t.clips)[0].id);seek(.1)")
