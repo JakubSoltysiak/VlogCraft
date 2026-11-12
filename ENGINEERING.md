@@ -10,7 +10,7 @@ The archive's decimal timeline, unvalidated recovery, independent media clocks a
 
 ## 3.4 buffered program transport
 
-The continuous-range prototype composes an eight-second window in one FFmpeg graph. Clip visibility, title timing, source-time animation and sample-delayed mixed audio are evaluated on the sequence clock. Matching source/seek/speed inputs share one decoder. Decoded comparisons match the segmented export reference across cuts, titles, animated geometry and delayed audio.
+The buffered transport composes an eight-second window with a continuous video graph and a separate audio graph, then muxes the completed streams. Clip visibility, title timing, source-time animation and sample-delayed mixed audio are evaluated on the sequence clock. Matching source/seek/speed inputs share a decoder within each media type. Decoded comparisons match the segmented export reference across cuts, titles, animated geometry and delayed audio.
 
 preview_cache.py owns a single render worker, two pending ranges, revision/fingerprint invalidation, cancellation, atomic publication and a twelve-file/512 MiB complete-file cache budget. Renderer format version participates in the cache key. Shutdown joins cancellation. Obsolete ranges never replace a newer monitor revision.
 
@@ -42,7 +42,9 @@ Motion analysis uses reduced original frames, forward/backward flow validation a
 
 ## Rendering and hardware
 
-FFmpeg composites segments on CPU and encodes using a tested local backend. A single complex-filter worker avoids a reproduced FFmpeg 9 scheduling stall with titles and mixed audio. PCM intermediate audio avoids repeated AAC priming. Final muxing encodes AAC once and atomically replaces the requested destination. Original media paths are protected from export replacement.
+FFmpeg composites segments on CPU and encodes using a tested local backend. Hosted regression exposed an intermittent FFmpeg 9 drain stall even with a single complex-filter worker. render_range now drains video-only and audio-only jobs independently, then muxes completed files. Each input decodes only its needed media type, and matching inputs share decoding within that type. Intermediate PCM avoids repeated AAC priming. Export concatenates complete segments, encodes final AAC once and atomically replaces the requested destination. Original media paths are protected from export replacement.
+
+Adding output shortest termination lost fractional-rate frames, while bounded input duration damaged seek preroll. Serial decoding and separate demux inputs alone still stalled. Those experiments were rejected. The independent-drain implementation passed 100 repeated renders with all expected frames decoded, the full regression and hosted Windows packaging. This qualifies the reproduced scene and current corpus, with arbitrary long-form/camera-media stress still open. Preview cancellation covers every render/mux stage; its cache format version changed to invalidate prior files.
 
 Runtime probes exercise actual encoders. AMD AMF output is decoded and checked. QSV and NVENC appear only when their probes pass. A failing hardware export retries once with the corresponding CPU codec while retaining project settings and destination atomicity. Tests inject device failure and verify fallback. Complete hardware decoding/filtering is outstanding.
 
@@ -52,7 +54,7 @@ Windows PDH counters collect process-tree GPU engine utilization alongside CPU, 
 
 Git Credential Manager and the connector were independently verified as JakubSoltysiak before writes. main and all baseline tags were pushed without rewriting. A fresh bare clone passed fsck. Future commits use the requested account name and email. tools/audit_repository.py scans reachable blob, commit and tag objects without exposing credential contents.
 
-Windows Actions pins current official action commits, verifies the FFmpeg archive checksum, checks dependency compatibility and syntax, runs regression and builds/installs/removes the MSI. It does not publish bundled binaries as stable releases. The first hosted run exposed 8.3 short-path assumptions in two tests. Comparing canonical paths corrected those assertions, after which hosted regression and packaging passed.
+Windows Actions pins current official action commits, verifies the FFmpeg archive checksum, checks dependency compatibility and syntax, runs regression and builds/installs/removes the MSI. It does not publish bundled binaries as stable releases. The first hosted run exposed 8.3 short-path assumptions in two tests. Comparing canonical paths corrected those assertions. A later run reproduced the renderer drain stall and drove the independent-stream repair. Hosted regression, packaging and installer lifecycle passed after that repair.
 
 ## Offline AI and consent
 

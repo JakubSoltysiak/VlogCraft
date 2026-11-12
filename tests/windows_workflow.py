@@ -56,6 +56,10 @@ def test(executable, source, results, record_visual=False, second_source=None):
                 baseline=ROOT/'tests'/'visual'
                 if record_visual:baseline.mkdir(exist_ok=True)
                 differences={}
+                page.set_viewport_size({'width':1440,'height':850})
+                page.mouse.move(1,1)
+                page.evaluate('document.activeElement?.blur()')
+                page.wait_for_timeout(250)
                 for selector in ('linkBtn','snapBtn','previewSource'):
                     image=Image.open(io.BytesIO(page.locator('#'+selector).screenshot(scale='css'))).convert('RGB')
                     reference=baseline/(selector+'.png')

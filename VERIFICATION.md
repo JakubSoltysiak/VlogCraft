@@ -1,6 +1,6 @@
 # VlogCraft Studio 3.4 development qualification
 
-12 November 2026. Local Windows build **3.4.2**, delivered as release/VlogCraft-Studio-3.4-x64.msi. SHA-256 **190503C54E8EB7CE9A92E84ED4BB678BDC7E1B9624CF086C9C8161439C8B0530**. The installed application passed the native workflow. This remains a development build with an experimental buffered playback mode.
+12 November 2026. Local Windows build **3.4.4**, delivered as release/VlogCraft-Studio-3.4-x64.msi. SHA-256 **D90488F38D5D14ECE6A55FC86548CBDE7F5B7921AB53EFDA05B09CA1FC0D5A2D**. The installed application passed the native workflow. This remains a development build with an experimental buffered playback mode.
 
 ## GitHub integration and publication audit
 
@@ -15,29 +15,29 @@ The initial audit inspected all 11 commits and 154 distinct file-content version
 - Exact 100, 120/1 and 120000/1001 sequence rates, including the 119.88 alias, use the existing rational frame/tick model.
 - Constant-speed editing extends to 10% speed, supporting 20% 120→24 slow motion. Speed ramps and synthesized optical-flow interpolation remain missing.
 - 8K UHD is available in the project and export presets.
-- A continuous FFmpeg range graph composes the visible clips and mixed audio in one process over an eight-second window. Matching source/seek/speed inputs share decoding.
+- A continuous FFmpeg video graph and a separate audio graph evaluate eight-second sequence ranges. Completed streams are muxed for playback. Matching source/seek/speed inputs share decoding within each media type.
 - The optional Composited preview monitor plays one combined audio/video stream, prepares the next range, reports progress and supports cancellation, obsolete-state invalidation and selectable preview resolutions.
 - The new mode defaults to 540p. Live layers stays the initial interactive mode. Complete preview files have a twelve-file/512 MiB cache budget. Crash remnants and full cache-management tooling need more work.
 - Decoded range/export comparisons cover clip appearance/disappearance, title fades, animated rotation, shared source inputs and delayed audio. A cache regression checks reuse, edit invalidation and cancellation.
 
-**All 33 Python regression tests passed in 49.209 seconds, and all six JavaScript timeline tests passed.** Evidence is build/qa/regression34-shared.log and build/qa/node34-shared.log. The packaged render_engine, preview_cache, server and timing code were structurally compared to compiled current source and matched. build/qa/bundled-source34.json records those checks.
+**The final 33 Python regression tests passed in 35.188 seconds, and all six JavaScript timeline tests passed.** Evidence is build/qa/regression34-final.log and build/qa/node34-final.log. The preceding post-repair full run also passed in 32.476 seconds. Nine packaged engine modules were structurally compared with compiled current source and matched. All bundled web files and the installed executable/web files also matched. build/qa/bundled-source34-drained.json records those checks.
 
 ## Installed 4K60 editing and endurance measurements
 
-The performance runs below were recorded with installed build 3.4.1. Build 3.4.2 subsequently corrected pending-seek handling and passed the installed workflow. These earlier figures retain their original measurement scope.
+The performance runs below were recorded with the installed 3.4.4 build after the independent-stream repair. Tests used Windows 11 Pro build 26300, Ryzen AI 9 HX 370, Radeon 890M, 24 logical CPUs, FFmpeg 9.0.2 and WebView2 on one workstation.
 
-The tested 4K60 sources are real decoded H.264/AAC moving test patterns. They are generated stress fixtures. The layered scene contains three video layers with animated transforms and three independent audio tracks. The endurance sequence has 1,500 clips across 600 seconds and was played for 70 seconds.
+The tested 4K60 sources are real decoded H.264/AAC moving test patterns. They are generated stress fixtures. The layered scene contains three video layers with animated transforms and three independent audio tracks. The endurance sequence has 1,500 clips across 600 seconds and was played for 70 seconds. Its cuts repeat one source; this does not qualify 1,500 independent files or a full ten-minute session.
 
 Both cases below use 720p source proxies and the 540p continuous-range compositor. The monitor presents the fully composed result through one video element. These are proxy-assisted, reduced-resolution figures.
 
-| Installed scene | Measured s | Presented composite FPS | Dropped / decoded frames | Buffering s | Initial preparation s | Three seek latencies ms, range | Peak summed working set MiB | Peak process GPU memory MiB, dedicated / shared |
+| Installed scene | Measured s | Presented composite FPS | Dropped / browser total frames | Buffering s | Initial preparation s | Three seek latencies ms, range | Peak summed working set MiB | Peak process GPU memory MiB, dedicated / shared |
 |---|---|---|---|---|---|---|---|---|
-| 4k60-3video-3audio-proxy | 9 | 58.44 | 1 / 537 | 0.019 | 8.469 | 62–125 | 1051.0 | 3.34 / 368.86 |
-| 4k60-1500clips-proxy | 70 | 59.54 | 8 / 4164 | 0.119 | 3.985 | 62–203 | 2023.4 | 3.56 / 292.96 |
+| 4k60-3video-3audio-proxy | 9 | 59.67 | 2 / 535 | 0.010 | 8.625 | 47–93 | 1020.2 | 7.86 / 369.64 |
+| 4k60-1500clips-proxy | 70 | 59.63 | 16 / 4163 | 0.077 | 3.718 | 31–156 | 2025.0 | 7.82 / 301.79 |
 
-The endurance playhead advanced 69.928 seconds during 70 seconds of measurement. Its UI animation rate was 60.00 callbacks/s and p95 video callback gap was 17.00 ms. The layered run averaged 4.63% of machine CPU, and endurance averaged 5.06%. Process I/O and GPU counter samples are in build/qa/composited34-installed/playback.json and build/qa/endurance34-installed/playback.json.
+The endurance playhead advanced 69.932 seconds during 70 seconds of measurement. Its UI animation rate was 119.44 callbacks/s and p95 video callback gap was 18.10 ms. The layered run averaged 7.40% of machine CPU, and endurance averaged 8.22%. Preparation peaked at 1060.8/1931.2 MiB summed working set respectively. The table's memory and GPU figures cover playback and subsequent seeks. Process I/O and counter samples are in build/qa/composited34-drained/playback.json and build/qa/endurance34-drained/playback.json.
 
-FPS counts presentation callbacks, while decoded frames and drops come from browser counters accumulated across player replacement. Audio meter activity was observed in both cases. The media clock owns this combined stream, so an independent HTML audio-element drift figure is inapplicable. Container A/V duration and delayed audio placement have decoded tests. Physical output latency, sample-locked range handoff and one-hour drift remain unqualified.
+FPS counts presentation callbacks. The frame totals and drops come from getVideoPlaybackQuality counters accumulated across player replacement; the raw JSON retains the historical decoded_frames field name for totalVideoFrames. Audio meter activity was observed in both cases. The media clock owns this combined stream, so an independent HTML audio-element drift figure is inapplicable. Container A/V duration and delayed audio placement have decoded tests. Physical output latency, sample-locked range handoff and one-hour drift remain unqualified.
 
 An earlier 720p buffered prototype waited until four seconds remained to prepare the next range. It paused at the boundary and averaged 47.6 callbacks/s. Preparation now starts earlier, the default render size is 540p, and matching inputs share decoding. The source prototype then reached 59.8 composite FPS with one drop and no measured buffering over nine seconds. Installed results above qualify the delivered build. Initial preparation remains several seconds.
 
@@ -59,7 +59,16 @@ This is a six-frame source and four-frame delivery. Longer 8K60 tests, a 60/1 na
 
 A local D3D11VA prototype decoded 360 original 4K60 H.264 frames and explicitly downloaded GPU surfaces to NV12 for the CPU path. It completed successfully. The software comparison took 0.969 seconds wall time, versus 1.843 seconds for D3D11VA plus download. FFmpeg reported 0.906/1.230 seconds internal runtime and about 154/474 MiB peak RSS respectively. D3D11VA used less CPU time. This single short fixture favored software for the current CPU-composited pipeline, so automatic hardware decoding has not been enabled.
 
-Actual GPU encoding through AMD AMF is preserved, with software fallback on failure. The 3.3 six-encoder matrix is retained below. GPU composition and a native zero-copy decoder/render path remain missing. NVIDIA and Intel driver qualification remains open.
+Actual GPU encoding through AMD AMF is preserved, with software fallback on failure. Final 3.4.4 smoke exports with H.264, HEVC and AV1 passed complete decoding on all three CPU and all three AMD AMF encoders at 640×360/60. build/qa/encoders34-drained.log records the results.
+
+The repaired renderer also exported and decoded 180 original-resolution 3840×2160/60 frames at a 35 Mb/s target. These source-engine measurements use the same packaged engine code verified above.
+
+| Encoder | Export s | Encoded FPS | Sampled process-tree CPU s | Peak summed working set MiB |
+|---|---|---|---|---|
+| libx264 | 11.063 | 16.27 | 33.11 | 1302.1 |
+| h264_amf | 9.219 | 19.52 | 13.20 | 593.1 |
+
+build/qa/encode34-drained/encoding.json contains the measurements. Independent-stream draining introduces scratch-file/process overhead, and current throughput is lower than the historical 3.3 figures below. The reliability repair has not established an export-speed improvement. Recovering throughput while retaining deadline/frame-accuracy checks is remaining work. GPU composition and a native zero-copy decoder/render path remain missing. NVIDIA and Intel driver qualification remains open.
 
 PDH now records dedicated/shared GPU process-memory counters. Those sums can count shared allocations across processes. The integrated Radeon uses shared system memory, so these figures are not a complete physical VRAM inventory. Video/3D utilization counters still report near zero in cases where AMF/D3D11VA completed. Their occupancy interpretation remains unqualified. Raw decode diagnostics are in ignored build/qa/decode34.json.
 
@@ -67,11 +76,13 @@ MLT's service architecture was reviewed as a candidate. The measured prototype r
 
 ## Windows installer, large files and recovery
 
-The 3.3→3.4.0 upgrade passed, followed by 3.4.0→3.4.1 and 3.4.1→3.4.2. The final installer upgrade, uninstall and reinstall each returned zero. Shortcuts were removed and restored correctly, and the controlled project-retention sentinel survived. That profile had no pre-existing user project/settings documents in the scanned directory. A populated long-lived profile still needs qualification.
+The initial 3.3→3.4.0 and subsequent development upgrades passed. The final 3.4.3→3.4.4 upgrade, uninstall and reinstall each returned zero. Intermediate 3.4.3 contained a rejected renderer experiment and is not a qualified delivery. Shortcuts were removed and restored correctly, and the controlled project-retention sentinel survived. That profile had no pre-existing user project/settings documents in the scanned directory. A populated long-lived profile still needs qualification.
 
 The final installed app passed the complete native workflow with two independently allocated 4,977,125,566-byte MOVs exposed through native paths. It linked originals without populating its media-copy folder, sought beyond 4 GiB, split/trimmed/moved and exercised undo/redo. Its delivery contains 24 frames at 3840×2160/60 with 0.400000-second audio/video. First-frame RGB error against the selected original was 0.891 levels at 96×54.
 
-That workflow also passed original-frame stepping, proxy cancellation/retry, source monitor, grading/reference/scopes, linked audio, nesting/expand/undo, selected-frame multitrack review, motion apply/undo, AI approval/undo/redo, project reload and the single-stream composited monitor. Browser errors were empty and the host exited normally. build/qa/lifecycle34-latest/lifecycle.json and build/qa/installed34-latest/windows-workflow.json retain the results.
+That workflow also passed original-frame stepping, proxy cancellation/retry, source monitor, grading/reference/scopes, linked audio, nesting/expand/undo, selected-frame multitrack review, motion apply/undo, AI approval/undo/redo, project reload and the single-stream composited monitor. Browser errors were empty and the host exited normally. build/qa/lifecycle34-drained/lifecycle.json and build/qa/installed34-drained-final/windows-workflow.json retain the results.
+
+Control-image comparison initially failed because the capture inherited the native window width. The harness now fixes the viewport at 1440×850, clears focus/hover, and uses reviewed source-build references for those dimensions. The same three installed controls matched with zero mean RGB difference, with the original tolerance unchanged. The 1024- and 1440-pixel layout checks also passed. These checks cover the specific controls and viewports, rather than full visual or accessibility acceptance.
 
 Recovery and previous-format compatibility passed the complete existing regressions. Native high-DPI changes remain unqualified. The earlier WebView2 DPI-emulation attempt timed out. No manual user test is being counted as acceptance.
 
@@ -79,19 +90,27 @@ Recovery and previous-format compatibility passed the complete existing regressi
 
 Windows Actions checks all reachable history for credential patterns and forbidden generated files, dependency compatibility, Python/JavaScript syntax, Python regressions, JavaScript commands, application packaging and MSI lifecycle. Official action revisions are pinned and the FFmpeg archive checksum is verified.
 
-The initial hosted run found two assertions that compared an 8.3 temporary path with its canonical Windows spelling. Those assertions now compare resolved paths. Subsequent hosted Windows regression and packaging passed, including the [compositor CI run](https://github.com/JakubSoltysiak/VlogCraft/actions/runs/43294828178). Final branch checks may run again after report commits. Their live status is shown on pull request 1.
+The initial hosted run found two assertions that compared an 8.3 temporary path with its canonical Windows spelling. Those assertions now compare resolved paths. Hosted CI later reproduced the mixed-stream drain stall described below. After the independent-stream repair, all 33 Python tests, six JavaScript tests, packaging and MSI lifecycle passed in the [3.4.4 repair CI run](https://github.com/JakubSoltysiak/VlogCraft/actions/runs/43303641985). Final branch checks may run again after report commits. Their live status is shown on pull request 1.
 
 CI does not publish a stable GitHub release or bundled installer artifact. Exact dependency source/redistribution material still needs review for public binaries. The local development installer remains available.
+
+## Render drain investigation and correction in 3.4.4
+
+A hosted run timed out in the existing multitrack title/two-audio render despite the 3.3 single-filter-worker workaround. Controlled local reproduction then timed out in two of twelve original renders. Serial decoding alone and separate demux inputs with combined encoded output also remained intermittent. Those failed runs remain recorded in ignored build/qa diagnostics.
+
+An output-shortest experiment sometimes appeared stable but later stalled and dropped fractional-rate/8K frames. Restricting input duration damaged preroll and selected-frame accuracy. Both changes were rejected. The final code preserves preroll and exact output frame/sample bounds, renders video and PCM audio independently, then muxes complete streams. Export and buffered preview both use render_range. This adds process and scratch-file overhead in exchange for removing the reproduced combined-stream drain dependency.
+
+The repaired scene passed **100 consecutive renders, zero timeouts, all nine expected frames per render**, with every output decoded. build/qa/stall-drained34.json retains the results. The ordinary mixed-track regression repeats three times with a 20-second deadline and exact frame-count checks. Fractional-rate, VFR held-frame, animated reference/preview parity, short 4K120 and short 8K tests all passed the complete suite. This evidence qualifies the tested scene and corpus; arbitrary long-form material still needs stress qualification.
 
 ## Pending-seek correction in 3.4.2
 
 Final review found that a range completing preparation could display an earlier cursor position. The monitor now records the latest requested target and either seeks the prepared range to that target or loads the range that contains it. The installed regression issues a seek during preparation and verifies the resulting media time before playback. Cache misses can still wait for current preparation.
 
-Only the changed monitor JavaScript required replacement in the existing application bundle. Its full web directory was compared against source before the MSI was repackaged as 3.4.2. The new MSI then passed upgrade/removal/reinstall and the complete native workflow, including that pending-seek regression.
+The correction first passed the 3.4.2 installed workflow. The final 3.4.4 application was rebuilt from source and again passed the complete native workflow, including that pending-seek regression.
 
 ## Known limitations and next priorities
 
-The buffered mode has startup/cache-miss latency and range handoff overhead. It is an experimental transport, and live-layer preview remains available. Full continuous native/MSE playback, sample-locked audio, hour-long endurance, high-DPI changes, camera acceptance media, GPU composition and broad HFR/8K qualification remain production blockers.
+The buffered mode has startup/cache-miss latency and range handoff overhead. The independent-stream reliability repair adds export overhead. It is an experimental transport, and live-layer preview remains available. Full continuous native/MSE playback, sample-locked audio, hour-long endurance, high-DPI changes, camera acceptance media, GPU composition and broad HFR/8K qualification remain production blockers.
 
 Offline review/proposals remain multitrack-aware and consent-bound. The optional online AI connector retains its existing legacy scope. No paid call was required and no footage was sent to an external service. Public GitHub publication includes source and reviewed demonstration images.
 
@@ -101,7 +120,7 @@ The next work is to remove range handoff gaps with an uninterrupted transport, r
 
 # VlogCraft Studio 3.3 release qualification
 
-12 November 2026. Private Windows development release. The qualified MSI is release/VlogCraft-Studio-3.3-x64.msi, 206,409,324 bytes. SHA-256 is **566D077D2FFD2972B59DCA6B03D77C3A845E35C4F844FE2333FFBA15A93D0AA2**. Version 3.3 remains installed with Start menu and desktop shortcuts.
+12 November 2026. Private Windows development release. The qualified MSI is release/VlogCraft-Studio-3.3-x64.msi, 206,409,324 bytes. SHA-256 is **566D077D2FFD2972B59DCA6B03D77C3A845E35C4F844FE2333FFBA15A93D0AA2**. Version 3.3 was installed with Start menu and desktop shortcuts for this historical qualification.
 
 Qualification used Windows 11 Pro build 26300, AMD Ryzen AI 9 HX 370, Radeon 890M, Python 3.11.9, FFmpeg 9.0.2 and WebView2. This is one live workstation. Core tests used local generated media. Production readiness remains open because full-quality layered playback, long-session synchronization, camera-media diversity, managed color and broader Windows qualification remain incomplete.
 
@@ -131,7 +150,7 @@ The FFmpeg complex graph uses one worker after a reproducible mixed-audio/title 
 
 **28 Python tests passed in 36.651 seconds. Six JavaScript tests passed with zero failures.** Logs are build/qa/regression33-fixed.log and build/qa/node33-fixed.log.
 
-The first complete run stalled in the FFmpeg mixed-video/title/two-audio graph. A diagnostic reproduction also timed out. The stalled child was terminated, and that run is recorded as failed in build/qa/regression33.log. Using one complex-filter worker resolved the reproduced graph. The fixed complete suite passed. The affected regression now imposes a 20-second subprocess deadline.
+The first complete run stalled in the FFmpeg mixed-video/title/two-audio graph. A diagnostic reproduction also timed out. The stalled child was terminated, and that run is recorded as failed in build/qa/regression33.log. Using one complex-filter worker resolved that reproduced run. The fixed complete suite passed at the time. Later 3.4 hosted stress reproduced an intermittent drain stall, superseding that workaround as described in the 3.4 report above. The affected regression now imposes a 20-second subprocess deadline.
 
 A benchmark counter initially followed the first video element across an edit and missed replacement/reused elements. The counter now attaches to each active player, retires it on removal and uses subscription tokens when reusing it. The installed results below use the corrected counter. Earlier source callback figures are unsuitable for a direct video-FPS comparison.
 

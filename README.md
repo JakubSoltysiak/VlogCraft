@@ -1,6 +1,6 @@
 # VlogCraft Studio 3.4 for Windows
 
-Windows 11 x64 development project. The local development installer is **release/VlogCraft-Studio-3.4-x64.msi**, currently version 3.4.2. The installer adds VlogCraft Studio to the Start menu and offers a desktop shortcut. Python, FFmpeg, FFprobe and OpenCV are bundled. WebView2 is required and was present on the qualification machine. Source and preserved tags are on the public repository, with 3.4 development reviewed in pull request 1. [GitHub repository](https://github.com/JakubSoltysiak/VlogCraft), [development PR](https://github.com/JakubSoltysiak/VlogCraft/pull/1).
+Windows 11 x64 development project. The local development installer is **release/VlogCraft-Studio-3.4-x64.msi**, currently version 3.4.4. The installer adds VlogCraft Studio to the Start menu and offers a desktop shortcut. Python, FFmpeg, FFprobe and OpenCV are bundled. WebView2 is required and was present on the qualification machine. Source and preserved tags are on the public repository, with 3.4 development reviewed in pull request 1. [GitHub repository](https://github.com/JakubSoltysiak/VlogCraft), [development PR](https://github.com/JakubSoltysiak/VlogCraft/pull/1).
 
 ## Editing
 
@@ -20,7 +20,7 @@ Space toggles playback. Arrow keys step sequence frames. **S** splits. Ctrl+Z an
 
 Projects default to %LOCALAPPDATA%\VlogCraft Studio\Projects. Project → New, Open and Save as open independent project windows. Original media stays linked. Keep the project, its .data folder and the referenced media together. Offline media can be relinked.
 
-Schema 2 and 3 projects open in 3.3. Saving uses schema 4 with rational frame/tick coordinates. The first schema-4 save preserves the prior document in a permanent **.v3.bak** file. The ordinary **.bak** keeps the last valid revision for recovery. Older editor versions require the prior-format copy. A failed save reports an error and retains the published revision.
+Schema 2 and 3 projects open in 3.4. Saving uses schema 4 with rational frame/tick coordinates. The first schema-4 save preserves the prior document in a permanent **.v3.bak** file. The ordinary **.bak** keeps the last valid revision for recovery. Older editor versions require the prior-format copy. A failed save reports an error and retains the published revision.
 
 AI Director supports offline review MP4 and multitrack frame packs. Choose the current program frame or let the pack sample the sequence. Its manifest includes every track, nested child, lock, source bound, link and keyframe. Paste the proposal from the review into the editor, preview its exact changes and explicitly approve it. Undo and redo work for approved edits.
 
