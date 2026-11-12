@@ -51,6 +51,7 @@ async function watchMediaJobs() {
   try {
     const jobs = await request('jobs');
     const proxy = jobs.proxy;
+    if(jobs.motion.status==='rendering' && $('motionInfo'))$('motionInfo').textContent='Analyzing source frames · '+jobs.motion.percent+'%';
     const ready = new Set(jobs.readyProxies);
     const changed = [...ready].some(id => !readyProxies.has(id)) || ready.size !== readyProxies.size;
     readyProxies = ready;
@@ -109,5 +110,40 @@ function setupStudio() {
     grip.onpointerup = grip.onpointercancel = () => { grip.onpointermove = null; };
   };
   if (state.recovered) toast('Recovered the previous saved revision. The primary project file was unreadable.',true);
+  new ResizeObserver(sizeMonitor).observe(document.querySelector('.viewer-body'));
   watchMediaJobs();
+}
+
+function sizeMonitor(){
+  if(!state)return;
+  const body=document.querySelector('.viewer-body'), style=getComputedStyle(body);
+  const width=body.clientWidth-parseFloat(style.paddingLeft)-parseFloat(style.paddingRight);
+  const height=body.clientHeight-parseFloat(style.paddingTop)-parseFloat(style.paddingBottom);
+  const ratio=state.output.width/state.output.height;
+  const stage=$('previewStage');
+  stage.style.width=Math.max(1,Math.min(width,height*ratio))+'px';
+  stage.style.aspectRatio=String(ratio);
+}
+async function openExport(){
+  openModal('exportModal');
+  const out=state.output;
+  const preset=[1280,1920,2560,3840].includes(out.width)&&out.height===out.width*9/16;
+  $('exportResolution').value=preset?String(out.width):'custom';
+  $('customDimensions').hidden=preset;
+  $('exportResolution').onchange=e=>{$('customDimensions').hidden=e.target.value!=='custom';};
+  $('outputWidth').value=out.width;$('outputHeight').value=out.height;
+  $('exportFps').value=out.fps;$('exportCrf').value=out.crf||20;$('exportPreset').value=out.preset||'medium';
+  $('outputBitrate').value=out.bitrate||0;
+  $('exportEstimate').textContent=out.width+' × '+out.height+' · '+out.fps+' fps · '+duration().toFixed(2)+' seconds';
+  const choice=$('encoderChoice');
+  choice.disabled=true;choice.replaceChildren(new Option('Checking local encoders…',''));
+  $('startRender').disabled=true;
+  try{
+    const available=await request('encoders');
+    choice.replaceChildren(...Object.entries(available).map(([id,label])=>new Option(label,id)));
+    choice.value=available[out.encoder]?out.encoder:'libx264';
+    if(!choice.value)choice.selectedIndex=0;
+    $('startRender').disabled=!choice.value || (await request('jobs')).export.status==='rendering';
+  }catch(error){toast('Encoder check failed: '+error.message,true);}
+  finally{choice.disabled=false;}
 }

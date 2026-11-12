@@ -43,7 +43,9 @@ def run(project):
         if len(part.stem) == 32 and all(c in '0123456789abcdef' for c in part.stem):
             part.unlink(missing_ok=True)
     if not project.exists() and not server.RECOVERED:
-        server.save_state()
+        document=deepcopy(server.STATE)
+        document['name']=project.stem
+        server.save_state(document)
     http = ThreadingHTTPServer(('127.0.0.1', 0), server.Handler)
     http.daemon_threads = True
     url = f'http://127.0.0.1:{http.server_port}/'
@@ -118,7 +120,10 @@ def run(project):
         window.dom.document.events.drop += DOMEventHandler(on_drop, prevent_default=True)
         window.run_js("document.documentElement.classList.add('native-ready')")
 
-    def on_closing():
+    closing=threading.Lock()
+    allow_close=threading.Event()
+
+    def finish_close():
         try:
             pending = window.evaluate_js('typeof state !== "undefined" && !!state && modified > persisted')
             if pending:
@@ -129,14 +134,27 @@ def run(project):
                     done.set()
                 window.evaluate_js('flushSave().then(()=>true,()=>false)', saved)
                 if not done.wait(8) or result != [True]:
-                    return window.create_confirmation_dialog('Save failed', 'Close and discard unsaved changes?')
+                    if not window.create_confirmation_dialog('Save failed', 'Close and discard unsaved changes?'):
+                        return
             with server.JOB_LOCK:
                 busy = any(job['status'] == 'rendering' for job in server.JOBS.values())
             if busy and not window.create_confirmation_dialog('Background work', 'Stop active jobs and close this project?'):
-                return False
+                return
+            allow_close.set()
+            window.destroy()
         except Exception:
             logging.exception('Closing project')
-        return True
+            if window.create_confirmation_dialog('Close project', 'The editor could not confirm its save. Close anyway?'):
+                allow_close.set()
+                window.destroy()
+        finally:
+            closing.release()
+
+    def on_closing():
+        if allow_close.is_set():return True
+        if closing.acquire(blocking=False):
+            threading.Thread(target=finish_close,daemon=True).start()
+        return False
 
     window.events.loaded += on_loaded
     window.events.closing += on_closing

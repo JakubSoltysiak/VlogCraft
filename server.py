@@ -28,6 +28,9 @@ from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 from concurrent.futures import ThreadPoolExecutor
 import project_store
+import animation
+import encoders
+import timeline_proposal
 import ai_bridge
 import render_engine as engine
 
@@ -51,6 +54,19 @@ PROXY_QUEUE=collections.deque()
 CURRENT_PROCESS={'export':None,'proxy':None}
 CANCEL={'export':threading.Event(),'proxy':threading.Event()}
 AI_PREVIEW={'token':None,'digest':None,'created':0}
+
+JOBS['motion']={'status':'idle','percent':0}
+CANCEL['motion']=threading.Event()
+CURRENT_PROCESS['motion']=None
+
+
+def motion_source(cid):
+    with LOCK:
+        clip=next((c for t in STATE['tracks'] for c in t['clips'] if c['id']==cid and c['kind']=='video'),None)
+        if clip is None:raise ValueError('Select a video clip')
+        asset=next(a for a in STATE['assets'] if a['id']==clip['assetId'])
+        return deepcopy(asset),deepcopy(clip)
+
 
 def clip_length(clip):return engine.clip_length(clip)
 def make_track(kind, index):
@@ -104,6 +120,7 @@ def migrate_v2(old):
 def save_state(candidate=None):
     with LOCK:
         new=deepcopy(STATE if candidate is None else candidate)
+        if PROJECT.is_file() and new==STATE and not RECOVERED:return
         new['updated']=int(time.time())
         project_store.save(PROJECT,new,validate_document)
         STATE.clear()
@@ -158,7 +175,7 @@ def add_asset(path,auto_add=True):
             last=max((engine.clip_finish(c) for c in t['clips']),default=0)
             t['clips'].append(default_clip(a,last,'audio' if kind=='audio' else kind))
         save_state(new)
-    CACHE_WORKERS.submit(create_thumbnail,a)
+    CACHE_WORKERS.submit(cache_media,a)
     return a
 
 def relink_asset(aid,path):
@@ -175,8 +192,15 @@ def relink_asset(aid,path):
         if any(c['kind']=='audio' for c in used) and not meta['hasAudio']:raise ValueError('Replacement has no audio stream')
         asset.update(meta,path=str(path),size=path.stat().st_size,name=path.name,cacheId=uuid.uuid4().hex)
         save_state(new)
-    CACHE_WORKERS.submit(create_thumbnail,asset)
+    CACHE_WORKERS.submit(cache_media,asset)
     return asset
+
+
+def cache_media(asset):
+    create_thumbnail(asset)
+    if asset.get('hasAudio'):
+        import waveform
+        waveform.build(asset,THUMBS/(cache_id(asset)+'.wave.png'))
 
 
 def create_thumbnail(asset):
@@ -206,7 +230,7 @@ def validate_state(d, base=None):
     assets={a['id']:a for a in base['assets']}
     result=deepcopy(base)
     result['name']=str(d.get('name',base['name']))[:160]
-    new=[];ids=set();clipids=set();clipcount=0
+    new=[];ids=set();clipids=set()
     for ti,t in enumerate(tracks):
         if not isinstance(t,dict) or t.get('type') not in ('video','audio'):raise ValueError('Invalid track kind')
         tid=str(t.get('id',uuid.uuid4().hex))[:64]
@@ -217,8 +241,12 @@ def validate_state(d, base=None):
         out={'id':tid,'type':t['type'],'name':str(t.get('name','Track'))[:90],
              'muted':bool(t.get('muted',False)),'hidden':bool(t.get('hidden',False)),
              'locked':bool(t.get('locked',False)), 'volume':_number(t.get('volume',1),'Track volume',0,3),'clips':[]}
+        out['solo']=bool(t.get('solo',False))
+        out['height']=int(_number(t.get('height',67),'Track height',42,150))
+        color=t.get('color','#ad95da' if t['type']=='audio' else '#79b4de')
+        if not isinstance(color,str) or not re.fullmatch(r'#[0-9a-fA-F]{6}',color):raise ValueError('Invalid track color')
+        out['color']=color
         for src in items:
-            clipcount+=1
             if not isinstance(src,dict):raise ValueError('Invalid clip')
             cid=str(src.get('id',uuid.uuid4().hex))[:64]
             if not re.fullmatch(r'[a-zA-Z0-9_-]{1,64}',cid) or cid in clipids:raise ValueError('Duplicate clip ID')
@@ -251,6 +279,7 @@ def validate_state(d, base=None):
                'fadeIn':_number(src.get('fadeIn',0),'Fade in',0,30),
                'fadeOut':_number(src.get('fadeOut',0),'Fade out',0,30),
                'locked':bool(src.get('locked',False))}
+            if 'keys' in src:c['keys']=animation.validate(src['keys'])
             if c['grade'] not in engine.GRADES:raise ValueError('Invalid color grade')
             if c['fit'] not in ('contain','cover'):raise ValueError('Invalid fit')
             if kind=='title':
@@ -258,16 +287,21 @@ def validate_state(d, base=None):
                          color=src.get('color','white') if src.get('color','white') in ('white','yellow','cyan','black','#ffffff','#f5ce8a','#a6ffdf') else 'white',
                          titleAlign=src.get('titleAlign','center') if src.get('titleAlign') in ('center','lower') else 'center',
                          fontScale=_number(src.get('fontScale',.048),'Title size',.01,.15))
+            if kind=='title' and isinstance(src.get('captionFor'),str):c['captionFor']=src['captionFor'][:64]
             out['clips'].append(c)
         new.append(out)
     result['tracks']=new
     output=d.get('output',base['output'])
     w=int(output.get('width',3840));fps=int(output.get('fps',30));crf=int(output.get('crf',20))
     preset=output.get('preset','medium')
-    if w not in (1280,1920,2560,3840) or fps not in (24,25,30,50,60):raise ValueError('Invalid export resolution or FPS')
+    h=int(output.get('height',w*9//16))
+    if min(w,h)<16 or max(w,h)>16384 or w%2 or h%2 or fps not in (24,25,30,50,60):raise ValueError('Invalid export resolution or FPS')
     if crf<15 or crf>30 or preset not in ('ultrafast','veryfast','fast','medium','slow'):
         raise ValueError('Invalid quality or encoder preset')
-    result['output']={'width':w,'height':w*9//16,'fps':fps,'crf':crf,'preset':preset}
+    encoder=output.get('encoder','libx264')
+    if encoder not in encoders.NAMES:raise ValueError('Unknown video encoder')
+    result['output']={'width':w,'height':h,'fps':fps,'crf':crf,'preset':preset,'encoder':encoder,
+                      'bitrate':_number(output.get('bitrate',0),'Video bitrate',0,2000)}
     return result
 
 def validate_document(document):
@@ -328,28 +362,51 @@ def job_status(which,**kw):
 def exec_process(command,cwd,which):
     if CANCEL[which].is_set():raise RuntimeError('Cancelled')
     creationflags=subprocess.CREATE_NO_WINDOW if os.name=='nt' else 0
-    p=subprocess.Popen(command,cwd=cwd,stdout=subprocess.DEVNULL,stderr=subprocess.PIPE,
-                       creationflags=creationflags)
-    with JOB_LOCK:CURRENT_PROCESS[which]=p
-    try:
-        _,err=p.communicate()
-        if CANCEL[which].is_set():raise RuntimeError('Cancelled')
-        if p.returncode:raise RuntimeError('FFmpeg: '+err.decode(errors='replace')[-1600:])
-    finally:
-        with JOB_LOCK:CURRENT_PROCESS[which]=None
+    start=JOBS[which]['percent']
+    total=JOBS[which].get('duration',0)
+    with tempfile.TemporaryFile() as errors:
+        cmd=[command[0],'-progress','pipe:1',*command[1:]]
+        p=subprocess.Popen(cmd,cwd=cwd,stdout=subprocess.PIPE,stderr=errors,creationflags=creationflags)
+        with JOB_LOCK:
+            CURRENT_PROCESS[which]=p
+            if CANCEL[which].is_set():p.terminate()
+        try:
+            for line in p.stdout:
+                if total and start<96 and line.startswith(b'out_time_us='):
+                    try:seconds=int(line.split(b'=')[1])/1e6
+                    except ValueError:continue
+                    job_status(which,percent=min(94,round(start+91*seconds/total)))
+            p.wait()
+            if CANCEL[which].is_set():raise RuntimeError('Cancelled')
+            if p.returncode:
+                errors.seek(0,2);errors.seek(max(0,errors.tell()-1600))
+                raise RuntimeError('FFmpeg: '+errors.read().decode(errors='replace'))
+        finally:
+            p.stdout.close()
+            with JOB_LOCK:CURRENT_PROCESS[which]=None
 
 def run_export(snapshot,path,review=False):
     dest=Path(path)
-    temp=Path(tempfile.mkdtemp(prefix='.vlogcraft_',dir=str(dest.parent)))
+    temp=None
     try:
+        temp=Path(tempfile.mkdtemp(prefix='.vlogcraft_',dir=str(dest.parent)))
+        encoder=snapshot['output'].get('encoder','libx264')
+        fallback=''
+        if not review and encoder.split('_')[-1] in encoders.BACKENDS and encoder not in encoders.available():
+            replacement=encoders.CODECS[encoder.split('_')[0]][0]
+            snapshot['output']['encoder']=replacement
+            fallback=' · used '+encoders.NAMES[replacement]+' (hardware unavailable)'
+        job_status('export',duration=engine.sequence_duration(snapshot))
+
         job_status('export',status='rendering',percent=1,message='Preparing timeline…',path=None,error=None)
         engine.render(snapshot,dest,temp,review=review,cancelled=CANCEL['export'].is_set,
                       popen=lambda c,d:exec_process(c,d,'export'),
                       on_progress=lambda pct,msg:job_status('export',percent=pct,message=msg))
-        job_status('export',status='done',percent=100,path=str(dest),message='Export completed')
+        job_status('export',status='done',percent=100,path=str(dest),message='Export completed'+fallback)
     except Exception as ex:
         job_status('export',status='cancelled' if CANCEL['export'].is_set() else 'error',error=str(ex),message='Export stopped')
-    finally:shutil.rmtree(temp,ignore_errors=True)
+    finally:
+        if temp:shutil.rmtree(temp,ignore_errors=True)
 
 def cache_id(asset):
     return asset.get('cacheId',asset['id'])
@@ -421,9 +478,9 @@ def _legacy(s):
     timeline=[]
     for c in sorted(video['clips'],key=lambda x:x['position']) if video else []:
         if c.get('assetId'):
-            timeline.append({'id':c['id'],'assetId':c['assetId'],'start':c['start'],'end':c['end'],
+            timeline.append({'id':c['id'],'originalId':c['id'],'assetId':c['assetId'],'start':c['start'],'end':c['end'],
                              'volume':c['volume'],'fade':bool(c.get('fadeIn') or c.get('fadeOut')),
-                             'caption':'','fit':c.get('fit','contain'),'grade':c.get('grade','neutral')})
+                             'caption':next((title['text'] for track in s['tracks'] for title in track['clips'] if title.get('captionFor')==c['id']),''),'fit':c.get('fit','contain'),'grade':c.get('grade','neutral')})
     a2=next((t for t in s['tracks'] if t['type']=='audio' and t['clips']),None)
     musicId=a2['clips'][0]['assetId'] if a2 and a2['clips'] else None
     musicVolume=a2['clips'][0].get('volume',.2) if musicId else .2
@@ -437,29 +494,57 @@ def _apply_legacy(current,legacy):
     source={c['id']:c for c in v1['clips']}
     timeline=[];pos=0
     for l in legacy['timeline']:
-        if l['id'] not in source:raise ValueError('Unknown clip in AI actions')
-        c=deepcopy(source[l['id']]);c.update({k:l[k] for k in ('start','end','volume','grade','fit')})
+        original=l.get('originalId',l['id'])
+        if original not in source:raise ValueError('Unknown clip in AI actions')
+        c=deepcopy(source[original]);c['id']=l['id'];c.update({k:l[k] for k in ('start','end','volume','grade','fit')})
         c['position']=round(pos,3)
         if l.get('fade'):c['fadeIn']=c['fadeOut']=.25
         else:c['fadeIn']=c['fadeOut']=0
         timeline.append(c);pos+=clip_length(c)
-    v1['clips']=timeline
+    v1['clips']=[c for c in v1['clips'] if c['kind']=='title']+timeline
+    previous={c['captionFor']:c for t in result['tracks'] for c in t['clips'] if c.get('captionFor') in source}
+    for t in result['tracks']:
+        t['clips']=[c for c in t['clips'] if c.get('captionFor') not in source]
+    for l,c in zip(legacy['timeline'],timeline):
+        if l.get('caption'):
+            title=previous.get(c['id'],default_title())
+            title.update(text=l['caption'],position=c['position'],end=clip_length(c),captionFor=c['id'])
+            next(t for t in result['tracks'] if t['type']=='video')['clips'].append(title)
     if legacy.get('musicId'):
         a=next((t for t in result['tracks'] if t['type']=='audio' and t['clips']),None)
         if a:a['clips'][0]['volume']=legacy.get('musicVolume',.2)
     return result
 
-def edit_digest(s,p):
-    return hashlib.sha256(json.dumps({'state':s,'proposal':p},sort_keys=True,ensure_ascii=False).encode()).hexdigest()
-
 def state_digest(s):
-    return hashlib.sha256(json.dumps(s,sort_keys=True,ensure_ascii=False).encode()).hexdigest()
+    contents={k:v for k,v in s.items() if k!='updated'}
+    return hashlib.sha256(json.dumps(contents,sort_keys=True,ensure_ascii=False).encode()).hexdigest()
+
+
+def edit_digest(s,p):
+    return hashlib.sha256(json.dumps([state_digest(s),p],sort_keys=True).encode()).hexdigest()
+
+
+def prepare_proposal(proposal,base):
+    if not isinstance(proposal,dict):raise ValueError('Expected an edit proposal')
+    if 'schema' in proposal:return timeline_proposal.apply(proposal,base,validate_state)
+    edited,audit=ai_bridge.validate_and_apply(proposal,_legacy(base))
+    checked=validate_state(_apply_legacy(base,edited),base)
+    for old,new in zip(base['tracks'],checked['tracks']):
+        if old.get('locked') and old!=new:raise ValueError('Proposal changes a locked track')
+        clips={c['id']:c for c in new['clips']}
+        for c in old['clips']:
+            if c.get('locked') and clips.get(c['id'])!=c:raise ValueError('Proposal changes a locked clip')
+    return checked,audit
+
 
 class Handler(BaseHTTPRequestHandler):
     server_version='VlogCraftStudio/3.0'
     protocol_version='HTTP/1.1'
+    def handle(self):
+        try:super().handle()
+        except (BrokenPipeError,ConnectionAbortedError,ConnectionResetError):pass
     def log_message(self,fmt,*args):
-        if not any(x in str(args) for x in ('/media/','/thumb/','/api/export/status')):
+        if not any(x in str(args) for x in ('/media/','/thumb/','/api/jobs')):
             if getattr(__import__('sys'),'stdout',None):print('[VlogCraft]',fmt%args)
     def json_response(self,data,status=200):
         b=json.dumps(data,ensure_ascii=False,allow_nan=False).encode('utf8')
@@ -508,7 +593,7 @@ class Handler(BaseHTTPRequestHandler):
                     data=f.read(min(1024*1024,remaining))
                     if not data:break
                     self.wfile.write(data);remaining-=len(data)
-        except (BrokenPipeError,ConnectionResetError):pass
+        except (BrokenPipeError,ConnectionResetError,ConnectionAbortedError):pass
     def do_HEAD(self):self.do_GET()
     def do_GET(self):
         parsed=urlparse(self.path);path=parsed.path
@@ -519,10 +604,21 @@ class Handler(BaseHTTPRequestHandler):
                 snapshot['desktop']=DESKTOP_ACTION is not None
                 snapshot['recovered']=RECOVERED
                 return self.json_response(snapshot)
+            if path=='/api/encoders':return self.json_response(encoders.available())
             if path=='/api/jobs':
                 with JOB_LOCK:jobs=deepcopy(JOBS);jobs['proxy']['queued']=len(PROXY_QUEUE)
                 with LOCK:jobs['readyProxies']=[a['id'] for a in STATE['assets'] if proxy_path(a).is_file()]
                 return self.json_response(jobs)
+            if path=='/api/motion/frame':
+                asset,clip=motion_source(parse_qs(parsed.query).get('clip',[''])[0])
+                cmd=['ffmpeg','-nostdin','-v','error','-ss',str(clip['start']),'-i',asset['path'],
+                     '-frames:v','1','-vf','scale=640:-2','-c:v','mjpeg','-f','image2pipe','pipe:1']
+                frame=subprocess.run(cmd,capture_output=True,timeout=30,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
+                if frame.returncode or not frame.stdout:raise ValueError('Unable to decode source frame')
+                self.send_response(200);self.send_header('Content-Type','image/jpeg')
+                self.send_header('Content-Length',str(len(frame.stdout)));self.end_headers()
+                self.wfile.write(frame.stdout)
+                return
             if path=='/api/upload/status':
                 uid=parse_qs(parsed.query).get('id',[''])[0]
                 with UPLOAD_LOCK:
@@ -537,11 +633,12 @@ class Handler(BaseHTTPRequestHandler):
                 if parse_qs(parsed.query).get('proxy',['0'])[0]=='1' and proxy.is_file():
                     return self.file_response(proxy,'video/mp4')
                 return self.file_response(a['path'])
-            if path.startswith('/thumb/'):
+            if path.startswith(('/thumb/','/wave/')):
                 aid=path.split('/')[2]
                 if not re.fullmatch(r'[a-f0-9]{32}',aid):return self.json_response({'error':'Invalid ID'},404)
                 with LOCK:asset=next((a for a in STATE['assets'] if a['id']==aid),None)
                 if not asset:return self.json_response({'error':'Unknown asset'},404)
+                if path.startswith('/wave/'):return self.file_response(THUMBS/(cache_id(asset)+'.wave.png'),'image/png')
                 return self.file_response(THUMBS/(cache_id(asset)+'.jpg'),'image/jpeg')
             if path.startswith('/download/'):
                 name=Path(path).name
@@ -550,9 +647,10 @@ class Handler(BaseHTTPRequestHandler):
                 if not target.exists():target=EXPORTS/name
                 return self.file_response(target)
             if path=='/' or path=='/index.html':return self.file_response(WEB/'index.html','text/html; charset=utf-8')
-            if path in ('/app.js','/studio.js','/style.css'):
+            if path in ('/app.js','/studio.js','/animation.js','/motion.js','/timeline.js','/style.css'):
                 return self.file_response(WEB/path.lstrip('/'))
             return self.json_response({'error':'Not found'},404)
+        except (BrokenPipeError,ConnectionAbortedError,ConnectionResetError):return
         except Exception as ex:return self.reject(ex)
     def do_PUT(self):
         if not self.check_origin():return self.json_response({'error':'Forbidden origin'},403)
@@ -577,6 +675,7 @@ class Handler(BaseHTTPRequestHandler):
                         f.write(part);remaining-=len(part)
                 u['offset']+=n;u['touched']=time.time()
                 return self.json_response({'offset':u['offset'],'size':u['size']})
+        except (BrokenPipeError,ConnectionAbortedError,ConnectionResetError):return
         except Exception as ex:return self.reject(ex)
     def do_POST(self):
         if not self.check_origin():return self.json_response({'error':'Forbidden origin'},403)
@@ -617,6 +716,18 @@ class Handler(BaseHTTPRequestHandler):
                 with UPLOAD_LOCK:u=UPLOADS.pop(uid,None)
                 if u:Path(u['tmp']).unlink(missing_ok=True)
                 return self.json_response({'cancelled':bool(u)})
+            if path=='/api/motion':
+                import motion
+                asset,clip=motion_source(data.get('clipId'))
+                with JOB_LOCK:
+                    if JOBS['motion']['status']=='rendering':raise ValueError('Another analysis is active')
+                    CANCEL['motion'].clear();job_status('motion',status='rendering',percent=0)
+                try:
+                    analysis=motion.analyze(asset,clip,data,CANCEL['motion'].is_set,
+                                            lambda percent:job_status('motion',percent=percent))
+                finally:
+                    job_status('motion',status='idle')
+                return self.json_response(analysis)
             if path=='/api/desktop':
                 if DESKTOP_ACTION is None:raise ValueError('Open the desktop application')
                 return self.json_response(DESKTOP_ACTION(data.get('action')))
@@ -674,7 +785,7 @@ class Handler(BaseHTTPRequestHandler):
                 return self.json_response({'started':True,'url':'/download/'+dest.name if review else None})
             if path=='/api/job/cancel':
                 kind=data.get('job','export')
-                if kind not in ('export','proxy'):raise ValueError('Invalid job')
+                if kind not in ('export','proxy','motion'):raise ValueError('Invalid job')
                 CANCEL[kind].set()
                 with JOB_LOCK:
                     p=CURRENT_PROCESS[kind]
@@ -686,9 +797,10 @@ class Handler(BaseHTTPRequestHandler):
                 legacy=_legacy(snap);r=ai_bridge.create_review_zip(legacy,dest)
                 with zipfile.ZipFile(dest,'a',zipfile.ZIP_DEFLATED) as z:
                     manifest={'project':snap['name'],'duration':engine.sequence_duration(snap),'output':snap['output'],
-                              'tracks':[{'name':t['name'],'type':t['type'],'muted':t['muted'],
+                              'proposalSchema':timeline_proposal.SCHEMA,'tracks':[{'trackId':t['id'],'name':t['name'],'type':t['type'],'locked':t['locked'],'muted':t['muted'],
                                          'clips':[{'clipId':c['id'],'assetName':next((a['name'] for a in snap['assets'] if a['id']==c.get('assetId')),'Title'),
-                                                   'position':c['position'],'duration':clip_length(c)} for c in t['clips']]} for t in snap['tracks']]}
+                                                   'position':c['position'],'sourceIn':c['start'],'sourceOut':c['end'],'duration':clip_length(c)} for c in t['clips']]} for t in snap['tracks']]}
+                    z.writestr('MULTITRACK_EDITS.txt','Use the IDs in multitrack_manifest.json. Return JSON with schema "vlogcraft.timeline/1" and actions. Each edit_clip action needs trackId, clipId and set (for example {"grade":"warm","volume":0.7}). Each edit_track needs trackId and set (volume, muted or hidden). Positions and source trims are seconds. All edits require approval.')
                     z.writestr('multitrack_manifest.json',json.dumps(manifest,ensure_ascii=False,indent=2))
                 return self.json_response({'url':'/download/'+name,**r})
             if path=='/api/ai/analyze':
@@ -697,10 +809,9 @@ class Handler(BaseHTTPRequestHandler):
             if path=='/api/ai/preview':
                 proposal=data.get('proposal')
                 with LOCK:base=deepcopy(STATE)
-                edited,audit=ai_bridge.validate_and_apply(proposal,_legacy(base))
-                validate_state(_apply_legacy(base,edited))
+                checked,audit=prepare_proposal(proposal,base)
                 with LOCK:
-                    AI_PREVIEW.update(token=uuid.uuid4().hex,digest=edit_digest(base,proposal),created=time.time())
+                    AI_PREVIEW.update(token=uuid.uuid4().hex,digest=edit_digest(base,proposal),created=time.time(),checked=checked,changes=audit)
                 return self.json_response({'changes':audit,'approvalToken':AI_PREVIEW['token'],
                                            'count':len(audit),'summary':str(proposal.get('summary',''))[:1000]})
             if path=='/api/ai/apply':
@@ -711,10 +822,10 @@ class Handler(BaseHTTPRequestHandler):
                         raise ValueError('Preview exact edits before applying')
                     if time.time()-AI_PREVIEW['created']>900 or edit_digest(base,proposal)!=AI_PREVIEW['digest']:
                         raise ValueError('Project changed since AI preview')
-                    edited,audit=ai_bridge.validate_and_apply(proposal,_legacy(base))
-                    checked=validate_state(_apply_legacy(base,edited))
+                    checked,audit=AI_PREVIEW['checked'],AI_PREVIEW['changes']
+                    undo_data=json.dumps({'before':base,'afterDigest':state_digest(checked)},ensure_ascii=False)
+                    project_store.atomic_write(AI_UNDO,undo_data.encode('utf8'))
                     save_state(checked)
-                    AI_UNDO.write_text(json.dumps({'before':base,'afterDigest':state_digest(STATE)},ensure_ascii=False),encoding='utf8')
                     AI_PREVIEW.update(token=None,digest=None,created=0)
                     return self.json_response({'state':deepcopy(STATE),'changes':audit})
             if path=='/api/ai/undo':
@@ -734,6 +845,7 @@ class Handler(BaseHTTPRequestHandler):
                     save_state(validate_document(migrated))
                     return self.json_response(deepcopy(STATE))
             return self.json_response({'error':'Unknown action'},404)
+        except (BrokenPipeError,ConnectionAbortedError,ConnectionResetError):return
         except Exception as ex:return self.reject(ex)
 
 def main():

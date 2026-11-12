@@ -6,6 +6,8 @@ Source files are always read-only. Heavy operations run in a worker thread.
 """
 from __future__ import annotations
 import math
+import animation
+import encoders
 import os
 import shutil
 import subprocess
@@ -33,36 +35,35 @@ def sequence_duration(state):
 
 def active_clips(state, start, finish):
     """Bottom to top for image compositing. Muted tracks remain visible."""
+    fps=state['output']['fps']
+    first,last=round(start*fps),round(finish*fps)
+    solo=any(t.get('solo') for t in state['tracks'])
     video, audio = [], []
     for t in reversed(state['tracks']):
         if t['type'] != 'video' or t.get('hidden'): continue
         for c in sorted(t['clips'], key=lambda z: z['position']):
-            if clip_finish(c)>start+1e-6 and c['position']<finish-1e-6:
+            if round(clip_finish(c)*fps)>first and round(c['position']*fps)<last:
                 video.append((t,c))
-                if c.get('assetId') and not t.get('muted') and c.get('volume',1)>0:
+                if c.get('assetId') and not t.get('muted') and (not solo or t.get('solo')) and (c.get('volume',1)>0 or c.get('keys',{}).get('volume')):
                     audio.append((t,c))
     for t in state['tracks']:
-        if t['type'] != 'audio' or t.get('muted'): continue
+        if t['type'] != 'audio' or t.get('muted') or (solo and not t.get('solo')): continue
         for c in t['clips']:
-            if clip_finish(c)>start+1e-6 and c['position']<finish-1e-6:
+            if round(clip_finish(c)*fps)>first and round(c['position']*fps)<last:
                 audio.append((t,c))
     return video, audio
 
 def boundaries(state, fps):
-    total=sequence_duration(state)
-    marks={0, math.ceil(total*fps)/fps}
+    # Partition on integer frame boundaries, including fractional-second edits.
+    marks={0}
     for track in state['tracks']:
-        if track.get('hidden'): continue
-        for c in track['clips']:
-            for at in (c['position'], clip_finish(c)):
-                marks.add(min(math.ceil(total*fps),max(0,round(float(at)*fps)))/fps)
-            # FFmpeg alpha fades are constrained within a segment; splitting at
-            # fade boundaries avoids resetting the source effect unexpectedly.
-            fi=float(c.get('fadeIn',0)); fo=float(c.get('fadeOut',0));
-            if fi>0:marks.add(round(min(total,c['position']+fi)*fps)/fps)
-            if fo>0:marks.add(round(max(0,clip_finish(c)-fo)*fps)/fps)
-    points=sorted(t for t in marks if 0<=t<=math.ceil(total*fps)/fps)
-    return [(a,b) for a,b in zip(points,points[1:]) if b-a>=1/fps-.0001]
+        if track.get('hidden'):continue
+        for clip in track['clips']:
+            marks.add(round(clip['position']*fps))
+            marks.add(round(clip_finish(clip)*fps))
+    points=sorted(marks)
+    return [(a/fps,b/fps) for a,b in zip(points,points[1:])]
+
 
 def _num(v): return f'{float(v):.5f}'
 
@@ -80,19 +81,15 @@ def _gain(track,clip):
 
 def _add_audio(filters, input_idx, track, clip, start, end, dur, label):
     offset=max(0,start-float(clip['position']))
-    remaining=max(0, min(clip_length(clip),end-float(clip['position'])))
-    fadein=float(clip.get('fadeIn',0))
-    fadeout=float(clip.get('fadeOut',0))
-    afades=''
-    if fadein>offset+1e-3:
-        # Remaining fade portion, approximately preserving its starting gain.
-        afades+=f',afade=t=in:st=0:d={_num(min(dur,fadein-offset))}'
-    end_at=clip_length(clip)-fadeout
-    if fadeout>0 and end_at<offset+dur:
-        afades+=f',afade=t=out:st={_num(max(0,end_at-offset))}:d={_num(min(fadeout,dur))}'
+    fi,fo=clip.get('fadeIn',0),clip.get('fadeOut',0)
+    afades=f',asetpts=PTS+{_num(offset)}/TB'
+    if fi:afades+=f',afade=t=in:d={_num(fi)}'
+    if fo:afades+=f',afade=t=out:st={_num(max(0,clip_length(clip)-fo))}:d={_num(fo)}'
+    afades+=',asetpts=PTS-STARTPTS'
+    gain=animation.expression(clip,'volume',start)
     filters.append(f'[{input_idx}:a]aresample=48000,aformat=channel_layouts=stereo,'
                    f'asetpts=PTS-STARTPTS,{_atempo(float(clip.get("speed",1)) )},'
-                   f'volume={_num(_gain(track,clip))}{afades},apad,'
+                   f"volume='{_num(track.get('volume',1))}*{gain}':eval=frame{afades},apad,"
                    f'atrim=duration={_num(dur)},asetpts=PTS-STARTPTS[{label}]')
 
 def _media_input(cmd, path, kind, at, speed, dur, fps):
@@ -104,12 +101,10 @@ def _media_input(cmd, path, kind, at, speed, dur, fps):
 def _fade_video(clip, start, dur):
     fi=float(clip.get('fadeIn',0)); fo=float(clip.get('fadeOut',0))
     off=max(0,start-float(clip['position']))
-    fade=''
-    if fi>off+0.00001:
-        fade+=f',fade=t=in:st=0:d={_num(min(dur,fi-off))}:alpha=1'
-    fade_end=clip_length(clip)-fo
-    if fo>0 and fade_end<off+dur:
-        fade+=f',fade=t=out:st={_num(max(0,fade_end-off))}:d={_num(min(fo,dur))}:alpha=1'
+    fade=f',setpts=PTS+{_num(off)}/TB'
+    if fi:fade+=f',fade=t=in:d={_num(fi)}:alpha=1'
+    if fo:fade+=f',fade=t=out:st={_num(max(0,clip_length(clip)-fo))}:d={_num(fo)}:alpha=1'
+    fade+=',setpts=PTS-STARTPTS'
     return fade
 
 def segment_command(state, start, end, target, jobdir, quality='final'):
@@ -117,7 +112,7 @@ def segment_command(state, start, end, target, jobdir, quality='final'):
     w=int(state['output']['width']); h=int(state['output']['height']); fps=int(state['output']['fps'])
     duration=end-start
     video,audio=active_clips(state,start,end)
-    cmd=['ffmpeg','-hide_banner','-nostdin','-loglevel','error','-y',
+    cmd=['ffmpeg','-hide_banner','-nostdin','-loglevel','error','-filter_complex_threads','4','-y',
          '-f','lavfi','-i',f'color=c=0x10131a:s={w}x{h}:r={fps}:d={_num(duration)}',
          '-f','lavfi','-i',f'anullsrc=channel_layout=stereo:sample_rate=48000:d={_num(duration)}']
     filters=['[0:v]format=yuv420p[back0]']; last='back0'; audio_labels=['1:a']; count=0
@@ -140,6 +135,8 @@ def segment_command(state, start, end, target, jobdir, quality='final'):
             count+=1
             f=jobdir/f'title_{count}.txt';f.write_text(c['text'],encoding='utf-8')
             text_y='(h-text_h)/2' if c.get('titleAlign','center')=='center' else 'h*0.78'
+            tx=animation.expression(c,'x',start)
+            ty=animation.expression(c,'y',start)
             fontsize=max(15,int(w*float(c.get('fontScale',0.048))))
             color=c.get('color','white')
             alpha=float(c.get('opacity',1))
@@ -159,7 +156,7 @@ def segment_command(state, start, end, target, jobdir, quality='final'):
                 if not font.exists():shutil.copyfile(Path(os.environ['WINDIR'])/'Fonts'/'segoeui.ttf',font)
                 font_option='fontfile=title-font.ttf:'
             filters.append(f'[{last}]drawtext={font_option}textfile={f.name}:fontcolor={color}@{alpha:.3f}:'
-                           f'expansion=none:fontsize={fontsize}:x=(w-text_w)/2:y={text_y}:'
+                           f"expansion=none:fontsize={fontsize}:x='(w-text_w)/2+w*({tx})':y='{text_y}+h*({ty})':" 
                            f'alpha={alpha_expr}:box=1:boxcolor=black@0.35:boxborderw=14'
                            f'[back{count}]')
             last=f'back{count}'
@@ -184,15 +181,15 @@ def segment_command(state, start, end, target, jobdir, quality='final'):
                +_fade_video(c,start,duration)+f'[lay{count}]')
         filters.append(expr)
         # Expressions are evaluated per frame; positions are in relative canvas units.
-        x=float(c.get('x',0));y=float(c.get('y',0))
+        x=animation.expression(c,'x',start);y=animation.expression(c,'y',start)
         filters.append(f'[{last}][lay{count}]overlay='
-                       f'x=(W-w)/2+({x:.5f})*W:y=(H-h)/2+({y:.5f})*H:'
+                       f"x='(W-w)/2+({x})*W':y='(H-h)/2+({y})*H':"
                        f'eof_action=pass:shortest=0:format=auto[back{count}]')
         last=f'back{count}'
 
     audio_seen=set()
     for t,c in audio:
-        if c.get('kind')=='title' or not c.get('assetId') or _gain(t,c)<=0:continue
+        if c.get('kind')=='title' or not c.get('assetId') or (_gain(t,c)<=0 and not c.get('keys',{}).get('volume')):continue
         if c['id'] in audio_seen:continue
         a=assets[c['assetId']]
         if a['kind']=='image' or not a.get('hasAudio'):continue
@@ -213,10 +210,12 @@ def segment_command(state, start, end, target, jobdir, quality='final'):
     script.write_text(';\n'.join(filters)+'\n',encoding='utf-8')
     crf='26' if quality=='review' else str(state['output'].get('crf',20))
     preset='veryfast' if quality=='review' else str(state['output'].get('preset','medium'))
+    encoder='libx264' if quality=='review' else state['output'].get('encoder','libx264')
+    bitrate=0 if quality=='review' else state['output'].get('bitrate',0)
+    video_options=encoders.options(encoder,preset,crf,bitrate)
     cmd+=['-/filter_complex',str(script),'-map','[finished]','-map','[mixed]',
-          '-t',_num(duration),'-r',str(fps),'-c:v','libx264','-preset',preset,
-          '-crf',crf,'-pix_fmt','yuv420p','-c:a','pcm_s16le',
-          '-ac','2','-ar','48000','-movflags','+faststart',str(target)]
+          '-t',_num(duration),'-r',str(fps),*video_options,'-pix_fmt','yuv420p','-c:a','pcm_s16le',
+          '-threads','4','-ac','2','-ar','48000','-movie_timescale','48000','-video_track_timescale','48000','-movflags','+faststart',str(target)]
     return cmd
 
 def render(state, output, work, *, review=False, on_progress=None, cancelled=lambda:False, popen=None):
@@ -235,12 +234,13 @@ def render(state, output, work, *, review=False, on_progress=None, cancelled=lam
     parts=[]
     for idx,(start,end) in enumerate(segments):
         if cancelled():raise RuntimeError('Export cancelled')
-        target=jobdir/f'segment_{idx:05d}.mov'
-        if on_progress:on_progress(round(3+idx/len(segments)*91),f'Rendering scene {idx+1} / {len(segments)}')
+        suffix='mp4' if ('av1' in state['output'].get('encoder','') and not review) else 'mov'
+        target=jobdir/f'segment_{idx:05d}.{suffix}'
+        if on_progress:on_progress(round(3+start/duration*91),f'Rendering scene {idx+1} / {len(segments)}')
         runner(segment_command(state,start,end,target,jobdir,'review' if review else 'final'),str(jobdir))
         parts.append(target)
     files=jobdir/'concat.txt';files.write_text(''.join(f"file '{p.name}'\n" for p in parts),encoding='utf-8')
-    if on_progress:on_progress(96,'Joining rendered scenes…')
+    if on_progress:on_progress(96,'Joining rendered scenesâ€¦')
     target=Path(output)
     target.parent.mkdir(parents=True,exist_ok=True)
     part=jobdir/'delivery.partial.mp4'

@@ -1,6 +1,7 @@
 """Run with the build venv's Python from the repository root."""
 import argparse
 import hashlib
+import importlib.metadata
 import os
 import shutil
 import subprocess
@@ -40,10 +41,23 @@ def build(wix):
     pen.polygon([(44, 68), (80, 68), (124, 157), (175, 64), (210, 64), (141, 190), (110, 190)], fill='#99dfce')
     pen.rounded_rectangle((154, 179, 213, 189), radius=5, fill='#f2b678')
     image.save(icon, sizes=[(16, 16), (32, 32), (48, 48), (64, 64), (128, 128), (256, 256)])
+    notices=BUILD/'notices'
+    notices.mkdir(exist_ok=True)
+    for name in ('pywebview','pythonnet','clr-loader','bottle','proxy_tools','opencv-python-headless',
+                 'numpy','Pillow','cffi','typing-extensions','pycparser'):
+        dist=importlib.metadata.distribution(name)
+        for entry in dist.files or []:
+            if ('license' in entry.name.lower() or 'copying' in entry.name.lower()) and entry.suffix.lower() not in ('.py','.pyc'):
+                original=Path(dist.locate_file(entry))
+                if original.is_file():
+                    dest=notices/name/str(entry).replace('..','_')
+                    dest.parent.mkdir(parents=True,exist_ok=True)
+                    shutil.copy2(original,dest)
+    shutil.copy2(Path(sys.base_prefix)/'LICENSE.txt',notices/'Python-LICENSE.txt')
     engine = Path(shutil.which('ffmpeg')).parent
     subprocess.run([sys.executable, '-m', 'PyInstaller', '--noconfirm', '--clean', '--noupx',
                     '--log-level', 'WARN', '--onedir', '--windowed', '--name', 'VlogCraftStudio',
-                    '--icon', str(icon), '--add-data', 'web;web',
+                    '--icon', str(icon), '--add-data', 'web;web', '--add-data',str(notices)+';notices',
                     '--add-data', str(engine / 'ffmpeg.exe') + ';engine',
                     '--add-data', str(engine / 'ffprobe.exe') + ';engine',
                     '--add-data', str(engine.parent / 'LICENSE') + ';engine',
@@ -85,6 +99,7 @@ def build(wix):
                 Target='[INSTALLDIR]VlogCraftStudio.exe', WorkingDirectory='INSTALLDIR', Icon='studio.ico')
         element(c, 'RegistryValue', Root='HKCU', Key=r'Software\VlogCraft\Studio', Name=label,
                 Type='integer', Value='1', KeyPath='yes')
+    element(product, 'WixVariable', Id='WixUILicenseRtf', Value=str(ROOT/'packaging'/'notice.rtf'))
     element(product, 'UIRef', Id='WixUI_FeatureTree')
     source = BUILD / 'studio.wxs'
     ET.ElementTree(root).write(source, encoding='utf-8', xml_declaration=True)
