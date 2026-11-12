@@ -1,0 +1,83 @@
+name: Windows validation
+on:
+  push:
+    branches: [main, "feature/**"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: windows-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  regression:
+    runs-on: windows-2022
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: "22"
+      - name: Install Python dependencies
+        run: python -m pip install -r packaging/requirements.txt
+      - name: Install FFmpeg
+        shell: pwsh
+        run: .github/scripts/setup-ffmpeg.ps1
+      - name: Check history, dependencies and syntax
+        shell: pwsh
+        run: |
+          python tools/audit_repository.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -m pip check
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -m compileall -q -x '[/\\](build|dist|\.git)[/\\]' .
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          foreach ($script in Get-ChildItem web -Filter *.js) {
+            node --check $script.FullName
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
+      - name: Python regression
+        env:
+          PYTHONUTF8: "1"
+        run: python -m unittest discover -s tests -p "test_*.py" -v
+      - name: JavaScript timeline commands
+        run: node --test tests/timeline_commands.test.js
+  package:
+    runs-on: windows-2022
+    timeout-minutes: 30
+    needs: regression
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.11"
+      - name: Install build dependencies
+        run: python -m pip install -r packaging/requirements.txt
+      - name: Install FFmpeg
+        shell: pwsh
+        run: .github/scripts/setup-ffmpeg.ps1
+      - name: Install WiX 3
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force build/tools/wix | Out-Null
+          Invoke-WebRequest https://github.com/wixtoolset/wix3/releases/download/wix3141rtm/wix314-binaries.zip -OutFile build/tools/wix.zip
+          Expand-Archive build/tools/wix.zip build/tools/wix -Force
+      - name: Build Windows installer
+        run: python packaging/build_windows.py
+      - name: Validate MSI lifecycle and retained data
+        env:
+          PYTHONUTF8: "1"
+        shell: pwsh
+        run: |
+          $msi=Get-ChildItem release -Filter *.msi | Select-Object -First 1
+          python tests/windows_release.py $msi.FullName build/qa/lifecycle
+      # Bundled dependencies need corresponding-source review before binary distribution.
+      # This job checks packaging and installation. It does not create a public release.

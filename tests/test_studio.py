@@ -61,10 +61,13 @@ class StudioTests(unittest.TestCase):
         title=server.default_title(.12);title['end']=.4;title['text']='KENYA';overlay['clips']=[title]
         audio=server.default_clip(a,.0,'audio');audio['end']=1.;audio['volume']=.2;a2['clips']=[audio]
         out=self.root/'edited.mp4'
-        with tempfile.TemporaryDirectory(dir=self.root) as tmp:
-            def bounded(command,cwd):
-                subprocess.run(command,cwd=cwd,capture_output=True,check=True,timeout=20)
-            engine.render(state,out,tmp,popen=bounded)
+        for attempt in range(3):
+            with tempfile.TemporaryDirectory(dir=self.root) as tmp:
+                def bounded(command,cwd):
+                    subprocess.run(command,cwd=cwd,capture_output=True,check=True,timeout=20)
+                engine.render(state,out,tmp,popen=bounded)
+            video=json.loads(subprocess.check_output(['ffprobe','-v','error','-show_streams','-of','json',str(out)]))['streams'][0]
+            self.assertEqual(int(video['nb_frames']),24)
         info=server.probe(out)
         self.assertEqual(info['width'],320);self.assertTrue(info['hasAudio'])
         self.assertGreater(out.stat().st_size,10000)
@@ -120,7 +123,7 @@ class StudioTests(unittest.TestCase):
         source=self.media().rename(self.root/'camera-file.unknown')
         data=server.add_asset(source)
         self.assertEqual(data['kind'],'video')
-        self.assertEqual(Path(data['path']),source)
+        self.assertEqual(Path(data['path']),source.resolve())
         self.assertIn('mp4',data['container'])
         doc=json.loads(server.PROJECT.read_bytes())
         server.CACHE_WORKERS.shutdown(wait=True)
@@ -204,7 +207,7 @@ class StudioTests(unittest.TestCase):
             self.assertEqual(status,200,response)
             self.assertEqual(response['asset']['id'],asset['id'])
             restored,_=server.project_store.load(server.PROJECT,server.validate_document)
-            self.assertEqual(restored['assets'][0]['path'],str(new))
+            self.assertEqual(restored['assets'][0]['path'],str(new.resolve()))
             self.assertEqual(restored['tracks'][2]['clips'][0]['assetId'],asset['id'])
             bad=self.root/'broken.mp4';bad.write_bytes(b'invalid media')
             with self.assertRaises(ValueError):server.add_asset(bad)

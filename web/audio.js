@@ -38,7 +38,7 @@ function syncMediaTime(media,target,speed,force){
     try{media.currentTime=Math.max(0,target);}catch{}
   }
   const correction=isPlaying&&!force&&Math.abs(drift)<hard?clamp(drift*.32,-.02,.02):0;
-  media.playbackRate=clamp(speed*(1+correction),.25,4);
+  media.playbackRate=clamp(speed*(1+correction),.1,4);
 }
 function mixerControls(c,track){
   const voices=state.tracks.filter(t=>t.id!==track.id && t.clips.some(k=>assetById(k.assetId)?.hasAudio&&!k.audioDetached));

@@ -33,8 +33,10 @@ def fixtures(folder):
 
 MEASURE = """async seconds=>{
   const frames=[],drifts=[],audioDrifts=[],callbackGaps=[],gaps=[];
-  let last=performance.now(),active=true,total=0,dropped=0;
+  let last=performance.now(),active=true,total=0,dropped=0,peakDb=-60,bufferMs=0;
+  const startPlayhead=playhead;
   const quality=new Map(),subscriptions=new WeakMap();
+  const players=()=>renderedEnabled()&&renderedCurrent?[{media:renderedCurrent.media,clipId:null}]:activePlayers.values();
   function observe(v){
     if(quality.has(v))return;
     quality.set(v,v.getVideoPlaybackQuality());
@@ -51,9 +53,12 @@ MEASURE = """async seconds=>{
   const tick=()=>{
     if(!active)return;
     for(const [v] of quality)if(!v.isConnected){count(v);quality.delete(v);}
-    const now=performance.now();gaps.push(now-last);last=now;
-    for(const p of activePlayers.values())if(p.media?.tagName==='VIDEO'){
-      observe(p.media);
+    const now=performance.now();gaps.push(now-last);
+    peakDb=Math.max(peakDb,Number($('masterMeter').value));
+    if(renderedEnabled()&&(renderedLoading||!renderedCurrent||renderedCurrent.media.readyState<3))bufferMs+=now-last;
+    last=now;
+    for(const p of players())if(p.media?.tagName==='VIDEO'){
+      observe(p.media);count(p.media);
       const clip=programTracks.flatMap(t=>t.clips).find(c=>c.id===p.clipId);
       if(clip&&!p.media.seeking)drifts.push(Math.abs(p.media.currentTime-(clip.start+(playhead-clip.position)*clip.speed)));
     }
@@ -70,11 +75,11 @@ MEASURE = """async seconds=>{
     ui_frame_gap_p95_ms:p95(gaps),video_callback_gap_p95_ms:p95(callbackGaps),
     media_clock_drift_p95_ms:drifts.length?p95(drifts)*1000:null,
     audio_clock_drift_p95_ms:audioDrifts.length?p95(audioDrifts)*1000:null,
-    context_state:mixer?.state,peak_meter_db:Number($('masterMeter').value)};
+    context_state:mixer?.state,peak_meter_db:peakDb,buffering_seconds:bufferMs/1000,advanced_seconds:playhead-startPlayhead};
 }"""
 
 
-def run(executable, folder, results,scenario=None):
+def run(executable, folder, results,scenario=None,engine='interactive'):
     media = fixtures(folder)
     results.mkdir(parents=True, exist_ok=True)
     records = []
@@ -110,7 +115,7 @@ def run(executable, folder, results,scenario=None):
                 page.evaluate('assets=>{state.assets=assets;useProxies=false}', response['assets'])
                 page.wait_for_function("(async()=>{const jobs=await request('jobs');return jobs.readyAudio.length===3;})()")
                 scenarios = [('1080p60', 0, 1, 7), ('4k30', 1, 1, 7), ('4k60', 2, 1, 7),
-                             ('4k60-3video-3audio-effects', 2, 3, 9), ('1080p60-stabilized', 0, 1, 7), ('10minute-1500clips', 0, 1, 70), ('4k60-3video-3audio-proxy', 2, 3, 9)]
+                             ('4k60-3video-3audio-effects', 2, 3, 9), ('1080p60-stabilized', 0, 1, 7), ('10minute-1500clips', 0, 1, 70), ('4k60-3video-3audio-proxy', 2, 3, 9), ('4k60-1500clips-proxy', 2, 1, 70)]
                 for name, index, layers, seconds in scenarios:
                     if scenario and name!=scenario:continue
                     if name.endswith('-proxy'):
@@ -137,7 +142,7 @@ def run(executable, folder, results,scenario=None):
                         for(let i=0;i<1500;i++){const c=clipFromAsset(a,i*.4,'video');c.start=2;c.end=2.4;t.clips.push(c);}
                       }
                       selectedId=null;playhead=0;redraw();
-                    }""", {'index': index, 'layers': layers, 'long': name.startswith('10minute')})
+                    }""", {'index': index, 'layers': layers, 'long': '1500clips' in name})
                     if name.endswith('-stabilized'):
                         page.evaluate('save();flushSave()')
                         page.evaluate("""(async()=>{
@@ -148,6 +153,15 @@ def run(executable, folder, results,scenario=None):
                           c.scale=1.1;redraw();
                         })()""")
                     page.wait_for_function("document.querySelector('#previewLayers video')?.readyState>=2")
+                    prepare_started=time.monotonic()
+                    prepare_resources=None
+                    if engine=='rendered':
+                        prepare_meter=Resources(process.pid,gpu=True)
+                        page.evaluate('save();flushSave()')
+                        page.locator('#playbackEngine').select_option('rendered')
+                        page.wait_for_function('renderedCurrent?.media.readyState>=2 && !renderedLoading',timeout=120000)
+                        prepare_resources=prepare_meter.finish()
+                    prepare_seconds=time.monotonic()-prepare_started
                     meter = Resources(process.pid, gpu=True)
                     page.locator('#playBtn').click()
                     page.wait_for_function('isPlaying && mixer?.state==="running"')
@@ -158,16 +172,18 @@ def run(executable, folder, results,scenario=None):
                     for at in (1.5, 6.5, 3.25):
                         started = time.monotonic()
                         page.evaluate('at=>seek(at)', at)
-                        page.wait_for_function("Array.from(document.querySelectorAll('#previewLayers video')).every(v=>v.readyState>=2&&!v.seeking)")
+                        page.wait_for_function("renderedEnabled()?renderedCurrent?.media.readyState>=2&&!renderedCurrent.media.seeking&&!renderedLoading:Array.from(document.querySelectorAll('#previewLayers video')).every(v=>v.readyState>=2&&!v.seeking)")
                         seeks.append(round((time.monotonic()-started)*1000, 2))
-                    data.update(name=name, resources=meter.finish(), seek_latency_ms=seeks,
+                    data.update(name=name, engine=engine,prepare_seconds=round(prepare_seconds,3),prepare_resources=prepare_resources, resources=meter.finish(), seek_latency_ms=seeks,
                                 timeline_seconds=page.evaluate('duration()'), timeline_clips=page.evaluate('state.tracks.flatMap(t=>t.clips).length'))
                     records.append(data)
                     print(json.dumps(data), flush=True)
                     assert data['context_state']=='running'
                     assert data['ui_animation_fps']>3, data
                     assert data['video_frame_callbacks']>0, data
-                    if layers>1:assert data['peak_meter_db']>-59 and data['audio_clock_drift_p95_ms'] is not None,data
+                    if layers>1:
+                        assert data['peak_meter_db']>-59,data
+                        if engine=='interactive':assert data['audio_clock_drift_p95_ms'] is not None,data
                 assert not errors, errors
                 (results/'playback.json').write_text(json.dumps({'scenarios':records,'browser_errors':errors},indent=2))
                 page.evaluate('flushSave()')
@@ -196,5 +212,6 @@ if __name__ == '__main__':
     parser.add_argument('media',type=Path)
     parser.add_argument('results',type=Path)
     parser.add_argument('--scenario')
+    parser.add_argument('--engine',choices=['interactive','rendered'],default='interactive')
     args=parser.parse_args()
-    run(args.executable.resolve(),args.media.resolve(),args.results.resolve(),args.scenario)
+    run(args.executable.resolve(),args.media.resolve(),args.results.resolve(),args.scenario,args.engine)

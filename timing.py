@@ -4,8 +4,8 @@ import sequences
 from fractions import Fraction
 
 RATES=(Fraction(24000,1001),Fraction(24),Fraction(25),Fraction(30000,1001),Fraction(30),
-       Fraction(50),Fraction(60000,1001),Fraction(60))
-ALIASES={'23.976':RATES[0],'29.97':RATES[3],'59.94':RATES[6]}
+       Fraction(50),Fraction(60000,1001),Fraction(60),Fraction(100),Fraction(120000,1001),Fraction(120))
+ALIASES={'23.976':RATES[0],'29.97':RATES[3],'59.94':RATES[6],'119.88':RATES[9]}
 FALLBACK_TICK=Fraction(1,1_000_000_000)
 
 

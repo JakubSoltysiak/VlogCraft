@@ -38,6 +38,7 @@ async function importNative(paths) {
 }
 
 function refreshPlayers() {
+  invalidateRendered();
   clearPlaybackCache();
   for (const player of activePlayers.values()) {
     player.media?.pause?.();releaseStrip(player.media);
@@ -133,7 +134,7 @@ function sizeMonitor(){
 async function openExport(){
   openModal('exportModal');
   const out=state.output;
-  const preset=[1280,1920,2560,3840].includes(out.width)&&out.height===out.width*9/16;
+  const preset=[1280,1920,2560,3840,7680].includes(out.width)&&out.height===out.width*9/16;
   $('exportResolution').value=preset?String(out.width):'custom';
   $('customDimensions').hidden=preset;
   $('exportResolution').onchange=e=>{$('customDimensions').hidden=e.target.value!=='custom';};
