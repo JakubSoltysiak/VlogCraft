@@ -31,6 +31,8 @@ import project_store
 import animation
 import timing
 import source_frames
+import sequences
+import grading
 import encoders
 import timeline_proposal
 import ai_bridge
@@ -133,7 +135,7 @@ def save_state(candidate=None):
 
 def probe(path):
     p=subprocess.run(['ffprobe','-v','error','-show_entries',
-                      'format=duration,start_time:stream=time_base,start_pts,duration_ts,avg_frame_rate,codec_type,codec_name,width,height,r_frame_rate,channels,color_transfer,color_primaries,color_space,pix_fmt',
+                      'format=format_name,duration,start_time:stream=time_base,start_pts,duration_ts,avg_frame_rate,codec_type,codec_name,width,height,r_frame_rate,channels,color_transfer,color_primaries,color_space,pix_fmt',
                       '-of','json',str(path)],capture_output=True,text=True,timeout=75)
     if p.returncode:raise ValueError(f'FFprobe could not read {Path(path).name}: {p.stderr[-500:]}')
     info=json.loads(p.stdout);streams=info.get('streams',[])
@@ -146,7 +148,10 @@ def probe(path):
         numerator,denominator=map(float,rate.split('/'))
         fps=round(numerator/denominator,3) if denominator else 0
     except (ValueError,ZeroDivisionError):fps=0
-    return {'duration':duration,'timeBase':(v or a or {}).get('time_base','1/1000000000'),
+    video_end=duration
+    if v and v.get('duration_ts') is not None:
+        video_end=float((int(v.get('start_pts') or 0)+int(v['duration_ts']))*timing.rational(v['time_base'])-timing.rational(info.get('format',{}).get('start_time') or 0))
+    return {'container':info.get('format',{}).get('format_name',''),'duration':duration,'videoEnd':video_end,'timeBase':(v or a or {}).get('time_base','1/1000000000'),
             'nominalRate':rate,'averageRate':(v or {}).get('avg_frame_rate','0/1'),
             'formatStart':info.get('format',{}).get('start_time','0'),'streamStartPts':(v or a or {}).get('start_pts',0),
             'width':(v or {}).get('width') or 0,
@@ -155,21 +160,24 @@ def probe(path):
             'colorTransfer':(v or {}).get('color_transfer','unknown'),
             'hdr':(v or {}).get('color_transfer') in ('smpte2084','arib-std-b67')}
 
-def classify(path):
+def classify(path,meta=None):
     ext=Path(path).suffix.lower()
     if ext in VIDEO:return 'video'
     if ext in IMAGE:return 'image'
     if ext in AUDIO:return 'audio'
-    raise ValueError(f'Unsupported media extension: {ext}')
+    if meta and meta.get('container') and meta['container'] not in ('concat','hls','dash'):
+        if meta.get('width') and meta.get('duration',0)>0:return 'video'
+        if meta.get('hasAudio'):return 'audio'
+    raise ValueError(f'Unsupported media type: {Path(path).name}')
 
 def add_asset(path,auto_add=True):
     path=Path(path).expanduser().resolve(strict=True)
     if not path.is_file():raise ValueError('Not a file: '+str(path))
-    kind=classify(path)
     with LOCK:
         existing=next((a for a in STATE['assets'] if os.path.normcase(a['path'])==os.path.normcase(str(path))),None)
         if existing:return existing
     meta=probe(path)
+    kind=classify(path,meta)
     if kind=='video' and not meta['width']:raise ValueError('No playable video stream: '+path.name)
     if kind=='audio' and not meta['hasAudio']:raise ValueError('No playable audio stream: '+path.name)
     a={'id':uuid.uuid4().hex,'name':path.name,'path':str(path),'kind':kind,'size':path.stat().st_size,**meta}
@@ -192,8 +200,8 @@ def relink_asset(aid,path):
     with LOCK:
         new=deepcopy(STATE)
         asset=next((a for a in new['assets'] if a['id']==aid),None)
-        if not asset or classify(path)!=asset['kind']:raise ValueError('Choose media of the same type')
-        used=[c for t in new['tracks'] for c in t['clips'] if c.get('assetId')==aid]
+        if not asset or classify(path,meta)!=asset['kind']:raise ValueError('Choose media of the same type')
+        used=[c for c in sequences.clips(new['tracks']) if c.get('assetId')==aid]
         if asset['kind']!='image' and any(c['end']>meta['duration']+.001 for c in used):
             raise ValueError('Replacement ends before a timeline out-point')
         if asset['kind']!='audio' and not meta['width']:raise ValueError('Replacement has no video')
@@ -260,6 +268,15 @@ def validate_state(d, base=None):
             if not re.fullmatch(r'[a-zA-Z0-9_-]{1,64}',cid) or cid in clipids:raise ValueError('Duplicate clip ID')
             clipids.add(cid)
             kind=src.get('kind');asset=assets.get(src.get('assetId'))
+            if kind=='sequence':
+                if t['type']!='video':raise ValueError('Place nested sequences on a video track')
+                children=validate_state({'tracks':src.get('children')},base)['tracks']
+                extent=max((engine.clip_finish(c) for child in children for c in child['clips']),default=0)
+                if extent<=0:raise ValueError('Empty nested sequence')
+                out['clips'].append({'id':cid,'kind':'sequence','assetId':None,'children':children,
+                    'name':str(src.get('name','Nested sequence'))[:90],'start':0,'end':extent,'speed':1,
+                    'position':_number(src.get('position',0),'Sequence position',0,1e12),'locked':bool(src.get('locked',False))})
+                continue
             if kind=='title':
                 if t['type']!='video':raise ValueError('Titles belong on video tracks')
                 assetId=None
@@ -289,6 +306,9 @@ def validate_state(d, base=None):
                'locked':bool(src.get('locked',False))}
             for prop,default in [('rotation',0),('brightness',0),('contrast',1),('saturation',1),('maskRadius',.5)]:
                 c[prop]=_number(src.get(prop,default),prop,*animation.LIMITS[prop])
+            if src.get('wipe','none') not in ('none','left','right','up','down'):raise ValueError('Unknown wipe direction')
+            if src.get('wipe','none')!='none':
+                c['wipe']=src['wipe'];c['wipeDuration']=_number(src.get('wipeDuration',.5),'Wipe duration',.001,30)
             c['mask']=src.get('mask','none')
             if c['mask'] not in ('none','ellipse'):raise ValueError('Unknown clip mask')
             c['feather']=_number(src.get('feather',.1),'Mask feather',0,1)
@@ -297,10 +317,16 @@ def validate_state(d, base=None):
             if not isinstance(c['keyColor'],str) or not re.fullmatch(r'#[a-fA-F0-9]{6}',c['keyColor']):raise ValueError('Invalid key color')
             c['similarity']=_number(src.get('similarity',.16),'Key similarity',.01,1)
             c['keyBlend']=_number(src.get('keyBlend',.08),'Key blend',0,1)
+            for prop,lo,hi,default in [('pan',-1,1,0),('bass',-18,18,0),('treble',-18,18,0),('compress',1,16,1)]:
+                c[prop]=_number(src.get(prop,default),prop,lo,hi)
             if src.get('linkId'):
                 if not isinstance(src['linkId'],str) or not re.fullmatch(r'[\w-]{1,64}',src['linkId']):raise ValueError('Invalid link group')
                 c['linkId']=src['linkId']
             if kind=='video' and src.get('audioDetached'):c['audioDetached']=True
+            if src.get('look'):c['look']=grading.validate(src['look'])
+            if src.get('lutId'):
+                if src['lutId'] not in base.get('luts',{}):raise ValueError('Missing project LUT')
+                c['lutId']=src['lutId']
             if 'keys' in src:c['keys']=animation.validate(src['keys'])
             if c['grade'] not in engine.GRADES:raise ValueError('Invalid color grade')
             if c['fit'] not in ('contain','cover'):raise ValueError('Invalid fit')
@@ -326,11 +352,23 @@ def validate_state(d, base=None):
                       'bitrate':_number(output.get('bitrate',0),'Video bitrate',0,2000)}
     return result
 
+def client_state():
+    with LOCK:
+        snapshot={k:deepcopy(v) for k,v in STATE.items() if k!='luts'}
+        snapshot['luts']={k:{'name':v['name'],'size':v['size']} for k,v in STATE.get('luts',{}).items()}
+    for asset in snapshot['assets']:asset['missing']=not Path(asset['path']).is_file()
+    snapshot['desktop']=DESKTOP_ACTION is not None
+    snapshot['recovered']=RECOVERED
+    return snapshot
+
+
 def validate_document(document):
     if not isinstance(document,dict):raise ValueError('Invalid project document')
     if document.get('version')==4:document=timing.decode(document)
     if document.get('version')==2:document=migrate_v2(document)
     if document.get('version')!=3:raise ValueError('Unsupported project version')
+    for ident,entry in document.get('luts',{}).items():
+        grading.unpack(ident,entry['size'],entry['data'])
     assets=document.get('assets')
     if not isinstance(assets,list):raise ValueError('Missing media inventory')
     known=set()
@@ -340,7 +378,7 @@ def validate_document(document):
         if not re.fullmatch(r'[a-zA-Z0-9_-]{1,64}',aid) or aid in known:raise ValueError('Invalid asset ID')
         if not re.fullmatch(r'[a-zA-Z0-9_-]{1,64}',asset.get('cacheId',aid)):raise ValueError('Invalid cache ID')
         known.add(aid)
-        if not Path(asset['path']).is_absolute() or classify(asset['path'])!=asset['kind']:
+        if not Path(asset['path']).is_absolute() or classify(asset['path'],asset)!=asset['kind']:
             raise ValueError('Invalid media path or type')
         if not isinstance(asset['name'],str) or not math.isfinite(float(asset['duration'])):
             raise ValueError('Invalid media metadata')
@@ -561,7 +599,7 @@ def prepare_proposal(proposal,base):
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version='VlogCraftStudio/3.0'
+    server_version='VlogCraftStudio/3.2'
     protocol_version='HTTP/1.1'
     def handle(self):
         try:super().handle()
@@ -582,7 +620,8 @@ class Handler(BaseHTTPRequestHandler):
         return origin in (None,host)
     def read_json(self):
         n=int(self.headers.get('Content-Length','0'))
-        if n<0 or n>5*1024**2:raise ValueError('JSON payload too large')
+        limit=40*1024**2 if self.path=='/api/lut/import' else 16*1024**2
+        if n<0 or n>limit:raise ValueError('JSON payload too large')
         return json.loads(self.rfile.read(n)) if n else {}
     def file_response(self,path,content_type=None):
         path=Path(path)
@@ -622,11 +661,7 @@ class Handler(BaseHTTPRequestHandler):
         parsed=urlparse(self.path);path=parsed.path
         try:
             if path=='/api/state':
-                with LOCK:snapshot=deepcopy(STATE)
-                for asset in snapshot['assets']:asset['missing']=not Path(asset['path']).is_file()
-                snapshot['desktop']=DESKTOP_ACTION is not None
-                snapshot['recovered']=RECOVERED
-                return self.json_response(snapshot)
+                return self.json_response(client_state())
             if path=='/api/source/status':
                 return self.json_response(FRAME_INDEX.status(parse_qs(parsed.query).get('assetId',[''])[0]))
             if path=='/api/encoders':return self.json_response(encoders.available())
@@ -672,7 +707,7 @@ class Handler(BaseHTTPRequestHandler):
                 if not target.exists():target=EXPORTS/name
                 return self.file_response(target)
             if path=='/' or path=='/index.html':return self.file_response(WEB/'index.html','text/html; charset=utf-8')
-            if path in ('/app.js','/studio.js','/animation.js','/motion.js','/timeline.js','/timebase.js','/edit_ops.js','/edit_commands.js','/monitor.js','/effects.js','/source_frames.js','/style.css'):
+            if path in ('/app.js','/studio.js','/animation.js','/motion.js','/timeline.js','/timebase.js','/edit_ops.js','/edit_commands.js','/monitor.js','/effects.js','/grade.js','/audio.js','/nesting.js','/source_frames.js','/style.css'):
                 return self.file_response(WEB/path.lstrip('/'))
             return self.json_response({'error':'Not found'},404)
         except (BrokenPipeError,ConnectionAbortedError,ConnectionResetError):return
@@ -711,7 +746,6 @@ class Handler(BaseHTTPRequestHandler):
                 name=Path(str(data.get('name','')).replace('\\','/')).name
                 size=int(data.get('size',0))
                 if not name or len(name)>220 or any(ord(x)<32 for x in name):raise ValueError('Invalid file name')
-                if classify(name) not in ('video','audio','image'):raise ValueError('Unsupported media')
                 if size<=0:raise ValueError('Invalid file size')
                 MEDIA.mkdir(parents=True,exist_ok=True)
                 free=shutil.disk_usage(MEDIA).free
@@ -741,6 +775,24 @@ class Handler(BaseHTTPRequestHandler):
                 with UPLOAD_LOCK:u=UPLOADS.pop(uid,None)
                 if u:Path(u['tmp']).unlink(missing_ok=True)
                 return self.json_response({'cancelled':bool(u)})
+            if path=='/api/lut/import':
+                ident,entry=grading.import_cube(data['text'],str(data.get('name','LUT')))
+                with LOCK:
+                    new=deepcopy(STATE);new.setdefault('luts',{})[ident]=entry;save_state(new)
+                return self.json_response({'id':ident,'name':entry['name'],'size':entry['size']})
+            if path=='/api/grade/table':
+                look=grading.validate(data.get('look',{}));ident=data.get('lutId')
+                with LOCK:library=STATE.get('luts',{})
+                if ident and ident not in library:raise ValueError('Unknown LUT')
+                values=grading.table(look,ident,library)
+                raw=(values*255+.5).astype('uint8').tobytes()
+                self.send_response(200);self.send_header('Content-Type','application/octet-stream')
+                self.send_header('X-Grid-Size',str(len(values)));self.send_header('Content-Length',str(len(raw)));self.end_headers()
+                self.wfile.write(raw);return
+            if path=='/api/audio/analyze':
+                import audio_edit
+                with LOCK:snap=deepcopy(STATE)
+                return self.json_response(audio_edit.analysis(snap,data))
             if path=='/api/program/frame':
                 with LOCK:snap=deepcopy(STATE)
                 fps=timing.rate(snap['output']['fps'])
@@ -794,7 +846,7 @@ class Handler(BaseHTTPRequestHandler):
             if path=='/api/import':
                 paths=data.get('paths')
                 if paths is None:paths=choose_files()
-                if not isinstance(paths,(list,tuple)) or len(paths)>150:raise ValueError('Select up to 150 files')
+                if not isinstance(paths,(list,tuple)):raise ValueError('Expected a list of media paths')
                 assets=[];errs=[]
                 for item in paths:
                     try:assets.append(add_asset(item,auto_add=False))
@@ -806,7 +858,7 @@ class Handler(BaseHTTPRequestHandler):
                 with LOCK:
                     s=validate_state(data)
                     save_state(s)
-                    return self.json_response(deepcopy(STATE))
+                    return self.json_response(client_state())
             if path=='/api/title':return self.json_response({'clip':default_title()})
             if path=='/api/proxy':
                 aid=str(data.get('assetId',''))
@@ -848,14 +900,8 @@ class Handler(BaseHTTPRequestHandler):
             if path=='/api/review':
                 with LOCK:snap=deepcopy(STATE)
                 name=f'Kenya_Review_{uuid.uuid4().hex[:12]}.zip';dest=REVIEWS/name
-                legacy=_legacy(snap);r=ai_bridge.create_review_zip(legacy,dest)
-                with zipfile.ZipFile(dest,'a',zipfile.ZIP_DEFLATED) as z:
-                    manifest={'project':snap['name'],'duration':engine.sequence_duration(snap),'output':snap['output'],
-                              'proposalSchema':timeline_proposal.SCHEMA,'tracks':[{'trackId':t['id'],'name':t['name'],'type':t['type'],'locked':t['locked'],'muted':t['muted'],
-                                         'clips':[{'clipId':c['id'],'assetName':next((a['name'] for a in snap['assets'] if a['id']==c.get('assetId')),'Title'),
-                                                   'position':c['position'],'sourceIn':c['start'],'sourceOut':c['end'],'duration':clip_length(c)} for c in t['clips']]} for t in snap['tracks']]}
-                    z.writestr('MULTITRACK_EDITS.txt','Use the IDs in multitrack_manifest.json. Return JSON with schema "vlogcraft.timeline/1" and actions. Each edit_clip action needs trackId, clipId and set (for example {"grade":"warm","volume":0.7}). Each edit_track needs trackId and set (volume, muted or hidden). Positions and source trims are seconds. All edits require approval.')
-                    z.writestr('multitrack_manifest.json',json.dumps(manifest,ensure_ascii=False,indent=2))
+                import review_packet
+                r=review_packet.create(snap,dest,ai_bridge.manifest(_legacy(snap)),data.get('frames'))
                 return self.json_response({'url':'/download/'+name,**r})
             if path=='/api/ai/analyze':
                 with LOCK:snap=deepcopy(STATE)
@@ -881,7 +927,7 @@ class Handler(BaseHTTPRequestHandler):
                     project_store.atomic_write(AI_UNDO,undo_data.encode('utf8'))
                     save_state(checked)
                     AI_PREVIEW.update(token=None,digest=None,created=0)
-                    return self.json_response({'state':deepcopy(STATE),'changes':audit})
+                    return self.json_response({'state':client_state(),'changes':audit})
             if path=='/api/ai/undo':
                 with LOCK:
                     if not AI_UNDO.is_file():raise ValueError('No AI edit to undo')
@@ -890,14 +936,14 @@ class Handler(BaseHTTPRequestHandler):
                         raise ValueError('Newer changes were made after the AI edit; undo blocked')
                     checked=validate_state(undo['before'])
                     save_state(checked);AI_UNDO.unlink()
-                    return self.json_response({'state':deepcopy(STATE)})
+                    return self.json_response({'state':client_state()})
             if path=='/api/migrate/v2':
                 legacy=WORK/'previous_v2_project.json'
                 if not legacy.exists():raise ValueError('No prior project imported')
                 migrated=migrate_v2(json.loads(legacy.read_text('utf8')))
                 with LOCK:
                     save_state(validate_document(migrated))
-                    return self.json_response(deepcopy(STATE))
+                    return self.json_response(client_state())
             return self.json_response({'error':'Unknown action'},404)
         except (BrokenPipeError,ConnectionAbortedError,ConnectionResetError):return
         except Exception as ex:return self.reject(ex)

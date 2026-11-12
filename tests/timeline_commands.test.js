@@ -1,6 +1,17 @@
 const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const {editTimeline}=require('../web/edit_ops.js');
+const {nestEdit,playbackTracks}=require('../web/nesting.js');
+test('nest, move and expand preserve offsets and child source handles',()=>{
+  const input=sequence();
+  let uid=0;const makeId=()=>String(++uid);
+  const nested=nestEdit(input,['B','C'],'nest',fps,makeId);
+  const group=nested.tracks[0].clips[0];assert.equal(group.kind,'sequence');assert.equal(frame(group.position),10);
+  const moved=run(nested.tracks,nested.ids,'move',{frames:4}).tracks;
+  const expanded=nestEdit(moved,[group.id],'expand',fps,makeId);
+  assert.deepEqual(summary(expanded.tracks),[[14,50,60],[24,70,85]]);
+  assert.deepEqual(summary(playbackTracks(moved)),[[14,50,60],[24,70,85]]);
+});
 const fps=30000/1001;
 const sec=n=>n/fps;
 const frame=t=>Math.round(t*fps);

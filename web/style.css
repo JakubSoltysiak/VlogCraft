@@ -27,3 +27,7 @@
 @media(max-width:1150px){.workspace{grid-template-columns:180px minmax(280px,1fr) 225px}.inspector-panel{display:flex}.timeline-tools{gap:0}.zoom-controls input{width:46px}}
 
 .export-settings input{display:block;width:100%;margin-top:7px;border:1px solid #3c4d61;background:#0d1622;color:#e2edf8;border-radius:5px;height:39px;padding:0 10px}
+
+#masterMeter{width:64px;height:10px;margin-left:8px}
+#scopeCanvas{position:absolute;z-index:6;bottom:6px;right:6px;width:min(35%,210px);height:auto;border:1px solid #627481;pointer-events:none}
+.grade-grid,.wheels{display:flex;align-items:center;gap:16px;flex-wrap:wrap}.grade-grid section>label,.wheels label{display:block;color:#bdcbd2}.wheels label{text-align:center;text-transform:capitalize;font-size:11px}.color-wheel{margin:6px auto;width:54px;height:54px;border-radius:50%;background:radial-gradient(circle,#9a9a9a,transparent 70%),conic-gradient(from 90deg,#d05959,#abb053,#49a471,#559da9,#6863bb,#b15caf,#d05959);position:relative;touch-action:none}.color-wheel i{position:absolute;width:8px;height:8px;border-radius:50%;border:1px solid white;box-shadow:0 0 0 1px black;transform:translate(-50%,-50%)}#rgbCurve{display:block;touch-action:none;margin:8px 0;max-width:100%}.grading-dialog{max-width:min(640px,96vw)}#scopeChoice{max-width:95px}

@@ -1,18 +1,19 @@
 // Prefix maxima also find long clips which begin before the visible range.
 let laneIndex=new Map();
-let sequenceEnd=0;
+let sequenceEnd=0,programTracks=[];
 function rebuildIndex(){
   laneIndex=new Map();sequenceEnd=0;
-  for(const track of state.tracks){
+  programTracks=playbackTracks(state.tracks);
+  for(const track of new Set([...state.tracks,...programTracks])){
     const clips=track.clips.slice().sort((a,b)=>a.position-b.position);
     const ends=[];let max=0;
     for(const clip of clips){max=Math.max(max,endOf(clip));ends.push(max);}
-    laneIndex.set(track.id,{clips,ends});
+    laneIndex.set(track,{clips,ends});
     if(!track.hidden)sequenceEnd=Math.max(sequenceEnd,max);
   }
 }
 function clipsIn(track,from,to){
-  const index=laneIndex.get(track.id);
+  const index=laneIndex.get(track);
   if(!index)return [];
   let lo=0,hi=index.ends.length;
   while(lo<hi){const mid=Math.floor((lo+hi)/2);if(index.ends[mid]<=from)lo=mid+1;else hi=mid;}
@@ -23,7 +24,7 @@ function clipsIn(track,from,to){
   return visible;
 }
 function audible(t){
-  return !t.muted && (!state.tracks.some(track=>track.solo) || t.solo);
+  return !t.muted && (!programTracks.some(track=>track.solo) || t.solo);
 }
 function trackSettings(t){
   const dialog=document.createElement('dialog');dialog.className='motion-dialog';

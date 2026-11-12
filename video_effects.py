@@ -26,6 +26,11 @@ def filters(c,start,count,jobdir):
         dist=f'sqrt(pow((X/W-0.5)/({r}),2)+pow((Y/H-0.5)/({r}),2))'
         weight=f'clip((1-{dist})/{max(.00001,feather)},0,1)'
         parts.append(f"geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a='alpha(X,Y)*{weight}':i=nearest")
+    wipe=c.get('wipe','none')
+    if wipe!='none' and c.get('wipeDuration',0)>0:
+        coord={'right':'(X+.5)/W','left':'1-(X+.5)/W','down':'(Y+.5)/H','up':'1-(Y+.5)/H'}[wipe]
+        progress=f"clip((T+{max(0,start-c['position'])})/{c['wipeDuration']},0,1)"
+        parts.append(f"geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a='alpha(X,Y)*lte({coord},{progress})':i=nearest")
     opacity=value(c,'opacity',start,1)
     if c.get('keys',{}).get('opacity'):
         commands=jobdir/f'alpha_{count}.cmd'

@@ -12,6 +12,7 @@ function editTimeline(tracks, assetList, fps, ids, command, args={}, makeId=()=>
   const n=args.frames??0;
   if(!Number.isSafeInteger(n))throw Error('Enter a whole number of sequence frames');
   function unlocked(t,c){
+    if(c?.kind==='sequence' && !['move','delete','duplicate'].includes(command))throw Error('Expand the sequence to edit its source ranges');
     if(t.locked||c?.locked)throw Error('The edit touches a locked clip or track');
   }
   function validate(c){

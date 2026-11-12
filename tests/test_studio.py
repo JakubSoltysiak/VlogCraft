@@ -114,8 +114,19 @@ class StudioTests(unittest.TestCase):
             self.assertEqual(server.probe(target)['width'],1280)
         finally:self.http.shutdown();self.http.server_close()
 
+    def test_link_video_using_detected_container_and_keep_missing_media_reopenable(self):
+        source=self.media().rename(self.root/'camera-file.unknown')
+        data=server.add_asset(source)
+        self.assertEqual(data['kind'],'video')
+        self.assertEqual(Path(data['path']),source)
+        self.assertIn('mp4',data['container'])
+        doc=json.loads(server.PROJECT.read_bytes())
+        server.CACHE_WORKERS.shutdown(wait=True)
+        source.unlink()
+        self.assertEqual(server.validate_document(doc)['assets'][0]['id'],data['id'])
+
     def test_large_file_http_range_beyond_four_gib(self):
-        video=self.root/'huge_fake.mp4';size=4*1024**3+615000000
+        video=self.root/'sparse-range.bin';size=4*1024**3+615000000
         video.touch();mark_sparse(video)
         with video.open('r+b') as file:
             file.truncate(size)

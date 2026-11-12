@@ -10,6 +10,21 @@ import render_engine as engine
 
 
 class CompositorTests(unittest.TestCase):
+    def test_directional_wipe_across_segment_boundaries(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder);source=root/'wipe.png'
+            Image.new('RGB',(96,64),(225,40,30)).save(source)
+            a=dict(kind='image',id='a'*32,path=str(source),name=source.name,duration=0,hasAudio=False,width=96,height=64,size=source.stat().st_size)
+            s=server.default_state();s['output'].update(width=96,height=64,fps=24)
+            s['assets']=[a];c=server.default_clip(a);c.update(end=1,wipeDuration=1)
+            s['tracks'][1]['clips']=[c]
+            for direction,lit,dark in [('right',(32,12),(32,84)),('left',(32,84),(32,12)),('down',(8,48),(56,48)),('up',(56,48),(8,48))]:
+                c['wipe']=direction
+                frame=root/(direction+'.png')
+                engine._run(engine.segment_command(s,.5,13/24,frame,root,'frame'),str(root))
+                image=np.array(Image.open(frame).convert('RGB'))
+                self.assertGreater(image[lit][0],180);self.assertLess(image[dark][0],50)
+
     def test_animated_transform_mask_chroma_and_reference_match(self):
         with tempfile.TemporaryDirectory() as folder:
             root=Path(folder);source=root/'layer.png'

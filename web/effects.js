@@ -12,12 +12,13 @@ function liveEffects(player,c){
   const transform='translate('+animated(c,'x')*100+'%,'+animated(c,'y')*100+'%) rotate('+animated(c,'rotation')+'deg) scale('+animated(c,'scale')+')';
   const color=(gradeFilters[c.grade]||'')+' brightness('+Math.max(0,1+animated(c,'brightness'))+') contrast('+animated(c,'contrast')+') saturate('+animated(c,'saturation')+')';
   let surface=m;
-  if(c.chroma && (m.videoWidth||m.naturalWidth)){
+  const lut=gradeTable(c);
+  if((c.chroma||lut) && (m.videoWidth||m.naturalWidth) && (m.readyState===undefined||m.readyState>=2)){
     if(!player.keySurface){
       player.keySurface=document.createElement('canvas');player.keySurface.className='key-surface';player.wrap.appendChild(player.keySurface);
     }
     const canvas=player.keySurface;
-    const stamp=[m.currentTime,c.keyColor,c.similarity,c.keyBlend].join('/');
+    const stamp=[m.currentTime,c.chroma,lut?.key,c.keyColor,c.similarity,c.keyBlend].join('/');
     if(stamp!==player.keyStamp || canvas.hidden){
       const sw=m.videoWidth||m.naturalWidth,sh=m.videoHeight||m.naturalHeight;
       const w=Math.min(sw,480),h=Math.max(1,Math.round(w*sh/sw));
@@ -27,6 +28,8 @@ function liveEffects(player,c){
       const key=parseInt((c.keyColor||'#00ff00').slice(1),16),r=key>>16,g=(key>>8)&255,b=key&255;
       const threshold=c.similarity??.16,blend=c.keyBlend??.08;
       for(let i=0;i<d.length;i+=4){
+        if(lut)sampleLookup(d,i,lut);
+        if(!c.chroma)continue;
         const distance=Math.hypot(d[i]-r,d[i+1]-g,d[i+2]-b)/441.67296;
         d[i+3]*=blend>0?clamp((distance-threshold)/blend,0,1):Number(distance>threshold);
       }
@@ -35,6 +38,9 @@ function liveEffects(player,c){
     canvas.hidden=false;m.style.opacity='0';surface=canvas;
   }else{if(player.keySurface)player.keySurface.hidden=true;m.style.opacity='1';}
   surface.style.objectFit=c.fit==='cover'?'cover':'contain';surface.style.filter=color;surface.style.transform=transform;
+  const remaining=100*(1-clamp((playhead-c.position)/(c.wipeDuration||.5),0,1))+'%';
+  const edges={right:'0 '+remaining+' 0 0',left:'0 0 0 '+remaining,down:'0 0 '+remaining+' 0',up:remaining+' 0 0 0'};
+  surface.style.clipPath=edges[c.wipe]?'inset('+edges[c.wipe]+')':'none';
   const radius=animated(c,'maskRadius')*100;
   surface.style.maskImage=c.mask==='ellipse'?'radial-gradient(ellipse '+radius+'% '+radius+'% at center,#000 '+(100*(1-(c.feather??.1)))+'%,transparent 100%)':'none';
 }

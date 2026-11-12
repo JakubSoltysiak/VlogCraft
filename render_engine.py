@@ -7,7 +7,10 @@ Source files are always read-only. Heavy operations run in a worker thread.
 from __future__ import annotations
 import math
 import animation
+import audio_edit
 import video_effects
+import grading
+import sequences
 import timing
 import encoders
 import os
@@ -33,7 +36,7 @@ def clip_finish(clip):
 
 def sequence_duration(state):
     return max((clip_finish(c) for t in state['tracks'] for c in t['clips']
-                if not t.get('hidden') and (c.get('assetId') or c.get('kind') == 'title')), default=0.0)
+                if not t.get('hidden') and (c.get('assetId') or c.get('kind') in ('title','sequence'))), default=0.0)
 
 def active_clips(state, start, finish):
     """Bottom to top for image compositing. Muted tracks remain visible."""
@@ -95,7 +98,7 @@ def _add_audio(filters, input_idx, track, clip, start, end, dur, label):
     afades+=',asetpts=PTS-STARTPTS'
     gain=animation.expression(clip,'volume',start)
     filters.append(f'[{input_idx}:a]atrim=start=0,aresample=48000,aformat=channel_layouts=stereo,'
-                   f'asetpts=PTS-STARTPTS,{_atempo(float(clip.get("speed",1)) )},'
+                   f'asetpts=PTS-STARTPTS,{_atempo(float(clip.get("speed",1)) )}{audio_edit.filters(clip)},'
                    f"volume='{_num(track.get('volume',1))}*{gain}':eval=frame{afades},apad,"
                    f'atrim=duration={_num(dur)},asetpts=PTS-STARTPTS[{label}]')
 
@@ -115,6 +118,7 @@ def _fade_video(clip, start, dur):
     return fade
 
 def segment_command(state, start, end, target, jobdir, quality='final'):
+    state=sequences.playback(state)
     assets={a['id']:a for a in state['assets']}
     w=int(state['output']['width']); h=int(state['output']['height']); fps=timing.rate(state['output']['fps'])
     duration=end-start
@@ -186,7 +190,7 @@ def segment_command(state, start, end, target, jobdir, quality='final'):
         if c.get('fit')=='cover':
             expr+=f',crop={targetw}:{targeth}'
         expr+=(GRADES.get(c.get('grade','neutral'), '')+
-               video_effects.filters(c,start,count,jobdir)
+               grading.filter_for(c,state,jobdir)+video_effects.filters(c,start,count,jobdir)
                +_fade_video(c,start,duration)+f'[lay{count}]')
         filters.append(expr)
         # Expressions are evaluated per frame; positions are in relative canvas units.
@@ -235,6 +239,7 @@ def render(state, output, work, *, review=False, on_progress=None, cancelled=lam
 
     popen is callback(command, cwd) that runs FFmpeg and handles cancellation.
     """
+    state=sequences.playback(state)
     duration=sequence_duration(state)
     if duration<=0:raise ValueError('Add at least one clip to the timeline')
     jobdir=Path(work);jobdir.mkdir(parents=True,exist_ok=True)

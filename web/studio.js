@@ -38,10 +38,10 @@ async function importNative(paths) {
 
 function refreshPlayers() {
   for (const player of activePlayers.values()) {
-    player.media?.pause?.();
+    player.media?.pause?.();releaseStrip(player.media);
     player.wrap.remove();
   }
-  for (const player of audioPlayers.values()) { player.pause(); player.remove(); }
+  for (const player of audioPlayers.values()) { player.pause();releaseStrip(player); player.remove(); }
   activePlayers.clear();
   audioPlayers.clear();
   syncPreview(true);

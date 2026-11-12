@@ -16,7 +16,7 @@ from PIL import Image, ImageDraw
 ROOT = Path(__file__).resolve().parents[1]
 BUILD = ROOT / 'build'
 RELEASE = ROOT / 'release'
-VERSION = '3.1.0'
+VERSION = '3.2.0'
 WIX_NS = 'http://schemas.microsoft.com/wix/2006/wi'
 UPGRADE_CODE = '09FA364C-4D7B-4B43-A1CF-7D82A0B62F02'
 ET.register_namespace('', WIX_NS)
@@ -106,7 +106,7 @@ def build(wix):
     obj = BUILD / 'studio.wixobj'
     subprocess.run([str(wix / 'candle.exe'), '-nologo', '-out', str(obj), str(source)], check=True)
     subprocess.run([str(wix / 'light.exe'), '-nologo', '-sval', '-spdb', '-ext', 'WixUIExtension',
-                    '-out', str(RELEASE / 'VlogCraft-Studio-3.1-x64.msi'), str(obj)], check=True)
+                    '-out', str(RELEASE / f'VlogCraft-Studio-{".".join(VERSION.split(".")[:2])}-x64.msi'), str(obj)], check=True)
 
 
 if __name__ == '__main__':
