@@ -213,6 +213,9 @@ def test(executable, source, results, record_visual=False, second_source=None):
                 assert page.evaluate("Math.abs(state.tracks.flatMap(t=>t.clips)[0].start-4.6)<1e-6")
                 assert not errors,errors
                 page.locator('#playbackEngine').select_option('rendered')
+                page.evaluate('seek(.2)')
+                page.wait_for_function("renderedCurrent?.media.readyState>=2 && !renderedLoading && !renderedCurrent.media.seeking && Math.abs(renderedCurrent.media.currentTime-.2)<.02",timeout=60000)
+                page.evaluate('seek(0)')
                 page.wait_for_function("renderedCurrent?.media.readyState>=2 && !renderedLoading",timeout=60000)
                 assert page.locator('.rendered-program:not([hidden])').is_visible()
                 assert page.evaluate('activePlayers.size===0 && audioPlayers.size===0')

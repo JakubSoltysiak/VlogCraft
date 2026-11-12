@@ -16,7 +16,7 @@ from PIL import Image, ImageDraw
 ROOT = Path(__file__).resolve().parents[1]
 BUILD = ROOT / 'build'
 RELEASE = ROOT / 'release'
-VERSION = '3.4.1'
+VERSION = '3.4.2'
 WIX_NS = 'http://schemas.microsoft.com/wix/2006/wi'
 UPGRADE_CODE = '09FA364C-4D7B-4B43-A1CF-7D82A0B62F02'
 ET.register_namespace('', WIX_NS)

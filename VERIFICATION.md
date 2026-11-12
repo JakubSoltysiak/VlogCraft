@@ -1,6 +1,6 @@
 # VlogCraft Studio 3.4 development qualification
 
-12 November 2026. Local Windows build **3.4.1**, delivered as release/VlogCraft-Studio-3.4-x64.msi. SHA-256 **33F010F973F8472272B80DCA984F64CF2930972CB15E27A619CFE8003A040F0F**. The installed application passed the native workflow. This remains a development build with an experimental buffered playback mode.
+12 November 2026. Local Windows build **3.4.2**, delivered as release/VlogCraft-Studio-3.4-x64.msi. SHA-256 **190503C54E8EB7CE9A92E84ED4BB678BDC7E1B9624CF086C9C8161439C8B0530**. The installed application passed the native workflow. This remains a development build with an experimental buffered playback mode.
 
 ## GitHub integration and publication audit
 
@@ -23,6 +23,8 @@ The initial audit inspected all 11 commits and 154 distinct file-content version
 **All 33 Python regression tests passed in 49.209 seconds, and all six JavaScript timeline tests passed.** Evidence is build/qa/regression34-shared.log and build/qa/node34-shared.log. The packaged render_engine, preview_cache, server and timing code were structurally compared to compiled current source and matched. build/qa/bundled-source34.json records those checks.
 
 ## Installed 4K60 editing and endurance measurements
+
+The performance runs below were recorded with installed build 3.4.1. Build 3.4.2 subsequently corrected pending-seek handling and passed the installed workflow. These earlier figures retain their original measurement scope.
 
 The tested 4K60 sources are real decoded H.264/AAC moving test patterns. They are generated stress fixtures. The layered scene contains three video layers with animated transforms and three independent audio tracks. The endurance sequence has 1,500 clips across 600 seconds and was played for 70 seconds.
 
@@ -65,11 +67,11 @@ MLT's service architecture was reviewed as a candidate. The measured prototype r
 
 ## Windows installer, large files and recovery
 
-The 3.3→3.4.0 upgrade passed, followed by 3.4.0→3.4.1. The final installer upgrade, uninstall and reinstall each returned zero. Shortcuts were removed and restored correctly, and the controlled project-retention sentinel survived. That profile had no pre-existing user project/settings documents in the scanned directory. A populated long-lived profile still needs qualification.
+The 3.3→3.4.0 upgrade passed, followed by 3.4.0→3.4.1 and 3.4.1→3.4.2. The final installer upgrade, uninstall and reinstall each returned zero. Shortcuts were removed and restored correctly, and the controlled project-retention sentinel survived. That profile had no pre-existing user project/settings documents in the scanned directory. A populated long-lived profile still needs qualification.
 
 The final installed app passed the complete native workflow with two independently allocated 4,977,125,566-byte MOVs exposed through native paths. It linked originals without populating its media-copy folder, sought beyond 4 GiB, split/trimmed/moved and exercised undo/redo. Its delivery contains 24 frames at 3840×2160/60 with 0.400000-second audio/video. First-frame RGB error against the selected original was 0.891 levels at 96×54.
 
-That workflow also passed original-frame stepping, proxy cancellation/retry, source monitor, grading/reference/scopes, linked audio, nesting/expand/undo, selected-frame multitrack review, motion apply/undo, AI approval/undo/redo, project reload and the single-stream composited monitor. Browser errors were empty and the host exited normally. build/qa/lifecycle34-final/lifecycle.json and build/qa/installed34-final/windows-workflow.json retain the results.
+That workflow also passed original-frame stepping, proxy cancellation/retry, source monitor, grading/reference/scopes, linked audio, nesting/expand/undo, selected-frame multitrack review, motion apply/undo, AI approval/undo/redo, project reload and the single-stream composited monitor. Browser errors were empty and the host exited normally. build/qa/lifecycle34-latest/lifecycle.json and build/qa/installed34-latest/windows-workflow.json retain the results.
 
 Recovery and previous-format compatibility passed the complete existing regressions. Native high-DPI changes remain unqualified. The earlier WebView2 DPI-emulation attempt timed out. No manual user test is being counted as acceptance.
 
@@ -80,6 +82,12 @@ Windows Actions checks all reachable history for credential patterns and forbidd
 The initial hosted run found two assertions that compared an 8.3 temporary path with its canonical Windows spelling. Those assertions now compare resolved paths. Subsequent hosted Windows regression and packaging passed, including the [compositor CI run](https://github.com/JakubSoltysiak/VlogCraft/actions/runs/43294828178). Final branch checks may run again after report commits. Their live status is shown on pull request 1.
 
 CI does not publish a stable GitHub release or bundled installer artifact. Exact dependency source/redistribution material still needs review for public binaries. The local development installer remains available.
+
+## Pending-seek correction in 3.4.2
+
+Final review found that a range completing preparation could display an earlier cursor position. The monitor now records the latest requested target and either seeks the prepared range to that target or loads the range that contains it. The installed regression issues a seek during preparation and verifies the resulting media time before playback. Cache misses can still wait for current preparation.
+
+Only the changed monitor JavaScript required replacement in the existing application bundle. Its full web directory was compared against source before the MSI was repackaged as 3.4.2. The new MSI then passed upgrade/removal/reinstall and the complete native workflow, including that pending-seek regression.
 
 ## Known limitations and next priorities
 

@@ -1,3 +1,4 @@
+let renderedTarget=0;
 let renderedEpoch=0,renderedRequest=0,renderedCurrent=null,renderedNext=null,renderedLoading=false;
 function renderedEnabled(){return $('playbackEngine')?.value==='rendered';}
 function releaseProgram(item){
@@ -33,6 +34,7 @@ async function fetchProgram(at,epoch){
 }
 async function loadProgram(at){
   if(renderedLoading)return;
+  renderedTarget=at;
   const epoch=renderedEpoch,serial=++renderedRequest;
   renderedLoading=true;$('programPreviewStatus').hidden=false;
   try{
@@ -40,8 +42,12 @@ async function loadProgram(at){
     if(renderedNext&&at>=renderedNext.start&&at<renderedNext.end){item=renderedNext;renderedNext=null;}
     else item=await fetchProgram(at,epoch);
     if(serial!==renderedRequest||!renderedEnabled()){releaseProgram(item);return;}
+    const target=Math.min(renderedTarget,Math.max(0,duration()-1/sequenceRate()));
+    if(target<item.start||target>=item.end){
+      releaseProgram(item);renderedLoading=false;return loadProgram(target);
+    }
     releaseProgram(renderedCurrent);renderedCurrent=item;
-    item.media.currentTime=Math.max(0,at-item.start);item.media.hidden=false;
+    item.media.currentTime=Math.max(0,target-item.start);item.media.hidden=false;
     item.media.onended=()=>{
       if(!isPlaying)return;
       playhead=Math.min(item.end,duration());positionPlayhead();
@@ -60,7 +66,7 @@ let prefetchEpoch=null;
 function renderedPreview(force){
   if(!renderedEnabled())return false;
   $('previewLayers').hidden=true;
-  if(force)referenceChanged();
+  if(force){renderedTarget=playhead;referenceChanged();}
   if(!duration())return true;
   const item=renderedCurrent;
   if(!item||playhead<item.start-1e-6||playhead>=item.end-1e-6){
