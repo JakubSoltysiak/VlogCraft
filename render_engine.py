@@ -248,7 +248,7 @@ def segment_command(state, start, end, target, jobdir, quality='final'):
     bitrate=0 if quality in ('review','preview') else state['output'].get('bitrate',0)
     video_options=encoders.options(encoder,preset,crf,bitrate)
     cmd+=['-/filter_complex',str(script),'-map','[finished]','-map','[mixed]',
-          '-t',_num(duration),'-r',str(fps),*video_options,'-pix_fmt','yuv420p','-c:a','aac' if continuous else 'pcm_s16le',
+          '-t',_num(duration),'-shortest','-r',str(fps),*video_options,'-pix_fmt','yuv420p','-c:a','aac' if continuous else 'pcm_s16le',
           '-threads','4','-ac','2','-ar','48000','-movie_timescale','120000','-video_track_timescale','120000','-movflags','+faststart',str(target)]
     return cmd
 
