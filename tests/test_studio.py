@@ -1,5 +1,6 @@
 """Runs without paid services, GUI libraries, or an internet connection."""
 import http.client
+import os
 import json
 import shutil
 import subprocess
@@ -7,12 +8,18 @@ import sys
 import tempfile
 import threading
 import unittest
+from unittest import mock
 from pathlib import Path
 from http.server import ThreadingHTTPServer
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 import server
 import render_engine as engine
+
+def mark_sparse(path):
+    if os.name=='nt':
+        subprocess.run(['fsutil','sparse','setflag',str(path)],check=True,capture_output=True)
+
 
 class StudioTests(unittest.TestCase):
     def setUp(self):
@@ -109,7 +116,8 @@ class StudioTests(unittest.TestCase):
 
     def test_large_file_http_range_beyond_four_gib(self):
         video=self.root/'huge_fake.mp4';size=4*1024**3+615000000
-        with video.open('wb') as file:
+        video.touch();mark_sparse(video)
+        with video.open('r+b') as file:
             file.truncate(size)
             file.seek(size-4);file.write(b'END!')
         aid='a'*32
@@ -135,6 +143,7 @@ class StudioTests(unittest.TestCase):
             # without consuming 4.5GB of CI disk. It is NOT a full 4.5GB transfer test.
             with server.UPLOAD_LOCK:
                 u=server.UPLOADS[id];u['offset']=big_size-64
+                mark_sparse(u['tmp'])
                 with Path(u['tmp']).open('r+b') as f:f.truncate(big_size-64)
             c=http.client.HTTPConnection('127.0.0.1',port,timeout=10)
             c.request('PUT',f'/api/upload/chunk?id={id}&offset={big_size-64}',body=b'X'*64)
@@ -144,5 +153,50 @@ class StudioTests(unittest.TestCase):
             status,r=self.req(port,'POST','/api/upload/cancel',{'id':id})
             self.assertTrue(r['cancelled']);self.assertFalse(Path(u['tmp']).exists())
         finally:self.http.shutdown();self.http.server_close()
+
+    def test_multitrack_approval_relink_and_missing_media(self):
+        media=self.media()
+        asset=server.add_asset(media,False)
+        state=server.default_state()
+        state['assets']=[asset]
+        track=state['tracks'][2]
+        c=server.default_clip(asset,0,'audio')
+        track['clips']=[c]
+        server.save_state(state)
+        proposal={'schema':'vlogcraft.timeline/1','actions':[{'type':'edit_clip','trackId':track['id'],
+                  'clipId':c['id'],'set':{'volume':.15}}]}
+        port=self.start()
+        try:
+            with mock.patch.object(server,'AI_UNDO',self.root/'undo.json'):
+                self.assertEqual(self.req(port,'POST','/api/ai/apply',{'proposal':proposal})[0],400)
+                status,preview=self.req(port,'POST','/api/ai/preview',{'proposal':proposal})
+                self.assertEqual(status,200,preview)
+                self.assertEqual(server.STATE['tracks'][2]['clips'][0]['volume'],1)
+                status,applied=self.req(port,'POST','/api/ai/apply',{'proposal':proposal,'approvalToken':preview['approvalToken']})
+                self.assertEqual(status,200,applied)
+                self.assertEqual(applied['state']['tracks'][2]['clips'][0]['volume'],.15)
+                self.assertEqual(self.req(port,'POST','/api/ai/undo',{})[0],200)
+                self.assertEqual(server.STATE['tracks'][2]['clips'][0]['volume'],1)
+                _,token=self.req(port,'POST','/api/ai/preview',{'proposal':proposal})
+                changed=server.deepcopy(server.STATE);changed['name']='Changed';server.save_state(changed)
+                self.assertEqual(self.req(port,'POST','/api/ai/apply',{'proposal':proposal,'approvalToken':token['approvalToken']})[0],400)
+            server.CACHE_WORKERS.shutdown(wait=True)
+            server.CACHE_WORKERS=server.ThreadPoolExecutor(max_workers=2)
+            self.assertTrue((server.THUMBS/(asset['id']+'.wave.png')).is_file())
+            new=media.with_name('relocated.mp4')
+            media.rename(new)
+            self.assertTrue(self.req(port,'GET','/api/state')[1]['assets'][0]['missing'])
+            with mock.patch.object(server,'choose_files',return_value=[str(new)]):
+                status,response=self.req(port,'POST','/api/relink',{'assetId':asset['id']})
+            self.assertEqual(status,200,response)
+            self.assertEqual(response['asset']['id'],asset['id'])
+            restored,_=server.project_store.load(server.PROJECT,server.validate_document)
+            self.assertEqual(restored['assets'][0]['path'],str(new))
+            self.assertEqual(restored['tracks'][2]['clips'][0]['assetId'],asset['id'])
+            bad=self.root/'broken.mp4';bad.write_bytes(b'invalid media')
+            with self.assertRaises(ValueError):server.add_asset(bad)
+            self.assertEqual(len(server.STATE['assets']),1)
+        finally:
+            self.http.shutdown();self.http.server_close()
 
 if __name__=='__main__':unittest.main(verbosity=2)
