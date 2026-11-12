@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+build/
+dist/
+release/
+workspace/*
+!workspace/README.txt
+*.spec
+*.pyc

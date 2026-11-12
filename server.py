@@ -25,11 +25,16 @@ from copy import deepcopy
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
+from concurrent.futures import ThreadPoolExecutor
+import project_store
 import ai_bridge
 import render_engine as engine
 
 ROOT=Path(__file__).resolve().parent
-WEB=ROOT/'web'; WORK=ROOT/'workspace'; PROJECT=WORK/'project.json'
+WEB=ROOT/'web'
+WORK=Path(os.environ.get('VLOGCRAFT_WORK',ROOT/'workspace'))
+PROJECT=Path(os.environ.get('VLOGCRAFT_PROJECT',WORK/'project.json'))
+CACHE_WORKERS=ThreadPoolExecutor(max_workers=2,thread_name_prefix='media-cache')
 MEDIA=WORK/'media'; THUMBS=WORK/'thumbnails'; PROXIES=WORK/'proxies'; REVIEWS=WORK/'reviews'; EXPORTS=WORK/'exports'
 AI_UNDO=WORK/'ai_undo.json'
 LOCK=threading.RLock(); UPLOAD_LOCK=threading.RLock(); JOB_LOCK=threading.RLock()
@@ -38,7 +43,6 @@ IMAGE={'.jpg','.jpeg','.png','.webp','.bmp','.tif','.tiff'}
 AUDIO={'.wav','.mp3','.m4a','.aac','.flac','.ogg','.opus','.wma'}
 SUPPORTED=VIDEO|IMAGE|AUDIO
 MAX_CHUNK=16*1024*1024  # keep resident uploads small; NOT a file size limit
-MAX_FILE=50*1024**4  # defensive sanity cap (50 TiB)
 UPLOADS={}
 JOBS={'export':{'status':'idle','percent':0,'message':'','path':None,'error':None},'proxy':{'status':'idle','percent':0,'message':'','assetId':None,'error':None}}
 CURRENT_PROCESS={'export':None,'proxy':None}
@@ -94,23 +98,13 @@ def migrate_v2(old):
     state['output']['fps']=out.get('fps',30)
     return state
 
-def load_state():
-    WORK.mkdir(parents=True,exist_ok=True)
-    if PROJECT.exists():
-        try:
-            s=json.loads(PROJECT.read_text('utf8'))
-            if s.get('version')==3 and isinstance(s.get('tracks'),list):return s
-        except (ValueError,OSError):pass
-    return default_state()
-
-STATE=load_state()
-
-def save_state():
-    WORK.mkdir(parents=True,exist_ok=True)
-    STATE['updated']=int(time.time())
-    p=PROJECT.with_suffix('.json.tmp')
-    p.write_text(json.dumps(STATE,ensure_ascii=False,indent=2),encoding='utf8')
-    p.replace(PROJECT)
+def save_state(candidate=None):
+    with LOCK:
+        new=deepcopy(STATE if candidate is None else candidate)
+        new['updated']=int(time.time())
+        project_store.save(PROJECT,new,validate_document)
+        STATE.clear()
+        STATE.update(new)
 
 def probe(path):
     p=subprocess.run(['ffprobe','-v','error','-show_entries',
@@ -152,13 +146,16 @@ def add_asset(path,auto_add=True):
     if kind=='audio' and not meta['hasAudio']:raise ValueError('No playable audio stream: '+path.name)
     a={'id':uuid.uuid4().hex,'name':path.name,'path':str(path),'kind':kind,'size':path.stat().st_size,**meta}
     with LOCK:
-        STATE['assets'].append(a)
+        existing=next((item for item in STATE['assets'] if Path(item['path'])==path),None)
+        if existing:return existing
+        new=deepcopy(STATE)
+        new['assets'].append(a)
         if auto_add:
-            t=next(t for t in reversed(STATE['tracks']) if t['type']==('audio' if kind=='audio' else 'video'))
+            t=next(t for t in reversed(new['tracks']) if t['type']==('audio' if kind=='audio' else 'video'))
             last=max((engine.clip_finish(c) for c in t['clips']),default=0)
             t['clips'].append(default_clip(a,last,'audio' if kind=='audio' else kind))
-        save_state()
-    threading.Thread(target=create_thumbnail,args=(a,),daemon=True).start()
+        save_state(new)
+    CACHE_WORKERS.submit(create_thumbnail,a)
     return a
 
 def create_thumbnail(asset):
@@ -178,32 +175,32 @@ def _number(value,what,lo,hi):
     try:n=float(value)
     except (TypeError,ValueError):raise ValueError(f'{what}: not a number')
     if not math.isfinite(n) or not lo<=n<=hi:raise ValueError(f'{what} out of range ({lo}–{hi})')
-    return round(n,5)
+    return n
 
-def validate_state(d):
+def validate_state(d, base=None):
+    if base is None:base=STATE
     if not isinstance(d,dict):raise ValueError('Project must be an object')
     tracks=d.get('tracks')
-    if not isinstance(tracks,list) or not 1<=len(tracks)<=64:raise ValueError('1–64 tracks required')
-    assets={a['id']:a for a in STATE['assets']}
-    result=deepcopy(STATE)
-    result['name']=str(d.get('name',STATE['name']))[:160]
+    if not isinstance(tracks,list) or not tracks:raise ValueError('At least one track required')
+    assets={a['id']:a for a in base['assets']}
+    result=deepcopy(base)
+    result['name']=str(d.get('name',base['name']))[:160]
     new=[];ids=set();clipids=set();clipcount=0
     for ti,t in enumerate(tracks):
         if not isinstance(t,dict) or t.get('type') not in ('video','audio'):raise ValueError('Invalid track kind')
         tid=str(t.get('id',uuid.uuid4().hex))[:64]
-        if tid in ids:raise ValueError('Duplicate track ID')
+        if not re.fullmatch(r'[a-zA-Z0-9_-]{1,64}',tid) or tid in ids:raise ValueError('Duplicate track ID')
         ids.add(tid)
         items=t.get('clips',[])
-        if not isinstance(items,list) or len(items)>800:raise ValueError('Too many clips in track')
+        if not isinstance(items,list):raise ValueError('Too many clips in track')
         out={'id':tid,'type':t['type'],'name':str(t.get('name','Track'))[:90],
              'muted':bool(t.get('muted',False)),'hidden':bool(t.get('hidden',False)),
              'locked':bool(t.get('locked',False)), 'volume':_number(t.get('volume',1),'Track volume',0,3),'clips':[]}
         for src in items:
             clipcount+=1
-            if clipcount>1000:raise ValueError('Maximum 1000 timeline clips')
             if not isinstance(src,dict):raise ValueError('Invalid clip')
             cid=str(src.get('id',uuid.uuid4().hex))[:64]
-            if cid in clipids:raise ValueError('Duplicate clip ID')
+            if not re.fullmatch(r'[a-zA-Z0-9_-]{1,64}',cid) or cid in clipids:raise ValueError('Duplicate clip ID')
             clipids.add(cid)
             kind=src.get('kind');asset=assets.get(src.get('assetId'))
             if kind=='title':
@@ -217,13 +214,13 @@ def validate_state(d):
                 kind='audio' if t['type']=='audio' else asset['kind'];assetId=asset['id']
             start=_number(src.get('start',0),'Source in',0,100000)
             end=_number(src.get('end',4),'Source out',.001,100000)
-            if end-start<.04:raise ValueError('Clip must be at least 0.04s long')
+            if end<=start:raise ValueError('Source out must follow source in')
             if asset and asset['kind']!='image' and end>float(asset['duration'])+.12:
                 raise ValueError('Clip exceeds source duration: '+asset['name'])
             if kind in ('image','title') and start!=0:raise ValueError('Still/title in-point must be zero')
             speed=_number(src.get('speed',1),'Playback speed',.25,4)
             c={'id':cid,'assetId':assetId,'kind':kind,
-               'position':_number(src.get('position',0),'Position',0,14400),'start':start,'end':end,
+               'position':_number(src.get('position',0),'Position',0,1e12),'start':start,'end':end,
                'speed':speed,'volume':_number(src.get('volume',1),'Clip volume',0,3),
                'opacity':_number(src.get('opacity',1),'Opacity',0,1),
                'scale':_number(src.get('scale',1),'Scale',.1,3),
@@ -243,15 +240,36 @@ def validate_state(d):
             out['clips'].append(c)
         new.append(out)
     result['tracks']=new
-    output=d.get('output',STATE['output'])
+    output=d.get('output',base['output'])
     w=int(output.get('width',3840));fps=int(output.get('fps',30));crf=int(output.get('crf',20))
     preset=output.get('preset','medium')
-    if w not in (1280,1920,2560,3840) or fps not in (24,25,30,60):raise ValueError('Invalid export resolution or FPS')
+    if w not in (1280,1920,2560,3840) or fps not in (24,25,30,50,60):raise ValueError('Invalid export resolution or FPS')
     if crf<15 or crf>30 or preset not in ('ultrafast','veryfast','fast','medium','slow'):
         raise ValueError('Invalid quality or encoder preset')
     result['output']={'width':w,'height':w*9//16,'fps':fps,'crf':crf,'preset':preset}
-    if engine.sequence_duration(result)>14400:raise ValueError('Sequence exceeds 4-hour limit')
     return result
+
+def validate_document(document):
+    if not isinstance(document,dict):raise ValueError('Invalid project document')
+    if document.get('version')==2:document=migrate_v2(document)
+    if document.get('version')!=3:raise ValueError('Unsupported project version')
+    assets=document.get('assets')
+    if not isinstance(assets,list):raise ValueError('Missing media inventory')
+    known=set()
+    for asset in assets:
+        if not isinstance(asset,dict):raise ValueError('Invalid asset')
+        aid=asset.get('id','')
+        if not re.fullmatch(r'[a-zA-Z0-9_-]{1,64}',aid) or aid in known:raise ValueError('Invalid asset ID')
+        known.add(aid)
+        if not Path(asset['path']).is_absolute() or classify(asset['path'])!=asset['kind']:
+            raise ValueError('Invalid media path or type')
+        if not isinstance(asset['name'],str) or not math.isfinite(float(asset['duration'])):
+            raise ValueError('Invalid media metadata')
+    return validate_state(document,document)
+
+
+STATE,RECOVERED=project_store.load(PROJECT,validate_document)
+if STATE is None:STATE=default_state()
 
 def choose_files():
     if os.name=='nt':
@@ -425,7 +443,10 @@ class Handler(BaseHTTPRequestHandler):
         parsed=urlparse(self.path);path=parsed.path
         try:
             if path=='/api/state':
-                with LOCK:return self.json_response(deepcopy(STATE))
+                with LOCK:snapshot=deepcopy(STATE)
+                for asset in snapshot['assets']:asset['missing']=not Path(asset['path']).is_file()
+                snapshot['recovered']=RECOVERED
+                return self.json_response(snapshot)
             if path=='/api/jobs':
                 with JOB_LOCK:return self.json_response(deepcopy(JOBS))
             if path=='/api/upload/status':
@@ -491,7 +512,7 @@ class Handler(BaseHTTPRequestHandler):
                 size=int(data.get('size',0))
                 if not name or len(name)>220 or any(ord(x)<32 for x in name):raise ValueError('Invalid file name')
                 if classify(name) not in ('video','audio','image'):raise ValueError('Unsupported media')
-                if size<=0 or size>MAX_FILE:raise ValueError('Invalid file size')
+                if size<=0:raise ValueError('Invalid file size')
                 MEDIA.mkdir(parents=True,exist_ok=True)
                 free=shutil.disk_usage(MEDIA).free
                 if size>free-128*1024**2:
@@ -532,7 +553,7 @@ class Handler(BaseHTTPRequestHandler):
             if path=='/api/state':
                 with LOCK:
                     s=validate_state(data)
-                    STATE.clear();STATE.update(s);save_state()
+                    save_state(s)
                     return self.json_response(deepcopy(STATE))
             if path=='/api/title':return self.json_response({'clip':default_title()})
             if path=='/api/proxy':
@@ -549,7 +570,7 @@ class Handler(BaseHTTPRequestHandler):
                 with JOB_LOCK:
                     if JOBS['export']['status']=='rendering':raise ValueError('Another export is active')
                 with LOCK:snap=deepcopy(STATE)
-                if engine.sequence_duration(snap)<.04:raise ValueError('Timeline empty')
+                if engine.sequence_duration(snap)<=0:raise ValueError('Timeline empty')
                 review=path=='/api/review/video'
                 if review:
                     snap['output'].update(width=1280,height=720,fps=24,crf=27,preset='veryfast')
@@ -608,7 +629,7 @@ class Handler(BaseHTTPRequestHandler):
                         raise ValueError('Project changed since AI preview')
                     edited,audit=ai_bridge.validate_and_apply(proposal,_legacy(base))
                     checked=validate_state(_apply_legacy(base,edited))
-                    STATE.clear();STATE.update(checked);save_state()
+                    save_state(checked)
                     AI_UNDO.write_text(json.dumps({'before':base,'afterDigest':state_digest(STATE)},ensure_ascii=False),encoding='utf8')
                     AI_PREVIEW.update(token=None,digest=None,created=0)
                     return self.json_response({'state':deepcopy(STATE),'changes':audit})
@@ -619,14 +640,14 @@ class Handler(BaseHTTPRequestHandler):
                     if state_digest(STATE)!=undo.get('afterDigest'):
                         raise ValueError('Newer changes were made after the AI edit; undo blocked')
                     checked=validate_state(undo['before'])
-                    STATE.clear();STATE.update(checked);save_state();AI_UNDO.unlink()
+                    save_state(checked);AI_UNDO.unlink()
                     return self.json_response({'state':deepcopy(STATE)})
             if path=='/api/migrate/v2':
                 legacy=WORK/'previous_v2_project.json'
                 if not legacy.exists():raise ValueError('No prior project imported')
                 migrated=migrate_v2(json.loads(legacy.read_text('utf8')))
                 with LOCK:
-                    STATE.clear();STATE.update(validate_state(migrated));save_state()
+                    save_state(validate_document(migrated))
                     return self.json_response(deepcopy(STATE))
             return self.json_response({'error':'Unknown action'},404)
         except Exception as ex:return self.reject(ex)

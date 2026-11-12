@@ -22,6 +22,8 @@ class StudioTests(unittest.TestCase):
         server.PROJECT=self.root/'project.json';server.STATE=server.default_state()
         server.MEDIA.mkdir();server.THUMBS.mkdir()
     def tearDown(self):
+        server.CACHE_WORKERS.shutdown(wait=True)
+        server.CACHE_WORKERS=server.ThreadPoolExecutor(max_workers=2)
         server.MEDIA,server.THUMBS,server.WORK,server.PROJECT,server.STATE=self.orig
         self._tmp.cleanup()
     def media(self):

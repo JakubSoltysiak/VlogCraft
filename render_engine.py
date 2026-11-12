@@ -153,8 +153,13 @@ def segment_command(state, start, end, target, jobdir, quality='final'):
             if c.get('fadeOut',0)>0:
                 alpha_terms.append(f'min(1\\,max(0\\,({_num(left)}-t)/{_num(c["fadeOut"])}))')
             alpha_expr='*'.join(alpha_terms) if alpha_terms else '1'
-            filters.append(f'[{last}]drawtext=textfile={f.name}:fontcolor={color}@{alpha:.3f}:'
-                           f'fontsize={fontsize}:x=(w-text_w)/2:y={text_y}:'
+            font_option=''
+            if os.name=='nt':
+                font=jobdir/'title-font.ttf'
+                if not font.exists():shutil.copyfile(Path(os.environ['WINDIR'])/'Fonts'/'segoeui.ttf',font)
+                font_option='fontfile=title-font.ttf:'
+            filters.append(f'[{last}]drawtext={font_option}textfile={f.name}:fontcolor={color}@{alpha:.3f}:'
+                           f'expansion=none:fontsize={fontsize}:x=(w-text_w)/2:y={text_y}:'
                            f'alpha={alpha_expr}:box=1:boxcolor=black@0.35:boxborderw=14'
                            f'[back{count}]')
             last=f'back{count}'
@@ -208,9 +213,9 @@ def segment_command(state, start, end, target, jobdir, quality='final'):
     script.write_text(';\n'.join(filters)+'\n',encoding='utf-8')
     crf='26' if quality=='review' else str(state['output'].get('crf',20))
     preset='veryfast' if quality=='review' else str(state['output'].get('preset','medium'))
-    cmd+=['-filter_complex_script',str(script),'-map','[finished]','-map','[mixed]',
+    cmd+=['-/filter_complex',str(script),'-map','[finished]','-map','[mixed]',
           '-t',_num(duration),'-r',str(fps),'-c:v','libx264','-preset',preset,
-          '-crf',crf,'-pix_fmt','yuv420p','-c:a','aac','-b:a','192k',
+          '-crf',crf,'-pix_fmt','yuv420p','-c:a','pcm_s16le',
           '-ac','2','-ar','48000','-movflags','+faststart',str(target)]
     return cmd
 
@@ -220,15 +225,17 @@ def render(state, output, work, *, review=False, on_progress=None, cancelled=lam
     popen is callback(command, cwd) that runs FFmpeg and handles cancellation.
     """
     duration=sequence_duration(state)
-    if duration<0.04:raise ValueError('Add at least one clip to the timeline')
+    if duration<=0:raise ValueError('Add at least one clip to the timeline')
     jobdir=Path(work);jobdir.mkdir(parents=True,exist_ok=True)
     segments=boundaries(state,int(state['output']['fps']))
+    if any(Path(a['path']).resolve() == Path(output).resolve() for a in state['assets']):
+        raise ValueError('Choose a destination different from source media')
     if not segments:raise ValueError('No usable frames in the timeline')
     runner=popen or _run
     parts=[]
     for idx,(start,end) in enumerate(segments):
         if cancelled():raise RuntimeError('Export cancelled')
-        target=jobdir/f'segment_{idx:05d}.mp4'
+        target=jobdir/f'segment_{idx:05d}.mov'
         if on_progress:on_progress(round(3+idx/len(segments)*91),f'Rendering scene {idx+1} / {len(segments)}')
         runner(segment_command(state,start,end,target,jobdir,'review' if review else 'final'),str(jobdir))
         parts.append(target)
@@ -236,11 +243,11 @@ def render(state, output, work, *, review=False, on_progress=None, cancelled=lam
     if on_progress:on_progress(96,'Joining rendered scenes…')
     target=Path(output)
     target.parent.mkdir(parents=True,exist_ok=True)
-    part=target.with_name('.'+target.stem+'.partial.mp4')
+    part=jobdir/'delivery.partial.mp4'
     if part.exists():part.unlink()
     try:
         runner(['ffmpeg','-hide_banner','-nostdin','-loglevel','error','-y',
-               '-f','concat','-safe','0','-i',str(files),'-c','copy','-movflags','+faststart',str(part)],str(jobdir))
+               '-f','concat','-safe','0','-i',str(files),'-c:v','copy','-c:a','aac','-b:a','192k','-movflags','+faststart',str(part)],str(jobdir))
         if cancelled():raise RuntimeError('Export cancelled')
         os.replace(part,target)
     finally:
