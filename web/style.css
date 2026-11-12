@@ -7,3 +7,11 @@
 /* Large-file drag overlay stays visible without intercepting timeline drop targets. */
 .drop-overlay{pointer-events:none}
 .hdr-badge{position:absolute;right:6px;top:6px;padding:3px 5px;border-radius:3px;background:#a27435c9;color:#fff1cf;font:9px Consolas,monospace}
+
+.compact-select {background:#182635;color:#cbdbe7;border:1px solid #394b5b;border-radius:5px;padding:5px 8px;font:12px "Segoe UI",sans-serif}
+#panelResize {height:7px;flex:none;cursor:ns-resize;touch-action:none}
+#panelResize:hover {background:#476474}
+.timeline-panel {margin-top:0}
+.drop-overlay {pointer-events:none}
+[hidden] {display:none!important}
+@media(max-width:1150px){.workspace{grid-template-columns:180px minmax(280px,1fr) 225px}.inspector-panel{display:flex}.timeline-tools{gap:0}.zoom-controls input{width:46px}}

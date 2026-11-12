@@ -8,6 +8,7 @@ streamed, bounded-size chunks to the local workspace, even for files >4 GiB.
 from __future__ import annotations
 import argparse
 import hashlib
+import collections
 import json
 import math
 import mimetypes
@@ -45,6 +46,8 @@ SUPPORTED=VIDEO|IMAGE|AUDIO
 MAX_CHUNK=16*1024*1024  # keep resident uploads small; NOT a file size limit
 UPLOADS={}
 JOBS={'export':{'status':'idle','percent':0,'message':'','path':None,'error':None},'proxy':{'status':'idle','percent':0,'message':'','assetId':None,'error':None}}
+DESKTOP_ACTION=None
+PROXY_QUEUE=collections.deque()
 CURRENT_PROCESS={'export':None,'proxy':None}
 CANCEL={'export':threading.Event(),'proxy':threading.Event()}
 AI_PREVIEW={'token':None,'digest':None,'created':0}
@@ -158,10 +161,28 @@ def add_asset(path,auto_add=True):
     CACHE_WORKERS.submit(create_thumbnail,a)
     return a
 
+def relink_asset(aid,path):
+    path=path.resolve(strict=True)
+    meta=probe(path)
+    with LOCK:
+        new=deepcopy(STATE)
+        asset=next((a for a in new['assets'] if a['id']==aid),None)
+        if not asset or classify(path)!=asset['kind']:raise ValueError('Choose media of the same type')
+        used=[c for t in new['tracks'] for c in t['clips'] if c.get('assetId')==aid]
+        if asset['kind']!='image' and any(c['end']>meta['duration']+.001 for c in used):
+            raise ValueError('Replacement ends before a timeline out-point')
+        if asset['kind']!='audio' and not meta['width']:raise ValueError('Replacement has no video')
+        if any(c['kind']=='audio' for c in used) and not meta['hasAudio']:raise ValueError('Replacement has no audio stream')
+        asset.update(meta,path=str(path),size=path.stat().st_size,name=path.name,cacheId=uuid.uuid4().hex)
+        save_state(new)
+    CACHE_WORKERS.submit(create_thumbnail,asset)
+    return asset
+
+
 def create_thumbnail(asset):
     if asset['kind']=='audio':return
     THUMBS.mkdir(parents=True,exist_ok=True)
-    out=THUMBS/(asset['id']+'.jpg')
+    out=THUMBS/(asset.get('cacheId',asset['id'])+'.jpg')
     if out.exists():return
     args=['ffmpeg','-hide_banner','-nostdin','-v','error','-y']
     if asset['kind']=='video':args+=['-ss',str(min(1,max(0,asset['duration']*.25)))]
@@ -260,6 +281,7 @@ def validate_document(document):
         if not isinstance(asset,dict):raise ValueError('Invalid asset')
         aid=asset.get('id','')
         if not re.fullmatch(r'[a-zA-Z0-9_-]{1,64}',aid) or aid in known:raise ValueError('Invalid asset ID')
+        if not re.fullmatch(r'[a-zA-Z0-9_-]{1,64}',asset.get('cacheId',aid)):raise ValueError('Invalid cache ID')
         known.add(aid)
         if not Path(asset['path']).is_absolute() or classify(asset['path'])!=asset['kind']:
             raise ValueError('Invalid media path or type')
@@ -329,21 +351,70 @@ def run_export(snapshot,path,review=False):
         job_status('export',status='cancelled' if CANCEL['export'].is_set() else 'error',error=str(ex),message='Export stopped')
     finally:shutil.rmtree(temp,ignore_errors=True)
 
+def cache_id(asset):
+    return asset.get('cacheId',asset['id'])
+
+
+def proxy_path(asset):
+    return PROXIES/(cache_id(asset)+'.mp4')
+
+
+def needs_proxy(asset):
+    return (asset['kind']=='video' and
+            (asset['width']>=3840 or asset['size']>=2**32 or asset['codec'] not in ('h264','vp8','vp9') or
+             Path(asset['path']).suffix.lower() not in ('.mp4','.m4v','.webm')))
+
+
+def queue_proxy(asset):
+    with JOB_LOCK:
+        key=cache_id(asset)
+        if proxy_path(asset).is_file() or any(cache_id(a)==key for a in PROXY_QUEUE):return
+        if JOBS['proxy']['status']=='rendering' and JOBS['proxy'].get('cacheId')==key:return
+        PROXY_QUEUE.append(deepcopy(asset))
+        if JOBS['proxy']['status']!='rendering':start_next_proxy()
+
+
+def start_next_proxy():
+    if not PROXY_QUEUE:return
+    asset=PROXY_QUEUE.popleft()
+    CANCEL['proxy'].clear()
+    job_status('proxy',status='rendering',percent=0,message='Preparing proxy',assetId=asset['id'],cacheId=cache_id(asset),error=None)
+    threading.Thread(target=run_proxy,args=(asset,),daemon=True).start()
+
+
 def run_proxy(asset):
-    dest=PROXIES/(asset['id']+'.mp4');tmp=PROXIES/(asset['id']+'.partial.mp4')
+    dest=proxy_path(asset)
+    tmp=dest.with_suffix('.partial.mp4')
     try:
-        if tmp.exists():tmp.unlink()
-        job_status('proxy',status='rendering',percent=5,message='Building 720p editing proxy…',assetId=asset['id'],error=None)
-        cmd=['ffmpeg','-hide_banner','-nostdin','-v','error','-y','-i',asset['path'],
-             '-vf','scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2:black',
-             '-c:v','libx264','-preset','veryfast','-crf','26','-pix_fmt','yuv420p','-c:a','aac','-b:a','128k','-movflags','+faststart',str(tmp)]
-        exec_process(cmd,str(ROOT),'proxy')
+        PROXIES.mkdir(parents=True,exist_ok=True)
+        cmd=['ffmpeg','-hide_banner','-nostdin','-v','error','-y','-progress','pipe:1','-i',asset['path'],
+             '-map','0:v:0','-map','0:a:0?','-vf','scale=1280:720:force_original_aspect_ratio=decrease:force_divisible_by=2,setsar=1',
+             '-c:v','libx264','-preset','veryfast','-crf','24','-pix_fmt','yuv420p','-g','24',
+             '-c:a','aac','-b:a','160k','-movflags','+faststart',str(tmp)]
+        with tempfile.TemporaryFile() as errors:
+            with subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=errors,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0)) as proc:
+                with JOB_LOCK:
+                    CURRENT_PROCESS['proxy']=proc
+                    if CANCEL['proxy'].is_set():proc.terminate()
+                for line in proc.stdout:
+                    if line.startswith(b'out_time_us='):
+                        try:seconds=int(line.split(b'=')[1])/1000000
+                        except ValueError:continue
+                        percent=min(99,int(100*seconds/max(.01,asset['duration'])))
+                        job_status('proxy',percent=percent,message='Proxy: '+asset['name'])
+                if CANCEL['proxy'].is_set():raise ValueError('Proxy cancelled')
+                if proc.wait():
+                    errors.seek(0);raise ValueError(errors.read()[-1200:].decode(errors='replace'))
         os.replace(tmp,dest)
-        job_status('proxy',status='done',percent=100,message='Proxy ready',assetId=asset['id'])
-    except Exception as ex:
-        job_status('proxy',status='cancelled' if CANCEL['proxy'].is_set() else 'error',error=str(ex),message='Proxy failed')
+        result=dict(status='done',percent=100,message='Proxy ready')
+    except Exception as exc:
+        result=dict(status='cancelled' if CANCEL['proxy'].is_set() else 'error',error=str(exc),message='Proxy stopped')
     finally:
-        if tmp.exists():tmp.unlink()
+        tmp.unlink(missing_ok=True)
+        with JOB_LOCK:
+            CURRENT_PROCESS['proxy']=None
+            job_status('proxy',**result)
+            start_next_proxy()
 
 def _legacy(s):
     video=next((t for t in reversed(s['tracks']) if t['type']=='video'),None)
@@ -389,7 +460,7 @@ class Handler(BaseHTTPRequestHandler):
     protocol_version='HTTP/1.1'
     def log_message(self,fmt,*args):
         if not any(x in str(args) for x in ('/media/','/thumb/','/api/export/status')):
-            print('[VlogCraft]',fmt%args)
+            if getattr(__import__('sys'),'stdout',None):print('[VlogCraft]',fmt%args)
     def json_response(self,data,status=200):
         b=json.dumps(data,ensure_ascii=False,allow_nan=False).encode('utf8')
         self.send_response(status);self.send_header('Content-Type','application/json; charset=utf-8')
@@ -445,10 +516,13 @@ class Handler(BaseHTTPRequestHandler):
             if path=='/api/state':
                 with LOCK:snapshot=deepcopy(STATE)
                 for asset in snapshot['assets']:asset['missing']=not Path(asset['path']).is_file()
+                snapshot['desktop']=DESKTOP_ACTION is not None
                 snapshot['recovered']=RECOVERED
                 return self.json_response(snapshot)
             if path=='/api/jobs':
-                with JOB_LOCK:return self.json_response(deepcopy(JOBS))
+                with JOB_LOCK:jobs=deepcopy(JOBS);jobs['proxy']['queued']=len(PROXY_QUEUE)
+                with LOCK:jobs['readyProxies']=[a['id'] for a in STATE['assets'] if proxy_path(a).is_file()]
+                return self.json_response(jobs)
             if path=='/api/upload/status':
                 uid=parse_qs(parsed.query).get('id',[''])[0]
                 with UPLOAD_LOCK:
@@ -459,14 +533,16 @@ class Handler(BaseHTTPRequestHandler):
                 parts=path.split('/');aid=parts[2] if len(parts)>2 else ''
                 with LOCK:a=next((a for a in STATE['assets'] if a['id']==aid),None)
                 if not a:return self.json_response({'error':'Unknown asset'},404)
-                proxy=PROXIES/(aid+'.mp4')
+                proxy=proxy_path(a)
                 if parse_qs(parsed.query).get('proxy',['0'])[0]=='1' and proxy.is_file():
                     return self.file_response(proxy,'video/mp4')
                 return self.file_response(a['path'])
             if path.startswith('/thumb/'):
                 aid=path.split('/')[2]
                 if not re.fullmatch(r'[a-f0-9]{32}',aid):return self.json_response({'error':'Invalid ID'},404)
-                return self.file_response(THUMBS/(aid+'.jpg'),'image/jpeg')
+                with LOCK:asset=next((a for a in STATE['assets'] if a['id']==aid),None)
+                if not asset:return self.json_response({'error':'Unknown asset'},404)
+                return self.file_response(THUMBS/(cache_id(asset)+'.jpg'),'image/jpeg')
             if path.startswith('/download/'):
                 name=Path(path).name
                 if not re.fullmatch(r'[\w.\-]{1,130}',name):return self.json_response({'error':'Invalid filename'},404)
@@ -474,7 +550,7 @@ class Handler(BaseHTTPRequestHandler):
                 if not target.exists():target=EXPORTS/name
                 return self.file_response(target)
             if path=='/' or path=='/index.html':return self.file_response(WEB/'index.html','text/html; charset=utf-8')
-            if path in ('/app.js','/style.css'):
+            if path in ('/app.js','/studio.js','/style.css'):
                 return self.file_response(WEB/path.lstrip('/'))
             return self.json_response({'error':'Not found'},404)
         except Exception as ex:return self.reject(ex)
@@ -541,14 +617,25 @@ class Handler(BaseHTTPRequestHandler):
                 with UPLOAD_LOCK:u=UPLOADS.pop(uid,None)
                 if u:Path(u['tmp']).unlink(missing_ok=True)
                 return self.json_response({'cancelled':bool(u)})
+            if path=='/api/desktop':
+                if DESKTOP_ACTION is None:raise ValueError('Open the desktop application')
+                return self.json_response(DESKTOP_ACTION(data.get('action')))
+            if path=='/api/relink':
+                aid=data.get('assetId')
+                paths=choose_files()
+                if not paths:return self.json_response({'cancelled':True})
+                if len(paths)!=1:raise ValueError('Select one replacement file')
+                return self.json_response({'asset':relink_asset(aid,Path(paths[0]))})
             if path=='/api/import':
                 paths=data.get('paths')
                 if paths is None:paths=choose_files()
-                if not isinstance(paths,list) or len(paths)>150:raise ValueError('Select up to 150 files')
+                if not isinstance(paths,(list,tuple)) or len(paths)>150:raise ValueError('Select up to 150 files')
                 assets=[];errs=[]
                 for item in paths:
                     try:assets.append(add_asset(item,auto_add=False))
                     except Exception as ex:errs.append(str(ex))
+                for asset in assets:
+                    if data.get('autoProxy') and needs_proxy(asset):queue_proxy(asset)
                 return self.json_response({'assets':assets,'errors':errs})
             if path=='/api/state':
                 with LOCK:
@@ -560,11 +647,7 @@ class Handler(BaseHTTPRequestHandler):
                 aid=str(data.get('assetId',''))
                 with LOCK:a=next((x for x in STATE['assets'] if x['id']==aid),None)
                 if not a or a['kind']!='video':raise ValueError('Select a video to create proxy')
-                with JOB_LOCK:
-                    if JOBS['proxy']['status']=='rendering':raise ValueError('Another proxy is rendering')
-                    CANCEL['proxy'].clear();job_status('proxy',status='rendering',percent=1,assetId=aid,error=None)
-                PROXIES.mkdir(parents=True,exist_ok=True)
-                threading.Thread(target=run_proxy,args=(deepcopy(a),),daemon=True).start()
+                queue_proxy(a)
                 return self.json_response({'started':True})
             if path=='/api/export' or path=='/api/review/video':
                 with JOB_LOCK:
@@ -584,6 +667,7 @@ class Handler(BaseHTTPRequestHandler):
                         raise ValueError('Refusing to overwrite your original footage')
                 dest.parent.mkdir(parents=True,exist_ok=True)
                 with JOB_LOCK:
+                    if JOBS['export']['status']=='rendering':raise ValueError('Another export is active')
                     CANCEL['export'].clear()
                     job_status('export',status='rendering',percent=0,path=None,error=None,message='Starting…')
                     threading.Thread(target=run_export,args=(snap,str(dest),review),daemon=True).start()

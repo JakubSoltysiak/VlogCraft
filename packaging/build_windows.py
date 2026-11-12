@@ -1,0 +1,100 @@
+"""Run with the build venv's Python from the repository root."""
+import argparse
+import hashlib
+import os
+import shutil
+import subprocess
+import sys
+import uuid
+import xml.etree.ElementTree as ET
+from pathlib import Path
+
+from PIL import Image, ImageDraw
+
+
+ROOT = Path(__file__).resolve().parents[1]
+BUILD = ROOT / 'build'
+RELEASE = ROOT / 'release'
+VERSION = '3.1.0'
+WIX_NS = 'http://schemas.microsoft.com/wix/2006/wi'
+UPGRADE_CODE = '09FA364C-4D7B-4B43-A1CF-7D82A0B62F02'
+ET.register_namespace('', WIX_NS)
+
+
+def element(parent, tag, **attrs):
+    return ET.SubElement(parent, '{' + WIX_NS + '}' + tag, attrs)
+
+
+def identifier(prefix, path):
+    return prefix + hashlib.sha256(str(path).casefold().encode()).hexdigest()[:28]
+
+
+def build(wix):
+    os.chdir(ROOT)
+    RELEASE.mkdir(exist_ok=True)
+    BUILD.mkdir(exist_ok=True)
+    icon = BUILD / 'studio.ico'
+    image = Image.new('RGBA', (256, 256), (0, 0, 0, 0))
+    pen = ImageDraw.Draw(image)
+    pen.rounded_rectangle((6, 6, 250, 250), radius=50, fill='#142536')
+    pen.polygon([(44, 68), (80, 68), (124, 157), (175, 64), (210, 64), (141, 190), (110, 190)], fill='#99dfce')
+    pen.rounded_rectangle((154, 179, 213, 189), radius=5, fill='#f2b678')
+    image.save(icon, sizes=[(16, 16), (32, 32), (48, 48), (64, 64), (128, 128), (256, 256)])
+    engine = Path(shutil.which('ffmpeg')).parent
+    subprocess.run([sys.executable, '-m', 'PyInstaller', '--noconfirm', '--clean', '--noupx',
+                    '--log-level', 'WARN', '--onedir', '--windowed', '--name', 'VlogCraftStudio',
+                    '--icon', str(icon), '--add-data', 'web;web',
+                    '--add-data', str(engine / 'ffmpeg.exe') + ';engine',
+                    '--add-data', str(engine / 'ffprobe.exe') + ';engine',
+                    '--add-data', str(engine.parent / 'LICENSE') + ';engine',
+                    '--collect-data', 'webview', '--exclude-module', 'playwright',
+                    '--exclude-module', 'tkinter', 'desktop.py'], check=True)
+    bundle = ROOT / 'dist' / 'VlogCraftStudio'
+    root = ET.Element('{' + WIX_NS + '}Wix')
+    product = element(root, 'Product', Id='*', Name='VlogCraft Studio', Language='1033',
+                      Version=VERSION, Manufacturer='VlogCraft Private', UpgradeCode=UPGRADE_CODE)
+    element(product, 'Package', InstallerVersion='500', Compressed='yes', InstallScope='perUser', Platform='x64')
+    element(product, 'MajorUpgrade', DowngradeErrorMessage='A newer VlogCraft Studio is installed.')
+    element(product, 'MediaTemplate', EmbedCab='yes', CompressionLevel='medium')
+    element(product, 'Icon', Id='studio.ico', SourceFile=str(icon))
+    element(product, 'Property', Id='ARPPRODUCTICON', Value='studio.ico')
+    target = element(product, 'Directory', Id='TARGETDIR', Name='SourceDir')
+    local = element(target, 'Directory', Id='LocalAppDataFolder')
+    apps = element(local, 'Directory', Id='UserPrograms', Name='Programs')
+    install = element(apps, 'Directory', Id='INSTALLDIR', Name='VlogCraft Studio')
+    menu = element(target, 'Directory', Id='ProgramMenuFolder')
+    desktop = element(target, 'Directory', Id='DesktopFolder')
+    core = element(product, 'Feature', Id='Editor', Title='VlogCraft Studio', Level='1', Absent='disallow')
+    optional = element(product, 'Feature', Id='DesktopShortcut', Title='Desktop shortcut', Level='1')
+    dirs = {bundle: install}
+    def component(directory, key, feature):
+        cid = identifier('C', key)
+        guid = str(uuid.uuid5(uuid.UUID(UPGRADE_CODE), str(key).casefold()))
+        element(feature, 'ComponentRef', Id=cid)
+        return element(directory, 'Component', Id=cid, Guid=guid, Win64='yes')
+    for path in sorted(bundle.rglob('*')):
+        relative = path.relative_to(bundle)
+        if path.is_dir():
+            dirs[path] = element(dirs[path.parent], 'Directory', Id=identifier('D', relative), Name=path.name)
+        else:
+            c = component(dirs[path.parent], relative, core)
+            element(c, 'File', Id=identifier('F', relative), Source=str(path), KeyPath='yes')
+    for directory, label, feature in ((menu, 'StartMenu', core), (desktop, 'Desktop', optional)):
+        c = component(directory, label, feature)
+        element(c, 'Shortcut', Id=label + 'Link', Name='VlogCraft Studio',
+                Target='[INSTALLDIR]VlogCraftStudio.exe', WorkingDirectory='INSTALLDIR', Icon='studio.ico')
+        element(c, 'RegistryValue', Root='HKCU', Key=r'Software\VlogCraft\Studio', Name=label,
+                Type='integer', Value='1', KeyPath='yes')
+    element(product, 'UIRef', Id='WixUI_FeatureTree')
+    source = BUILD / 'studio.wxs'
+    ET.ElementTree(root).write(source, encoding='utf-8', xml_declaration=True)
+    obj = BUILD / 'studio.wixobj'
+    subprocess.run([str(wix / 'candle.exe'), '-nologo', '-out', str(obj), str(source)], check=True)
+    subprocess.run([str(wix / 'light.exe'), '-nologo', '-sval', '-spdb', '-ext', 'WixUIExtension',
+                    '-out', str(RELEASE / 'VlogCraft-Studio-3.1-x64.msi'), str(obj)], check=True)
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--wix', type=Path, default=BUILD / 'tools' / 'wix')
+    build(parser.parse_args().wix)
