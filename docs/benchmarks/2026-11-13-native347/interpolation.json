@@ -1,0 +1,24 @@
+{
+  "resolution": [
+    640,
+    360
+  ],
+  "input_rate": "30/1",
+  "output_rate": "60/1",
+  "trials": [
+    {
+      "mode": "repeat",
+      "seconds": 0.1904117000012775,
+      "decoded_frames": 120,
+      "process_fps": 630.2133744890409
+    },
+    {
+      "mode": "motion_compensated",
+      "seconds": 5.212826399998448,
+      "decoded_frames": 116,
+      "process_fps": 22.25280320097261
+    }
+  ],
+  "adopted": false,
+  "reason": "CPU-only batch prototype; future-frame lookahead/end truncation and motion-artifact acceptance not qualified. No 4K/GPU/NPU or perceptual-quality claim."
+}

@@ -1,0 +1,42 @@
+{
+  "initial_baseline": {
+    "median_seconds": 6.035075,
+    "min_seconds": 5.858456,
+    "max_seconds": 6.089773
+  },
+  "initial_candidate": {
+    "median_seconds": 7.672943,
+    "min_seconds": 7.498069,
+    "max_seconds": 7.691437
+  },
+  "same_renderer_controls": [
+    {
+      "label": "baseline",
+      "seconds": 8.906925
+    },
+    {
+      "label": "candidate",
+      "seconds": 7.690565
+    },
+    {
+      "label": "candidate",
+      "seconds": 6.994135
+    },
+    {
+      "label": "baseline",
+      "seconds": 7.451089
+    },
+    {
+      "label": "baseline",
+      "seconds": 6.860448
+    },
+    {
+      "label": "candidate",
+      "seconds": 7.003798
+    }
+  ],
+  "strict_seek_controls": true,
+  "reference_renderer_byte_identical": true,
+  "renderer_source_sha256": "2ebcc3ba738a737a3db59e216b822880fc6819af4bb3cc524e7c12804f0f4b31",
+  "interpretation": "Same exact renderer under alternating labels; range reflects conditions, not separate implementation performance. No export speedup claimed."
+}

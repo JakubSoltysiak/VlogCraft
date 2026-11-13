@@ -1,0 +1,102 @@
+{
+  "qualification": "experimental / scoped passes; sustained zero-skip 60FPS and broad production gates remain open",
+  "baseline_revision": "48f4d4e6ce28e063121514d601984435071a9bb5",
+  "native_runtime_sha256": "fe2f6ee15ca5f9e2460445072381cc834cd887d934ac14485fc00060346b818f",
+  "evidence": "2026-11-13-native347",
+  "matched_comparison": {
+    "compatible": true,
+    "metrics": {
+      "present_fps": {
+        "baseline_median": 57.71498512384867,
+        "candidate_median": 59.665518505417225,
+        "change_percent": 3.379596091696065,
+        "baseline_range": [
+          56.76769355673825,
+          57.828548780700125
+        ],
+        "candidate_range": [
+          57.83210708808839,
+          59.795973295869956
+        ],
+        "investigate": false,
+        "repeated": true
+      },
+      "first_frame_ms": {
+        "baseline_median": 997.9511999990791,
+        "candidate_median": 933.8361999980407,
+        "change_percent": -6.424662849355518,
+        "baseline_range": [
+          965.6644999995478,
+          1038.2451999976183
+        ],
+        "candidate_range": [
+          827.327700004389,
+          979.5955000008689
+        ],
+        "investigate": false,
+        "repeated": true
+      }
+    },
+    "investigate": false,
+    "interpretation": "Investigation trigger, not automatic failure; inspect variation, quality and completeness"
+  },
+  "endurance": {
+    "seconds": 600,
+    "sample_frames": 28800000,
+    "underruns": 0,
+    "distinct_fps": 59.8723482948951,
+    "skipped_sequence_frames": 62
+  },
+  "image_quality": "877-level P010/PQ and scoped reference comparison passed; no interpolation/adaptive resolution in product",
+  "remaining_gates": [
+    "zero-skip sustained performance",
+    "longer memory/heap analysis",
+    "physical scanout/acoustic sync",
+    "actual device reset",
+    "HDR/mixed-color/effect parity",
+    "other hardware"
+  ],
+  "method_notes": [
+    "Baseline legacy Present counters may include redraws; candidate raw and distinct counts agree in matched runs",
+    "FPS denominator includes up to one 250ms observation polling tail; compare exact sequence completeness as well",
+    "Core native runtime unchanged after final diagnostics ownership/UI-clarity fixes; those paths were retested in the final bundle"
+  ],
+  "source_fingerprint": "9cd518c209d205281b1746213ee020cc8af1b14ab26989294ae0dd930990aaeb",
+  "fingerprint_method": "SHA256 sorted relevant relative path + NUL + LF-normalized source + NUL",
+  "regression_investigations": [
+    {
+      "metric": "export",
+      "initial_baseline_seconds": 6.035075,
+      "initial_candidate_seconds": 7.672943,
+      "triggered": true,
+      "renderer_byte_identical": true,
+      "same_renderer_control_range_seconds": [
+        6.860448,
+        8.906925
+      ],
+      "conclusion": "No implementation change to attribute this to; large condition variation remains. No export speedup is claimed."
+    },
+    {
+      "metric": "seek_p95",
+      "initial_baseline_ms": 644.0959,
+      "initial_candidate_ms": 719.8773,
+      "triggered": true,
+      "strict_generation_frame_control_baseline_ms": [
+        751.4336,
+        643.6322
+      ],
+      "strict_control_candidate_ms": [
+        716.138,
+        626.3777
+      ],
+      "conclusion": "Strict repeated endpoint controls overlap; >10% regression not reproduced. Two runs/arm; no significant speedup claimed."
+    }
+  ],
+  "resource_tradeoff": {
+    "baseline_median_peak_working_set_MiB": 2496.5,
+    "candidate_median_peak_working_set_MiB": 3437.3,
+    "baseline_median_cpu_machine_percent": 9.02,
+    "candidate_median_cpu_machine_percent": 8.91,
+    "note": "Matched AC conditions. GPU occupancy counters unreliable, energy/thermal throttling not measured."
+  }
+}

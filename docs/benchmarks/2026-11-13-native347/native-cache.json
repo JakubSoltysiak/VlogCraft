@@ -1,0 +1,26 @@
+{
+  "checks": [
+    {
+      "sequence_frame": 0,
+      "all_source_pts": 0
+    },
+    {
+      "sequence_frame": 90,
+      "all_source_pts": 0
+    },
+    {
+      "sequence_frame": 91,
+      "all_source_pts": 256
+    },
+    {
+      "sequence_frame": 93,
+      "all_source_pts": 768
+    }
+  ],
+  "cache_hits": 3,
+  "cache_frames_per_source": [
+    6,
+    6,
+    6
+  ]
+}

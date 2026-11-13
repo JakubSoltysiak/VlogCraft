@@ -306,6 +306,7 @@ function setup(){
  };
  $('linkBtn').onclick=importLinked;$('firstImport').onclick=importLinked;$('dropBtn').onclick=()=>$('fileInput').click();$('fileInput').onchange=e=>{void importDropped(e.target.files);e.target.value='';};
  $('searchAssets').oninput=renderAssets;$('assetFilter').onchange=renderAssets;
+ $('performanceBtn').onclick=()=>{stopPlayback();openModal('performanceModal');};$('performanceRun').onclick=performanceTest;$('performanceApply').onclick=applyPerformancePreview;
  $('aiBtn').onclick=()=>openModal('aiModal');$('exportBtn').onclick=openExport;$('helpBtn').onclick=()=>openModal('helpModal');
  document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>closeModal(b.dataset.close));document.querySelectorAll('.modal-overlay').forEach(m=>m.onclick=e=>{if(e.target===m)m.hidden=true;});
  $('playBtn').onclick=playPause;$('stepBack').onclick=()=>seek(playhead-1/sequenceRate());$('stepForward').onclick=()=>seek(playhead+1/sequenceRate());$('jumpStart').onclick=()=>seek(0);
@@ -321,7 +322,7 @@ function setup(){
  $('reviewPackBtn').onclick=()=>void makeReviewPack();$('reviewVideoBtn').onclick=()=>void makeReviewVideo();$('openChat').onclick=()=>window.open('https://chatgpt.com/','_blank','noopener');
  $('analyzeBtn').onclick=()=>void analyzeAi();$('previewAiBtn').onclick=()=>void previewAi();$('applyAiBtn').onclick=()=>void applyAi();$('undoAiBtn').onclick=()=>void undoAi();
  $('proposalJson').oninput=()=>{proposalToken=null;$('applyAiBtn').disabled=true;};$('transferCancel').onclick=()=>{transferStop=true;toast('Cancel requested');};
- document.addEventListener('keydown',e=>{if(document.querySelector('dialog[open]'))return;if(e.key==='Escape'){$('aiModal').hidden=$('exportModal').hidden=$('helpModal').hidden=true;return;}if(['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName)||!$('aiModal').hidden||!$('exportModal').hidden||!$('helpModal').hidden)return;
+ document.addEventListener('keydown',e=>{if(document.querySelector('dialog[open]'))return;if(e.key==='Escape'){$('performanceModal').hidden=$('aiModal').hidden=$('exportModal').hidden=$('helpModal').hidden=true;return;}if(['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName)||!$('aiModal').hidden||!$('exportModal').hidden||!$('helpModal').hidden||!$('performanceModal').hidden)return;
   if(e.ctrlKey&&e.key.toLowerCase()==='s'){e.preventDefault();void flushSave();return;}
   if(e.ctrlKey&&e.key.toLowerCase()==='z'){e.preventDefault();restoreHistory(e.shiftKey?redoStack:undoStack,e.shiftKey?undoStack:redoStack);return;}
   if(e.ctrlKey&&e.key.toLowerCase()==='y'){e.preventDefault();restoreHistory(redoStack,undoStack);return;}

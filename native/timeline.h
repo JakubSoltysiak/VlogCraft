@@ -62,11 +62,12 @@ struct Plan {
 };
 struct Producer {
  std::mutex guard;std::condition_variable changed;std::deque<Frame> queue;Frame current;
+ std::vector<Frame> warm;size_t warmBudget=0;int64_t warmTarget=INT64_MIN;uint64_t warmHits=0;
  std::thread worker;std::atomic<bool> stop{false};bool eof=false;std::string failure;
  int64_t epoch=0,workerEpoch=-1,seekTick=0;size_t peak=0;double decodedSeconds=0;uint64_t decoded=0,seeks=0;
  std::unique_ptr<Decoder> decoder;AVRational base;int64_t origin=0;double rotation=0;
- Producer(const Clip& c,AVBufferRef* device,bool software=false){
-  decoder=std::make_unique<Decoder>(c.path,device,!software);
+ Producer(const Clip& c,AVBufferRef* device,bool software=false,int extraHardwareFrames=8,size_t cacheFrames=0):warmBudget(cacheFrames){
+  decoder=std::make_unique<Decoder>(c.path,device,!software,extraHardwareFrames+(int)warmBudget);
   auto* parameters=decoder->file->streams[decoder->stream]->codecpar;
   auto* matrix=av_packet_side_data_get(parameters->coded_side_data,parameters->nb_coded_side_data,AV_PKT_DATA_DISPLAYMATRIX);
   if(matrix)rotation=av_display_rotation_get((const int32_t*)matrix->data);
@@ -78,7 +79,7 @@ struct Producer {
  }
  ~Producer(){stop=true;changed.notify_all();if(worker.joinable())worker.join();}
  void reset(int64_t tick,AVRational sourceBase){
-  std::lock_guard<std::mutex> lock(guard);epoch++;seekTick=av_rescale_q(tick,sourceBase,base);queue.clear();current.reset();eof=false;changed.notify_all();
+  std::lock_guard<std::mutex> lock(guard);epoch++;seekTick=av_rescale_q(tick,sourceBase,base);if(warmTarget!=seekTick){warm.clear();warmTarget=seekTick;}queue.clear();current.reset();eof=false;changed.notify_all();
  }
  void produce(){
   try{
@@ -97,6 +98,7 @@ struct Producer {
     if(!ok)eof=true;
     else{
      if(frame->best_effort_timestamp==AV_NOPTS_VALUE)throw std::runtime_error("Missing source presentation timestamp");
+     if(warmBudget&&frame->best_effort_timestamp>=target+origin&&warm.size()<warmBudget){if(warmTarget!=target){warm.clear();warmTarget=target;}warm.push_back(frame);}
      queue.push_back(frame);decoded++;peak=std::max(peak,queue.size());
     }changed.notify_all();
    }
@@ -110,10 +112,14 @@ struct Producer {
    current=queue.front();queue.pop_front();changed.notify_all();
   }
   ready=current&&(eof||!queue.empty());
+  if(!ready&&warm.size()>1){
+   for(size_t i=1;i<warm.size();i++)if(warm[i-1]->best_effort_timestamp<=target&&target<warm[i]->best_effort_timestamp){ready=true;warmHits++;return warm[i-1];}
+  }
   return ready?current:nullptr;
  }
 };
 struct Input {
+ HANDLE changed=CreateEventW(nullptr,FALSE,FALSE,nullptr);~Input(){if(changed)CloseHandle(changed);}
  std::mutex guard;std::atomic<bool> stop{false};int64_t microseconds=0,generation=0;bool playing=false;
  Clock::time_point received=Clock::now();
  void command(const std::string& line){
@@ -121,6 +127,7 @@ struct Input {
   std::lock_guard<std::mutex> lock(guard);
   if(op=="CLOCK"){s>>microseconds>>playing>>generation;received=Clock::now();}
   else if(op=="CLOSE")stop=true;
+  SetEvent(changed);
  }
  void snapshot(int64_t& us,int64_t& gen,bool& play){
   std::lock_guard<std::mutex> lock(guard);us=microseconds;gen=generation;play=playing;

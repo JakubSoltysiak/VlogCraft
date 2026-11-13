@@ -1,0 +1,38 @@
+{
+  "contract": {
+    "hardware": "ASUS UM5606WA / HX370 / Radeon890M / 32GiB",
+    "workload": "125 seconds / 1500 clips / 3V+3A / .5s cuts",
+    "input_class": "three independent generated 3840x2160 H26460 originals and AAC48k",
+    "composition": [
+      960,
+      540
+    ],
+    "surface": [
+      356,
+      200
+    ],
+    "rate": "60/1",
+    "proxy": false,
+    "cache_state": "fresh process/project; OS cache unmanaged",
+    "power": "AC",
+    "driver": "32.0.32015.7029",
+    "active_refresh": 120
+  },
+  "trials": [
+    {
+      "present_fps": 57.828548780700125,
+      "first_frame_ms": 997.9511999990791,
+      "skipped_frames": 264
+    },
+    {
+      "present_fps": 56.76769355673825,
+      "first_frame_ms": 965.6644999995478,
+      "skipped_frames": 407
+    },
+    {
+      "present_fps": 57.71498512384867,
+      "first_frame_ms": 1038.2451999976183,
+      "skipped_frames": 279
+    }
+  ]
+}

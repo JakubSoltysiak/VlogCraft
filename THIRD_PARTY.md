@@ -22,6 +22,7 @@ The opt-in setup script fetches checksum-pinned Zig 0.17.1, a Gyan FFmpeg 9.0.2 
 | Pillow | Image operations | MIT-CMU |
 | OpenCV Python headless | Motion analysis | Apache-2.0 for current OpenCV, plus package/bundled third-party notices |
 | NumPy | Color/audio array operations | BSD-3-Clause and bundled notices |
+| psutil | Local process/memory/power diagnostics | BSD-3-Clause; installed package notice included |
 | PyInstaller | Application packaging | GPL-2.0-or-later with the PyInstaller bootloader exception |
 | WiX Toolset 3 | MSI build tool | Microsoft Reciprocal License |
 | Microsoft Edge WebView2 | Installed Windows runtime | Microsoft's runtime terms |

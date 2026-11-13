@@ -1,0 +1,208 @@
+{
+  "cpu": {
+    "Name": "AMD Ryzen AI 9 HX 370 w/ Radeon 890M           ",
+    "NumberOfCores": 12,
+    "NumberOfLogicalProcessors": 24,
+    "MaxClockSpeed": 2000,
+    "CurrentClockSpeed": 2000,
+    "L2CacheSize": 12288,
+    "L3CacheSize": 24576
+  },
+  "memory": [
+    {
+      "Capacity": 8589934592,
+      "ConfiguredClockSpeed": 7500,
+      "Speed": 7500,
+      "SMBIOSMemoryType": 35,
+      "FormFactor": 1,
+      "DataWidth": 32,
+      "TotalWidth": 32
+    },
+    {
+      "Capacity": 8589934592,
+      "ConfiguredClockSpeed": 7500,
+      "Speed": 7500,
+      "SMBIOSMemoryType": 35,
+      "FormFactor": 1,
+      "DataWidth": 32,
+      "TotalWidth": 32
+    },
+    {
+      "Capacity": 8589934592,
+      "ConfiguredClockSpeed": 7500,
+      "Speed": 7500,
+      "SMBIOSMemoryType": 35,
+      "FormFactor": 1,
+      "DataWidth": 32,
+      "TotalWidth": 32
+    },
+    {
+      "Capacity": 8589934592,
+      "ConfiguredClockSpeed": 7500,
+      "Speed": 7500,
+      "SMBIOSMemoryType": 35,
+      "FormFactor": 1,
+      "DataWidth": 32,
+      "TotalWidth": 32
+    }
+  ],
+  "os": {
+    "Caption": "Microsoft Windows 11 Pro",
+    "Version": "10.0.26300",
+    "BuildNumber": "26300",
+    "OSArchitecture": "64-bitowy",
+    "TotalVisibleMemorySize": 32630636,
+    "FreePhysicalMemory": 11866516
+  },
+  "gpu": {
+    "Name": "AMD Radeon(TM) 890M Graphics",
+    "DriverVersion": "32.0.32015.7029",
+    "DriverDate": "2026-10-18T02:00:00+02:00",
+    "CurrentHorizontalResolution": 2880,
+    "CurrentVerticalResolution": 1800,
+    "CurrentRefreshRate": 60,
+    "VideoModeDescription": "2880 x 1800 x 4294967296 kolor\u00f3w"
+  },
+  "storage": {
+    "FriendlyName": "MTFDKBA1T0QFM-1BD1AABGB",
+    "MediaType": "SSD",
+    "BusType": "NVMe",
+    "Size": 1024209543168,
+    "HealthStatus": "Healthy"
+  },
+  "system_volume": {
+    "FileSystem": "NTFS",
+    "Size": 1022243442688,
+    "SizeRemaining": 84877074432
+  },
+  "system": {
+    "Manufacturer": "ASUSTeK COMPUTER INC.",
+    "Model": "ASUS Zenbook S 16 UM5606WA_UM5606WA"
+  },
+  "native": {
+    "adapters": [
+      {
+        "name": "AMD Radeon(TM) 890M Graphics",
+        "feature_level": 45312,
+        "unified_memory": true,
+        "dedicated_video_MiB": 338,
+        "shared_system_MiB": 15932,
+        "local_budget_MiB": 15503,
+        "local_current_MiB": 5,
+        "nonlocal_budget_MiB": 0,
+        "decoder_profile_count": 20,
+        "decode_formats": [
+          {
+            "codec": "h264",
+            "NV12": true,
+            "P010": false
+          },
+          {
+            "codec": "hevc-main",
+            "NV12": true,
+            "P010": false
+          },
+          {
+            "codec": "hevc-main10",
+            "NV12": true,
+            "P010": true
+          }
+        ],
+        "outputs": [
+          {
+            "width": 2880,
+            "height": 1800,
+            "bits_per_color": 10,
+            "color_space": 12,
+            "max_luminance_nits": 190.96,
+            "available_refresh_rates": [
+              [
+                60,
+                1
+              ],
+              [
+                120,
+                1
+              ]
+            ]
+          }
+        ]
+      }
+    ],
+    "cpu_cores": [
+      {
+        "efficiency_class": 1,
+        "logical_threads": 2
+      },
+      {
+        "efficiency_class": 1,
+        "logical_threads": 2
+      },
+      {
+        "efficiency_class": 1,
+        "logical_threads": 2
+      },
+      {
+        "efficiency_class": 1,
+        "logical_threads": 2
+      },
+      {
+        "efficiency_class": 0,
+        "logical_threads": 2
+      },
+      {
+        "efficiency_class": 0,
+        "logical_threads": 2
+      },
+      {
+        "efficiency_class": 0,
+        "logical_threads": 2
+      },
+      {
+        "efficiency_class": 0,
+        "logical_threads": 2
+      },
+      {
+        "efficiency_class": 0,
+        "logical_threads": 2
+      },
+      {
+        "efficiency_class": 0,
+        "logical_threads": 2
+      },
+      {
+        "efficiency_class": 0,
+        "logical_threads": 2
+      },
+      {
+        "efficiency_class": 0,
+        "logical_threads": 2
+      }
+    ],
+    "dwm_refresh_rate": [
+      10000000,
+      83701
+    ],
+    "active_refresh_hz": 120,
+    "ac_line_status": 1,
+    "battery_percent": 43
+  },
+  "npu_driver": {
+    "DeviceName": "NPU Compute Accelerator Device",
+    "DriverVersion": "32.0.20102.4480",
+    "Manufacturer": "AMD"
+  },
+  "npu_inference_qualified": false,
+  "thermal_throttling": "not observable",
+  "storage_microbenchmark": {
+    "available": true,
+    "bytes_written": 134217728,
+    "direct_io": true,
+    "sequential_write_MiB_s": 2133.53,
+    "sequential_read_MiB_s": 3494.39,
+    "random_4k_read_p50_ms": 0.0668,
+    "random_4k_read_p95_ms": 0.1138,
+    "random_read_count": 512
+  },
+  "inventory_conditions": "Initial CIM on battery at 60 Hz; subsequent DPI-aware native inventory on AC at nominal120 Hz/HDR. Refresh not continuously logged."
+}

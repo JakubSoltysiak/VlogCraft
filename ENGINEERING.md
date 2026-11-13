@@ -1,6 +1,14 @@
 # Architecture and continuation
 
-## 3.4.6 native integration — current continuation
+## 3.4.7 workstation refinement — current continuation
+
+See [workstation report](docs/WORKSTATION_OPTIMIZATION_3_4_7.md). The scheduler uses an owned high-resolution waitable timer and input event, bounded timing histograms/GPU timestamps, a memory-budgeted 3–6 slot completion ring and a 0–6 frame original-PTS prefix cache per active source. Decoder surface allowance includes retained cache frames. Cached selection requires a measured next PTS; no fabricated VFR intervals or interpolated frames. Forward playback holds through small clock rewinds; raw submissions and distinct sequence submissions are separate.
+
+Immediate-context locks remain shared with FFmpeg. The rejected DXGI one/two-frame admission experiments are not enabled. Native clock polling has one request in flight. Manual resolution participates in snapshot invalidation so a 1440p/2160p change actually recreates the monitor. The local diagnostic worker whitelists hardware fields and uses a bounded temporary direct-I/O test; it never changes project/export quality or scans media. Automatic dynamic-quality/worker tuning remains partial.
+
+benchmarks/performance_suite.py and performance_gate.py define repeatable regression levels and strict comparison contracts. Actual CPU topology, power, display mode, GPU/driver, memory and storage are measured; no affinity, power-plan or desktop/HDR setting is forced.
+
+## 3.4.6 native integration — historical checkpoint
 
 See [native contract, ownership, privacy and acceptance](docs/NATIVE_PLAYBACK_3_4_6.md). native_plan.py conservatively admits a supported whole program; native_playback.py owns the child/panel and cancellable raw-PCM producers; native/player.cpp schedules original PTS into a bounded float16 ring. web/native_preview.js coordinates generations, coalesced seeks and the sample-counted AudioWorklet. Shared compiler audio now preserves initial PTS via aresample first_pts=0 and uses anull at 1×. Program preview dependency format 3.4.6/1 invalidates older cached audio.
 

@@ -1,0 +1,282 @@
+[
+  {
+    "label": "baseline",
+    "first_ready_ms": 862.9336999947554,
+    "seek_samples": [
+      {
+        "target_seconds": 2.2,
+        "milliseconds": 676.0363000066718,
+        "first_visit": true
+      },
+      {
+        "target_seconds": 0.5,
+        "milliseconds": 534.9600999979884,
+        "first_visit": true
+      },
+      {
+        "target_seconds": 4.2,
+        "milliseconds": 332.31700000033015,
+        "first_visit": true
+      },
+      {
+        "target_seconds": 2.2,
+        "milliseconds": 760.5996000056621,
+        "first_visit": false
+      },
+      {
+        "target_seconds": 0.5,
+        "milliseconds": 450.5892000015592,
+        "first_visit": false
+      },
+      {
+        "target_seconds": 4.2,
+        "milliseconds": 325.5030000000261,
+        "first_visit": false
+      },
+      {
+        "target_seconds": 2.2,
+        "milliseconds": 751.4336000022013,
+        "first_visit": false
+      },
+      {
+        "target_seconds": 0.5,
+        "milliseconds": 450.37040000170236,
+        "first_visit": false
+      },
+      {
+        "target_seconds": 4.2,
+        "milliseconds": 307.84480000147596,
+        "first_visit": false
+      },
+      {
+        "target_seconds": 2.2,
+        "milliseconds": 559.8656999936793,
+        "first_visit": false
+      },
+      {
+        "target_seconds": 0.5,
+        "milliseconds": 534.3032000018866,
+        "first_visit": false
+      },
+      {
+        "target_seconds": 4.2,
+        "milliseconds": 333.1311000001733,
+        "first_visit": false
+      }
+    ],
+    "seek_p50_ms": 492.4462000017229,
+    "seek_p95_ms": 751.4336000022013,
+    "endpoint": "completed GPU frame in requested generation; not physical scanout",
+    "browser_errors": []
+  },
+  {
+    "label": "candidate",
+    "first_ready_ms": 716.1294000034104,
+    "seek_samples": [
+      {
+        "target_seconds": 2.2,
+        "milliseconds": 716.1379999961355,
+        "first_visit": true
+      },
+      {
+        "target_seconds": 0.5,
+        "milliseconds": 625.7843999992474,
+        "first_visit": true
+      },
+      {
+        "target_seconds": 4.2,
+        "milliseconds": 416.63659999903757,
+        "first_visit": true
+      },
+      {
+        "target_seconds": 2.2,
+        "milliseconds": 735.0340999983018,
+        "first_visit": false
+      },
+      {
+        "target_seconds": 0.5,
+        "milliseconds": 524.5454000032623,
+        "first_visit": false
+      },
+      {
+        "target_seconds": 4.2,
+        "milliseconds": 306.96760000137147,
+        "first_visit": false
+      },
+      {
+        "target_seconds": 2.2,
+        "milliseconds": 635.8693000001949,
+        "first_visit": false
+      },
+      {
+        "target_seconds": 0.5,
+        "milliseconds": 516.6474999932689,
+        "first_visit": false
+      },
+      {
+        "target_seconds": 4.2,
+        "milliseconds": 316.73639999644365,
+        "first_visit": false
+      },
+      {
+        "target_seconds": 2.2,
+        "milliseconds": 609.054799999285,
+        "first_visit": false
+      },
+      {
+        "target_seconds": 0.5,
+        "milliseconds": 525.3690000026836,
+        "first_visit": false
+      },
+      {
+        "target_seconds": 4.2,
+        "milliseconds": 317.9463999986183,
+        "first_visit": false
+      }
+    ],
+    "seek_p50_ms": 524.957200002973,
+    "seek_p95_ms": 716.1379999961355,
+    "endpoint": "completed GPU frame in requested generation; not physical scanout",
+    "browser_errors": []
+  },
+  {
+    "label": "candidate",
+    "first_ready_ms": 771.2877000012668,
+    "seek_samples": [
+      {
+        "target_seconds": 2.2,
+        "milliseconds": 615.9746999983327,
+        "first_visit": true
+      },
+      {
+        "target_seconds": 0.5,
+        "milliseconds": 525.1942000031704,
+        "first_visit": true
+      },
+      {
+        "target_seconds": 4.2,
+        "milliseconds": 417.76109999773325,
+        "first_visit": true
+      },
+      {
+        "target_seconds": 2.2,
+        "milliseconds": 716.1407000021427,
+        "first_visit": false
+      },
+      {
+        "target_seconds": 0.5,
+        "milliseconds": 516.5254999956232,
+        "first_visit": false
+      },
+      {
+        "target_seconds": 4.2,
+        "milliseconds": 317.63060000230325,
+        "first_visit": false
+      },
+      {
+        "target_seconds": 2.2,
+        "milliseconds": 626.3776999985566,
+        "first_visit": false
+      },
+      {
+        "target_seconds": 0.5,
+        "milliseconds": 417.00789999595145,
+        "first_visit": false
+      },
+      {
+        "target_seconds": 4.2,
+        "milliseconds": 317.5554999979795,
+        "first_visit": false
+      },
+      {
+        "target_seconds": 2.2,
+        "milliseconds": 609.3596999999136,
+        "first_visit": false
+      },
+      {
+        "target_seconds": 0.5,
+        "milliseconds": 526.0729000001447,
+        "first_visit": false
+      },
+      {
+        "target_seconds": 4.2,
+        "milliseconds": 317.91059999522986,
+        "first_visit": false
+      }
+    ],
+    "seek_p50_ms": 520.8598499993968,
+    "seek_p95_ms": 626.3776999985566,
+    "endpoint": "completed GPU frame in requested generation; not physical scanout",
+    "browser_errors": []
+  },
+  {
+    "label": "baseline",
+    "first_ready_ms": 900.582399997802,
+    "seek_samples": [
+      {
+        "target_seconds": 2.2,
+        "milliseconds": 642.0647999984794,
+        "first_visit": true
+      },
+      {
+        "target_seconds": 0.5,
+        "milliseconds": 451.3232000026619,
+        "first_visit": true
+      },
+      {
+        "target_seconds": 4.2,
+        "milliseconds": 308.52730000333395,
+        "first_visit": true
+      },
+      {
+        "target_seconds": 2.2,
+        "milliseconds": 769.1342999969493,
+        "first_visit": false
+      },
+      {
+        "target_seconds": 0.5,
+        "milliseconds": 440.16730000294046,
+        "first_visit": false
+      },
+      {
+        "target_seconds": 4.2,
+        "milliseconds": 334.043599999859,
+        "first_visit": false
+      },
+      {
+        "target_seconds": 2.2,
+        "milliseconds": 643.6322000008659,
+        "first_visit": false
+      },
+      {
+        "target_seconds": 0.5,
+        "milliseconds": 550.080999993952,
+        "first_visit": false
+      },
+      {
+        "target_seconds": 4.2,
+        "milliseconds": 332.87689999997383,
+        "first_visit": false
+      },
+      {
+        "target_seconds": 2.2,
+        "milliseconds": 551.7407000006642,
+        "first_visit": false
+      },
+      {
+        "target_seconds": 0.5,
+        "milliseconds": 542.7304000040749,
+        "first_visit": false
+      },
+      {
+        "target_seconds": 4.2,
+        "milliseconds": 324.9257999996189,
+        "first_visit": false
+      }
+    ],
+    "seek_p50_ms": 497.0268000033684,
+    "seek_p95_ms": 643.6322000008659,
+    "endpoint": "completed GPU frame in requested generation; not physical scanout",
+    "browser_errors": []
+  }
+]
