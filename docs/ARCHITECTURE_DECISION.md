@@ -56,6 +56,10 @@ Current stereo caches/mix/export cannot preserve all source channels. New probe 
 
 Use explicit sample rate, channel mask/order, sample count and rational clock origin through clip edits, buses and export. Preserve compatible untouched compressed bitstreams only when container/cut/tempo constraints allow it. Mixing/processing requires decoding; source spatial/object metadata cannot simply be copied afterward. Binaural stereo, 5.1/7.1 speaker PCM and Dolby Atmos object bitstreams are different deliverables. No Atmos encoding/mastering is implemented. PCM multichannel and accurate monitoring/downmix take priority.
 
+## Finalization evidence
+
+The installed 3.4.5 ten-minute synthetic test reached its sequence end but delivered 51.76 callbacks/s. A matched 3.4.4 control was similarly below target. Cached seeks are fast while uncached original4K program ranges take seconds. Full low-resolution long export frame/sample counts and two independent >5 GiB native workflows passed. These findings reinforce the incremental scheduler/parity milestone; they do not justify enabling the native prototype as the default.
+
 ## Adoption criteria
 
 Do not switch the default until the native slice passes rational/VFR PTS and frame-ID cuts; three-video/three-audio animated effect equivalence; sample-accurate clock tests; seek/cancel/recovery/device reset; original-quality CPU/GPU export fallback; bounded long-session memory; explicit SDR/HDR policy; two independent >5 GiB native imports; and 10–60 minute real-camera sessions. Preserve an automatically exercised full-fidelity FFmpeg fallback throughout.

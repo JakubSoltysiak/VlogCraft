@@ -14,6 +14,8 @@ The canonical requirements remain [TODO.md](../TODO.md). These are engineering m
 | 8 | HDR/Log and multichannel | Actual device/mode evidence, Samsung Log transform sources, HDR10/HLG and frame-mapped HDR10+ mastering policy; channel-layout graph, sample-accurate buses and lawful passthrough. No fake Atmos or copied invalid HDR payloads. |
 | 9 | Release | Real-camera acceptance, multiple Windows/GPU configurations, clean install/runtime provisioning, DPI/accessibility, code signing, provenance/license choice and corresponding-source compliance. Owner approves release/merge. |
 
+Full ten-minute generated playback/export and two independent >5 GiB native checks now have scoped passing functional results. The playback rate remains below target; they do not close real-camera/hour-long/native4K acceptance.
+
 ## Next slice in concrete terms
 
 Keep UI commands and project persistence. Add a versioned local engine interface with create(snapshot), seek(frame), play, pause, cancel(generation), metrics and close. The current prototype owns the decoder/device/surfaces but has no sequence scheduler or audio callback. Build those before a large effect catalogue. A frame queue must retain original PTS/timebase and output sequence frame IDs, release all AVFrame/COM references on generation replacement, and fall back to the existing compiler for a whole unsupported range.

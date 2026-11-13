@@ -139,7 +139,9 @@ def test(executable, source, results, record_visual=False, second_source=None, o
                 streams=probe(target,'-show_streams')['streams']
                 video=next(s for s in streams if s['codec_type']=='video')
                 audio=next(s for s in streams if s['codec_type']=='audio')
-                assert (video['width'],video['height'],video['r_frame_rate'],video['nb_frames'])==(3840,2160,'60/1','24'),video
+                expected_frames=round((asset['duration']-4.6)*60)
+                assert (video['width'],video['height'],video['r_frame_rate'],int(video['nb_frames']))==(3840,2160,'60/1',expected_frames),video
+                subprocess.run(['ffmpeg','-nostdin','-v','error','-i',str(target),'-f','null','-'],capture_output=True,check=True,timeout=120)
                 assert abs(float(audio['duration'])-float(video['duration']))<1/60
                 packets=probe(source,'-select_streams','v:0','-read_intervals','4.6%+#1','-show_packets')['packets']
                 assert int(packets[0]['pos'])>2**32 and source.stat().st_size>4.5*1024**3

@@ -1,0 +1,124 @@
+{
+  "repetitions": [
+    {
+      "seconds": 0.25,
+      "frames": 9,
+      "decoded": true,
+      "exit": 0
+    },
+    {
+      "seconds": 0.21899999998277053,
+      "frames": 9,
+      "decoded": true,
+      "exit": 0
+    },
+    {
+      "seconds": 0.23399999999674037,
+      "frames": 9,
+      "decoded": true,
+      "exit": 0
+    },
+    {
+      "seconds": 0.23499999998603016,
+      "frames": 9,
+      "decoded": true,
+      "exit": 0
+    },
+    {
+      "seconds": 0.21899999998277053,
+      "frames": 9,
+      "decoded": true,
+      "exit": 0
+    },
+    {
+      "seconds": 0.23399999999674037,
+      "frames": 9,
+      "decoded": true,
+      "exit": 0
+    },
+    {
+      "seconds": 0.23500000004423782,
+      "frames": 9,
+      "decoded": true,
+      "exit": 0
+    },
+    {
+      "seconds": 0.21899999998277053,
+      "frames": 9,
+      "decoded": true,
+      "exit": 0
+    },
+    {
+      "seconds": 0.21799999999348074,
+      "frames": 9,
+      "decoded": true,
+      "exit": 0
+    },
+    {
+      "seconds": 0.21899999998277053,
+      "frames": 9,
+      "decoded": true,
+      "exit": 0
+    },
+    {
+      "seconds": 0.21799999999348074,
+      "frames": 9,
+      "decoded": true,
+      "exit": 0
+    },
+    {
+      "seconds": 0.23500000004423782,
+      "frames": 9,
+      "decoded": true,
+      "exit": 0
+    },
+    {
+      "seconds": 0.23399999999674037,
+      "frames": 9,
+      "decoded": true,
+      "exit": 0
+    },
+    {
+      "seconds": 0.21899999998277053,
+      "frames": 9,
+      "decoded": true,
+      "exit": 0
+    },
+    {
+      "seconds": 0.23399999999674037,
+      "frames": 9,
+      "decoded": true,
+      "exit": 0
+    },
+    {
+      "seconds": 0.23499999998603016,
+      "frames": 9,
+      "decoded": true,
+      "exit": 0
+    },
+    {
+      "seconds": 0.23399999999674037,
+      "frames": 9,
+      "decoded": true,
+      "exit": 0
+    },
+    {
+      "seconds": 0.25,
+      "frames": 9,
+      "decoded": true,
+      "exit": 0
+    },
+    {
+      "seconds": 0.23399999999674037,
+      "frames": 9,
+      "decoded": true,
+      "exit": 0
+    },
+    {
+      "seconds": 0.23399999999674037,
+      "frames": 9,
+      "decoded": true,
+      "exit": 0
+    }
+  ]
+}

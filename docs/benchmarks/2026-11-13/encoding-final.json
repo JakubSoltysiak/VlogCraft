@@ -1,0 +1,70 @@
+{
+  "libx264": {
+    "seconds": 6.36,
+    "encoding_fps": 28.3,
+    "video_frames": 180,
+    "file_bytes": 13343879,
+    "resources": {
+      "duration_seconds": 6.375,
+      "gpu": {
+        "peak_process_gpu_memory_MiB": {
+          "Dedicated Usage": 0.0,
+          "Shared Usage": 0.0
+        },
+        "memory_counter_errors": {},
+        "samples": 51,
+        "unavailable": null,
+        "peak_engine_percent": {},
+        "mean_engine_percent": {}
+      },
+      "average_cpu_machine_percent": 11.35,
+      "peak_summed_working_set_MiB": 999.6,
+      "sampled_cpu_seconds": 17.36,
+      "process_read_MiB": 62.7,
+      "process_write_MiB": 24.8
+    }
+  },
+  "h264_amf": {
+    "seconds": 2.359,
+    "encoding_fps": 76.3,
+    "video_frames": 180,
+    "file_bytes": 13772883,
+    "resources": {
+      "duration_seconds": 2.375,
+      "gpu": {
+        "peak_process_gpu_memory_MiB": {
+          "Dedicated Usage": 6.96,
+          "Shared Usage": 94.3
+        },
+        "memory_counter_errors": {},
+        "samples": 19,
+        "unavailable": null,
+        "peak_engine_percent": {
+          "3D": 0,
+          "Copy": 0.31,
+          "Compute 0": 0,
+          "Timer 0": 0,
+          "Security 1": 0,
+          "Video JPEG 0": 0,
+          "Video Processor": 0,
+          "Video Codec Engine": 0
+        },
+        "mean_engine_percent": {
+          "3D": 0.0,
+          "Copy": 0.02,
+          "Compute 0": 0.0,
+          "Timer 0": 0.0,
+          "Security 1": 0.0,
+          "Video JPEG 0": 0.0,
+          "Video Processor": 0.0,
+          "Video Codec Engine": 0.0
+        }
+      },
+      "average_cpu_machine_percent": 5.78,
+      "peak_summed_working_set_MiB": 339.3,
+      "sampled_cpu_seconds": 3.3,
+      "process_read_MiB": 63.1,
+      "process_write_MiB": 26.1
+    }
+  }
+}

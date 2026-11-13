@@ -57,6 +57,10 @@ jobs:
           $env:PYTHONPATH = Join-Path (Get-Location) 'tests/offline_guard'
           python -m unittest discover -s tests -p "test_*.py" -v
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Historical render-drain stress (20 decoded repetitions)
+        env:
+          PYTHONUTF8: "1"
+        run: python benchmarks/drain_stress.py --repeat 20
       - name: JavaScript timeline commands
         run: node --test tests/timeline_commands.test.js
   native-compile:

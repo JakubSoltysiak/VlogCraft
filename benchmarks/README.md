@@ -10,11 +10,14 @@ python tools/setup_architecture_lab.py --build-native
 python benchmarks/compare_engines.py build/qa/architecture/media build/qa/architecture/comparison-current
 python benchmarks/filter_profile.py build/qa/architecture/media/h264-4k60-0.mp4 build/qa/architecture/filters
 python benchmarks/engine_profile.py build/qa/architecture/export build/qa/architecture/media/h264-4k60-0.mp4 --seconds 3 --width 3840 --repeat 3 --gpu
+python benchmarks/opaque_ab.py build/qa/benchmark-media/4k60.mp4 build/qa/architecture/opaque-ab
+python benchmarks/drain_stress.py --repeat 100
 python benchmarks/cache_profile.py --help
 python benchmarks/service_profile.py build/qa/architecture/media/hevc10-4k5994.mp4 build/qa/field-test.mov build/qa/architecture/services
 python benchmarks/ui_profile.py .venv/Scripts/python.exe build/qa/architecture/distinct-media build/qa/architecture/ui
 python benchmarks/distinct_playback.py .venv/Scripts/python.exe build/qa/architecture/distinct-media build/qa/architecture/playback --seconds 660 --until-end
 python benchmarks/long_render.py build/qa/architecture/distinct-media build/qa/architecture/long-render
+python benchmarks/program_seek.py .venv/Scripts/python.exe build/qa/architecture/media build/qa/architecture/program-seek
 python benchmarks/precision_audio.py build/qa/architecture/precision-audio
 python experiments/ffmpeg_raw.py build/qa/architecture/raw build/qa/architecture/media/h264-4k60-0.mp4 build/qa/architecture/media/h264-4k60-1.mp4 build/qa/architecture/media/h264-4k60-2.mp4 --capture
 python experiments/mlt/direct.py build/tools/architecture/shotcut/Shotcut build/qa/architecture/mlt build/qa/architecture/media/h264-4k60-0.mp4 --capture

@@ -10,6 +10,8 @@ The investigation preserves the editor and PR #1. The [architecture audit](docs/
 
 3.4.5 adds a conservative opaque-picture render fastpath, range-dependent persistent preview caching with bounded pending work, and deterministic source-index child shutdown. The matched three-second 4K60 single-stream export improved from 7.326 to 6.101 seconds in the tested fixture; unrelated caption edits reuse unaffected preview ranges. See VERIFICATION.md for exact scope, failures and current package checks. [Reproduction scripts](benchmarks/README.md) use generated media; no private camera files or dependency binaries are published.
 
+Final scoped qualification includes a complete ten-minute generated sequence (1,500 clips/32 distinct sources), decoded long low-resolution export with exact frame/sample counts, two independent >5 GiB native originals and Windows installer retention. Sustained playback averaged 51.76 callbacks/s and still misses 60 FPS. Current source and installed bytes match; detailed evidence and limits are in VERIFICATION.md. Both development PRs remain unmerged drafts.
+
 ## Editing
 
 - Drag files from Explorer into the editor to link their original paths. **Link files** opens the native picker. Multiple files are processed with progress and cancellation. The library **+** and browser-only drops create local copies through bounded chunks. There is no application file-size ceiling.

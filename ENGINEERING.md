@@ -8,6 +8,8 @@ Production changes are deliberately narrow: render_engine._opaque_base conservat
 
 The native C++ experiment directly samples NV12/P010 D3D11 decoder textures into float16 and can display an SDR child swapchain beside WebView2. Software/download controls preserve ten-bit ramps. MLT 7.41 CPU image pull, RGBA64 and six-channel PCM were actually exercised. Neither engine is integrated with the project scheduler/effect/audio contract. New MLT 7.42 GPU behavior, D3D12 and Rust performance are unqualified. A continuous FFmpeg raw-frame canvas path is measured but video-only. No experimental dependencies enter the packaged editor.
 
+Final endurance evidence covers a full 600-second generated sequence across 32 files, a 36,000-frame/28,800,000-sample low-resolution export and two independent >5 GiB native imports/exports. The 51.76 callback/s playback result remains below target. Cold original4K range preparation remains seconds despite 29–49 ms cached seeks. Tests and public sanitized records distinguish these scopes; no further engine migration or installer rebuild is part of finalization.
+
 The records below describe the retained 3.4.4 implementation and historical work; newer scoped results and remaining blockers are in the linked investigation and VERIFICATION.md.
 
 The 3.4 work continues from ddb8b55 and studio-3.3-verified on feature/studio-3.4-playback, reviewed in GitHub pull request 1. Public main preserves the verified baseline plus the publication audit. Historical development started from the 3.2 source snapshot, preserved at studio-3.2-source. The 3.1 Windows qualification remains at studio-3.1-verified. The extracted archive is at studio-3.0-original.

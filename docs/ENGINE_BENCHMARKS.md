@@ -50,6 +50,15 @@ Same generated historical 4K60 source, three-second original-resolution export, 
 
 Baseline staged rendering attributed roughly 6.57–6.89 s to video, .07–.18 to audio, .12–.24 to mux and .19–.20 to final concat. Splitting audio/video remains essential to the historical stall repair.
 
+A final interleaved **ABBAAB guard-off/guard-on** control isolates this optimization in the current renderer (same original source hash, 35 Mbps/veryfast, three runs per arm/encoder). It is distinct from the full-version sequential comparison above:
+
+| Encoder | Guard disabled median (range), s | Enabled median (range), s | Wall reduction |
+|---|---:|---:|---:|
+| libx264 | 8.984 (7.824–9.130) | 5.406 (5.374–5.432) | 39.8% |
+| h264_amf | 7.671 (7.054–8.118) | 2.427 (2.323–2.663) | 68.4% |
+
+All twelve 180-frame exports decoded. First/last picture RGB MAE at 192×108 was .564–.602 for CPU and .564–.713 for AMF. Different OS/thermal/cache conditions produced different absolute baseline costs from the earlier set; neither set guarantees a universal gain. The fastpath is ineligible for multi-layer/alpha/mask/geometry cases. These simple-scene AMF results do not establish real-time effects or long4K delivery. Raw opaque-ab.json retains all stages and resource samples.
+
 ### Range-dependent program cache
 
 Same three independent original4K sources, six-second program range and an unrelated caption edited at 16 seconds. Old first preparation 12.973126 s; unrelated edit **12.716990 s** and a new render. New first preparation 12.853892 s; unrelated edit **.001731 s** and the same cache ID. The resulting MP4 bytes were identical. This is one paired integration trial, not a throughput gain for cache misses.
@@ -102,7 +111,11 @@ MLT six-channel PCM pull returned 120 video frames and 96,000 audio sample frame
 
 ## Sustained tests
 
-The 70-second source smoke used 1,500 clips/600 seconds across **32 distinct two-second 720p60 recordings**, not 1,500 independent recordings or native4K sources. The 540p composited monitor averaged 52.04 callbacks/s; browser totals 4,165 frames with 548 drops, .0889 s measured buffering, 1.953 s initial preparation, 1,331.2 MiB peak summed working set, no browser errors and ten complete files/49,709,854 bytes. Original sources, no proxies. Dropped frames remain a blocker. Installed full-sequence and long-render results are recorded in VERIFICATION.md after completion.
+The 70-second source smoke used 1,500 clips/600 seconds across **32 distinct two-second 720p60 recordings**, not 1,500 independent recordings or native4K sources. The 540p composited monitor averaged 52.04 callbacks/s; browser totals 4,165 frames with 548 drops, .0889 s measured buffering, 1.953 s initial preparation, 1,331.2 MiB peak summed working set, no browser errors and ten complete files/49,709,854 bytes. Original sources, no proxies. Dropped frames remain a blocker. The installed full-sequence run reached all 600 seconds in 600.117 measured seconds: 51.76 callbacks/s, 4,865 drops / 35,694 browser frames, .7942 s buffering and 2.674 s first program ready. Peak summed working set 1,730.6 MiB; ten-second samples rose from ~920 MiB to a ~1,420–1,720 MiB band after five minutes, not proof of leak absence. Final cache 12 files / 59,659,593 bytes; 75 misses, no cache-hit requests during forward-only traversal; browser errors empty. The functional/end/budget checks passed, but the 60 FPS target failed. A matched preserved 3.4.4 70-second control measured 51.98 callbacks/s, 551/4,164 drops and .0925 s buffering versus the changed-source smoke's 52.04, 548/4,165 and .0889 s. The low rate predates these fixes in this configuration; this is one control run, not a statistical equivalence claim.
+
+The full 600-second/1,500-clip render completed in 269.464 s at **320×180/60**, using the same 32 independent 720p originals. All **36,000 video frames** and **28,800,000 stereo sample frames at 48 kHz** decoded; audio stream duration 600.000000 s and end sample-count error zero. Output 52,612,315 bytes. Original source SHA-256s were unchanged. Sampled peak summed working set 100.5 MiB (brief child peaks may be missed). This proves the tested duration/count/original-integrity behavior, not long 4K export, perceptual A/V sync or hour-long stability.
+
+Program seek test: three consecutive six-second original4K60 H.264 sources, 540p composed monitor, no proxies, paused transport. Initial uncached eight-second range ready in 12.476 s. Uncached seeks to 9 and 17 seconds took 10.007 and 2.420 s (different eight/two-second range lengths). Current-range seeks .029–.038 s; cached-file reopen .0491–.0495 s. API records verified three misses then two hits. Endpoint is loaded media/seek completion, not physical panel presentation. One trial, OS caches uncontrolled. Sub-250 ms cached seeks do not establish fast cold seeks.
 
 Browser quality counters count decoder/presentation behavior of one composed stream; callbacks can be coalesced or obscured. They are not panel scanout measurements. Meter activity demonstrates non-silence, not measured audible clock drift.
 
@@ -113,8 +126,9 @@ Browser quality counters count decoder/presentation behavior of one composed str
 - Software/download native controls initially reduced HEVC10 to NV12. They were changed to preserve P010 and the precision test rerun; current-source comparisons are separately retained.
 - FFmpeg raw-page inline JavaScript initially failed syntax preflight. It was corrected; only completed canvas runs are reported.
 - Native per-frame fences verify finished GPU work but serialize the pipeline. The display proof exposes this limitation rather than counting submissions as presentation.
-- Offline visual regression initially failed because historical control references used another DPI capture configuration. Expected controls were regenerated from the independently verified installed 3.4.4 binary under explicit DPR1, inspected, and both baseline and changed source passed at unchanged pixel tolerance.
+- Offline visual regression initially failed because historical control references used another DPI capture configuration. Expected controls were regenerated from the independently verified installed 3.4.4 binary under explicit DPR1 and sRGB profile, inspected, and both baseline and changed source passed at unchanged pixel tolerance.
 - The first hosted native-compile job failed before compilation because Windows Server 2022 tar lacked LZMA support. Setup now selects installed 7-Zip when available, with tar retained for compatible systems. This was a tool-extraction failure, not a GPU run; final hosted status is in VERIFICATION.md.
+- The initial six-second >5 GiB workflow produced the correct 84-frame / 1.4-second export, but the old harness assumed a five-second source and expected 24 frames. The expectation now derives independently from the fixture duration minus the 4.6-second selected source offset, and full export decoding was added. The two-file installed workflow then passed without changing production rendering or tolerance.
 - The installed PyInstaller executable does not load the optional Python sitecustomize socket guard. Browser proxy/routing blocks still apply. Source Python is guarded; neither is an OS-firewall/physically disconnected qualification.
 - Current candidate comparison omits equivalent advanced effects/audio; no performance winner is declared for those missing scenarios.
 
