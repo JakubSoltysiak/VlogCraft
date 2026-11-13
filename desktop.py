@@ -20,6 +20,7 @@ BUNDLE = Path(getattr(sys, '_MEIPASS', Path(__file__).resolve().parent))
 
 
 def run(project):
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('VlogCraft.Studio')
     project = project.resolve()
     cache = project.parent / (project.name + '.data')
     cache.mkdir(parents=True, exist_ok=True)
@@ -164,7 +165,8 @@ def run(project):
     window.events.closing += on_closing
     threading.Thread(target=http.serve_forever, daemon=True).start()
     try:
-        webview.start(gui='edgechromium', private_mode=False, storage_path=str(cache / 'webview'))
+        webview.start(gui='edgechromium', private_mode=False, storage_path=str(cache / 'webview'),
+                      icon=str(BUNDLE / 'web/branding/vlogcraft-approved.ico'))
     finally:
         import audio_cache
         server.NATIVE_PLAYBACK.close()

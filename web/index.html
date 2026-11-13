@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>VlogCraft Studio — Kenya</title><link rel="stylesheet" href="style.css"></head>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>VlogCraft Studio — Kenya</title><link rel="icon" type="image/vnd.microsoft.icon" sizes="16x16 24x24 32x32 48x48 64x64 128x128 256x256" href="branding/vlogcraft-approved.ico"><link rel="stylesheet" href="style.css"></head>
 <body>
 <svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
 <symbol id="i-film" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></symbol>
@@ -27,7 +27,7 @@
 <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9 9a3 3 0 116 0c0 2-3 2-3 4m0 4v1"/></symbol>
 </svg>
 <header class="topbar">
-  <div class="brand"><div class="brand-icon"><svg><use href="#i-film"/></svg></div><div><div class="brand-name">VLOGCRAFT<span> STUDIO</span></div><div class="brand-sub">PRIVATE EDITION <em>3.4</em></div></div></div>
+  <div class="brand"><img class="brand-icon approved-brand" src="branding/vlogcraft-64.png" alt="VlogCraft Studio"><div><div class="brand-name">VLOGCRAFT<span> STUDIO</span></div><div class="brand-sub">PRIVATE EDITION <em>3.4</em></div></div></div>
   <div class="top-middle"><div class="tiny-dot"></div><span id="projectTitle">KENYA / The Journey</span><span class="save-label" id="saveStatus">ALL CHANGES SAVED</span></div>
   <div class="top-buttons"><select id="projectMenu" class="compact-select" aria-label="Project file" hidden><option>Project</option><option value="new">New project…</option><option value="open">Open project…</option><option value="save-as">Save as…</option></select><button class="icon-btn" id="performanceBtn" title="Local performance diagnostics" aria-label="Local performance diagnostics"><svg><use href="#i-settings"/></svg></button><button class="icon-btn" id="helpBtn" title="Shortcuts"><svg><use href="#i-help"/></svg></button><button id="aiBtn" class="button ai-btn"><svg><use href="#i-ai"/></svg> AI DIRECTOR</button><button id="exportBtn" class="button primary"><svg><use href="#i-export"/></svg> EXPORT FILM</button></div>
 </header>
@@ -56,7 +56,7 @@
   <div class="timeline-scroller" id="timelineScroller"><div class="timeline-content" id="timelineContent"></div></div>
   <div class="timeline-bottom"><div><span class="orange-led">●</span> <span id="timelineStatus">READY TO EDIT</span></div><div>SPACE <span>PLAY / PAUSE</span>　 S <span>SPLIT</span>　 CTRL+Z <span>UNDO</span>　 DEL <span>REMOVE</span></div></div>
 </section>
-<footer class="footer"><span><span class="footer-mark">V.</span> VLOGCRAFT STUDIO 3.4 <b>PRIVATE EDITION</b></span><span id="footerMessage"></span><span>ENGINE <strong>FFMPEG</strong> · 16:9</span></footer>
+<footer class="footer"><span><img class="footer-mark approved-brand" src="branding/vlogcraft-32.png" alt=""> VLOGCRAFT STUDIO 3.4 <b>PRIVATE EDITION</b></span><span id="footerMessage"></span><span>ENGINE <strong>FFMPEG</strong> · 16:9</span></footer>
 <div id="dropOverlay" class="drop-overlay" hidden><div class="drop-card"><svg><use href="#i-upload"/></svg><strong>DROP TO IMPORT</strong><span>MP4 · MOV · MKV · JPG · WAV and more</span><p>Files over 4.5 GB work — streamed to local disk in 8 MB chunks.</p></div></div>
 <div id="transferOverlay" class="transfer-overlay" hidden><div class="transfer-card"><div class="transfer-icon"><svg><use href="#i-upload"/></svg></div><h2 id="transferTitle">Importing media…</h2><p id="transferDetail">Preparing transfer</p><div class="transfer-progress"><div id="transferBar"></div></div><div class="transfer-bottom"><span id="transferStats"></span><button class="button secondary" id="transferCancel">CANCEL</button></div><p class="transfer-note">Media processing runs on this computer.</p></div></div>
 <div class="modal-overlay" id="exportModal" hidden><div class="dialog export-dialog"><div class="dialog-top"><div><div class="eyebrow">FINAL DELIVERY</div><h2>Export your film</h2></div><button class="icon-btn modal-close" data-close="exportModal"><svg><use href="#i-close"/></svg></button></div>

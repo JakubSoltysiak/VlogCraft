@@ -1,5 +1,7 @@
 # VlogCraft Studio 3.4 development qualification
 
+The approved icon asset checkpoint passed installed EXE/MSI/shortcut/window/taskbar/favicon/web and retained-data lifecycle checks. The unmodified source and exact seven-size results are documented separately in [ICON_UPDATE.md](docs/ICON_UPDATE.md). Performance results below still describe the 3.4.7 engine; 3.4.8 engine work is not yet qualified.
+
 ## 3.4.7 workstation refinement — 13 November 2026
 
 Continues PR #3 / 48f4d4e on feature/studio-3.4.7-workstation; canonical main requirements VC-P0-024–031 are preserved. PRs #1–#3 remain unmerged drafts. [Workstation report](docs/WORKSTATION_OPTIMIZATION_3_4_7.md), [curated measurements](docs/benchmarks/2026-11-13-native347) and [source-bound performance record](docs/benchmarks/studio-3.4.7-performance.json) state exact scopes. **Native remains experimental.**

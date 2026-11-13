@@ -78,6 +78,10 @@ Runtime probes exercise actual encoders. AMD AMF output is decoded and checked. 
 
 Windows PDH counters collect process-tree GPU engine utilization alongside CPU, working set and I/O. Near-zero driver counters do not establish a GPU-free processing path. Actual selected encoder, valid output and throughput are reported separately. CPU composition remains explicit.
 
+## Approved visual assets
+
+The owner-approved RGBA source stays unmodified in assets/branding. tools/build_branding.py generates premultiplied-alpha Lanczos icons; tests/icon_assets.py and tests/windows_icons.py verify actual PE/MSI/shell/live resources. Web asset routes are explicitly allowlisted. This is a separate asset checkpoint; native scheduling and export are unchanged.
+
 ## GitHub and automated checks
 
 Git Credential Manager and the connector were independently verified as JakubSoltysiak before writes. main and all baseline tags were pushed without rewriting. A fresh bare clone passed fsck. Future commits use the requested account name and email. tools/audit_repository.py scans reachable blob, commit and tag objects without exposing credential contents.
