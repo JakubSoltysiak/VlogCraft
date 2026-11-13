@@ -5,7 +5,7 @@ from PyInstaller.archive.readers import CArchiveReader
 ROOT=Path(__file__).resolve().parents[1]
 MODULES=['server','render_engine','preview_cache','preview_dependencies','source_frames','timing','project_store',
          'animation','sequences','video_effects','grading','audio_cache','audio_edit','waveform',
-         'motion','review_packet','timeline_proposal','ai_bridge','encoders','native_plan','native_playback']
+         'motion','review_packet','timeline_proposal','ai_bridge','encoders','native_plan','native_playback','performance_profile']
 def normalize(code):
  return code.replace(co_filename='<source>',co_consts=tuple(normalize(c) if isinstance(c,types.CodeType) else c for c in code.co_consts))
 def digest(path):return hashlib.sha256(path.read_bytes()).hexdigest()

@@ -107,6 +107,8 @@ def run(project):
     server.DESKTOP_ACTION = project_action
     import native_playback
     server.NATIVE_PLAYBACK=native_playback.Controller(window,cache,BUNDLE)
+    import performance_profile
+    server.PERFORMANCE_DIAGNOSTICS=performance_profile.Diagnostics(BUNDLE,cache)
 
     def on_drop(event):
         files = event.get('dataTransfer', {}).get('files', [])
@@ -166,6 +168,7 @@ def run(project):
     finally:
         import audio_cache
         server.NATIVE_PLAYBACK.close()
+        server.PERFORMANCE_DIAGNOSTICS.close()
         audio_cache.cancel()
         server.FRAME_INDEX.close()
         server.PROGRAM_PREVIEW.close()

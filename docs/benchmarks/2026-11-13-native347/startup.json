@@ -1,0 +1,30 @@
+{
+  "baseline": {
+    "fresh_process_ready_seconds": [
+      3.104199699999299,
+      2.1525548999998136,
+      2.0670803999964846
+    ],
+    "median": 2.1525548999998136,
+    "range": [
+      2.0670803999964846,
+      3.104199699999299
+    ],
+    "filesystem_cache": "unmanaged",
+    "endpoint": "native-ready application state; no media imported"
+  },
+  "candidate": {
+    "fresh_process_ready_seconds": [
+      2.3057370000024093,
+      2.2779324000002816,
+      2.220733599999221
+    ],
+    "median": 2.2779324000002816,
+    "range": [
+      2.220733599999221,
+      2.3057370000024093
+    ],
+    "filesystem_cache": "unmanaged",
+    "endpoint": "native-ready application state; no media imported"
+  }
+}

@@ -16,7 +16,7 @@ from PIL import Image, ImageDraw
 ROOT = Path(__file__).resolve().parents[1]
 BUILD = ROOT / 'build'
 RELEASE = ROOT / 'release'
-VERSION = '3.4.6'
+VERSION = '3.4.7'
 WIX_NS = 'http://schemas.microsoft.com/wix/2006/wi'
 UPGRADE_CODE = '09FA364C-4D7B-4B43-A1CF-7D82A0B62F02'
 ET.register_namespace('', WIX_NS)
@@ -73,6 +73,7 @@ def build(wix,experimental_native=False):
             raise RuntimeError('Build the optional native runtime with tools/setup_architecture_lab.py first')
         target=bundle/'_internal/engine/native';target.mkdir(parents=True,exist_ok=True)
         shutil.copy2(executable,target/executable.name)
+        for name in ('VlogCraftProbe.exe','VlogCraftStorageProbe.exe'):shutil.copy2(runtime/name,target/name)
         for library in (sdk/'bin').glob('*.dll'):shutil.copy2(library,target/library.name)
         for license_file in sdk.glob('LICENSE*'):shutil.copy2(license_file,target/license_file.name)
         manifest={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in target.iterdir() if p.is_file()}

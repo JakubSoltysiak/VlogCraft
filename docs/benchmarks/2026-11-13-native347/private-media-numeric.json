@@ -1,0 +1,230 @@
+{
+  "offscreen": [
+    {
+      "alias": "CameraA",
+      "seeks": [
+        {
+          "target_seconds": 0,
+          "process_seconds": 0.21937289999914356,
+          "pts_matches_reference": true
+        },
+        {
+          "target_seconds": 1.1,
+          "process_seconds": 0.29679240000405116,
+          "pts_matches_reference": true
+        },
+        {
+          "target_seconds": 3.217,
+          "process_seconds": 0.3673538999937591,
+          "pts_matches_reference": true
+        }
+      ],
+      "hdr10plus_retained_at_decode": true,
+      "float_readback": {
+        "finite": true,
+        "rgb_max": 17.953125,
+        "rgb_min": 0.0,
+        "hdr_linear_output": true
+      },
+      "offscreen180_seconds": 1.5592213999989326
+    },
+    {
+      "alias": "CameraB",
+      "seeks": [
+        {
+          "target_seconds": 0,
+          "process_seconds": 0.24341500000446104,
+          "pts_matches_reference": true
+        },
+        {
+          "target_seconds": 1.1,
+          "process_seconds": 0.286247000003641,
+          "pts_matches_reference": true
+        },
+        {
+          "target_seconds": 3.217,
+          "process_seconds": 0.35369160000118427,
+          "pts_matches_reference": true
+        }
+      ],
+      "hdr10plus_retained_at_decode": true,
+      "float_readback": {
+        "finite": true,
+        "rgb_max": 14.3515625,
+        "rgb_min": -0.00024318695068359375,
+        "hdr_linear_output": true
+      },
+      "offscreen180_seconds": 1.366898799999035
+    },
+    {
+      "alias": "CameraC",
+      "seeks": [
+        {
+          "target_seconds": 0,
+          "process_seconds": 0.3007872000016505,
+          "pts_matches_reference": true
+        },
+        {
+          "target_seconds": 1.1,
+          "process_seconds": 0.5063334000005852,
+          "pts_matches_reference": true
+        },
+        {
+          "target_seconds": 3.217,
+          "process_seconds": 0.8164842999976827,
+          "pts_matches_reference": true
+        }
+      ],
+      "hdr10plus_retained_at_decode": false,
+      "float_readback": {
+        "finite": true,
+        "rgb_max": 1.0,
+        "rgb_min": 0.0,
+        "hdr_linear_output": false
+      },
+      "offscreen180_seconds": 0.9104865000044811
+    }
+  ],
+  "whole_recordings": [
+    {
+      "alias": "CameraA",
+      "seconds": 81.68333333333334,
+      "first_ready_seconds": 0.4889222999991034,
+      "samples": 3920800,
+      "underruns": 0,
+      "browser_error_count": 0,
+      "last_sequence_frame": 4900,
+      "timeline_skips": 12,
+      "source_frame_repetitions": 229
+    },
+    {
+      "alias": "CameraB",
+      "seconds": 49.266666666666666,
+      "first_ready_seconds": 0.4619116000030772,
+      "samples": 2364800,
+      "underruns": 0,
+      "browser_error_count": 0,
+      "last_sequence_frame": 2955,
+      "timeline_skips": 1,
+      "source_frame_repetitions": 12
+    },
+    {
+      "alias": "CameraC",
+      "seconds": 18.016666666666666,
+      "first_ready_seconds": 0.8235780000031809,
+      "samples": 864800,
+      "underruns": 0,
+      "browser_error_count": 0,
+      "last_sequence_frame": 1080,
+      "timeline_skips": 0,
+      "source_frame_repetitions": 0
+    }
+  ],
+  "cache_pts": [
+    {
+      "alias": "CameraA",
+      "checks": [
+        {
+          "sequence_frame": 0,
+          "pts_match": true,
+          "hdr10plus_retained": true
+        },
+        {
+          "sequence_frame": 90,
+          "pts_match": true,
+          "hdr10plus_retained": true
+        },
+        {
+          "sequence_frame": 91,
+          "pts_match": true,
+          "hdr10plus_retained": true
+        },
+        {
+          "sequence_frame": 93,
+          "pts_match": true,
+          "hdr10plus_retained": true
+        },
+        {
+          "sequence_frame": 94,
+          "pts_match": true,
+          "hdr10plus_retained": true
+        }
+      ],
+      "cache_hits": 1
+    },
+    {
+      "alias": "CameraB",
+      "checks": [
+        {
+          "sequence_frame": 0,
+          "pts_match": true,
+          "hdr10plus_retained": true
+        },
+        {
+          "sequence_frame": 90,
+          "pts_match": true,
+          "hdr10plus_retained": true
+        },
+        {
+          "sequence_frame": 91,
+          "pts_match": true,
+          "hdr10plus_retained": true
+        },
+        {
+          "sequence_frame": 93,
+          "pts_match": true,
+          "hdr10plus_retained": true
+        },
+        {
+          "sequence_frame": 94,
+          "pts_match": true,
+          "hdr10plus_retained": true
+        }
+      ],
+      "cache_hits": 1
+    },
+    {
+      "alias": "CameraC",
+      "checks": [
+        {
+          "sequence_frame": 0,
+          "pts_match": true,
+          "hdr10plus_retained": false
+        },
+        {
+          "sequence_frame": 90,
+          "pts_match": true,
+          "hdr10plus_retained": false
+        },
+        {
+          "sequence_frame": 91,
+          "pts_match": true,
+          "hdr10plus_retained": false
+        },
+        {
+          "sequence_frame": 93,
+          "pts_match": true,
+          "hdr10plus_retained": false
+        },
+        {
+          "sequence_frame": 94,
+          "pts_match": true,
+          "hdr10plus_retained": false
+        }
+      ],
+      "cache_hits": 1
+    }
+  ],
+  "integrity": {
+    "source_count": 3,
+    "private_folder_tracked_files": 0,
+    "private_history_path_matches": 0,
+    "private_content_objects": 0,
+    "private_text_objects": 0,
+    "private_working_text_files": 0,
+    "missing_originals": 0,
+    "original_hashes_verified": true,
+    "changed_originals": 0
+  },
+  "provenance": "A/B owner-identified Galaxy S25 Ultra; C Google Earth animation. Device model is not independently embedded-metadata verified."
+}

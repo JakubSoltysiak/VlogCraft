@@ -4,6 +4,8 @@ The canonical requirements remain [TODO.md](../TODO.md). These are engineering m
 
 3.4.6 implements the initial bounded native scheduler, PCM clock, child surface and explicit parity fallback. The scoped 125-second test reached its end below 60 FPS; high precision and private-camera checks do not close calibrated HDR, complex effects, actual device reset or 10–60 minute acceptance. See [current evidence](NATIVE_PLAYBACK_3_4_6.md).
 
+3.4.7 adds an owned high-resolution deadline wait, memory-budgeted completion ring and original-PTS prefix cache, explicit native quality/DPI tests and reusable QUICK/STANDARD/FULL performance contracts. Matched 125 s median 57.71→59.67 FPS /279→28 skips; ten minutes59.87 FPS /62 skips /zero audio underruns. Memory rises; raw call/unique sequence rates are separate. [Workstation report](WORKSTATION_OPTIMIZATION_3_4_7.md) retains failed queue experiments, export/seek investigations and remaining gates.
+
 | Order | Work | Acceptance evidence before switching behavior |
 |---|---|---|
 | 1 — this draft | Guarded opaque base; range dependency cache; deterministic index shutdown | Decoded output, cache restart/stale/corrupt/budget cases, launch/cancel race, native-close child ownership, full regression and package checks. Measured scope in ENGINE_BENCHMARKS. |

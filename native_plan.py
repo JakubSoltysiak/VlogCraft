@@ -8,7 +8,7 @@ class Unsupported(ValueError):pass
 def compile_plan(state,width=960):
  state=sequences.playback(state);fps=timing.rate(state['output']['fps'])
  width=int(width)
- if width not in (640,960,1280,1920,3840):raise Unsupported('Choose a supported native monitor size')
+ if width not in (640,960,1280,1920,2560,3840):raise Unsupported('Choose a supported native monitor size')
  height=width*9//16;assets={a['id']:a for a in state['assets']};clips=[];used={}
  for track in reversed(state['tracks']):
   if track['type']!='video' or track.get('hidden'):continue

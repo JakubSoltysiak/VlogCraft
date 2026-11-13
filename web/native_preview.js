@@ -1,9 +1,16 @@
 /* Experimental native video + reference PCM. Unsupported operations remain explicit. */
 const nativeState={available:false,blocked:false,seeking:false,seekFrame:0,prepared:false,hdr:false,busy:null,signature:'',generation:0,serial:0,node:null,audioAbort:null,sent:0,ack:null,start:0,metrics:null,timer:null,bounds:''};
 function* nativePCMBlocks(data,length){for(let offset=0;offset<length;offset+=32768)yield data.buffer.slice(offset,Math.min(length,offset+32768));}
+function nativeQualityOptions(){
+ const native=nativeSelected(),select=$('programResolution'),source=$('previewSource');
+ if(native&&!source.disabled){nativeState.savedPreviewSource=source.value;source.value='original';source.disabled=true;}
+ else if(!native&&source.disabled){source.disabled=false;source.value=nativeState.savedPreviewSource||'auto';}
+ for(const option of select.options)if(option.dataset.nativeOnly)option.disabled=!native;
+ if(!native&&Number(select.value)>1920)select.value='960';
+}
 function nativeSelected(){return $('playbackEngine')?.value==='native';}
 function nativeRect(){const r=$('previewStage').getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height,dpr:devicePixelRatio};}
-function nativeSignature(){return JSON.stringify([state.tracks,state.output,state.assets.map(a=>[a.id,a.path,a.size,a.cacheId])]);}
+function nativeSignature(){return JSON.stringify([$('programResolution').value,state.tracks,state.output,state.assets.map(a=>[a.id,a.path,a.size,a.cacheId])]);}
 function nativeDuration(){return frameIndex(duration())/sequenceRate();}
 function nativeSamplesAt(segments,now){
  let samples=0;for(const [start,end,first,last] of segments||[]){if(now<start)break;samples=Math.min(last,first+Math.max(0,now-start)*48000);}return samples;
@@ -99,11 +106,12 @@ async function nativePrepare(){
   const result=await request('native/start','POST',{rect:nativeRect(),width:Number($('programResolution').value),microseconds:Math.round(playhead*1e6)});
   if(!nativeSelected()||serial!==nativeState.serial)return;
   nativeState.signature=signature;nativeState.generation=result.generation;nativeState.prepared=true;nativeState.hdr=result.hdr;nativeState.metrics=null;
-  $('programPreviewStatus').textContent='Native experimental · '+result.colorPolicy;
+  $('programPreviewStatus').textContent='Original media · '+result.width+' × '+result.height+' preview'+(result.width<state.output.width?' (reduced)':'')+' · '+(result.hdr?'HDR PQ; HDR10+ metadata not applied':'SDR')+' · Native GPU experimental';
   await nativeAudio(frame,serial);
   clearInterval(nativeState.timer);
   nativeState.timer=setInterval(async()=>{
-   if(!nativeSelected()||!nativeState.prepared)return;
+   if(!nativeSelected()||!nativeState.prepared||nativeState.polling)return;
+   nativeState.polling=true;
    try{
     const generation=nativeState.generation,serial=nativeState.serial;
     const rect=nativeRect(),visible=!nativeState.seeking&&!document.querySelector('dialog[open],.modal-overlay:not([hidden]),#dropOverlay:not([hidden]),#transferOverlay:not([hidden])')&&(isPlaying||!($('referenceButton').classList.contains('active')||$('scopeChoice').value)),bounds=JSON.stringify([rect,visible]);
@@ -113,7 +121,8 @@ async function nativePrepare(){
     nativeState.metrics=metrics;
     if(nativeState.seeking&&nativeState.metrics.completed_generation===nativeState.generation&&nativeState.metrics.completed_sequence_frame>=nativeState.seekFrame)nativeState.seeking=false;
     if(nativeState.metrics.event==='error')nativeFail(nativeState.metrics.reason,nativeState.metrics.code);
-   }catch(error){nativeFail(error.message);}
+   }catch(error){if(nativeState.prepared&&nativeSelected())nativeFail(error.message);}
+   finally{nativeState.polling=false;}
   },15);
  })().catch(error=>nativeFail(error.message)).finally(()=>nativeState.busy=null);
  return nativeState.busy;
@@ -147,4 +156,5 @@ async function setupNative(){
  const info=await request('native/capabilities');nativeState.available=info.available;
  const choice=document.createElement('option');choice.value='native';choice.textContent='Native GPU · experimental';choice.disabled=!info.available;
  $('playbackEngine').append(choice);
+ for(const [value,label] of [[2560,'1440p · native preview'],[3840,'2160p · native preview']]){const o=new Option(label,value);o.dataset.nativeOnly='true';$('programResolution').add(o);}nativeQualityOptions();
 }

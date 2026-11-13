@@ -1,0 +1,1059 @@
+[
+  {
+    "seconds": 10.0,
+    "measured_seconds": 10.2135,
+    "first_ready_seconds": 0.7739407999979449,
+    "samples": 480000,
+    "expected_samples": 480000,
+    "underruns": 0,
+    "reached_end": true,
+    "video_tracks": 1,
+    "audio_tracks": 1,
+    "original_resolution": [
+      3840,
+      2160
+    ],
+    "program_resolution": [
+      960,
+      540
+    ],
+    "rate": "24/1",
+    "proxies": false,
+    "completed_frames_per_second": 23.40040142948059,
+    "present_calls_per_second": 23.40040142948059,
+    "dxgi_present_count_per_second": 23.40040142948059,
+    "distinct_sequence_fps": 23.40040142948059,
+    "working_set_history": [
+      {
+        "seconds": 0.015,
+        "summed_working_set_MiB": 1423.77
+      },
+      {
+        "seconds": 5.047,
+        "summed_working_set_MiB": 1375.77
+      },
+      {
+        "seconds": 10.062,
+        "summed_working_set_MiB": 1216.38
+      }
+    ],
+    "last": {
+      "completed_frames": 240,
+      "submitted_frames": 240,
+      "present_calls": 240,
+      "dxgi_present_count": 240,
+      "dxgi_statistics_available": true,
+      "surface_width": 356,
+      "surface_height": 200,
+      "sequence_frame": 239,
+      "skipped_sequence_frames": 0,
+      "distinct_sequence_submissions": 240,
+      "nonadvancing_redraws": 0,
+      "clock_rewind_hold_iterations": 1,
+      "repeated_source_layer_frames": 0,
+      "peak_decoder_count": 1,
+      "peak_source_queue_frames": 4,
+      "peak_inflight_gpu_frames": 1,
+      "gpu_slot_budget": 6,
+      "source_wait_iterations": 35,
+      "gpu_wait_iterations": 0,
+      "skipped_after_source_wait": 0,
+      "skipped_after_gpu_wait": 0,
+      "skipped_without_queue_wait": 0,
+      "timings": {
+        "context_wait": {
+          "count": 3103,
+          "mean_ms": 0.0304886,
+          "p50_upper_ms": 0.1,
+          "p95_upper_ms": 0.2,
+          "max_ms": 34.1573,
+          "overflow_100ms": 0
+        },
+        "submit_cpu": {
+          "count": 240,
+          "mean_ms": 0.469173,
+          "p50_upper_ms": 0.5,
+          "p95_upper_ms": 0.8,
+          "max_ms": 7.3112,
+          "overflow_100ms": 0
+        },
+        "completion_observation": {
+          "count": 240,
+          "mean_ms": 4.69456,
+          "p50_upper_ms": 5.6,
+          "p95_upper_ms": 6.2,
+          "max_ms": 6.4327,
+          "overflow_100ms": 0
+        },
+        "composition_gpu": {
+          "count": 240,
+          "mean_ms": 0.25882,
+          "p50_upper_ms": 0.3,
+          "p95_upper_ms": 0.4,
+          "max_ms": 0.37094,
+          "overflow_100ms": 0
+        },
+        "present_call": {
+          "count": 240,
+          "mean_ms": 0.238349,
+          "p50_upper_ms": 0.2,
+          "p95_upper_ms": 0.5,
+          "max_ms": 3.2685,
+          "overflow_100ms": 0
+        },
+        "present_call_interval": {
+          "count": 239,
+          "mean_ms": 46.035,
+          "p50_upper_ms": 41.7,
+          "p95_upper_ms": 42.8,
+          "max_ms": 1085.85,
+          "overflow_100ms": 1
+        },
+        "wake_overshoot": {
+          "count": 1598,
+          "mean_ms": 0.359898,
+          "p50_upper_ms": 0.4,
+          "p95_upper_ms": 0.7,
+          "max_ms": 1.6804,
+          "overflow_100ms": 0
+        }
+      },
+      "decoder_statistics": [
+        {
+          "decoded_frames": 614,
+          "decode_wall_seconds": 0.4293,
+          "seeks": 7,
+          "queued_frames": 4,
+          "warm_cache_frames": 6,
+          "warm_cache_hits": 6
+        }
+      ]
+    },
+    "resources": {
+      "average_cpu_machine_percent": 5.73,
+      "peak_summed_working_set_MiB": 1535.0,
+      "process_read_MiB": 82.5,
+      "process_write_MiB": 25.2
+    },
+    "gpu_memory_peak_MiB": {
+      "Dedicated Usage": 14.8,
+      "Shared Usage": 491.61
+    },
+    "gpu_occupancy_qualified": false,
+    "gpu_occupancy_note": "PDH 3D/video engine values were zero despite verified hardware frames and nonzero GPU timestamps; occupancy is unreliable",
+    "conditions": {
+      "all_ac": true,
+      "available_memory_MiB_range": [
+        9844,
+        10168
+      ],
+      "thermal_throttling": "not observable"
+    }
+  },
+  {
+    "seconds": 10.0,
+    "measured_seconds": 10.22210000000149,
+    "first_ready_seconds": 0.8260137000033865,
+    "samples": 480000,
+    "expected_samples": 480000,
+    "underruns": 0,
+    "reached_end": true,
+    "video_tracks": 1,
+    "audio_tracks": 1,
+    "original_resolution": [
+      3840,
+      2160
+    ],
+    "program_resolution": [
+      960,
+      540
+    ],
+    "rate": "25/1",
+    "proxies": false,
+    "completed_frames_per_second": 24.358986900926787,
+    "present_calls_per_second": 24.358986900926787,
+    "dxgi_present_count_per_second": 24.358986900926787,
+    "distinct_sequence_fps": 24.358986900926787,
+    "working_set_history": [
+      {
+        "seconds": 0.016,
+        "summed_working_set_MiB": 1430.06
+      },
+      {
+        "seconds": 5.062,
+        "summed_working_set_MiB": 1382.23
+      },
+      {
+        "seconds": 10.078,
+        "summed_working_set_MiB": 1220.12
+      }
+    ],
+    "last": {
+      "completed_frames": 250,
+      "submitted_frames": 250,
+      "present_calls": 250,
+      "dxgi_present_count": 250,
+      "dxgi_statistics_available": true,
+      "surface_width": 356,
+      "surface_height": 200,
+      "sequence_frame": 249,
+      "skipped_sequence_frames": 0,
+      "distinct_sequence_submissions": 250,
+      "nonadvancing_redraws": 0,
+      "clock_rewind_hold_iterations": 1,
+      "repeated_source_layer_frames": 0,
+      "peak_decoder_count": 1,
+      "peak_source_queue_frames": 4,
+      "peak_inflight_gpu_frames": 1,
+      "gpu_slot_budget": 6,
+      "source_wait_iterations": 43,
+      "gpu_wait_iterations": 0,
+      "skipped_after_source_wait": 0,
+      "skipped_after_gpu_wait": 0,
+      "skipped_without_queue_wait": 0,
+      "timings": {
+        "context_wait": {
+          "count": 3173,
+          "mean_ms": 0.0336759,
+          "p50_upper_ms": 0.1,
+          "p95_upper_ms": 0.2,
+          "max_ms": 33.6355,
+          "overflow_100ms": 0
+        },
+        "submit_cpu": {
+          "count": 250,
+          "mean_ms": 0.476333,
+          "p50_upper_ms": 0.5,
+          "p95_upper_ms": 0.8,
+          "max_ms": 8.4835,
+          "overflow_100ms": 0
+        },
+        "completion_observation": {
+          "count": 250,
+          "mean_ms": 4.59085,
+          "p50_upper_ms": 5.7,
+          "p95_upper_ms": 6.2,
+          "max_ms": 10.3516,
+          "overflow_100ms": 0
+        },
+        "composition_gpu": {
+          "count": 250,
+          "mean_ms": 0.261752,
+          "p50_upper_ms": 0.3,
+          "p95_upper_ms": 0.3,
+          "max_ms": 0.38756,
+          "overflow_100ms": 0
+        },
+        "present_call": {
+          "count": 250,
+          "mean_ms": 0.256895,
+          "p50_upper_ms": 0.2,
+          "p95_upper_ms": 0.4,
+          "max_ms": 8.4212,
+          "overflow_100ms": 0
+        },
+        "present_call_interval": {
+          "count": 249,
+          "mean_ms": 44.2161,
+          "p50_upper_ms": 40,
+          "p95_upper_ms": 41.6,
+          "max_ms": 1091.41,
+          "overflow_100ms": 1
+        },
+        "wake_overshoot": {
+          "count": 1634,
+          "mean_ms": 0.347027,
+          "p50_upper_ms": 0.4,
+          "p95_upper_ms": 0.7,
+          "max_ms": 1.0369,
+          "overflow_100ms": 0
+        }
+      },
+      "decoder_statistics": [
+        {
+          "decoded_frames": 613,
+          "decode_wall_seconds": 0.457072,
+          "seeks": 7,
+          "queued_frames": 4,
+          "warm_cache_frames": 6,
+          "warm_cache_hits": 6
+        }
+      ]
+    },
+    "resources": {
+      "average_cpu_machine_percent": 6.05,
+      "peak_summed_working_set_MiB": 1533.4,
+      "process_read_MiB": 78.1,
+      "process_write_MiB": 24.8
+    },
+    "gpu_memory_peak_MiB": {
+      "Dedicated Usage": 13.8,
+      "Shared Usage": 492.86
+    },
+    "gpu_occupancy_qualified": false,
+    "gpu_occupancy_note": "PDH 3D/video engine values were zero despite verified hardware frames and nonzero GPU timestamps; occupancy is unreliable",
+    "conditions": {
+      "all_ac": true,
+      "available_memory_MiB_range": [
+        9786,
+        10174
+      ],
+      "thermal_throttling": "not observable"
+    }
+  },
+  {
+    "seconds": 10.0,
+    "measured_seconds": 10.13620000000298,
+    "first_ready_seconds": 0.8732013999979245,
+    "samples": 480000,
+    "expected_samples": 480000,
+    "underruns": 0,
+    "reached_end": true,
+    "video_tracks": 1,
+    "audio_tracks": 1,
+    "original_resolution": [
+      3840,
+      2160
+    ],
+    "program_resolution": [
+      960,
+      540
+    ],
+    "rate": "30/1",
+    "proxies": false,
+    "completed_frames_per_second": 29.498234052200242,
+    "present_calls_per_second": 29.498234052200242,
+    "dxgi_present_count_per_second": 29.498234052200242,
+    "distinct_sequence_fps": 29.498234052200242,
+    "working_set_history": [
+      {
+        "seconds": 0.031,
+        "summed_working_set_MiB": 1430.25
+      },
+      {
+        "seconds": 5.078,
+        "summed_working_set_MiB": 1290.12
+      },
+      {
+        "seconds": 10.094,
+        "summed_working_set_MiB": 1225.99
+      }
+    ],
+    "last": {
+      "completed_frames": 300,
+      "submitted_frames": 300,
+      "present_calls": 300,
+      "dxgi_present_count": 300,
+      "dxgi_statistics_available": true,
+      "surface_width": 356,
+      "surface_height": 200,
+      "sequence_frame": 299,
+      "skipped_sequence_frames": 0,
+      "distinct_sequence_submissions": 300,
+      "nonadvancing_redraws": 0,
+      "clock_rewind_hold_iterations": 2,
+      "repeated_source_layer_frames": 0,
+      "peak_decoder_count": 1,
+      "peak_source_queue_frames": 4,
+      "peak_inflight_gpu_frames": 1,
+      "gpu_slot_budget": 6,
+      "source_wait_iterations": 33,
+      "gpu_wait_iterations": 0,
+      "skipped_after_source_wait": 0,
+      "skipped_after_gpu_wait": 0,
+      "skipped_without_queue_wait": 0,
+      "timings": {
+        "context_wait": {
+          "count": 3300,
+          "mean_ms": 0.0305416,
+          "p50_upper_ms": 0.1,
+          "p95_upper_ms": 0.2,
+          "max_ms": 29.0918,
+          "overflow_100ms": 0
+        },
+        "submit_cpu": {
+          "count": 300,
+          "mean_ms": 0.485068,
+          "p50_upper_ms": 0.5,
+          "p95_upper_ms": 0.8,
+          "max_ms": 7.6033,
+          "overflow_100ms": 0
+        },
+        "completion_observation": {
+          "count": 300,
+          "mean_ms": 4.89664,
+          "p50_upper_ms": 5.7,
+          "p95_upper_ms": 6.2,
+          "max_ms": 8.9695,
+          "overflow_100ms": 0
+        },
+        "composition_gpu": {
+          "count": 300,
+          "mean_ms": 0.262974,
+          "p50_upper_ms": 0.3,
+          "p95_upper_ms": 0.4,
+          "max_ms": 0.41248,
+          "overflow_100ms": 0
+        },
+        "present_call": {
+          "count": 300,
+          "mean_ms": 0.252189,
+          "p50_upper_ms": 0.2,
+          "p95_upper_ms": 0.5,
+          "max_ms": 8.6995,
+          "overflow_100ms": 0
+        },
+        "present_call_interval": {
+          "count": 299,
+          "mean_ms": 36.9893,
+          "p50_upper_ms": 33.4,
+          "p95_upper_ms": 34.6,
+          "max_ms": 1127.6,
+          "overflow_100ms": 1
+        },
+        "wake_overshoot": {
+          "count": 1623,
+          "mean_ms": 0.354645,
+          "p50_upper_ms": 0.4,
+          "p95_upper_ms": 0.7,
+          "max_ms": 1.6797,
+          "overflow_100ms": 0
+        }
+      },
+      "decoder_statistics": [
+        {
+          "decoded_frames": 621,
+          "decode_wall_seconds": 0.480922,
+          "seeks": 7,
+          "queued_frames": 4,
+          "warm_cache_frames": 6,
+          "warm_cache_hits": 6
+        }
+      ]
+    },
+    "resources": {
+      "average_cpu_machine_percent": 5.62,
+      "peak_summed_working_set_MiB": 1533.8,
+      "process_read_MiB": 78.2,
+      "process_write_MiB": 24.6
+    },
+    "gpu_memory_peak_MiB": {
+      "Dedicated Usage": 15.55,
+      "Shared Usage": 491.11
+    },
+    "gpu_occupancy_qualified": false,
+    "gpu_occupancy_note": "PDH 3D/video engine values were zero despite verified hardware frames and nonzero GPU timestamps; occupancy is unreliable",
+    "conditions": {
+      "all_ac": true,
+      "available_memory_MiB_range": [
+        9852,
+        10187
+      ],
+      "thermal_throttling": "not observable"
+    }
+  },
+  {
+    "seconds": 10.0,
+    "measured_seconds": 10.11620000000298,
+    "first_ready_seconds": 0.8487382000021171,
+    "samples": 480000,
+    "expected_samples": 480000,
+    "underruns": 0,
+    "reached_end": true,
+    "video_tracks": 1,
+    "audio_tracks": 1,
+    "original_resolution": [
+      3840,
+      2160
+    ],
+    "program_resolution": [
+      960,
+      540
+    ],
+    "rate": "50/1",
+    "proxies": false,
+    "completed_frames_per_second": 49.227970977229916,
+    "present_calls_per_second": 49.227970977229916,
+    "dxgi_present_count_per_second": 49.129119629886084,
+    "distinct_sequence_fps": 49.227970977229916,
+    "working_set_history": [
+      {
+        "seconds": 0.031,
+        "summed_working_set_MiB": 1420.24
+      },
+      {
+        "seconds": 5.047,
+        "summed_working_set_MiB": 1456.35
+      },
+      {
+        "seconds": 10.062,
+        "summed_working_set_MiB": 1202.06
+      }
+    ],
+    "last": {
+      "completed_frames": 499,
+      "submitted_frames": 499,
+      "present_calls": 499,
+      "dxgi_present_count": 498,
+      "dxgi_statistics_available": true,
+      "surface_width": 356,
+      "surface_height": 200,
+      "sequence_frame": 498,
+      "skipped_sequence_frames": 0,
+      "distinct_sequence_submissions": 499,
+      "nonadvancing_redraws": 0,
+      "clock_rewind_hold_iterations": 4,
+      "repeated_source_layer_frames": 0,
+      "peak_decoder_count": 1,
+      "peak_source_queue_frames": 4,
+      "peak_inflight_gpu_frames": 1,
+      "gpu_slot_budget": 6,
+      "source_wait_iterations": 34,
+      "gpu_wait_iterations": 0,
+      "skipped_after_source_wait": 0,
+      "skipped_after_gpu_wait": 0,
+      "skipped_without_queue_wait": 0,
+      "timings": {
+        "context_wait": {
+          "count": 4003,
+          "mean_ms": 0.0340109,
+          "p50_upper_ms": 0.1,
+          "p95_upper_ms": 0.2,
+          "max_ms": 22.9083,
+          "overflow_100ms": 0
+        },
+        "submit_cpu": {
+          "count": 499,
+          "mean_ms": 0.426973,
+          "p50_upper_ms": 0.4,
+          "p95_upper_ms": 0.8,
+          "max_ms": 5.6369,
+          "overflow_100ms": 0
+        },
+        "completion_observation": {
+          "count": 499,
+          "mean_ms": 5.03214,
+          "p50_upper_ms": 5.7,
+          "p95_upper_ms": 6.2,
+          "max_ms": 17.1769,
+          "overflow_100ms": 0
+        },
+        "composition_gpu": {
+          "count": 499,
+          "mean_ms": 0.25488,
+          "p50_upper_ms": 0.3,
+          "p95_upper_ms": 0.3,
+          "max_ms": 0.3536,
+          "overflow_100ms": 0
+        },
+        "present_call": {
+          "count": 499,
+          "mean_ms": 0.209074,
+          "p50_upper_ms": 0.2,
+          "p95_upper_ms": 0.4,
+          "max_ms": 6.2269,
+          "overflow_100ms": 0
+        },
+        "present_call_interval": {
+          "count": 498,
+          "mean_ms": 21.8633,
+          "p50_upper_ms": 20,
+          "p95_upper_ms": 21.1,
+          "max_ms": 949.57,
+          "overflow_100ms": 1
+        },
+        "wake_overshoot": {
+          "count": 1743,
+          "mean_ms": 0.321656,
+          "p50_upper_ms": 0.4,
+          "p95_upper_ms": 0.6,
+          "max_ms": 1.0285,
+          "overflow_100ms": 0
+        }
+      },
+      "decoder_statistics": [
+        {
+          "decoded_frames": 620,
+          "decode_wall_seconds": 0.556359,
+          "seeks": 7,
+          "queued_frames": 4,
+          "warm_cache_frames": 6,
+          "warm_cache_hits": 6
+        }
+      ]
+    },
+    "resources": {
+      "average_cpu_machine_percent": 4.99,
+      "peak_summed_working_set_MiB": 1515.2,
+      "process_read_MiB": 78.2,
+      "process_write_MiB": 24.6
+    },
+    "gpu_memory_peak_MiB": {
+      "Dedicated Usage": 14.8,
+      "Shared Usage": 492.36
+    },
+    "gpu_occupancy_qualified": false,
+    "gpu_occupancy_note": "PDH 3D/video engine values were zero despite verified hardware frames and nonzero GPU timestamps; occupancy is unreliable",
+    "conditions": {
+      "all_ac": true,
+      "available_memory_MiB_range": [
+        9808,
+        10242
+      ],
+      "thermal_throttling": "not observable"
+    }
+  },
+  {
+    "seconds": 10.0,
+    "measured_seconds": 10.11509999999404,
+    "first_ready_seconds": 0.6732847000021138,
+    "samples": 479679,
+    "expected_samples": 479679,
+    "underruns": 0,
+    "reached_end": true,
+    "video_tracks": 1,
+    "audio_tracks": 1,
+    "original_resolution": [
+      3840,
+      2160
+    ],
+    "program_resolution": [
+      960,
+      540
+    ],
+    "rate": "60000/1001",
+    "proxies": false,
+    "completed_frames_per_second": 59.11953416183254,
+    "present_calls_per_second": 59.11953416183254,
+    "dxgi_present_count_per_second": 59.11953416183254,
+    "distinct_sequence_fps": 59.11953416183254,
+    "working_set_history": [
+      {
+        "seconds": 0.016,
+        "summed_working_set_MiB": 1438.1
+      },
+      {
+        "seconds": 5.047,
+        "summed_working_set_MiB": 1379.93
+      },
+      {
+        "seconds": 10.11,
+        "summed_working_set_MiB": 1241.06
+      }
+    ],
+    "last": {
+      "completed_frames": 599,
+      "submitted_frames": 599,
+      "present_calls": 599,
+      "dxgi_present_count": 599,
+      "dxgi_statistics_available": true,
+      "surface_width": 356,
+      "surface_height": 200,
+      "sequence_frame": 598,
+      "skipped_sequence_frames": 0,
+      "distinct_sequence_submissions": 599,
+      "nonadvancing_redraws": 0,
+      "clock_rewind_hold_iterations": 4,
+      "repeated_source_layer_frames": 0,
+      "peak_decoder_count": 1,
+      "peak_source_queue_frames": 4,
+      "peak_inflight_gpu_frames": 2,
+      "gpu_slot_budget": 6,
+      "source_wait_iterations": 71,
+      "gpu_wait_iterations": 0,
+      "skipped_after_source_wait": 0,
+      "skipped_after_gpu_wait": 0,
+      "skipped_without_queue_wait": 0,
+      "timings": {
+        "context_wait": {
+          "count": 4417,
+          "mean_ms": 0.041088,
+          "p50_upper_ms": 0.1,
+          "p95_upper_ms": 0.3,
+          "max_ms": 34.3113,
+          "overflow_100ms": 0
+        },
+        "submit_cpu": {
+          "count": 599,
+          "mean_ms": 0.465588,
+          "p50_upper_ms": 0.5,
+          "p95_upper_ms": 0.8,
+          "max_ms": 10.6258,
+          "overflow_100ms": 0
+        },
+        "completion_observation": {
+          "count": 599,
+          "mean_ms": 4.83203,
+          "p50_upper_ms": 5.7,
+          "p95_upper_ms": 6.3,
+          "max_ms": 19.111,
+          "overflow_100ms": 0
+        },
+        "composition_gpu": {
+          "count": 599,
+          "mean_ms": 0.257763,
+          "p50_upper_ms": 0.3,
+          "p95_upper_ms": 0.4,
+          "max_ms": 0.7224,
+          "overflow_100ms": 0
+        },
+        "present_call": {
+          "count": 599,
+          "mean_ms": 0.246354,
+          "p50_upper_ms": 0.2,
+          "p95_upper_ms": 0.5,
+          "max_ms": 9.4706,
+          "overflow_100ms": 0
+        },
+        "present_call_interval": {
+          "count": 598,
+          "mean_ms": 18.1713,
+          "p50_upper_ms": 16.7,
+          "p95_upper_ms": 17.8,
+          "max_ms": 906.804,
+          "overflow_100ms": 1
+        },
+        "wake_overshoot": {
+          "count": 1809,
+          "mean_ms": 0.347088,
+          "p50_upper_ms": 0.4,
+          "p95_upper_ms": 0.7,
+          "max_ms": 1.4918,
+          "overflow_100ms": 0
+        }
+      },
+      "decoder_statistics": [
+        {
+          "decoded_frames": 628,
+          "decode_wall_seconds": 0.749437,
+          "seeks": 7,
+          "queued_frames": 4,
+          "warm_cache_frames": 6,
+          "warm_cache_hits": 6
+        }
+      ]
+    },
+    "resources": {
+      "average_cpu_machine_percent": 6.21,
+      "peak_summed_working_set_MiB": 1537.2,
+      "process_read_MiB": 79.0,
+      "process_write_MiB": 24.9
+    },
+    "gpu_memory_peak_MiB": {
+      "Dedicated Usage": 16.09,
+      "Shared Usage": 503.86
+    },
+    "gpu_occupancy_qualified": false,
+    "gpu_occupancy_note": "PDH 3D/video engine values were zero despite verified hardware frames and nonzero GPU timestamps; occupancy is unreliable",
+    "conditions": {
+      "all_ac": true,
+      "available_memory_MiB_range": [
+        9843,
+        10139
+      ],
+      "thermal_throttling": "not observable"
+    }
+  },
+  {
+    "seconds": 10.0,
+    "measured_seconds": 10.3155,
+    "first_ready_seconds": 0.7001586000042153,
+    "samples": 480000,
+    "expected_samples": 480000,
+    "underruns": 0,
+    "reached_end": true,
+    "video_tracks": 1,
+    "audio_tracks": 1,
+    "original_resolution": [
+      3840,
+      2160
+    ],
+    "program_resolution": [
+      960,
+      540
+    ],
+    "rate": "60/1",
+    "proxies": false,
+    "completed_frames_per_second": 58.067955988560904,
+    "present_calls_per_second": 58.067955988560904,
+    "dxgi_present_count_per_second": 58.067955988560904,
+    "distinct_sequence_fps": 58.067955988560904,
+    "working_set_history": [
+      {
+        "seconds": 0.031,
+        "summed_working_set_MiB": 1424.34
+      },
+      {
+        "seconds": 5.062,
+        "summed_working_set_MiB": 1377.57
+      },
+      {
+        "seconds": 10.093,
+        "summed_working_set_MiB": 1215.57
+      }
+    ],
+    "last": {
+      "completed_frames": 600,
+      "submitted_frames": 600,
+      "present_calls": 600,
+      "dxgi_present_count": 600,
+      "dxgi_statistics_available": true,
+      "surface_width": 356,
+      "surface_height": 200,
+      "sequence_frame": 599,
+      "skipped_sequence_frames": 0,
+      "distinct_sequence_submissions": 600,
+      "nonadvancing_redraws": 0,
+      "clock_rewind_hold_iterations": 3,
+      "repeated_source_layer_frames": 0,
+      "peak_decoder_count": 1,
+      "peak_source_queue_frames": 4,
+      "peak_inflight_gpu_frames": 1,
+      "gpu_slot_budget": 6,
+      "source_wait_iterations": 121,
+      "gpu_wait_iterations": 0,
+      "skipped_after_source_wait": 0,
+      "skipped_after_gpu_wait": 0,
+      "skipped_without_queue_wait": 0,
+      "timings": {
+        "context_wait": {
+          "count": 4548,
+          "mean_ms": 0.032577,
+          "p50_upper_ms": 0.1,
+          "p95_upper_ms": 0.2,
+          "max_ms": 17.4606,
+          "overflow_100ms": 0
+        },
+        "submit_cpu": {
+          "count": 600,
+          "mean_ms": 0.436848,
+          "p50_upper_ms": 0.5,
+          "p95_upper_ms": 0.7,
+          "max_ms": 5.3933,
+          "overflow_100ms": 0
+        },
+        "completion_observation": {
+          "count": 600,
+          "mean_ms": 4.91676,
+          "p50_upper_ms": 5.6,
+          "p95_upper_ms": 6.1,
+          "max_ms": 22.7732,
+          "overflow_100ms": 0
+        },
+        "composition_gpu": {
+          "count": 600,
+          "mean_ms": 0.257067,
+          "p50_upper_ms": 0.3,
+          "p95_upper_ms": 0.3,
+          "max_ms": 0.38708,
+          "overflow_100ms": 0
+        },
+        "present_call": {
+          "count": 600,
+          "mean_ms": 0.24944,
+          "p50_upper_ms": 0.2,
+          "p95_upper_ms": 0.5,
+          "max_ms": 22.4969,
+          "overflow_100ms": 0
+        },
+        "present_call_interval": {
+          "count": 599,
+          "mean_ms": 18.3465,
+          "p50_upper_ms": 16.7,
+          "p95_upper_ms": 17.8,
+          "max_ms": 1024.28,
+          "overflow_100ms": 1
+        },
+        "wake_overshoot": {
+          "count": 1867,
+          "mean_ms": 0.343597,
+          "p50_upper_ms": 0.4,
+          "p95_upper_ms": 0.7,
+          "max_ms": 1.649,
+          "overflow_100ms": 0
+        }
+      },
+      "decoder_statistics": [
+        {
+          "decoded_frames": 628,
+          "decode_wall_seconds": 0.775953,
+          "seeks": 7,
+          "queued_frames": 4,
+          "warm_cache_frames": 6,
+          "warm_cache_hits": 6
+        }
+      ]
+    },
+    "resources": {
+      "average_cpu_machine_percent": 5.6,
+      "peak_summed_working_set_MiB": 1527.2,
+      "process_read_MiB": 79.0,
+      "process_write_MiB": 24.8
+    },
+    "gpu_memory_peak_MiB": {
+      "Dedicated Usage": 15.8,
+      "Shared Usage": 492.11
+    },
+    "gpu_occupancy_qualified": false,
+    "gpu_occupancy_note": "PDH 3D/video engine values were zero despite verified hardware frames and nonzero GPU timestamps; occupancy is unreliable",
+    "conditions": {
+      "all_ac": true,
+      "available_memory_MiB_range": [
+        9795,
+        10187
+      ],
+      "thermal_throttling": "not observable"
+    }
+  },
+  {
+    "seconds": 10.0,
+    "measured_seconds": 10.27030000000447,
+    "first_ready_seconds": 0.6986170999953174,
+    "samples": 480000,
+    "expected_samples": 480000,
+    "underruns": 0,
+    "reached_end": true,
+    "video_tracks": 1,
+    "audio_tracks": 1,
+    "original_resolution": [
+      3840,
+      2160
+    ],
+    "program_resolution": [
+      960,
+      540
+    ],
+    "rate": "120/1",
+    "proxies": false,
+    "completed_frames_per_second": 116.4522944801495,
+    "present_calls_per_second": 116.4522944801495,
+    "dxgi_present_count_per_second": 116.4522944801495,
+    "distinct_sequence_fps": 116.4522944801495,
+    "working_set_history": [
+      {
+        "seconds": 0.015,
+        "summed_working_set_MiB": 1422.61
+      },
+      {
+        "seconds": 5.047,
+        "summed_working_set_MiB": 1390.41
+      },
+      {
+        "seconds": 10.062,
+        "summed_working_set_MiB": 1247.14
+      }
+    ],
+    "last": {
+      "completed_frames": 1197,
+      "submitted_frames": 1197,
+      "present_calls": 1197,
+      "dxgi_present_count": 1197,
+      "dxgi_statistics_available": true,
+      "surface_width": 356,
+      "surface_height": 200,
+      "sequence_frame": 1199,
+      "skipped_sequence_frames": 3,
+      "distinct_sequence_submissions": 1197,
+      "nonadvancing_redraws": 0,
+      "clock_rewind_hold_iterations": 7,
+      "repeated_source_layer_frames": 597,
+      "peak_decoder_count": 1,
+      "peak_source_queue_frames": 4,
+      "peak_inflight_gpu_frames": 3,
+      "gpu_slot_budget": 6,
+      "source_wait_iterations": 45,
+      "gpu_wait_iterations": 0,
+      "skipped_after_source_wait": 0,
+      "skipped_after_gpu_wait": 0,
+      "skipped_without_queue_wait": 3,
+      "timings": {
+        "context_wait": {
+          "count": 5093,
+          "mean_ms": 0.045836,
+          "p50_upper_ms": 0.1,
+          "p95_upper_ms": 0.4,
+          "max_ms": 37.9681,
+          "overflow_100ms": 0
+        },
+        "submit_cpu": {
+          "count": 1197,
+          "mean_ms": 0.376451,
+          "p50_upper_ms": 0.4,
+          "p95_upper_ms": 0.7,
+          "max_ms": 7.6882,
+          "overflow_100ms": 0
+        },
+        "completion_observation": {
+          "count": 1197,
+          "mean_ms": 15.5382,
+          "p50_upper_ms": 16.3,
+          "p95_upper_ms": 25.4,
+          "max_ms": 26.6336,
+          "overflow_100ms": 0
+        },
+        "composition_gpu": {
+          "count": 1197,
+          "mean_ms": 0.265118,
+          "p50_upper_ms": 0.3,
+          "p95_upper_ms": 0.4,
+          "max_ms": 1.56768,
+          "overflow_100ms": 0
+        },
+        "present_call": {
+          "count": 1197,
+          "mean_ms": 4.59496,
+          "p50_upper_ms": 6.4,
+          "p95_upper_ms": 8.3,
+          "max_ms": 8.6987,
+          "overflow_100ms": 0
+        },
+        "present_call_interval": {
+          "count": 1196,
+          "mean_ms": 9.2005,
+          "p50_upper_ms": 8.4,
+          "p95_upper_ms": 8.9,
+          "max_ms": 967.795,
+          "overflow_100ms": 1
+        },
+        "wake_overshoot": {
+          "count": 995,
+          "mean_ms": 0.343581,
+          "p50_upper_ms": 0.4,
+          "p95_upper_ms": 0.7,
+          "max_ms": 1.571,
+          "overflow_100ms": 0
+        }
+      },
+      "decoder_statistics": [
+        {
+          "decoded_frames": 628,
+          "decode_wall_seconds": 3.49357,
+          "seeks": 7,
+          "queued_frames": 4,
+          "warm_cache_frames": 6,
+          "warm_cache_hits": 23
+        }
+      ]
+    },
+    "resources": {
+      "average_cpu_machine_percent": 6.63,
+      "peak_summed_working_set_MiB": 1537.0,
+      "process_read_MiB": 83.6,
+      "process_write_MiB": 25.0
+    },
+    "gpu_memory_peak_MiB": {
+      "Dedicated Usage": 15.61,
+      "Shared Usage": 523.86
+    },
+    "gpu_occupancy_qualified": false,
+    "gpu_occupancy_note": "PDH 3D/video engine values were zero despite verified hardware frames and nonzero GPU timestamps; occupancy is unreliable",
+    "conditions": {
+      "all_ac": true,
+      "available_memory_MiB_range": [
+        9769,
+        10077
+      ],
+      "thermal_throttling": "not observable"
+    }
+  }
+]

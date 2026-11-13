@@ -64,6 +64,6 @@ def main(a):
   report={'initial_native_ready_seconds':ready,'seek_seconds':seek,'playback':state,'reference_fallback':True,'process_failure_recovery':True,'resize_and_modal_visibility':True,'rapid_and_playing_seek':True,'browser_errors':errors}
   a.results.mkdir(parents=True,exist_ok=True);(a.results/'native-windows.json').write_text(json.dumps(report,indent=2));print(json.dumps(report))
   assert not errors,errors
-  assert state['metrics']['peak_source_queue_frames']<=4 and state['metrics']['peak_inflight_gpu_frames']<=3
+  assert state['metrics']['peak_source_queue_frames']<=4 and state['metrics']['peak_inflight_gpu_frames']<=state['metrics'].get('gpu_slot_budget',3)<=6
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('executable',type=Path);p.add_argument('media',type=Path);p.add_argument('results',type=Path);main(p.parse_args())

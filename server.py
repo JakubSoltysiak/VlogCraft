@@ -49,6 +49,7 @@ AI_UNDO=WORK/'ai_undo.json'
 import preview_cache
 PROGRAM_PREVIEW=preview_cache.PreviewCache(WORK/'preview-cache')
 NATIVE_PLAYBACK=None
+PERFORMANCE_DIAGNOSTICS=None
 LOCK=threading.RLock(); UPLOAD_LOCK=threading.RLock(); JOB_LOCK=threading.RLock()
 VIDEO={'.mp4','.mov','.mkv','.m4v','.avi','.wmv','.webm','.mpg','.mpeg','.mts','.m2ts'}
 IMAGE={'.jpg','.jpeg','.png','.webp','.bmp','.tif','.tiff'}
@@ -683,6 +684,7 @@ class Handler(BaseHTTPRequestHandler):
         try:
             if path=='/api/state':
                 return self.json_response(client_state())
+            if path=='/api/performance/status':return self.json_response(PERFORMANCE_DIAGNOSTICS.status() if PERFORMANCE_DIAGNOSTICS else {'status':'unavailable'})
             if path=='/api/native/capabilities':return self.json_response(NATIVE_PLAYBACK.capabilities() if NATIVE_PLAYBACK else {'available':False,'experimental':True})
             if path=='/api/native/status':return self.json_response(NATIVE_PLAYBACK.status() if NATIVE_PLAYBACK else {'running':False})
             if path=='/api/native/audio':
@@ -754,7 +756,7 @@ class Handler(BaseHTTPRequestHandler):
                 if not target.exists():target=EXPORTS/name
                 return self.file_response(target)
             if path=='/' or path=='/index.html':return self.file_response(WEB/'index.html','text/html; charset=utf-8')
-            if path in ('/app.js','/studio.js','/animation.js','/motion.js','/timeline.js','/timebase.js','/edit_ops.js','/edit_commands.js','/monitor.js','/rendered_preview.js','/native_preview.js','/native_audio_worklet.js','/playback_cache.js','/effects.js','/grade.js','/audio.js','/nesting.js','/source_frames.js','/style.css'):
+            if path in ('/app.js','/studio.js','/animation.js','/motion.js','/timeline.js','/timebase.js','/edit_ops.js','/edit_commands.js','/monitor.js','/rendered_preview.js','/native_preview.js','/native_audio_worklet.js','/performance.js','/playback_cache.js','/effects.js','/grade.js','/audio.js','/nesting.js','/source_frames.js','/style.css'):
                 return self.file_response(WEB/path.lstrip('/'))
             return self.json_response({'error':'Not found'},404)
         except (BrokenPipeError,ConnectionAbortedError,ConnectionResetError):return
@@ -822,6 +824,9 @@ class Handler(BaseHTTPRequestHandler):
                 with UPLOAD_LOCK:u=UPLOADS.pop(uid,None)
                 if u:Path(u['tmp']).unlink(missing_ok=True)
                 return self.json_response({'cancelled':bool(u)})
+            if path=='/api/performance/start':
+                if not PERFORMANCE_DIAGNOSTICS:raise ValueError('Local diagnostics require the desktop app')
+                return self.json_response(PERFORMANCE_DIAGNOSTICS.start(bool(data.get('storage',False))))
             if path.startswith('/api/native/'):
                 if not NATIVE_PLAYBACK:raise ValueError('Native preview is unavailable')
                 command=path.rsplit('/',1)[-1]

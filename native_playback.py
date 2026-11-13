@@ -9,6 +9,9 @@ class Controller:
   self.bundle=Path(bundle);self.guard=threading.RLock();self.process=None;self.panel=None;self.latest={};self.generation=0;self.snapshot=None
   self.audio_processes=set();self.closed=False
  def runtime(self):
+  override=os.environ.get('VLOGCRAFT_NATIVE_BINARY')
+  if override:
+   exe=Path(override).resolve();return exe,Path(__file__).resolve().parent/'build/tools/architecture/ffmpeg-shared/ffmpeg-9.0.2-full_build-shared/bin'
   packaged=self.bundle/'engine/native/VlogCraftNative.exe'
   source=Path(__file__).resolve().parent/'build/tools/architecture/VlogCraftNative.exe'
   exe=packaged if packaged.is_file() else source

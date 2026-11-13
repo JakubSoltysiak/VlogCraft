@@ -2,9 +2,13 @@
 
 > **[MASTER TO-DO LIST & PRODUCT ROADMAP](TODO.md)** — shared living backlog for the owner, Codex and ChatGPT. Check priorities and update it with each feature PR.
 
-Windows 11 x64 development project. The local development installer is **release/VlogCraft-Studio-3.4-x64.msi**, currently version 3.4.6 (experimental native-playback development build). The installer adds VlogCraft Studio to the Start menu and offers a desktop shortcut. Python, FFmpeg, FFprobe and OpenCV are bundled. WebView2 is required and was present on the qualification machine. Source and preserved tags are on the public repository, with 3.4 development reviewed in pull request 1. [GitHub repository](https://github.com/JakubSoltysiak/VlogCraft), [development PR](https://github.com/JakubSoltysiak/VlogCraft/pull/1).
+Windows 11 x64 development project. The local development installer is **release/VlogCraft-Studio-3.4-x64.msi**, currently version 3.4.7 (workstation-refinement development build). The installer adds VlogCraft Studio to the Start menu and offers a desktop shortcut. Python, FFmpeg, FFprobe and OpenCV are bundled. WebView2 is required and was present on the qualification machine. Source and preserved tags are on the public repository, with 3.4 development reviewed in pull request 1. [GitHub repository](https://github.com/JakubSoltysiak/VlogCraft), [development PR](https://github.com/JakubSoltysiak/VlogCraft/pull/1).
 
-## Experimental native playback — 3.4.6
+## Workstation refinement — 3.4.7 development
+
+Current development continues PR #3 on feature/studio-3.4.7-workstation. Matched 125-second median presentation improved **57.71 → 59.67 FPS** at 540p from three original 4K inputs, with median skips **279 → 28**. The ten-minute case completed at 59.87 distinct FPS with 62 skips and exact audio counts. More decoder/cache memory is used; zero-skip60, acoustic sync and broad production acceptance remain open. [The workstation report](docs/WORKSTATION_OPTIMIZATION_3_4_7.md) records measured hardware/AC/display conditions, baseline variation, deadline scheduling, bounded GPU ring/source-frame caching, explicit preview quality and the permanent performance regression framework. The settings gear runs local hardware/storage diagnostics and proposes a reversible preview resolution. Native remains experimental; dynamic quality and full professional/HDR acceptance remain open.
+
+## Experimental native playback — historical 3.4.6
 
 The **Native GPU · experimental** preview choice integrates original-media libav/D3D11 decoding, bounded float16 composition and a stereo PCM audio clock into the existing Windows editor. The production FFmpeg renderer remains available and the default is unchanged. Supported cuts, transforms and keys use the native path; unsupported effects switch the whole SDR program to the reference compositor. PQ display requires active Windows HDR and never silently tone-maps to SDR.
 

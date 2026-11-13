@@ -1,0 +1,479 @@
+[
+  {
+    "seconds": 125.0,
+    "measured_seconds": 125.14580000000447,
+    "first_ready_seconds": 0.9979511999990791,
+    "samples": 6000000,
+    "underruns": 0,
+    "reached_end": true,
+    "video_tracks": 3,
+    "audio_tracks": 3,
+    "original_resolution": [
+      3840,
+      2160
+    ],
+    "program_resolution": [
+      960,
+      540
+    ],
+    "rate": "60/1",
+    "proxies": false,
+    "completed_frames_per_second": 57.828548780700125,
+    "present_calls_per_second": 57.828548780700125,
+    "dxgi_present_count_per_second": 57.820558101028894,
+    "working_set_history": [
+      {
+        "seconds": 0.016,
+        "summed_working_set_MiB": 2089.51
+      },
+      {
+        "seconds": 5.047,
+        "summed_working_set_MiB": 1968.48
+      },
+      {
+        "seconds": 10.078,
+        "summed_working_set_MiB": 1826.5
+      },
+      {
+        "seconds": 15.109,
+        "summed_working_set_MiB": 1852.52
+      },
+      {
+        "seconds": 20.141,
+        "summed_working_set_MiB": 1878.72
+      },
+      {
+        "seconds": 25.203,
+        "summed_working_set_MiB": 1928.87
+      },
+      {
+        "seconds": 30.234,
+        "summed_working_set_MiB": 1979.36
+      },
+      {
+        "seconds": 35.281,
+        "summed_working_set_MiB": 1950.2
+      },
+      {
+        "seconds": 40.328,
+        "summed_working_set_MiB": 1968.66
+      },
+      {
+        "seconds": 45.375,
+        "summed_working_set_MiB": 1959.32
+      },
+      {
+        "seconds": 50.422,
+        "summed_working_set_MiB": 1978.54
+      },
+      {
+        "seconds": 55.453,
+        "summed_working_set_MiB": 1974.0
+      },
+      {
+        "seconds": 60.484,
+        "summed_working_set_MiB": 1961.04
+      },
+      {
+        "seconds": 65.531,
+        "summed_working_set_MiB": 1981.14
+      },
+      {
+        "seconds": 70.563,
+        "summed_working_set_MiB": 2071.34
+      },
+      {
+        "seconds": 75.594,
+        "summed_working_set_MiB": 2002.54
+      },
+      {
+        "seconds": 80.656,
+        "summed_working_set_MiB": 2017.11
+      },
+      {
+        "seconds": 85.688,
+        "summed_working_set_MiB": 2037.65
+      },
+      {
+        "seconds": 90.703,
+        "summed_working_set_MiB": 2048.16
+      },
+      {
+        "seconds": 95.766,
+        "summed_working_set_MiB": 2047.39
+      },
+      {
+        "seconds": 100.797,
+        "summed_working_set_MiB": 2048.31
+      },
+      {
+        "seconds": 105.828,
+        "summed_working_set_MiB": 2066.45
+      },
+      {
+        "seconds": 110.875,
+        "summed_working_set_MiB": 2065.0
+      },
+      {
+        "seconds": 115.938,
+        "summed_working_set_MiB": 2067.81
+      },
+      {
+        "seconds": 120.969,
+        "summed_working_set_MiB": 2058.58
+      }
+    ],
+    "last": {
+      "completed_frames": 7238,
+      "submitted_frames": 7238,
+      "present_calls": 7238,
+      "dxgi_present_count": 7237,
+      "dxgi_statistics_available": true,
+      "surface_width": 356,
+      "surface_height": 200,
+      "sequence_frame": 7499,
+      "skipped_sequence_frames": 264,
+      "peak_decoder_count": 3,
+      "peak_source_queue_frames": 4,
+      "peak_inflight_gpu_frames": 3
+    },
+    "resources": {
+      "average_cpu_machine_percent": 8.93,
+      "peak_summed_working_set_MiB": 2146.5,
+      "process_read_MiB": 2581.9,
+      "process_write_MiB": 401.8
+    },
+    "gpu_memory_peak_MiB": {
+      "Dedicated Usage": 19.26,
+      "Shared Usage": 1430.46
+    },
+    "gpu_occupancy_qualified": false,
+    "gpu_occupancy_note": "PDH 3D/video engine values were zero despite verified hardware frames and nonzero GPU timestamps; occupancy is unreliable",
+    "conditions": {
+      "all_ac": true,
+      "available_memory_MiB_range": [
+        8793,
+        9478
+      ],
+      "thermal_throttling": "not observable"
+    }
+  },
+  {
+    "seconds": 125.0,
+    "measured_seconds": 125.14160000000149,
+    "first_ready_seconds": 0.9656644999995478,
+    "samples": 6000000,
+    "underruns": 0,
+    "reached_end": true,
+    "video_tracks": 3,
+    "audio_tracks": 3,
+    "original_resolution": [
+      3840,
+      2160
+    ],
+    "program_resolution": [
+      960,
+      540
+    ],
+    "rate": "60/1",
+    "proxies": false,
+    "completed_frames_per_second": 56.76769355673825,
+    "present_calls_per_second": 56.76769355673825,
+    "dxgi_present_count_per_second": 56.75970260888398,
+    "working_set_history": [
+      {
+        "seconds": 0.016,
+        "summed_working_set_MiB": 2422.89
+      },
+      {
+        "seconds": 5.047,
+        "summed_working_set_MiB": 2456.3
+      },
+      {
+        "seconds": 10.079,
+        "summed_working_set_MiB": 2128.6
+      },
+      {
+        "seconds": 15.11,
+        "summed_working_set_MiB": 1909.45
+      },
+      {
+        "seconds": 20.157,
+        "summed_working_set_MiB": 1930.09
+      },
+      {
+        "seconds": 25.188,
+        "summed_working_set_MiB": 1950.73
+      },
+      {
+        "seconds": 30.219,
+        "summed_working_set_MiB": 1990.4
+      },
+      {
+        "seconds": 35.25,
+        "summed_working_set_MiB": 1950.59
+      },
+      {
+        "seconds": 40.282,
+        "summed_working_set_MiB": 1954.48
+      },
+      {
+        "seconds": 45.313,
+        "summed_working_set_MiB": 1958.75
+      },
+      {
+        "seconds": 50.36,
+        "summed_working_set_MiB": 1961.21
+      },
+      {
+        "seconds": 55.407,
+        "summed_working_set_MiB": 1958.33
+      },
+      {
+        "seconds": 60.469,
+        "summed_working_set_MiB": 1959.6
+      },
+      {
+        "seconds": 65.5,
+        "summed_working_set_MiB": 1984.41
+      },
+      {
+        "seconds": 70.532,
+        "summed_working_set_MiB": 2053.09
+      },
+      {
+        "seconds": 75.563,
+        "summed_working_set_MiB": 1989.4
+      },
+      {
+        "seconds": 80.61,
+        "summed_working_set_MiB": 2003.16
+      },
+      {
+        "seconds": 85.641,
+        "summed_working_set_MiB": 2003.93
+      },
+      {
+        "seconds": 90.688,
+        "summed_working_set_MiB": 2008.54
+      },
+      {
+        "seconds": 95.719,
+        "summed_working_set_MiB": 2046.97
+      },
+      {
+        "seconds": 100.735,
+        "summed_working_set_MiB": 2079.55
+      },
+      {
+        "seconds": 105.782,
+        "summed_working_set_MiB": 2079.88
+      },
+      {
+        "seconds": 110.813,
+        "summed_working_set_MiB": 2079.87
+      },
+      {
+        "seconds": 115.844,
+        "summed_working_set_MiB": 2090.54
+      },
+      {
+        "seconds": 120.891,
+        "summed_working_set_MiB": 2090.77
+      }
+    ],
+    "last": {
+      "completed_frames": 7105,
+      "submitted_frames": 7105,
+      "present_calls": 7105,
+      "dxgi_present_count": 7104,
+      "dxgi_statistics_available": true,
+      "surface_width": 356,
+      "surface_height": 200,
+      "sequence_frame": 7499,
+      "skipped_sequence_frames": 407,
+      "peak_decoder_count": 3,
+      "peak_source_queue_frames": 4,
+      "peak_inflight_gpu_frames": 3
+    },
+    "resources": {
+      "average_cpu_machine_percent": 9.66,
+      "peak_summed_working_set_MiB": 2578.5,
+      "process_read_MiB": 2602.5,
+      "process_write_MiB": 403.3
+    },
+    "gpu_memory_peak_MiB": {
+      "Dedicated Usage": 29.41,
+      "Shared Usage": 2127.36
+    },
+    "gpu_occupancy_qualified": false,
+    "gpu_occupancy_note": "PDH 3D/video engine values were zero despite verified hardware frames and nonzero GPU timestamps; occupancy is unreliable",
+    "conditions": {
+      "all_ac": true,
+      "available_memory_MiB_range": [
+        8341,
+        9419
+      ],
+      "thermal_throttling": "not observable"
+    }
+  },
+  {
+    "seconds": 125.0,
+    "measured_seconds": 125.16680000000447,
+    "first_ready_seconds": 1.0382451999976183,
+    "samples": 6000000,
+    "underruns": 0,
+    "reached_end": true,
+    "video_tracks": 3,
+    "audio_tracks": 3,
+    "original_resolution": [
+      3840,
+      2160
+    ],
+    "program_resolution": [
+      960,
+      540
+    ],
+    "rate": "60/1",
+    "proxies": false,
+    "completed_frames_per_second": 57.70699578482267,
+    "present_calls_per_second": 57.71498512384867,
+    "dxgi_present_count_per_second": 57.70699578482267,
+    "working_set_history": [
+      {
+        "seconds": 0.016,
+        "summed_working_set_MiB": 2461.17
+      },
+      {
+        "seconds": 5.047,
+        "summed_working_set_MiB": 2019.35
+      },
+      {
+        "seconds": 10.078,
+        "summed_working_set_MiB": 1839.58
+      },
+      {
+        "seconds": 15.094,
+        "summed_working_set_MiB": 1794.39
+      },
+      {
+        "seconds": 20.109,
+        "summed_working_set_MiB": 1860.67
+      },
+      {
+        "seconds": 25.141,
+        "summed_working_set_MiB": 1905.45
+      },
+      {
+        "seconds": 30.187,
+        "summed_working_set_MiB": 1959.2
+      },
+      {
+        "seconds": 35.219,
+        "summed_working_set_MiB": 1928.59
+      },
+      {
+        "seconds": 40.25,
+        "summed_working_set_MiB": 1936.84
+      },
+      {
+        "seconds": 45.266,
+        "summed_working_set_MiB": 1954.37
+      },
+      {
+        "seconds": 50.297,
+        "summed_working_set_MiB": 1957.26
+      },
+      {
+        "seconds": 55.344,
+        "summed_working_set_MiB": 1966.47
+      },
+      {
+        "seconds": 60.375,
+        "summed_working_set_MiB": 1962.63
+      },
+      {
+        "seconds": 65.422,
+        "summed_working_set_MiB": 1965.72
+      },
+      {
+        "seconds": 70.437,
+        "summed_working_set_MiB": 2047.63
+      },
+      {
+        "seconds": 75.469,
+        "summed_working_set_MiB": 1982.12
+      },
+      {
+        "seconds": 80.5,
+        "summed_working_set_MiB": 1996.33
+      },
+      {
+        "seconds": 85.547,
+        "summed_working_set_MiB": 2011.47
+      },
+      {
+        "seconds": 90.594,
+        "summed_working_set_MiB": 2014.18
+      },
+      {
+        "seconds": 95.625,
+        "summed_working_set_MiB": 2023.08
+      },
+      {
+        "seconds": 100.656,
+        "summed_working_set_MiB": 2028.65
+      },
+      {
+        "seconds": 105.687,
+        "summed_working_set_MiB": 2053.68
+      },
+      {
+        "seconds": 110.734,
+        "summed_working_set_MiB": 2075.4
+      },
+      {
+        "seconds": 115.766,
+        "summed_working_set_MiB": 2072.95
+      },
+      {
+        "seconds": 120.812,
+        "summed_working_set_MiB": 2056.92
+      }
+    ],
+    "last": {
+      "completed_frames": 7224,
+      "submitted_frames": 7225,
+      "present_calls": 7225,
+      "dxgi_present_count": 7224,
+      "dxgi_statistics_available": true,
+      "surface_width": 356,
+      "surface_height": 200,
+      "sequence_frame": 7499,
+      "skipped_sequence_frames": 279,
+      "peak_decoder_count": 3,
+      "peak_source_queue_frames": 4,
+      "peak_inflight_gpu_frames": 3
+    },
+    "resources": {
+      "average_cpu_machine_percent": 9.02,
+      "peak_summed_working_set_MiB": 2496.5,
+      "process_read_MiB": 2589.3,
+      "process_write_MiB": 401.4
+    },
+    "gpu_memory_peak_MiB": {
+      "Dedicated Usage": 26.07,
+      "Shared Usage": 2018.17
+    },
+    "gpu_occupancy_qualified": false,
+    "gpu_occupancy_note": "PDH 3D/video engine values were zero despite verified hardware frames and nonzero GPU timestamps; occupancy is unreliable",
+    "conditions": {
+      "all_ac": true,
+      "available_memory_MiB_range": [
+        8765,
+        9911
+      ],
+      "thermal_throttling": "not observable"
+    }
+  }
+]

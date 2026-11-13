@@ -1,5 +1,7 @@
 # Experimental native playback integration — 3.4.6
 
+Historical checkpoint. [3.4.7 workstation optimization](WORKSTATION_OPTIMIZATION_3_4_7.md) continues this implementation with measured scheduling/cache changes; the 3.4.6 numbers below retain their original scope.
+
 This development milestone continues commit 6bf93f94033936d1ac66ed872c64ba8e5b31ba31. PRs #1 and #2 remain unmerged drafts. The existing WebView2 interface, editing commands, project schema, live API integration and production FFmpeg exporter remain. **Native GPU preview is opt-in and is not production-qualified.**
 
 ## Implemented contract
@@ -26,6 +28,8 @@ The audio master is a bounded 48 kHz stereo AudioWorklet fed by raw PCM from the
 | Export | Existing original-media FFmpeg CPU/hardware fallback; 4K60 remains available | Native GPU export is not implemented; export remains explicit 8-bit SDR/stereo |
 
 ## Real-camera privacy and inspection
+
+Owner provenance correction in 3.4.7: CameraA/B are owner-identified Galaxy S25 Ultra recordings; CameraC is a Google Earth travel animation, not Samsung camera footage. This does not invent embedded device tags or a Log profile.
 
 Three owner-provided originals were ignored before development and opened only for reading. All probes, PTS tables, graphs, frame readbacks, audio and exports remain in ignored local QA storage outside the original directory. Public results use CameraA/B/C aliases and selected technical numbers. No private footage, frame, thumbnail, source hash, original name, identifying path, GPS or private metadata is included in Git.
 

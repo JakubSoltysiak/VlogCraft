@@ -1,6 +1,7 @@
 #pragma once
 #include <dxgi1_6.h>
 #include "sampler.h"
+#include "telemetry.h"
 const char* nativeShader=R"HLSL(
 Texture2DArray<float> Y:register(t0);Texture2DArray<float2> UV:register(t1);SamplerState S:register(s0);
 cbuffer Params:register(b0){float4 geometry;float4 effect;float4 range;float4 source;float4 coefficients;}
@@ -26,13 +27,13 @@ float4 ps(Vertex v):SV_Target{
 )HLSL";
 struct DeviceLock {
  AVD3D11VADeviceContext* hw;
- DeviceLock(AVD3D11VADeviceContext* p):hw(p){hw->lock(hw->lock_ctx);}
+ DeviceLock(AVD3D11VADeviceContext* p,Distribution* timing=nullptr):hw(p){auto began=Clock::now();hw->lock(hw->lock_ctx);if(timing)timing->add(seconds(began)*1000);}
  ~DeviceLock(){hw->unlock(hw->lock_ctx);}
 };
 struct NativeDisplay {
  HWND window=nullptr,parent=nullptr;Com<IDXGISwapChain> swap;Com<ID3D11RenderTargetView> target;
  ID3D11Device* device;Com<ID3D11PixelShader> pixel;int width=0,height=0;bool hdr=false;
- uint64_t calls=0;UINT displayed=0;bool statistics=false,wasVisible=false;
+ uint64_t calls=0;UINT displayed=0;bool statistics=false,wasVisible=false;Distribution presentTime,presentIntervals;Clock::time_point lastFlip={};
  static LRESULT CALLBACK proc(HWND w,UINT m,WPARAM a,LPARAM b){return DefWindowProcW(w,m,a,b);}
  NativeDisplay(ID3D11Device* d,HWND p,int w,int h,bool pq,decltype(&D3DCompile) compile):parent(p),device(d),hdr(pq){
   if(parent)SetThreadDpiAwarenessContext(GetWindowDpiAwarenessContext(parent));
@@ -77,7 +78,8 @@ struct NativeDisplay {
   ID3D11ShaderResourceView* empty=nullptr;context->PSSetShaderResources(0,1,&empty);
  }
  void flip(){
-  check(swap->Present(1,0),"Native Present");calls++;
+  auto began=Clock::now();check(swap->Present(1,0),"Native Present");presentTime.add(seconds(began)*1000);calls++;
+  if(lastFlip!=Clock::time_point{})presentIntervals.add(seconds(lastFlip)*1000);lastFlip=Clock::now();
   wasVisible=IsWindowVisible(window);stats();
  }
  void stats(){
@@ -87,14 +89,17 @@ struct NativeDisplay {
 };
 struct Slot {
  Com<ID3D11Texture2D> image;Com<ID3D11RenderTargetView> target;Com<ID3D11ShaderResourceView> view;Com<ID3D11Query> query;
+ Com<ID3D11Query> disjoint,beginStamp,endStamp;Clock::time_point queuedAt={};
  bool pending=false;int64_t frame=-1,generation=-1;std::vector<Frame> holds;
 };
 struct Renderer {
  AVBufferRef* hw=nullptr;AVD3D11VADeviceContext* hd;ID3D11Device* device;ID3D11DeviceContext* context;
  HMODULE compiler=nullptr;Com<ID3D11VertexShader> vertex;Com<ID3D11PixelShader> pixel;
  Com<ID3D11Buffer> constants;Com<ID3D11SamplerState> sampler;Com<ID3D11BlendState> blend;
- Slot slots[3];Sampler textures;std::unique_ptr<NativeDisplay> display;uint64_t submitted=0,completed=0;int64_t completedFrame=-1,completedGeneration=-1;size_t peakPending=0;
- Renderer(const Plan& plan,HWND parent,bool offscreen){
+ std::vector<Slot> slots;Sampler textures;std::unique_ptr<NativeDisplay> display;uint64_t submitted=0,completed=0;int64_t completedFrame=-1,completedGeneration=-1;size_t peakPending=0;Distribution contextWait,submitTime,completionAge,gpuTime;
+ static size_t slotBudget(const Plan& plan){MEMORYSTATUSEX memory={};memory.dwLength=sizeof(memory);GlobalMemoryStatusEx(&memory);return memory.ullAvailPhys>6ULL*1024*1024*1024&&plan.width<=1920?6:memory.ullAvailPhys>3ULL*1024*1024*1024?4:3;}
+ static size_t cacheBudget(){MEMORYSTATUSEX memory={};memory.dwLength=sizeof(memory);GlobalMemoryStatusEx(&memory);return memory.ullAvailPhys>6ULL*1024*1024*1024?6:memory.ullAvailPhys>3ULL*1024*1024*1024?2:0;}
+ Renderer(const Plan& plan,HWND parent,bool offscreen):slots(slotBudget(plan)){
   avcheck(av_hwdevice_ctx_create(&hw,AV_HWDEVICE_TYPE_D3D11VA,nullptr,nullptr,0),"D3D11 hardware");
   hd=(AVD3D11VADeviceContext*)((AVHWDeviceContext*)hw->data)->hwctx;hd->BindFlags|=D3D11_BIND_SHADER_RESOURCE;device=hd->device;context=hd->device_context;
   compiler=LoadLibraryW(L"d3dcompiler_47.dll");if(!compiler)throw std::runtime_error("Shader compiler missing");
@@ -112,20 +117,25 @@ struct Renderer {
    check(device->CreateRenderTargetView(slot.image,nullptr,slot.target.out()),"Native float16 target");
    check(device->CreateShaderResourceView(slot.image,nullptr,slot.view.out()),"Native float16 view");
    D3D11_QUERY_DESC query={D3D11_QUERY_EVENT,0};check(device->CreateQuery(&query,slot.query.out()),"Native completion query");
+   query.Query=D3D11_QUERY_TIMESTAMP_DISJOINT;check(device->CreateQuery(&query,slot.disjoint.out()),"GPU timing");
+   query.Query=D3D11_QUERY_TIMESTAMP;check(device->CreateQuery(&query,slot.beginStamp.out()),"GPU start");check(device->CreateQuery(&query,slot.endStamp.out()),"GPU end");
   }
   if(!offscreen)display=std::make_unique<NativeDisplay>(device,parent,plan.width,plan.height,plan.hdr,compile);
  }
  Slot* available(){
-  DeviceLock lock(hd);Slot* free=nullptr;for(auto& slot:slots){
+  DeviceLock lock(hd,&contextWait);Slot* free=nullptr;for(auto& slot:slots){
    if(slot.pending){BOOL done=false;HRESULT result=context->GetData(slot.query,&done,sizeof(done),D3D11_ASYNC_GETDATA_DONOTFLUSH);check(result,"Native GPU completion");
-    if(result==S_OK){slot.pending=false;slot.holds.clear();completed++;
+    if(result==S_OK){completionAge.add(seconds(slot.queuedAt)*1000);
+     D3D11_QUERY_DATA_TIMESTAMP_DISJOINT data={};UINT64 begin=0,end=0;
+     if(context->GetData(slot.disjoint,&data,sizeof(data),D3D11_ASYNC_GETDATA_DONOTFLUSH)==S_OK&&!data.Disjoint&&data.Frequency&&context->GetData(slot.beginStamp,&begin,sizeof(begin),D3D11_ASYNC_GETDATA_DONOTFLUSH)==S_OK&&context->GetData(slot.endStamp,&end,sizeof(end),D3D11_ASYNC_GETDATA_DONOTFLUSH)==S_OK)gpuTime.add(1000.*(end-begin)/data.Frequency);
+     slot.pending=false;slot.holds.clear();completed++;
      if(slot.generation>completedGeneration){completedGeneration=slot.generation;completedFrame=slot.frame;}else if(slot.generation==completedGeneration)completedFrame=std::max(completedFrame,slot.frame);}}
    if(!slot.pending&&!free)free=&slot;
   }return free;
  }
  void drain(){auto start=Clock::now();while(true){available();bool pending=false;for(auto& s:slots)pending|=s.pending;if(!pending)return;if(seconds(start)>5)throw std::runtime_error("Native GPU completion timeout");Sleep(1);}}
  void draw(Slot& slot,const Plan& plan,int64_t frame,int64_t gen,const std::vector<std::pair<const Clip*,Frame>>& layers){
-  {DeviceLock lock(hd);float clear[4]={plan.hdr?0.f:16.f/255,plan.hdr?0.f:19.f/255,plan.hdr?0.f:26.f/255,1};context->ClearRenderTargetView(slot.target,clear);
+  auto began=Clock::now();{DeviceLock lock(hd,&contextWait);context->Begin(slot.disjoint);context->End(slot.beginStamp);float clear[4]={plan.hdr?0.f:16.f/255,plan.hdr?0.f:19.f/255,plan.hdr?0.f:26.f/255,1};context->ClearRenderTargetView(slot.target,clear);
   ID3D11RenderTargetView* rt=slot.target;context->OMSetRenderTargets(1,&rt,nullptr);context->OMSetBlendState(blend,nullptr,0xffffffff);
   D3D11_VIEWPORT vp={0,0,(float)plan.width,(float)plan.height,0,1};context->RSSetViewports(1,&vp);context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
   context->VSSetShader(vertex,nullptr,0);context->PSSetShader(pixel,nullptr,0);ID3D11SamplerState* samp=sampler;context->PSSetSamplers(0,1,&samp);ID3D11Buffer* cb=constants;context->PSSetConstantBuffers(0,1,&cb);
@@ -149,10 +159,11 @@ struct Renderer {
    ID3D11ShaderResourceView* srv[2]={view.first,view.second};context->PSSetShaderResources(0,2,srv);context->UpdateSubresource(constants,0,nullptr,&p,0,0);context->Draw(3,0);
    ID3D11ShaderResourceView* empty[2]={};context->PSSetShaderResources(0,2,empty);slot.holds.push_back(layer.second);
   }
+  context->End(slot.endStamp);context->End(slot.disjoint);
   if(display)display->present(context,slot.view);
-  context->End(slot.query);context->Flush();slot.pending=true;slot.frame=frame;slot.generation=gen;submitted++;
+  context->End(slot.query);context->Flush();slot.queuedAt=Clock::now();slot.pending=true;slot.frame=frame;slot.generation=gen;submitted++;
   size_t pending=0;for(auto& s:slots)pending+=s.pending;peakPending=std::max(peakPending,pending);}
-  if(display)display->flip();
+  submitTime.add(seconds(began)*1000);if(display)display->flip();
  }
  void capture(Slot& slot,const std::string& path){
   drain();DeviceLock lock(hd);D3D11_TEXTURE2D_DESC d;slot.image->GetDesc(&d);d.BindFlags=0;d.Usage=D3D11_USAGE_STAGING;d.CPUAccessFlags=D3D11_CPU_ACCESS_READ;

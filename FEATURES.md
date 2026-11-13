@@ -2,9 +2,18 @@
 
 Tested means the specific check in VERIFICATION.md passed. Implemented means code is available with further acceptance coverage needed. Partial identifies implemented behavior with material gaps. Missing identifies an unavailable capability. A test result qualifies its fixture and environment.
 
-3.4.6 adds an opt-in experimental native preview. The existing full FFmpeg renderer/exporter remains. [Current native scope and fallback matrix](docs/NATIVE_PLAYBACK_3_4_6.md), [verification](VERIFICATION.md) and historical [3.4.5 benchmarks](docs/ENGINE_BENCHMARKS.md) distinguish working behavior from remaining acceptance gates.
+3.4.7 refines the opt-in native preview. [Workstation and performance framework scope](docs/WORKSTATION_OPTIMIZATION_3_4_7.md) documents the candidate and its qualification limits. The 3.4.6 matrix below is a historical checkpoint. The existing full FFmpeg renderer/exporter remains. [Current native scope and fallback matrix](docs/NATIVE_PLAYBACK_3_4_6.md), [verification](VERIFICATION.md) and historical [3.4.5 benchmarks](docs/ENGINE_BENCHMARKS.md) distinguish working behavior from remaining acceptance gates.
 
-| Native 3.4.6 capability | Status | Verification / gap |
+| 3.4.7 capability | Status | Verified scope / remaining limits |
+|---|---|---|
+| Deadline scheduler and original-frame cache | Tested subset | 61 Python +11 JS, exact cached PTS, 600 s /7,200 clips; 59.87 distinct FPS and62 skips at 540p. Native remains experimental. |
+| Hardware diagnostics | Tested subset | Actual whitelisted CPU/GPU/memory/storage/DPI/power, bounded128MiB storage, owned process cancellation and reversible preview suggestion. Thermals/NPU inference and other machines unqualified. |
+| Native monitor quality / DPI | Partial | Manual540p–2160p and175% measured-client layout; dimensions/source mode explicit. Seamless adaptive resolution/upscaling not adopted. |
+| Performance regression framework | Implemented, tested locally | QUICK/STANDARD/FULL, compatible repeated comparisons and CI source-evidence fingerprint. Hosted CI cannot qualify GPU execution. |
+| Real source/end timing | Tested subset | Two complete Galaxy-owner-identified HDR recordings and full Google Earth animation; exact sample budgets, zero underruns, bounded VFR/cached PTS checks. Acoustic/calibrated HDR/mixed working spaces remain open. |
+| Frame interpolation | Missing in product | Isolated CPU360p MCI ~22FPS; rejected. No generated frames in preview/inspection/export. |
+
+| Native 3.4.6 checkpoint capability | Status | Verification / gap |
 |---|---|---|
 | Continuous D3D11 preview | Partial, tested subset | Async original H.264/HEVC decode; queues 4/source, GPU ring 3, max 3 active decoders. 125 s / 1,500 clips completed, ~57.2 presented FPS at 540p, 345 skipped frames; no 60 FPS qualification. |
 | PCM/audio clock | Tested subset | Exact 6,000,000 samples in 125 s, zero underruns; mono/stereo only, source offsets retained. Acoustic/hour-long/device-change drift pending. |

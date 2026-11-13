@@ -1,0 +1,37 @@
+{
+  "compatible": true,
+  "metrics": {
+    "present_fps": {
+      "baseline_median": 57.71498512384867,
+      "candidate_median": 59.665518505417225,
+      "change_percent": 3.379596091696065,
+      "baseline_range": [
+        56.76769355673825,
+        57.828548780700125
+      ],
+      "candidate_range": [
+        57.83210708808839,
+        59.795973295869956
+      ],
+      "investigate": false,
+      "repeated": true
+    },
+    "first_frame_ms": {
+      "baseline_median": 997.9511999990791,
+      "candidate_median": 933.8361999980407,
+      "change_percent": -6.424662849355518,
+      "baseline_range": [
+        965.6644999995478,
+        1038.2451999976183
+      ],
+      "candidate_range": [
+        827.327700004389,
+        979.5955000008689
+      ],
+      "investigate": false,
+      "repeated": true
+    }
+  },
+  "investigate": false,
+  "interpretation": "Investigation trigger, not automatic failure; inspect variation, quality and completeness"
+}

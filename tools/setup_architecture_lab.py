@@ -44,6 +44,8 @@ def build(folder):
  subprocess.run(cmd,cwd=ROOT,check=True)
  player=list(cmd);player[player.index(str(ROOT/'experiments/native_d3d11/main.cpp'))]=str(ROOT/'native/player.cpp');player[-1]=str(folder/'VlogCraftNative.exe')
  subprocess.run(player,cwd=ROOT,check=True)
+ probe=list(cmd);probe[probe.index(str(ROOT/'experiments/native_d3d11/main.cpp'))]=str(ROOT/'native/workstation.cpp');probe[-1]=str(folder/'VlogCraftProbe.exe');probe.insert(-2,'-ldwmapi');subprocess.run(probe,cwd=ROOT,check=True)
+ subprocess.run([str(zig),'c++','-std=c++17','-O2','-target','x86_64-windows-gnu','-municode',str(ROOT/'native/storage_probe.cpp'),'-o',str(folder/'VlogCraftStorageProbe.exe')],cwd=ROOT,check=True)
  print(json.dumps({'native_binary_sha256':digest(folder/'native_d3d11.exe'),'player_binary_sha256':digest(folder/'VlogCraftNative.exe')}),flush=True)
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('--component',choices=list(SPECS),action='append');p.add_argument('--build-native',action='store_true')

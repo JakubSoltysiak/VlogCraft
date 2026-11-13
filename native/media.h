@@ -28,8 +28,9 @@ extern "C" {
 }
 using Clock=std::chrono::steady_clock;
 double seconds(Clock::time_point a){return std::chrono::duration<double>(Clock::now()-a).count();}
-void check(HRESULT h,const char* label){if(FAILED(h)){char b[200];snprintf(b,sizeof(b),"%s HRESULT=0x%08lx",label,(unsigned long)h);throw std::runtime_error(b);}}
-void avcheck(int h,const char* label){if(h<0){char e[256];av_strerror(h,e,sizeof(e));throw std::runtime_error(std::string(label)+": "+e);}}
+thread_local HRESULT nativeHResult=S_OK;thread_local int nativeAVError=0;
+void check(HRESULT h,const char* label){if(FAILED(h)){nativeHResult=h;char b[200];snprintf(b,sizeof(b),"%s HRESULT=0x%08lx",label,(unsigned long)h);throw std::runtime_error(b);}}
+void avcheck(int h,const char* label){if(h<0){nativeAVError=h;char e[256];av_strerror(h,e,sizeof(e));throw std::runtime_error(std::string(label)+": "+e);}}
 template<class T> struct Com {
     T* p=nullptr;~Com(){if(p)p->Release();}T** out(){if(p){p->Release();p=nullptr;}return &p;}
     T* operator->()const{return p;}operator T*()const{return p;}
@@ -45,7 +46,7 @@ struct Decoder {
     std::vector<unsigned char> packed;Com<ID3D11Texture2D> uploaded;
     std::map<std::pair<ID3D11Texture2D*,int>,std::pair<ID3D11ShaderResourceView*,ID3D11ShaderResourceView*>> views;
     double decode_s=0,transfer_s=0,upload_s=0;int frames=0;bool direct=false;
-    Decoder(const std::string& path,AVBufferRef* hw,bool useHardware){
+    Decoder(const std::string& path,AVBufferRef* hw,bool useHardware,int extraHardwareFrames=8){
         if(!std::filesystem::is_regular_file(std::filesystem::u8path(path)))throw std::runtime_error("A local media file is required");
         AVDictionary* options=nullptr;av_dict_set(&options,"protocol_whitelist","file",0);
         int opened=avformat_open_input(&file,path.c_str(),nullptr,&options);av_dict_free(&options);avcheck(opened,"open");
@@ -53,7 +54,7 @@ struct Decoder {
         stream=av_find_best_stream(file,AVMEDIA_TYPE_VIDEO,-1,-1,nullptr,0);avcheck(stream,"video stream");
         auto decoder=avcodec_find_decoder(file->streams[stream]->codecpar->codec_id);
         codec=avcodec_alloc_context3(decoder);avcheck(avcodec_parameters_to_context(codec,file->streams[stream]->codecpar),"parameters");
-        codec->thread_count=1;codec->extra_hw_frames=8;
+        codec->thread_count=1;codec->extra_hw_frames=extraHardwareFrames;
         if(useHardware){codec->hw_device_ctx=av_buffer_ref(hw);codec->get_format=hardware_format;}
         avcheck(avcodec_open2(codec,decoder,nullptr),"codec open");
     }

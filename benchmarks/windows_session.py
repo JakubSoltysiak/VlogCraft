@@ -16,6 +16,7 @@ def session(executable,results,*,offline=False):
         if offline:env['WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS']+=' --proxy-server=http://127.0.0.1:9 --proxy-bypass-list="127.0.0.1;localhost"'
         cmd=[str(executable.resolve())]
         if executable.stem.lower() in ('python','pythonw'):cmd.append(str(ROOT/'desktop.py'))
+        launch_started=time.perf_counter()
         with (results/'host.log').open('w',encoding='utf8') as log:
             process=subprocess.Popen([*cmd,'--project',str(project)],env=env,stdout=log,stderr=log)
             try:
@@ -33,6 +34,7 @@ def session(executable,results,*,offline=False):
                     page=next(p for p in context.pages if p.url.startswith('http://127.0.0.1:'))
                     page.set_default_timeout(120000)
                     page.wait_for_function("state?.desktop && document.documentElement.classList.contains('native-ready')")
+                    page._vlogcraft_launch_seconds=time.perf_counter()-launch_started
                     page.set_viewport_size({'width':1440,'height':850})
                     errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
                     yield page,process,project,errors
