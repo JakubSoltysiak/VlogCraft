@@ -1,0 +1,106 @@
+{
+  "measured_seconds": 70.00430000001192,
+  "video_frame_callbacks": 3639,
+  "presented_callback_fps": 51.98252107369662,
+  "browser_total_video_frames": 4164,
+  "browser_dropped_video_frames": 551,
+  "buffering_seconds": 0.0925,
+  "playhead_advanced_seconds": 69.938667,
+  "first_measured_playhead": 0.301333,
+  "reached_sequence_end": false,
+  "video_callback_gap_p95_ms": 20.099999999998545,
+  "peak_meter_db": -26.016367165235152,
+  "cache_requests": {
+    "hits": 0,
+    "misses": 10
+  },
+  "resources": {
+    "duration_seconds": 70.469,
+    "gpu": {
+      "peak_process_gpu_memory_MiB": {
+        "Dedicated Usage": 51.49,
+        "Shared Usage": 290.79
+      },
+      "memory_counter_errors": {},
+      "samples": 563,
+      "unavailable": null,
+      "peak_engine_percent": {
+        "3D": 0,
+        "Copy": 3.64,
+        "Compute 0": 0,
+        "Timer 0": 0,
+        "Security 1": 0,
+        "Video JPEG 0": 0,
+        "Video Processor": 4.14,
+        "Video Codec Engine": 0
+      },
+      "mean_engine_percent": {
+        "3D": 0.0,
+        "Copy": 0.09,
+        "Compute 0": 0.0,
+        "Timer 0": 0.0,
+        "Security 1": 0.0,
+        "Video JPEG 0": 0.0,
+        "Video Processor": 3.04,
+        "Video Codec Engine": 0.0
+      }
+    },
+    "average_cpu_machine_percent": 6.6,
+    "peak_summed_working_set_MiB": 1354.0,
+    "sampled_cpu_seconds": 111.62,
+    "process_read_MiB": 426.9,
+    "process_write_MiB": 250.5
+  },
+  "working_set_history": [
+    {
+      "seconds": 0.015,
+      "summed_working_set_MiB": 923.7
+    },
+    {
+      "seconds": 10.047,
+      "summed_working_set_MiB": 1216.06
+    },
+    {
+      "seconds": 20.062,
+      "summed_working_set_MiB": 1034.72
+    },
+    {
+      "seconds": 30.078,
+      "summed_working_set_MiB": 1079.47
+    },
+    {
+      "seconds": 40.109,
+      "summed_working_set_MiB": 1071.76
+    },
+    {
+      "seconds": 50.14,
+      "summed_working_set_MiB": 1298.45
+    },
+    {
+      "seconds": 60.156,
+      "summed_working_set_MiB": 1099.27
+    },
+    {
+      "seconds": 70.187,
+      "summed_working_set_MiB": 1110.87
+    }
+  ],
+  "first_program_ready_seconds": 2.320290700008627,
+  "engine": "rendered",
+  "source_files": 32,
+  "source_resolution": [
+    1280,
+    720
+  ],
+  "source_rate": "60/1",
+  "proxy_mode": false,
+  "program_resolution": [
+    960,
+    540
+  ],
+  "timeline_clips": 1500,
+  "timeline_seconds": 600,
+  "browser_errors": [],
+  "final_complete_cache_files": 10,
+  "final_complete_cache_bytes": 49709854
+}

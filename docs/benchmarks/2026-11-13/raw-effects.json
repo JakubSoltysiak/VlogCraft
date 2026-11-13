@@ -1,0 +1,22 @@
+{
+  "completed_frames": 24,
+  "first_canvas_frame_seconds": 0.469,
+  "total_seconds": 2.409899999976158,
+  "canvas_completed_fps": 9.958919457337416,
+  "audio": false,
+  "temporary_encoded_files": false,
+  "physical_presentation_qualified": false,
+  "capture": true,
+  "first_raw_frame_seconds": 0.4573320000199601,
+  "producer_stream_seconds": 2.4351129999849945,
+  "resources": {
+    "duration_seconds": 4.704,
+    "gpu": null,
+    "average_cpu_machine_percent": 5.79,
+    "peak_summed_working_set_MiB": 1036.1,
+    "sampled_cpu_seconds": 6.53,
+    "process_read_MiB": 76.2,
+    "process_write_MiB": 57.5
+  },
+  "canvas_upload_mean_absolute_error": 0.0
+}

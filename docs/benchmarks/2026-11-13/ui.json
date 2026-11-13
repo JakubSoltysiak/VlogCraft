@@ -1,0 +1,100 @@
+{
+  "operations": {
+    "interval_index": {
+      "synchronous_ms": {
+        "median": 0.19999998807907104,
+        "p95": 0.3999999761581421,
+        "max": 0.5
+      },
+      "through_next_frame_ms": {
+        "median": 33.30000001192093,
+        "p95": 34.30000001192093,
+        "max": 34.5
+      }
+    },
+    "visible_timeline": {
+      "synchronous_ms": {
+        "median": 4.900000035762787,
+        "p95": 9.699999988079071,
+        "max": 11.199999988079071
+      },
+      "through_next_frame_ms": {
+        "median": 33.30000001192093,
+        "p95": 33.60000002384186,
+        "max": 33.69999998807907
+      }
+    },
+    "clip_selection": {
+      "synchronous_ms": {
+        "median": 1.9000000357627869,
+        "p95": 2.399999976158142,
+        "max": 3.400000035762787
+      },
+      "through_next_frame_ms": {
+        "median": 33.30000001192093,
+        "p95": 33.60000002384186,
+        "max": 104
+      }
+    },
+    "zoom": {
+      "synchronous_ms": {
+        "median": 4.899999976158142,
+        "p95": 6.600000023841858,
+        "max": 10.199999988079071
+      },
+      "through_next_frame_ms": {
+        "median": 33.30000001192093,
+        "p95": 33.60000002384186,
+        "max": 33.69999998807907
+      }
+    },
+    "scroll": {
+      "synchronous_ms": {
+        "median": 6,
+        "p95": 7.800000011920929,
+        "max": 7.899999976158142
+      },
+      "through_next_frame_ms": {
+        "median": 33.39999997615814,
+        "p95": 35.30000001192093,
+        "max": 64.09999996423721
+      }
+    },
+    "media_library": {
+      "synchronous_ms": {
+        "median": 1.5,
+        "p95": 2.199999988079071,
+        "max": 2.200000047683716
+      },
+      "through_next_frame_ms": {
+        "median": 33.30000001192093,
+        "p95": 34.19999998807907,
+        "max": 34.69999998807907
+      }
+    },
+    "inspector": {
+      "synchronous_ms": {
+        "median": 1.7000000476837158,
+        "p95": 2.800000011920929,
+        "max": 2.800000011920929
+      },
+      "through_next_frame_ms": {
+        "median": 33.30000001192093,
+        "p95": 34,
+        "max": 34.39999997615814
+      }
+    }
+  },
+  "clips": 1500,
+  "assets": 32,
+  "sequence_seconds": 600,
+  "visible_clip_nodes": 110,
+  "dpr": 1.0000000447034836,
+  "viewport": [
+    1440,
+    850
+  ],
+  "import_and_cache_settle_seconds": 4.1957464999868535,
+  "browser_errors": [],
+  "sources": "32 independent allocated generated 720p60 H264/AAC, 2 seconds each"
+}

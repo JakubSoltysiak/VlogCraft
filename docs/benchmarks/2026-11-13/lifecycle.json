@@ -1,0 +1,11 @@
+{
+  "upgrade_exit": 0,
+  "upgrade_preserved_projects_settings": true,
+  "uninstall_exit": 0,
+  "uninstall_preserved_projects_settings": true,
+  "removed_executable_shortcuts": true,
+  "reinstall_exit": 0,
+  "reinstall_preserved_projects_settings": true,
+  "protected_file_count": 1,
+  "msi_sha256": "e2ec33ba5649ce2e43f95092efe2d370f8eb7c4e81dac9231ee78b6fb810a189"
+}

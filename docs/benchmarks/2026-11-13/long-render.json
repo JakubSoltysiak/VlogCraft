@@ -1,0 +1,42 @@
+{
+  "timeline_seconds": 600,
+  "timeline_clips": 1500,
+  "distinct_source_files": 32,
+  "source_resolution": [
+    1280,
+    720
+  ],
+  "output_resolution": [
+    320,
+    180
+  ],
+  "rate": "60/1",
+  "seconds": 269.463636600005,
+  "decoded_video_frames": 36000,
+  "decoded_audio_sample_frames": 28800000,
+  "expected_audio_samples": 28800000,
+  "audio_end_error_seconds": 0.0,
+  "audio_stream_duration": "600.000000",
+  "file_bytes": 52612315,
+  "resources": {
+    "duration_seconds": 269.094,
+    "gpu": {
+      "peak_process_gpu_memory_MiB": {
+        "Dedicated Usage": 0.0,
+        "Shared Usage": 0.0
+      },
+      "memory_counter_errors": {},
+      "samples": 2128,
+      "unavailable": null,
+      "peak_engine_percent": {},
+      "mean_engine_percent": {}
+    },
+    "average_cpu_machine_percent": 2.29,
+    "peak_summed_working_set_MiB": 100.5,
+    "sampled_cpu_seconds": 147.72,
+    "process_read_MiB": 673.7,
+    "process_write_MiB": 135.9
+  },
+  "source_sha256_unchanged": true,
+  "qualification": "frame/sample counts and complete decoding; not acoustic synchronization or 4K endurance"
+}

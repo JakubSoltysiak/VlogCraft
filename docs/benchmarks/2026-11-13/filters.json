@@ -1,0 +1,167 @@
+{
+  "width": 960,
+  "frames": 120,
+  "repeat": 3,
+  "variants": {
+    "decode": {
+      "runs": [
+        {
+          "output": "-",
+          "seconds": 1.786074,
+          "exit": 0,
+          "ffmpeg_user_s": 1.688,
+          "ffmpeg_system_s": 0.047,
+          "ffmpeg_runtime_s": 1.704,
+          "ffmpeg_peak_rss_MiB": 120.58
+        },
+        {
+          "output": "-",
+          "seconds": 1.723937,
+          "exit": 0,
+          "ffmpeg_user_s": 1.609,
+          "ffmpeg_system_s": 0.062,
+          "ffmpeg_runtime_s": 1.666,
+          "ffmpeg_peak_rss_MiB": 120.22
+        },
+        {
+          "output": "-",
+          "seconds": 1.722859,
+          "exit": 0,
+          "ffmpeg_user_s": 1.672,
+          "ffmpeg_system_s": 0.062,
+          "ffmpeg_runtime_s": 1.665,
+          "ffmpeg_peak_rss_MiB": 120.59
+        }
+      ],
+      "median_seconds": 1.723937
+    },
+    "scale": {
+      "runs": [
+        {
+          "output": "-",
+          "seconds": 1.727571,
+          "exit": 0,
+          "ffmpeg_user_s": 1.953,
+          "ffmpeg_system_s": 0.125,
+          "ffmpeg_runtime_s": 1.668,
+          "ffmpeg_peak_rss_MiB": 122.14
+        },
+        {
+          "output": "-",
+          "seconds": 1.747262,
+          "exit": 0,
+          "ffmpeg_user_s": 2.125,
+          "ffmpeg_system_s": 0.047,
+          "ffmpeg_runtime_s": 1.686,
+          "ffmpeg_peak_rss_MiB": 122.97
+        },
+        {
+          "output": "-",
+          "seconds": 1.762019,
+          "exit": 0,
+          "ffmpeg_user_s": 2.016,
+          "ffmpeg_system_s": 0.078,
+          "ffmpeg_runtime_s": 1.706,
+          "ffmpeg_peak_rss_MiB": 122.16
+        }
+      ],
+      "median_seconds": 1.747262
+    },
+    "rgba": {
+      "runs": [
+        {
+          "output": "-",
+          "seconds": 1.75156,
+          "exit": 0,
+          "ffmpeg_user_s": 2.047,
+          "ffmpeg_system_s": 0.141,
+          "ffmpeg_runtime_s": 1.692,
+          "ffmpeg_peak_rss_MiB": 124.95
+        },
+        {
+          "output": "-",
+          "seconds": 1.783117,
+          "exit": 0,
+          "ffmpeg_user_s": 2.188,
+          "ffmpeg_system_s": 0.172,
+          "ffmpeg_runtime_s": 1.725,
+          "ffmpeg_peak_rss_MiB": 124.87
+        },
+        {
+          "output": "-",
+          "seconds": 1.759057,
+          "exit": 0,
+          "ffmpeg_user_s": 2.141,
+          "ffmpeg_system_s": 0.031,
+          "ffmpeg_runtime_s": 1.699,
+          "ffmpeg_peak_rss_MiB": 124.93
+        }
+      ],
+      "median_seconds": 1.759057
+    },
+    "rotation": {
+      "runs": [
+        {
+          "output": "-",
+          "seconds": 1.775096,
+          "exit": 0,
+          "ffmpeg_user_s": 3.016,
+          "ffmpeg_system_s": 0.125,
+          "ffmpeg_runtime_s": 1.713,
+          "ffmpeg_peak_rss_MiB": 133.13
+        },
+        {
+          "output": "-",
+          "seconds": 1.747881,
+          "exit": 0,
+          "ffmpeg_user_s": 2.922,
+          "ffmpeg_system_s": 0.047,
+          "ffmpeg_runtime_s": 1.692,
+          "ffmpeg_peak_rss_MiB": 133.41
+        },
+        {
+          "output": "-",
+          "seconds": 1.783903,
+          "exit": 0,
+          "ffmpeg_user_s": 2.984,
+          "ffmpeg_system_s": 0.125,
+          "ffmpeg_runtime_s": 1.727,
+          "ffmpeg_peak_rss_MiB": 132.83
+        }
+      ],
+      "median_seconds": 1.775096
+    },
+    "mask": {
+      "runs": [
+        {
+          "output": "-",
+          "seconds": 20.973431,
+          "exit": 0,
+          "ffmpeg_user_s": 22.016,
+          "ffmpeg_system_s": 0.281,
+          "ffmpeg_runtime_s": 20.911,
+          "ffmpeg_peak_rss_MiB": 141.95
+        },
+        {
+          "output": "-",
+          "seconds": 20.707944,
+          "exit": 0,
+          "ffmpeg_user_s": 21.609,
+          "ffmpeg_system_s": 0.406,
+          "ffmpeg_runtime_s": 20.649,
+          "ffmpeg_peak_rss_MiB": 141.49
+        },
+        {
+          "output": "-",
+          "seconds": 21.128934,
+          "exit": 0,
+          "ffmpeg_user_s": 22.172,
+          "ffmpeg_system_s": 0.344,
+          "ffmpeg_runtime_s": 21.064,
+          "ffmpeg_peak_rss_MiB": 141.8
+        }
+      ],
+      "median_seconds": 20.973431
+    }
+  }
+}

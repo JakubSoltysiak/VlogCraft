@@ -137,7 +137,7 @@ def save_state(candidate=None):
 
 def probe(path):
     p=subprocess.run(['ffprobe','-v','error','-show_entries',
-                      'format=format_name,duration,start_time:stream=time_base,start_pts,duration_ts,avg_frame_rate,codec_type,codec_name,width,height,r_frame_rate,channels,color_transfer,color_primaries,color_space,pix_fmt',
+                      'format=format_name,duration,start_time:stream=time_base,start_pts,duration_ts,avg_frame_rate,codec_type,codec_name,width,height,r_frame_rate,channels,channel_layout,sample_rate,sample_aspect_ratio,bits_per_raw_sample,color_transfer,color_primaries,color_space,color_range,pix_fmt',
                       '-of','json',str(path)],capture_output=True,text=True,timeout=75)
     if p.returncode:raise ValueError(f'FFprobe could not read {Path(path).name}: {p.stderr[-500:]}')
     info=json.loads(p.stdout);streams=info.get('streams',[])
@@ -159,6 +159,10 @@ def probe(path):
             'width':(v or {}).get('width') or 0,
             'height':(v or {}).get('height') or 0,'hasAudio':bool(a),
             'codec':(v or a or {}).get('codec_name','unknown'),'fps':fps,
+            'pixelFormat':(v or {}).get('pix_fmt','unknown'),'sampleAspectRatio':(v or {}).get('sample_aspect_ratio','unknown'),
+            'colorPrimaries':(v or {}).get('color_primaries','unknown'),'colorSpace':(v or {}).get('color_space','unknown'),
+            'colorRange':(v or {}).get('color_range','unknown'),'audioChannels':(a or {}).get('channels'),
+            'audioChannelLayout':(a or {}).get('channel_layout'),'audioSampleRate':(a or {}).get('sample_rate'),
             'colorTransfer':(v or {}).get('color_transfer','unknown'),
             'hdr':(v or {}).get('color_transfer') in ('smpte2084','arib-std-b67')}
 

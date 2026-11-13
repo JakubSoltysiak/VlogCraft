@@ -1,0 +1,65 @@
+{
+  "resources": {
+    "duration_seconds": 6.312,
+    "gpu": null,
+    "average_cpu_machine_percent": 14.05,
+    "peak_summed_working_set_MiB": 1724.9,
+    "sampled_cpu_seconds": 21.28,
+    "process_read_MiB": 5061.4,
+    "process_write_MiB": 6.9
+  },
+  "drop_through_proxy_ready_seconds": 3.297,
+  "single_seek_seconds": 1.0,
+  "visual_RGB_differences": {
+    "linkBtn": 0.0,
+    "snapBtn": 0.0,
+    "previewSource": 0.0
+  },
+  "visual_capture_dpr": 1,
+  "native_dpr": 1,
+  "source_bytes": 4977125566,
+  "first_edited_packet_offset": 4578951204,
+  "native_drop_to_timeline_seconds": 0.656,
+  "proxy_monitor_distinct_byte_values": 107,
+  "decoded_rgb_mean_absolute_error": 0.052,
+  "export_seconds": 1.281,
+  "video_frames": 24,
+  "resolution": [
+    3840,
+    2160
+  ],
+  "rate": "60/1",
+  "audio_seconds": "0.400000",
+  "video_seconds": "0.400000",
+  "browser_errors": [],
+  "source_original_step": true,
+  "rendered_scope": true,
+  "curve_grade": true,
+  "linked_audio_nest_expand_undo": true,
+  "selected_frame_multitrack_pack": true,
+  "single_stream_composited_playback": true,
+  "ai_redo": true,
+  "multiple_large_native_paths": true,
+  "batch_independent_source": true,
+  "proxy_cancel_retry": true,
+  "batch_resources": {
+    "duration_seconds": 6.625,
+    "gpu": null,
+    "average_cpu_machine_percent": 22.27,
+    "peak_summed_working_set_MiB": 1593.7,
+    "sampled_cpu_seconds": 35.41,
+    "process_read_MiB": 10312.9,
+    "process_write_MiB": 5.5
+  },
+  "offline_network": {
+    "browser_external_fetch_blocked": true,
+    "loopback_allowed": true,
+    "python_socket_guard": false,
+    "media_process_proxy": "closed loopback port",
+    "os_firewall_test": false
+  },
+  "installed_motion_apply_undo": true,
+  "offline_proposal_approve_undo": true,
+  "source_monitor": true,
+  "project_reload": true
+}

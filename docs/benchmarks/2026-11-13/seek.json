@@ -1,0 +1,85 @@
+{
+  "initial_ready_seconds": 12.476485099992715,
+  "seeks": [
+    {
+      "kind": "cold-range",
+      "target_seconds": 9,
+      "seconds": 10.007429799996316
+    },
+    {
+      "kind": "current-range",
+      "target_seconds": 9.5,
+      "seconds": 0.0380509999813512
+    },
+    {
+      "kind": "cold-range",
+      "target_seconds": 17,
+      "seconds": 2.420071000000462
+    },
+    {
+      "kind": "current-range",
+      "target_seconds": 17.5,
+      "seconds": 0.028986699995584786
+    },
+    {
+      "kind": "cached-file-reopen",
+      "target_seconds": 9,
+      "seconds": 0.04949160001706332
+    },
+    {
+      "kind": "current-range",
+      "target_seconds": 9.5,
+      "seconds": 0.02900839998619631
+    },
+    {
+      "kind": "cached-file-reopen",
+      "target_seconds": 17,
+      "seconds": 0.049114599998574704
+    }
+  ],
+  "preview_requests": [
+    {
+      "id": "df645c6a7de6722a80a78b6ae5f75825445456a0bf5f966a6b9b1be704facfeb",
+      "cacheHit": false,
+      "start": 0,
+      "end": 8
+    },
+    {
+      "id": "6e64d8b621d7d55b876f94fee5ca10f37bd9f90e2e10742642e2a74a41737501",
+      "cacheHit": false,
+      "start": 8,
+      "end": 16
+    },
+    {
+      "id": "f45039ea32141101eec486f558d85bb70d2700a04b57df1eeec9586702d66900",
+      "cacheHit": false,
+      "start": 16,
+      "end": 18
+    },
+    {
+      "id": "6e64d8b621d7d55b876f94fee5ca10f37bd9f90e2e10742642e2a74a41737501",
+      "cacheHit": true,
+      "start": 8,
+      "end": 16
+    },
+    {
+      "id": "f45039ea32141101eec486f558d85bb70d2700a04b57df1eeec9586702d66900",
+      "cacheHit": true,
+      "start": 16,
+      "end": 18
+    }
+  ],
+  "source_files": 3,
+  "source_resolution": [
+    3840,
+    2160
+  ],
+  "source_rate": "60/1",
+  "program_resolution": [
+    960,
+    540
+  ],
+  "proxies": false,
+  "endpoint": "program media loaded and seek complete; not physical screen display",
+  "browser_errors": []
+}

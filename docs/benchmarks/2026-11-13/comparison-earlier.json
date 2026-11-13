@@ -1,0 +1,3141 @@
+{
+  "workload": "BT709 static scale/position/opacity, full 4K decode, no audio, no presentation",
+  "records": [
+    {
+      "engine": "ffmpeg",
+      "width": 960,
+      "height": 540,
+      "layers": 1,
+      "frames": 180,
+      "audio": false,
+      "presented": false,
+      "runs": [
+        {
+          "wall_seconds": 2.9640375000308268,
+          "first_output_frame_seconds": 0.46648000000277534,
+          "resources": {
+            "duration_seconds": 2.515,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 0.0,
+                "Shared Usage": 0.0
+              },
+              "memory_counter_errors": {},
+              "samples": 21,
+              "unavailable": null,
+              "peak_engine_percent": {},
+              "mean_engine_percent": {}
+            },
+            "average_cpu_machine_percent": 5.49,
+            "peak_summed_working_set_MiB": 125.6,
+            "sampled_cpu_seconds": 3.31,
+            "process_read_MiB": 15.3,
+            "process_write_MiB": 0.1
+          },
+          "frames": 180,
+          "composited_fps": 60.72797661909741
+        },
+        {
+          "wall_seconds": 2.593411699985154,
+          "first_output_frame_seconds": 0.11223259998951107,
+          "resources": {
+            "duration_seconds": 2.578,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 0.0,
+                "Shared Usage": 0.0
+              },
+              "memory_counter_errors": {},
+              "samples": 21,
+              "unavailable": null,
+              "peak_engine_percent": {},
+              "mean_engine_percent": {}
+            },
+            "average_cpu_machine_percent": 5.18,
+            "peak_summed_working_set_MiB": 125.7,
+            "sampled_cpu_seconds": 3.2,
+            "process_read_MiB": 16.3,
+            "process_write_MiB": 0.1
+          },
+          "frames": 180,
+          "composited_fps": 69.40664299502868
+        },
+        {
+          "wall_seconds": 2.6030491000274196,
+          "first_output_frame_seconds": 0.11305859999265522,
+          "resources": {
+            "duration_seconds": 2.593,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 0.0,
+                "Shared Usage": 0.0
+              },
+              "memory_counter_errors": {},
+              "samples": 21,
+              "unavailable": null,
+              "peak_engine_percent": {},
+              "mean_engine_percent": {}
+            },
+            "average_cpu_machine_percent": 5.12,
+            "peak_summed_working_set_MiB": 125.6,
+            "sampled_cpu_seconds": 3.19,
+            "process_read_MiB": 16.2,
+            "process_write_MiB": 0.1
+          },
+          "frames": 180,
+          "composited_fps": 69.14967527815897
+        }
+      ],
+      "median_full_wall_fps": 69.14967527815897,
+      "min_full_wall_fps": 60.72797661909741,
+      "max_full_wall_fps": 69.40664299502868
+    },
+    {
+      "engine": "mlt",
+      "width": 960,
+      "height": 540,
+      "layers": 1,
+      "frames": 180,
+      "audio": false,
+      "presented": false,
+      "runs": [
+        {
+          "wall_seconds": 11.197973100002855,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 11.187,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 0.0,
+                "Shared Usage": 0.0
+              },
+              "memory_counter_errors": {},
+              "samples": 90,
+              "unavailable": null,
+              "peak_engine_percent": {},
+              "mean_engine_percent": {}
+            },
+            "average_cpu_machine_percent": 5.21,
+            "peak_summed_working_set_MiB": 368.4,
+            "sampled_cpu_seconds": 14.0,
+            "process_read_MiB": 19.8,
+            "process_write_MiB": 0.0
+          },
+          "engine": "MLT C ABI",
+          "frames": 180,
+          "layers": 1,
+          "width": 960,
+          "audio": false,
+          "setup_seconds": 0.1583618000149727,
+          "first_frame_seconds": 0.3272302999976091,
+          "processing_seconds": 10.86063309997553,
+          "composited_fps": 16.573619451374853,
+          "seeks_seconds": [],
+          "audio_samples": 0,
+          "captures": [],
+          "presented": false
+        },
+        {
+          "wall_seconds": 11.177959900000133,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 11.156,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 0.0,
+                "Shared Usage": 0.0
+              },
+              "memory_counter_errors": {},
+              "samples": 90,
+              "unavailable": null,
+              "peak_engine_percent": {},
+              "mean_engine_percent": {}
+            },
+            "average_cpu_machine_percent": 5.26,
+            "peak_summed_working_set_MiB": 368.6,
+            "sampled_cpu_seconds": 14.08,
+            "process_read_MiB": 19.8,
+            "process_write_MiB": 0.0
+          },
+          "engine": "MLT C ABI",
+          "frames": 180,
+          "layers": 1,
+          "width": 960,
+          "audio": false,
+          "setup_seconds": 0.15938959998311475,
+          "first_frame_seconds": 0.3401043000048958,
+          "processing_seconds": 10.860414800001308,
+          "composited_fps": 16.573952589727817,
+          "seeks_seconds": [],
+          "audio_samples": 0,
+          "captures": [],
+          "presented": false
+        },
+        {
+          "wall_seconds": 11.069154499971773,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 11.063,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 0.0,
+                "Shared Usage": 0.0
+              },
+              "memory_counter_errors": {},
+              "samples": 89,
+              "unavailable": null,
+              "peak_engine_percent": {},
+              "mean_engine_percent": {}
+            },
+            "average_cpu_machine_percent": 5.33,
+            "peak_summed_working_set_MiB": 367.8,
+            "sampled_cpu_seconds": 14.14,
+            "process_read_MiB": 19.8,
+            "process_write_MiB": 0.0
+          },
+          "engine": "MLT C ABI",
+          "frames": 180,
+          "layers": 1,
+          "width": 960,
+          "audio": false,
+          "setup_seconds": 0.12405949999811128,
+          "first_frame_seconds": 0.2870427999878302,
+          "processing_seconds": 10.784416599955875,
+          "composited_fps": 16.690749873362318,
+          "seeks_seconds": [],
+          "audio_samples": 0,
+          "captures": [],
+          "presented": false
+        }
+      ],
+      "median_full_wall_fps": 16.103117349705098,
+      "min_full_wall_fps": 16.07433759596673,
+      "max_full_wall_fps": 16.26140460867711
+    },
+    {
+      "engine": "hardware",
+      "width": 960,
+      "height": 540,
+      "layers": 1,
+      "frames": 180,
+      "audio": false,
+      "presented": false,
+      "runs": [
+        {
+          "wall_seconds": 1.141853099979926,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 1.141,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 5.82,
+                "Shared Usage": 251.25
+              },
+              "memory_counter_errors": {},
+              "samples": 9,
+              "unavailable": null,
+              "peak_engine_percent": {
+                "3D": 0,
+                "Copy": 0,
+                "Compute 0": 0,
+                "Timer 0": 0,
+                "Security 1": 0,
+                "Video JPEG 0": 0,
+                "Video Processor": 0,
+                "Video Codec Engine": 0
+              },
+              "mean_engine_percent": {
+                "3D": 0.0,
+                "Copy": 0.0,
+                "Compute 0": 0.0,
+                "Timer 0": 0.0,
+                "Security 1": 0.0,
+                "Video JPEG 0": 0.0,
+                "Video Processor": 0.0,
+                "Video Codec Engine": 0.0
+              }
+            },
+            "average_cpu_machine_percent": 3.25,
+            "peak_summed_working_set_MiB": 391.3,
+            "sampled_cpu_seconds": 0.89,
+            "process_read_MiB": 15.0,
+            "process_write_MiB": 0.0
+          },
+          "mode": "hardware",
+          "layers": 1,
+          "width": 960,
+          "height": 540,
+          "frames": 180,
+          "setup_seconds": 0.0964585,
+          "first_frame_seconds": 0.163196,
+          "seek_seconds": 0,
+          "processing_seconds": 0.931477,
+          "composited_fps": 193.241,
+          "decode_api_seconds": 0.100171,
+          "transfer_seconds": 0,
+          "upload_seconds": 0,
+          "draw_submit_seconds": 0.001365,
+          "gpu_wait_seconds": 0.829862,
+          "float16_output": true,
+          "presented": false,
+          "audio": false
+        },
+        {
+          "wall_seconds": 0.9379086999688298,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 0.937,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 5.82,
+                "Shared Usage": 251.25
+              },
+              "memory_counter_errors": {},
+              "samples": 8,
+              "unavailable": null,
+              "peak_engine_percent": {
+                "3D": 0,
+                "Copy": 0,
+                "Compute 0": 0,
+                "Timer 0": 0,
+                "Security 1": 0,
+                "Video JPEG 0": 0,
+                "Video Processor": 0,
+                "Video Codec Engine": 0
+              },
+              "mean_engine_percent": {
+                "3D": 0.0,
+                "Copy": 0.0,
+                "Compute 0": 0.0,
+                "Timer 0": 0.0,
+                "Security 1": 0.0,
+                "Video JPEG 0": 0.0,
+                "Video Processor": 0.0,
+                "Video Codec Engine": 0.0
+              }
+            },
+            "average_cpu_machine_percent": 3.47,
+            "peak_summed_working_set_MiB": 391.6,
+            "sampled_cpu_seconds": 0.78,
+            "process_read_MiB": 15.6,
+            "process_write_MiB": 0.0
+          },
+          "mode": "hardware",
+          "layers": 1,
+          "width": 960,
+          "height": 540,
+          "frames": 180,
+          "setup_seconds": 0.0955841,
+          "first_frame_seconds": 0.158938,
+          "seek_seconds": 0,
+          "processing_seconds": 0.735625,
+          "composited_fps": 244.69,
+          "decode_api_seconds": 0.0909356,
+          "transfer_seconds": 0,
+          "upload_seconds": 0,
+          "draw_submit_seconds": 0.0010817,
+          "gpu_wait_seconds": 0.643542,
+          "float16_output": true,
+          "presented": false,
+          "audio": false
+        },
+        {
+          "wall_seconds": 1.1705542000127025,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 1.172,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 5.82,
+                "Shared Usage": 318.45
+              },
+              "memory_counter_errors": {},
+              "samples": 10,
+              "unavailable": null,
+              "peak_engine_percent": {
+                "3D": 0,
+                "Copy": 0,
+                "Compute 0": 0,
+                "Timer 0": 0,
+                "Security 1": 0,
+                "Video JPEG 0": 0,
+                "Video Processor": 0,
+                "Video Codec Engine": 0
+              },
+              "mean_engine_percent": {
+                "3D": 0.0,
+                "Copy": 0.0,
+                "Compute 0": 0.0,
+                "Timer 0": 0.0,
+                "Security 1": 0.0,
+                "Video JPEG 0": 0.0,
+                "Video Processor": 0.0,
+                "Video Codec Engine": 0.0
+              }
+            },
+            "average_cpu_machine_percent": 3.67,
+            "peak_summed_working_set_MiB": 391.5,
+            "sampled_cpu_seconds": 1.03,
+            "process_read_MiB": 15.6,
+            "process_write_MiB": 0.0
+          },
+          "mode": "hardware",
+          "layers": 1,
+          "width": 960,
+          "height": 540,
+          "frames": 180,
+          "setup_seconds": 0.0932419,
+          "first_frame_seconds": 0.157776,
+          "seek_seconds": 0,
+          "processing_seconds": 0.983183,
+          "composited_fps": 183.079,
+          "decode_api_seconds": 0.0988442,
+          "transfer_seconds": 0,
+          "upload_seconds": 0,
+          "draw_submit_seconds": 0.0013329,
+          "gpu_wait_seconds": 0.882908,
+          "float16_output": true,
+          "presented": false,
+          "audio": false
+        }
+      ],
+      "median_full_wall_fps": 157.6384913288447,
+      "min_full_wall_fps": 153.77331523653214,
+      "max_full_wall_fps": 191.91633471998082
+    },
+    {
+      "engine": "download",
+      "width": 960,
+      "height": 540,
+      "layers": 1,
+      "frames": 180,
+      "audio": false,
+      "presented": false,
+      "runs": [
+        {
+          "wall_seconds": 1.8192409999901429,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 1.813,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 6.77,
+                "Shared Usage": 494.11
+              },
+              "memory_counter_errors": {},
+              "samples": 15,
+              "unavailable": null,
+              "peak_engine_percent": {
+                "3D": 0,
+                "Copy": 0,
+                "Compute 0": 0,
+                "Timer 0": 0,
+                "Security 1": 0,
+                "Video JPEG 0": 0,
+                "Video Processor": 0,
+                "Video Codec Engine": 0
+              },
+              "mean_engine_percent": {
+                "3D": 0.0,
+                "Copy": 0.0,
+                "Compute 0": 0.0,
+                "Timer 0": 0.0,
+                "Security 1": 0.0,
+                "Video JPEG 0": 0.0,
+                "Video Processor": 0.0,
+                "Video Codec Engine": 0.0
+              }
+            },
+            "average_cpu_machine_percent": 2.77,
+            "peak_summed_working_set_MiB": 542.8,
+            "sampled_cpu_seconds": 1.2,
+            "process_read_MiB": 15.6,
+            "process_write_MiB": 0.0
+          },
+          "mode": "download",
+          "layers": 1,
+          "width": 960,
+          "height": 540,
+          "frames": 180,
+          "setup_seconds": 0.0916625,
+          "first_frame_seconds": 0.169571,
+          "seek_seconds": 0,
+          "processing_seconds": 1.58604,
+          "composited_fps": 113.49,
+          "decode_api_seconds": 0.117643,
+          "transfer_seconds": 0.876979,
+          "upload_seconds": 0.182294,
+          "draw_submit_seconds": 1.0622,
+          "gpu_wait_seconds": 0.405976,
+          "float16_output": true,
+          "presented": false,
+          "audio": false
+        },
+        {
+          "wall_seconds": 1.8538374000345357,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 1.828,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 6.77,
+                "Shared Usage": 494.11
+              },
+              "memory_counter_errors": {},
+              "samples": 15,
+              "unavailable": null,
+              "peak_engine_percent": {
+                "3D": 0,
+                "Copy": 0,
+                "Compute 0": 0,
+                "Timer 0": 0,
+                "Security 1": 0,
+                "Video JPEG 0": 0,
+                "Video Processor": 0,
+                "Video Codec Engine": 0
+              },
+              "mean_engine_percent": {
+                "3D": 0.0,
+                "Copy": 0.0,
+                "Compute 0": 0.0,
+                "Timer 0": 0.0,
+                "Security 1": 0.0,
+                "Video JPEG 0": 0.0,
+                "Video Processor": 0.0,
+                "Video Codec Engine": 0.0
+              }
+            },
+            "average_cpu_machine_percent": 2.67,
+            "peak_summed_working_set_MiB": 543.6,
+            "sampled_cpu_seconds": 1.17,
+            "process_read_MiB": 15.6,
+            "process_write_MiB": 0.0
+          },
+          "mode": "download",
+          "layers": 1,
+          "width": 960,
+          "height": 540,
+          "frames": 180,
+          "setup_seconds": 0.0957752,
+          "first_frame_seconds": 0.16723,
+          "seek_seconds": 0,
+          "processing_seconds": 1.57429,
+          "composited_fps": 114.337,
+          "decode_api_seconds": 0.115886,
+          "transfer_seconds": 0.873584,
+          "upload_seconds": 0.17783,
+          "draw_submit_seconds": 1.05444,
+          "gpu_wait_seconds": 0.403739,
+          "float16_output": true,
+          "presented": false,
+          "audio": false
+        },
+        {
+          "wall_seconds": 1.9166783000109717,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 1.906,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 6.77,
+                "Shared Usage": 494.11
+              },
+              "memory_counter_errors": {},
+              "samples": 16,
+              "unavailable": null,
+              "peak_engine_percent": {
+                "3D": 0,
+                "Copy": 0,
+                "Compute 0": 0,
+                "Timer 0": 0,
+                "Security 1": 0,
+                "Video JPEG 0": 0,
+                "Video Processor": 0,
+                "Video Codec Engine": 0
+              },
+              "mean_engine_percent": {
+                "3D": 0.0,
+                "Copy": 0.0,
+                "Compute 0": 0.0,
+                "Timer 0": 0.0,
+                "Security 1": 0.0,
+                "Video JPEG 0": 0.0,
+                "Video Processor": 0.0,
+                "Video Codec Engine": 0.0
+              }
+            },
+            "average_cpu_machine_percent": 2.73,
+            "peak_summed_working_set_MiB": 543.5,
+            "sampled_cpu_seconds": 1.25,
+            "process_read_MiB": 15.6,
+            "process_write_MiB": 0.0
+          },
+          "mode": "download",
+          "layers": 1,
+          "width": 960,
+          "height": 540,
+          "frames": 180,
+          "setup_seconds": 0.100061,
+          "first_frame_seconds": 0.184393,
+          "seek_seconds": 0,
+          "processing_seconds": 1.6568,
+          "composited_fps": 108.643,
+          "decode_api_seconds": 0.132715,
+          "transfer_seconds": 0.918854,
+          "upload_seconds": 0.183862,
+          "draw_submit_seconds": 1.10594,
+          "gpu_wait_seconds": 0.417935,
+          "float16_output": true,
+          "presented": false,
+          "audio": false
+        }
+      ],
+      "median_full_wall_fps": 97.09589416884498,
+      "min_full_wall_fps": 93.91247346984083,
+      "max_full_wall_fps": 98.94236112806125
+    },
+    {
+      "engine": "software",
+      "width": 960,
+      "height": 540,
+      "layers": 1,
+      "frames": 180,
+      "audio": false,
+      "presented": false,
+      "runs": [
+        {
+          "wall_seconds": 3.3717314999666996,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 3.359,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 3.64,
+                "Shared Usage": 338.41
+              },
+              "memory_counter_errors": {},
+              "samples": 27,
+              "unavailable": null,
+              "peak_engine_percent": {
+                "3D": 0,
+                "Copy": 0,
+                "Compute 0": 0,
+                "Timer 0": 0,
+                "Security 1": 0,
+                "Video JPEG 0": 0,
+                "Video Processor": 0,
+                "Video Codec Engine": 0
+              },
+              "mean_engine_percent": {
+                "3D": 0.0,
+                "Copy": 0.0,
+                "Compute 0": 0.0,
+                "Timer 0": 0.0,
+                "Security 1": 0.0,
+                "Video JPEG 0": 0.0,
+                "Video Processor": 0.0,
+                "Video Codec Engine": 0.0
+              }
+            },
+            "average_cpu_machine_percent": 3.76,
+            "peak_summed_working_set_MiB": 500.5,
+            "sampled_cpu_seconds": 3.03,
+            "process_read_MiB": 15.6,
+            "process_write_MiB": 0.0
+          },
+          "mode": "software",
+          "layers": 1,
+          "width": 960,
+          "height": 540,
+          "frames": 180,
+          "setup_seconds": 0.0889606,
+          "first_frame_seconds": 0.153483,
+          "seek_seconds": 0,
+          "processing_seconds": 3.15079,
+          "composited_fps": 57.1286,
+          "decode_api_seconds": 2.4664,
+          "transfer_seconds": 6.3e-06,
+          "upload_seconds": 0.178306,
+          "draw_submit_seconds": 0.182039,
+          "gpu_wait_seconds": 0.502103,
+          "float16_output": true,
+          "presented": false,
+          "audio": false
+        },
+        {
+          "wall_seconds": 3.4413153000059538,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 3.437,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 3.64,
+                "Shared Usage": 338.41
+              },
+              "memory_counter_errors": {},
+              "samples": 28,
+              "unavailable": null,
+              "peak_engine_percent": {
+                "3D": 0,
+                "Copy": 0,
+                "Compute 0": 0,
+                "Timer 0": 0,
+                "Security 1": 0,
+                "Video JPEG 0": 0,
+                "Video Processor": 0,
+                "Video Codec Engine": 0
+              },
+              "mean_engine_percent": {
+                "3D": 0.0,
+                "Copy": 0.0,
+                "Compute 0": 0.0,
+                "Timer 0": 0.0,
+                "Security 1": 0.0,
+                "Video JPEG 0": 0.0,
+                "Video Processor": 0.0,
+                "Video Codec Engine": 0.0
+              }
+            },
+            "average_cpu_machine_percent": 3.83,
+            "peak_summed_working_set_MiB": 500.1,
+            "sampled_cpu_seconds": 3.16,
+            "process_read_MiB": 15.6,
+            "process_write_MiB": 0.0
+          },
+          "mode": "software",
+          "layers": 1,
+          "width": 960,
+          "height": 540,
+          "frames": 180,
+          "setup_seconds": 0.0916076,
+          "first_frame_seconds": 0.166791,
+          "seek_seconds": 0,
+          "processing_seconds": 3.2327,
+          "composited_fps": 55.6809,
+          "decode_api_seconds": 2.53402,
+          "transfer_seconds": 5.8e-06,
+          "upload_seconds": 0.179309,
+          "draw_submit_seconds": 0.183091,
+          "gpu_wait_seconds": 0.515349,
+          "float16_output": true,
+          "presented": false,
+          "audio": false
+        },
+        {
+          "wall_seconds": 3.4045270000351593,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 3.391,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 3.64,
+                "Shared Usage": 338.41
+              },
+              "memory_counter_errors": {},
+              "samples": 28,
+              "unavailable": null,
+              "peak_engine_percent": {
+                "3D": 0,
+                "Copy": 0,
+                "Compute 0": 0,
+                "Timer 0": 0,
+                "Security 1": 0,
+                "Video JPEG 0": 0,
+                "Video Processor": 0,
+                "Video Codec Engine": 0
+              },
+              "mean_engine_percent": {
+                "3D": 0.0,
+                "Copy": 0.0,
+                "Compute 0": 0.0,
+                "Timer 0": 0.0,
+                "Security 1": 0.0,
+                "Video JPEG 0": 0.0,
+                "Video Processor": 0.0,
+                "Video Codec Engine": 0.0
+              }
+            },
+            "average_cpu_machine_percent": 3.9,
+            "peak_summed_working_set_MiB": 500.1,
+            "sampled_cpu_seconds": 3.17,
+            "process_read_MiB": 15.6,
+            "process_write_MiB": 0.0
+          },
+          "mode": "software",
+          "layers": 1,
+          "width": 960,
+          "height": 540,
+          "frames": 180,
+          "setup_seconds": 0.0934442,
+          "first_frame_seconds": 0.161161,
+          "seek_seconds": 0,
+          "processing_seconds": 3.21488,
+          "composited_fps": 55.9896,
+          "decode_api_seconds": 2.50198,
+          "transfer_seconds": 6.4e-06,
+          "upload_seconds": 0.189649,
+          "draw_submit_seconds": 0.193385,
+          "gpu_wait_seconds": 0.519252,
+          "float16_output": true,
+          "presented": false,
+          "audio": false
+        }
+      ],
+      "median_full_wall_fps": 52.87078058072123,
+      "min_full_wall_fps": 52.305582112655756,
+      "max_full_wall_fps": 53.38503377323424
+    },
+    {
+      "engine": "ffmpeg",
+      "width": 960,
+      "height": 540,
+      "layers": 3,
+      "frames": 180,
+      "audio": false,
+      "presented": false,
+      "runs": [
+        {
+          "wall_seconds": 5.760914299986325,
+          "first_output_frame_seconds": 0.28834339999593794,
+          "resources": {
+            "duration_seconds": 5.735,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 0.0,
+                "Shared Usage": 0.0
+              },
+              "memory_counter_errors": {},
+              "samples": 46,
+              "unavailable": null,
+              "peak_engine_percent": {},
+              "mean_engine_percent": {}
+            },
+            "average_cpu_machine_percent": 7.08,
+            "peak_summed_working_set_MiB": 336.5,
+            "sampled_cpu_seconds": 9.75,
+            "process_read_MiB": 47.6,
+            "process_write_MiB": 0.1
+          },
+          "frames": 180,
+          "composited_fps": 31.245040392360508
+        },
+        {
+          "wall_seconds": 5.761385900026653,
+          "first_output_frame_seconds": 0.2987708000000566,
+          "resources": {
+            "duration_seconds": 5.719,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 0.0,
+                "Shared Usage": 0.0
+              },
+              "memory_counter_errors": {},
+              "samples": 46,
+              "unavailable": null,
+              "peak_engine_percent": {},
+              "mean_engine_percent": {}
+            },
+            "average_cpu_machine_percent": 7.19,
+            "peak_summed_working_set_MiB": 335.9,
+            "sampled_cpu_seconds": 9.88,
+            "process_read_MiB": 47.9,
+            "process_write_MiB": 0.1
+          },
+          "frames": 180,
+          "composited_fps": 31.242482819831128
+        },
+        {
+          "wall_seconds": 5.742093299981207,
+          "first_output_frame_seconds": 0.2644665000261739,
+          "resources": {
+            "duration_seconds": 5.734,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 0.0,
+                "Shared Usage": 0.0
+              },
+              "memory_counter_errors": {},
+              "samples": 46,
+              "unavailable": null,
+              "peak_engine_percent": {},
+              "mean_engine_percent": {}
+            },
+            "average_cpu_machine_percent": 7.2,
+            "peak_summed_working_set_MiB": 335.9,
+            "sampled_cpu_seconds": 9.91,
+            "process_read_MiB": 47.6,
+            "process_write_MiB": 0.1
+          },
+          "frames": 180,
+          "composited_fps": 31.347453027380993
+        }
+      ],
+      "median_full_wall_fps": 31.245040392360508,
+      "min_full_wall_fps": 31.242482819831128,
+      "max_full_wall_fps": 31.347453027380993
+    },
+    {
+      "engine": "mlt",
+      "width": 960,
+      "height": 540,
+      "layers": 3,
+      "frames": 180,
+      "audio": false,
+      "presented": false,
+      "runs": [
+        {
+          "wall_seconds": 29.006773500004783,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 28.984,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 0.0,
+                "Shared Usage": 0.0
+              },
+              "memory_counter_errors": {},
+              "samples": 232,
+              "unavailable": null,
+              "peak_engine_percent": {},
+              "mean_engine_percent": {}
+            },
+            "average_cpu_machine_percent": 4.38,
+            "peak_summed_working_set_MiB": 857.0,
+            "sampled_cpu_seconds": 30.44,
+            "process_read_MiB": 55.1,
+            "process_write_MiB": 0.0
+          },
+          "engine": "MLT C ABI",
+          "frames": 180,
+          "layers": 3,
+          "width": 960,
+          "audio": false,
+          "setup_seconds": 0.25034980004420504,
+          "first_frame_seconds": 0.7276315000490285,
+          "processing_seconds": 28.552439099992625,
+          "composited_fps": 6.304189963233176,
+          "seeks_seconds": [],
+          "audio_samples": 0,
+          "captures": [],
+          "presented": false
+        },
+        {
+          "wall_seconds": 28.99945200001821,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 29.0,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 0.0,
+                "Shared Usage": 0.0
+              },
+              "memory_counter_errors": {},
+              "samples": 232,
+              "unavailable": null,
+              "peak_engine_percent": {},
+              "mean_engine_percent": {}
+            },
+            "average_cpu_machine_percent": 4.47,
+            "peak_summed_working_set_MiB": 860.4,
+            "sampled_cpu_seconds": 31.12,
+            "process_read_MiB": 55.1,
+            "process_write_MiB": 0.0
+          },
+          "engine": "MLT C ABI",
+          "frames": 180,
+          "layers": 3,
+          "width": 960,
+          "audio": false,
+          "setup_seconds": 0.2841105000115931,
+          "first_frame_seconds": 0.7777362000197172,
+          "processing_seconds": 28.533311299979687,
+          "composited_fps": 6.308416086293081,
+          "seeks_seconds": [],
+          "audio_samples": 0,
+          "captures": [],
+          "presented": false
+        },
+        {
+          "wall_seconds": 29.101734400028363,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 29.062,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 0.0,
+                "Shared Usage": 0.0
+              },
+              "memory_counter_errors": {},
+              "samples": 233,
+              "unavailable": null,
+              "peak_engine_percent": {},
+              "mean_engine_percent": {}
+            },
+            "average_cpu_machine_percent": 4.34,
+            "peak_summed_working_set_MiB": 859.4,
+            "sampled_cpu_seconds": 30.27,
+            "process_read_MiB": 55.1,
+            "process_write_MiB": 0.0
+          },
+          "engine": "MLT C ABI",
+          "frames": 180,
+          "layers": 3,
+          "width": 960,
+          "audio": false,
+          "setup_seconds": 0.24776940001174808,
+          "first_frame_seconds": 0.7490493999794126,
+          "processing_seconds": 28.613679800007958,
+          "composited_fps": 6.290697360776014,
+          "seeks_seconds": [],
+          "audio_samples": 0,
+          "captures": [],
+          "presented": false
+        }
+      ],
+      "median_full_wall_fps": 6.205447151851285,
+      "min_full_wall_fps": 6.185198363978766,
+      "max_full_wall_fps": 6.207013842878375
+    },
+    {
+      "engine": "hardware",
+      "width": 960,
+      "height": 540,
+      "layers": 3,
+      "frames": 180,
+      "audio": false,
+      "presented": false,
+      "runs": [
+        {
+          "wall_seconds": 2.0696707000024617,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 2.062,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 10.47,
+                "Shared Usage": 731.1
+              },
+              "memory_counter_errors": {},
+              "samples": 17,
+              "unavailable": null,
+              "peak_engine_percent": {
+                "3D": 0,
+                "Copy": 0,
+                "Compute 0": 0,
+                "Timer 0": 0,
+                "Security 1": 0,
+                "Video JPEG 0": 0,
+                "Video Processor": 0,
+                "Video Codec Engine": 0
+              },
+              "mean_engine_percent": {
+                "3D": 0.0,
+                "Copy": 0.0,
+                "Compute 0": 0.0,
+                "Timer 0": 0.0,
+                "Security 1": 0.0,
+                "Video JPEG 0": 0.0,
+                "Video Processor": 0.0,
+                "Video Codec Engine": 0.0
+              }
+            },
+            "average_cpu_machine_percent": 3.5,
+            "peak_summed_working_set_MiB": 740.7,
+            "sampled_cpu_seconds": 1.73,
+            "process_read_MiB": 45.7,
+            "process_write_MiB": 0.0
+          },
+          "mode": "hardware",
+          "layers": 3,
+          "width": 960,
+          "height": 540,
+          "frames": 180,
+          "setup_seconds": 0.135754,
+          "first_frame_seconds": 0.349704,
+          "seek_seconds": 0,
+          "processing_seconds": 1.77535,
+          "composited_fps": 101.389,
+          "decode_api_seconds": 0.297097,
+          "transfer_seconds": 0,
+          "upload_seconds": 0,
+          "draw_submit_seconds": 0.0016671,
+          "gpu_wait_seconds": 1.47646,
+          "float16_output": true,
+          "presented": false,
+          "audio": false
+        },
+        {
+          "wall_seconds": 2.11847340001259,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 2.078,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 10.47,
+                "Shared Usage": 731.1
+              },
+              "memory_counter_errors": {},
+              "samples": 17,
+              "unavailable": null,
+              "peak_engine_percent": {
+                "3D": 0,
+                "Copy": 0,
+                "Compute 0": 0,
+                "Timer 0": 0,
+                "Security 1": 0,
+                "Video JPEG 0": 0,
+                "Video Processor": 0,
+                "Video Codec Engine": 0
+              },
+              "mean_engine_percent": {
+                "3D": 0.0,
+                "Copy": 0.0,
+                "Compute 0": 0.0,
+                "Timer 0": 0.0,
+                "Security 1": 0.0,
+                "Video JPEG 0": 0.0,
+                "Video Processor": 0.0,
+                "Video Codec Engine": 0.0
+              }
+            },
+            "average_cpu_machine_percent": 3.45,
+            "peak_summed_working_set_MiB": 743.9,
+            "sampled_cpu_seconds": 1.72,
+            "process_read_MiB": 45.7,
+            "process_write_MiB": 0.0
+          },
+          "mode": "hardware",
+          "layers": 3,
+          "width": 960,
+          "height": 540,
+          "frames": 180,
+          "setup_seconds": 0.135247,
+          "first_frame_seconds": 0.361909,
+          "seek_seconds": 0,
+          "processing_seconds": 1.78722,
+          "composited_fps": 100.715,
+          "decode_api_seconds": 0.311335,
+          "transfer_seconds": 0,
+          "upload_seconds": 0,
+          "draw_submit_seconds": 0.0017138,
+          "gpu_wait_seconds": 1.47405,
+          "float16_output": true,
+          "presented": false,
+          "audio": false
+        },
+        {
+          "wall_seconds": 2.122906500007957,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 2.093,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 10.47,
+                "Shared Usage": 731.1
+              },
+              "memory_counter_errors": {},
+              "samples": 17,
+              "unavailable": null,
+              "peak_engine_percent": {
+                "3D": 0,
+                "Copy": 0,
+                "Compute 0": 0,
+                "Timer 0": 0,
+                "Security 1": 0,
+                "Video JPEG 0": 0,
+                "Video Processor": 0,
+                "Video Codec Engine": 0
+              },
+              "mean_engine_percent": {
+                "3D": 0.0,
+                "Copy": 0.0,
+                "Compute 0": 0.0,
+                "Timer 0": 0.0,
+                "Security 1": 0.0,
+                "Video JPEG 0": 0.0,
+                "Video Processor": 0.0,
+                "Video Codec Engine": 0.0
+              }
+            },
+            "average_cpu_machine_percent": 3.61,
+            "peak_summed_working_set_MiB": 910.1,
+            "sampled_cpu_seconds": 1.81,
+            "process_read_MiB": 45.7,
+            "process_write_MiB": 0.0
+          },
+          "mode": "hardware",
+          "layers": 3,
+          "width": 960,
+          "height": 540,
+          "frames": 180,
+          "setup_seconds": 0.13864,
+          "first_frame_seconds": 0.359231,
+          "seek_seconds": 0,
+          "processing_seconds": 1.7975,
+          "composited_fps": 100.139,
+          "decode_api_seconds": 0.302434,
+          "transfer_seconds": 0,
+          "upload_seconds": 0,
+          "draw_submit_seconds": 0.0016286,
+          "gpu_wait_seconds": 1.49331,
+          "float16_output": true,
+          "presented": false,
+          "audio": false
+        }
+      ],
+      "median_full_wall_fps": 84.96684452064882,
+      "min_full_wall_fps": 84.78941488912739,
+      "max_full_wall_fps": 86.97035716830987
+    },
+    {
+      "engine": "download",
+      "width": 960,
+      "height": 540,
+      "layers": 3,
+      "frames": 180,
+      "audio": false,
+      "presented": false,
+      "runs": [
+        {
+          "wall_seconds": 5.527636300015729,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 5.485,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 12.18,
+                "Shared Usage": 1169.7
+              },
+              "memory_counter_errors": {},
+              "samples": 44,
+              "unavailable": null,
+              "peak_engine_percent": {
+                "3D": 0,
+                "Copy": 0,
+                "Compute 0": 0,
+                "Timer 0": 0,
+                "Security 1": 0,
+                "Video JPEG 0": 0,
+                "Video Processor": 0,
+                "Video Codec Engine": 0
+              },
+              "mean_engine_percent": {
+                "3D": 0.0,
+                "Copy": 0.0,
+                "Compute 0": 0.0,
+                "Timer 0": 0.0,
+                "Security 1": 0.0,
+                "Video JPEG 0": 0.0,
+                "Video Processor": 0.0,
+                "Video Codec Engine": 0.0
+              }
+            },
+            "average_cpu_machine_percent": 2.62,
+            "peak_summed_working_set_MiB": 1183.9,
+            "sampled_cpu_seconds": 3.45,
+            "process_read_MiB": 45.7,
+            "process_write_MiB": 0.0
+          },
+          "mode": "download",
+          "layers": 3,
+          "width": 960,
+          "height": 540,
+          "frames": 180,
+          "setup_seconds": 0.137254,
+          "first_frame_seconds": 0.398776,
+          "seek_seconds": 0,
+          "processing_seconds": 4.76158,
+          "composited_fps": 37.8026,
+          "decode_api_seconds": 0.370845,
+          "transfer_seconds": 3.40837,
+          "upload_seconds": 0.550386,
+          "draw_submit_seconds": 3.96511,
+          "gpu_wait_seconds": 0.425269,
+          "float16_output": true,
+          "presented": false,
+          "audio": false
+        },
+        {
+          "wall_seconds": 5.335372300003655,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 5.328,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 13.43,
+                "Shared Usage": 1168.45
+              },
+              "memory_counter_errors": {},
+              "samples": 42,
+              "unavailable": null,
+              "peak_engine_percent": {
+                "3D": 0,
+                "Copy": 0,
+                "Compute 0": 0,
+                "Timer 0": 0,
+                "Security 1": 0,
+                "Video JPEG 0": 0,
+                "Video Processor": 0,
+                "Video Codec Engine": 0
+              },
+              "mean_engine_percent": {
+                "3D": 0.0,
+                "Copy": 0.0,
+                "Compute 0": 0.0,
+                "Timer 0": 0.0,
+                "Security 1": 0.0,
+                "Video JPEG 0": 0.0,
+                "Video Processor": 0.0,
+                "Video Codec Engine": 0.0
+              }
+            },
+            "average_cpu_machine_percent": 2.61,
+            "peak_summed_working_set_MiB": 1181.3,
+            "sampled_cpu_seconds": 3.34,
+            "process_read_MiB": 45.7,
+            "process_write_MiB": 0.0
+          },
+          "mode": "download",
+          "layers": 3,
+          "width": 960,
+          "height": 540,
+          "frames": 180,
+          "setup_seconds": 0.32472,
+          "first_frame_seconds": 0.64113,
+          "seek_seconds": 0,
+          "processing_seconds": 4.72085,
+          "composited_fps": 38.1287,
+          "decode_api_seconds": 0.415899,
+          "transfer_seconds": 3.34055,
+          "upload_seconds": 0.540638,
+          "draw_submit_seconds": 3.88735,
+          "gpu_wait_seconds": 0.41732,
+          "float16_output": true,
+          "presented": false,
+          "audio": false
+        },
+        {
+          "wall_seconds": 4.878871500026435,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 4.875,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 13.43,
+                "Shared Usage": 1168.45
+              },
+              "memory_counter_errors": {},
+              "samples": 39,
+              "unavailable": null,
+              "peak_engine_percent": {
+                "3D": 0,
+                "Copy": 0,
+                "Compute 0": 0,
+                "Timer 0": 0,
+                "Security 1": 0,
+                "Video JPEG 0": 0,
+                "Video Processor": 0,
+                "Video Codec Engine": 0
+              },
+              "mean_engine_percent": {
+                "3D": 0.0,
+                "Copy": 0.0,
+                "Compute 0": 0.0,
+                "Timer 0": 0.0,
+                "Security 1": 0.0,
+                "Video JPEG 0": 0.0,
+                "Video Processor": 0.0,
+                "Video Codec Engine": 0.0
+              }
+            },
+            "average_cpu_machine_percent": 2.76,
+            "peak_summed_working_set_MiB": 1182.6,
+            "sampled_cpu_seconds": 3.23,
+            "process_read_MiB": 45.7,
+            "process_write_MiB": 0.0
+          },
+          "mode": "download",
+          "layers": 3,
+          "width": 960,
+          "height": 540,
+          "frames": 180,
+          "setup_seconds": 0.139173,
+          "first_frame_seconds": 0.390647,
+          "seek_seconds": 0,
+          "processing_seconds": 4.53487,
+          "composited_fps": 39.6924,
+          "decode_api_seconds": 0.356325,
+          "transfer_seconds": 3.24419,
+          "upload_seconds": 0.52992,
+          "draw_submit_seconds": 3.78015,
+          "gpu_wait_seconds": 0.398148,
+          "float16_output": true,
+          "presented": false,
+          "audio": false
+        }
+      ],
+      "median_full_wall_fps": 33.737102094989076,
+      "min_full_wall_fps": 32.56364750327148,
+      "max_full_wall_fps": 36.893777587506605
+    },
+    {
+      "engine": "software",
+      "width": 960,
+      "height": 540,
+      "layers": 3,
+      "frames": 180,
+      "audio": false,
+      "presented": false,
+      "runs": [
+        {
+          "wall_seconds": 9.473161600006279,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 9.422,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 8.19,
+                "Shared Usage": 988.41
+              },
+              "memory_counter_errors": {},
+              "samples": 75,
+              "unavailable": null,
+              "peak_engine_percent": {
+                "3D": 0,
+                "Copy": 0,
+                "Compute 0": 0,
+                "Timer 0": 0,
+                "Security 1": 0,
+                "Video JPEG 0": 0,
+                "Video Processor": 0,
+                "Video Codec Engine": 0
+              },
+              "mean_engine_percent": {
+                "3D": 0.0,
+                "Copy": 0.0,
+                "Compute 0": 0.0,
+                "Timer 0": 0.0,
+                "Security 1": 0.0,
+                "Video JPEG 0": 0.0,
+                "Video Processor": 0.0,
+                "Video Codec Engine": 0.0
+              }
+            },
+            "average_cpu_machine_percent": 3.86,
+            "peak_summed_working_set_MiB": 1382.9,
+            "sampled_cpu_seconds": 8.73,
+            "process_read_MiB": 45.7,
+            "process_write_MiB": 0.0
+          },
+          "mode": "software",
+          "layers": 3,
+          "width": 960,
+          "height": 540,
+          "frames": 180,
+          "setup_seconds": 0.128342,
+          "first_frame_seconds": 0.308541,
+          "seek_seconds": 0,
+          "processing_seconds": 9.04789,
+          "composited_fps": 19.8941,
+          "decode_api_seconds": 7.34658,
+          "transfer_seconds": 1.65e-05,
+          "upload_seconds": 0.484869,
+          "draw_submit_seconds": 0.489993,
+          "gpu_wait_seconds": 1.2109,
+          "float16_output": true,
+          "presented": false,
+          "audio": false
+        },
+        {
+          "wall_seconds": 9.525613099976908,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 9.515,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 8.19,
+                "Shared Usage": 988.41
+              },
+              "memory_counter_errors": {},
+              "samples": 76,
+              "unavailable": null,
+              "peak_engine_percent": {
+                "3D": 0,
+                "Copy": 0,
+                "Compute 0": 0,
+                "Timer 0": 0,
+                "Security 1": 0,
+                "Video JPEG 0": 0,
+                "Video Processor": 0,
+                "Video Codec Engine": 0
+              },
+              "mean_engine_percent": {
+                "3D": 0.0,
+                "Copy": 0.0,
+                "Compute 0": 0.0,
+                "Timer 0": 0.0,
+                "Security 1": 0.0,
+                "Video JPEG 0": 0.0,
+                "Video Processor": 0.0,
+                "Video Codec Engine": 0.0
+              }
+            },
+            "average_cpu_machine_percent": 3.87,
+            "peak_summed_working_set_MiB": 1382.8,
+            "sampled_cpu_seconds": 8.83,
+            "process_read_MiB": 45.7,
+            "process_write_MiB": 0.0
+          },
+          "mode": "software",
+          "layers": 3,
+          "width": 960,
+          "height": 540,
+          "frames": 180,
+          "setup_seconds": 0.144031,
+          "first_frame_seconds": 0.315556,
+          "seek_seconds": 0,
+          "processing_seconds": 9.12422,
+          "composited_fps": 19.7277,
+          "decode_api_seconds": 7.43227,
+          "transfer_seconds": 1.86e-05,
+          "upload_seconds": 0.485929,
+          "draw_submit_seconds": 0.490984,
+          "gpu_wait_seconds": 1.20053,
+          "float16_output": true,
+          "presented": false,
+          "audio": false
+        },
+        {
+          "wall_seconds": 9.391926000011154,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 9.375,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 8.19,
+                "Shared Usage": 988.41
+              },
+              "memory_counter_errors": {},
+              "samples": 75,
+              "unavailable": null,
+              "peak_engine_percent": {
+                "3D": 0,
+                "Copy": 0,
+                "Compute 0": 0,
+                "Timer 0": 0,
+                "Security 1": 0,
+                "Video JPEG 0": 0,
+                "Video Processor": 0,
+                "Video Codec Engine": 0
+              },
+              "mean_engine_percent": {
+                "3D": 0.0,
+                "Copy": 0.0,
+                "Compute 0": 0.0,
+                "Timer 0": 0.0,
+                "Security 1": 0.0,
+                "Video JPEG 0": 0.0,
+                "Video Processor": 0.0,
+                "Video Codec Engine": 0.0
+              }
+            },
+            "average_cpu_machine_percent": 3.81,
+            "peak_summed_working_set_MiB": 1382.8,
+            "sampled_cpu_seconds": 8.58,
+            "process_read_MiB": 45.7,
+            "process_write_MiB": 0.0
+          },
+          "mode": "software",
+          "layers": 3,
+          "width": 960,
+          "height": 540,
+          "frames": 180,
+          "setup_seconds": 0.130471,
+          "first_frame_seconds": 0.303928,
+          "seek_seconds": 0,
+          "processing_seconds": 9.00995,
+          "composited_fps": 19.9779,
+          "decode_api_seconds": 7.34014,
+          "transfer_seconds": 1.7e-05,
+          "upload_seconds": 0.478459,
+          "draw_submit_seconds": 0.483424,
+          "gpu_wait_seconds": 1.18601,
+          "float16_output": true,
+          "presented": false,
+          "audio": false
+        }
+      ],
+      "median_full_wall_fps": 19.001048182254245,
+      "min_full_wall_fps": 18.896421480779683,
+      "max_full_wall_fps": 19.165398023769164
+    },
+    {
+      "engine": "ffmpeg",
+      "width": 3840,
+      "height": 2160,
+      "layers": 1,
+      "frames": 60,
+      "audio": false,
+      "presented": false,
+      "runs": [
+        {
+          "wall_seconds": 0.9933044000063092,
+          "first_output_frame_seconds": 0.11805350001668558,
+          "resources": {
+            "duration_seconds": 0.969,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 0.0,
+                "Shared Usage": 0.0
+              },
+              "memory_counter_errors": {},
+              "samples": 8,
+              "unavailable": null,
+              "peak_engine_percent": {},
+              "mean_engine_percent": {}
+            },
+            "average_cpu_machine_percent": 4.3,
+            "peak_summed_working_set_MiB": 184.8,
+            "sampled_cpu_seconds": 1.0,
+            "process_read_MiB": 5.9,
+            "process_write_MiB": 0.0
+          },
+          "frames": 60,
+          "composited_fps": 60.404443994830686
+        },
+        {
+          "wall_seconds": 1.0109151999931782,
+          "first_output_frame_seconds": 0.13470689998939633,
+          "resources": {
+            "duration_seconds": 0.984,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 0.0,
+                "Shared Usage": 0.0
+              },
+              "memory_counter_errors": {},
+              "samples": 8,
+              "unavailable": null,
+              "peak_engine_percent": {},
+              "mean_engine_percent": {}
+            },
+            "average_cpu_machine_percent": 4.1,
+            "peak_summed_working_set_MiB": 184.7,
+            "sampled_cpu_seconds": 0.97,
+            "process_read_MiB": 5.9,
+            "process_write_MiB": 0.0
+          },
+          "frames": 60,
+          "composited_fps": 59.35215931109245
+        },
+        {
+          "wall_seconds": 0.9605998999904841,
+          "first_output_frame_seconds": 0.11269390000961721,
+          "resources": {
+            "duration_seconds": 0.953,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 0.0,
+                "Shared Usage": 0.0
+              },
+              "memory_counter_errors": {},
+              "samples": 8,
+              "unavailable": null,
+              "peak_engine_percent": {},
+              "mean_engine_percent": {}
+            },
+            "average_cpu_machine_percent": 4.3,
+            "peak_summed_working_set_MiB": 184.3,
+            "sampled_cpu_seconds": 0.98,
+            "process_read_MiB": 6.0,
+            "process_write_MiB": 0.0
+          },
+          "frames": 60,
+          "composited_fps": 62.46096840171894
+        }
+      ],
+      "median_full_wall_fps": 60.404443994830686,
+      "min_full_wall_fps": 59.35215931109245,
+      "max_full_wall_fps": 62.46096840171894
+    },
+    {
+      "engine": "mlt",
+      "width": 3840,
+      "height": 2160,
+      "layers": 1,
+      "frames": 60,
+      "audio": false,
+      "presented": false,
+      "runs": [
+        {
+          "wall_seconds": 2.847367900016252,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 2.828,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 0.0,
+                "Shared Usage": 0.0
+              },
+              "memory_counter_errors": {},
+              "samples": 23,
+              "unavailable": null,
+              "peak_engine_percent": {},
+              "mean_engine_percent": {}
+            },
+            "average_cpu_machine_percent": 4.03,
+            "peak_summed_working_set_MiB": 324.7,
+            "sampled_cpu_seconds": 2.73,
+            "process_read_MiB": 9.5,
+            "process_write_MiB": 0.0
+          },
+          "engine": "MLT C ABI",
+          "frames": 60,
+          "layers": 1,
+          "width": 3840,
+          "audio": false,
+          "setup_seconds": 0.13852419995237142,
+          "first_frame_seconds": 0.2836700999760069,
+          "processing_seconds": 2.546949899988249,
+          "composited_fps": 23.557589413233778,
+          "seeks_seconds": [],
+          "audio_samples": 0,
+          "captures": [],
+          "presented": false
+        },
+        {
+          "wall_seconds": 2.9032804999733344,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 2.891,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 0.0,
+                "Shared Usage": 0.0
+              },
+              "memory_counter_errors": {},
+              "samples": 23,
+              "unavailable": null,
+              "peak_engine_percent": {},
+              "mean_engine_percent": {}
+            },
+            "average_cpu_machine_percent": 4.01,
+            "peak_summed_working_set_MiB": 325.2,
+            "sampled_cpu_seconds": 2.78,
+            "process_read_MiB": 9.4,
+            "process_write_MiB": 0.0
+          },
+          "engine": "MLT C ABI",
+          "frames": 60,
+          "layers": 1,
+          "width": 3840,
+          "audio": false,
+          "setup_seconds": 0.11850110004888847,
+          "first_frame_seconds": 0.2694804000784643,
+          "processing_seconds": 2.5822949000285007,
+          "composited_fps": 23.235146380584876,
+          "seeks_seconds": [],
+          "audio_samples": 0,
+          "captures": [],
+          "presented": false
+        },
+        {
+          "wall_seconds": 2.9374284999794327,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 2.89,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 0.0,
+                "Shared Usage": 0.0
+              },
+              "memory_counter_errors": {},
+              "samples": 23,
+              "unavailable": null,
+              "peak_engine_percent": {},
+              "mean_engine_percent": {}
+            },
+            "average_cpu_machine_percent": 3.78,
+            "peak_summed_working_set_MiB": 324.7,
+            "sampled_cpu_seconds": 2.62,
+            "process_read_MiB": 9.4,
+            "process_write_MiB": 0.0
+          },
+          "engine": "MLT C ABI",
+          "frames": 60,
+          "layers": 1,
+          "width": 3840,
+          "audio": false,
+          "setup_seconds": 0.11757800000486895,
+          "first_frame_seconds": 0.27169320004759356,
+          "processing_seconds": 2.606674400041811,
+          "composited_fps": 23.017834524725295,
+          "seeks_seconds": [],
+          "audio_samples": 0,
+          "captures": [],
+          "presented": false
+        }
+      ],
+      "median_full_wall_fps": 20.666277337153982,
+      "min_full_wall_fps": 20.42602909327669,
+      "max_full_wall_fps": 21.072092580539923
+    },
+    {
+      "engine": "hardware",
+      "width": 3840,
+      "height": 2160,
+      "layers": 1,
+      "frames": 60,
+      "audio": false,
+      "presented": false,
+      "runs": [
+        {
+          "wall_seconds": 0.5406030000303872,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 0.531,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 6.05,
+                "Shared Usage": 318.45
+              },
+              "memory_counter_errors": {},
+              "samples": 5,
+              "unavailable": null,
+              "peak_engine_percent": {
+                "3D": 0,
+                "Copy": 0,
+                "Compute 0": 0,
+                "Timer 0": 0,
+                "Security 1": 0,
+                "Video JPEG 0": 0,
+                "Video Processor": 0,
+                "Video Codec Engine": 0
+              },
+              "mean_engine_percent": {
+                "3D": 0.0,
+                "Copy": 0.0,
+                "Compute 0": 0.0,
+                "Timer 0": 0.0,
+                "Security 1": 0.0,
+                "Video JPEG 0": 0.0,
+                "Video Processor": 0.0,
+                "Video Codec Engine": 0.0
+              }
+            },
+            "average_cpu_machine_percent": 2.94,
+            "peak_summed_working_set_MiB": 450.7,
+            "sampled_cpu_seconds": 0.38,
+            "process_read_MiB": 5.3,
+            "process_write_MiB": 0.0
+          },
+          "mode": "hardware",
+          "layers": 1,
+          "width": 3840,
+          "height": 2160,
+          "frames": 60,
+          "setup_seconds": 0.0945591,
+          "first_frame_seconds": 0.166531,
+          "seek_seconds": 0,
+          "processing_seconds": 0.331756,
+          "composited_fps": 180.856,
+          "decode_api_seconds": 0.0642595,
+          "transfer_seconds": 0,
+          "upload_seconds": 0,
+          "draw_submit_seconds": 0.0005489,
+          "gpu_wait_seconds": 0.266925,
+          "float16_output": true,
+          "presented": false,
+          "audio": false
+        },
+        {
+          "wall_seconds": 0.5536266000126489,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 0.547,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 6.05,
+                "Shared Usage": 318.45
+              },
+              "memory_counter_errors": {},
+              "samples": 5,
+              "unavailable": null,
+              "peak_engine_percent": {
+                "3D": 0,
+                "Copy": 0,
+                "Compute 0": 0,
+                "Timer 0": 0,
+                "Security 1": 0,
+                "Video JPEG 0": 0,
+                "Video Processor": 0,
+                "Video Codec Engine": 0
+              },
+              "mean_engine_percent": {
+                "3D": 0.0,
+                "Copy": 0.0,
+                "Compute 0": 0.0,
+                "Timer 0": 0.0,
+                "Security 1": 0.0,
+                "Video JPEG 0": 0.0,
+                "Video Processor": 0.0,
+                "Video Codec Engine": 0.0
+              }
+            },
+            "average_cpu_machine_percent": 3.21,
+            "peak_summed_working_set_MiB": 450.8,
+            "sampled_cpu_seconds": 0.42,
+            "process_read_MiB": 5.3,
+            "process_write_MiB": 0.0
+          },
+          "mode": "hardware",
+          "layers": 1,
+          "width": 3840,
+          "height": 2160,
+          "frames": 60,
+          "setup_seconds": 0.0986327,
+          "first_frame_seconds": 0.171168,
+          "seek_seconds": 0,
+          "processing_seconds": 0.34073,
+          "composited_fps": 176.093,
+          "decode_api_seconds": 0.0644349,
+          "transfer_seconds": 0,
+          "upload_seconds": 0,
+          "draw_submit_seconds": 0.0004386,
+          "gpu_wait_seconds": 0.275832,
+          "float16_output": true,
+          "presented": false,
+          "audio": false
+        },
+        {
+          "wall_seconds": 0.5891950000077486,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 0.547,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 6.05,
+                "Shared Usage": 311.25
+              },
+              "memory_counter_errors": {},
+              "samples": 5,
+              "unavailable": null,
+              "peak_engine_percent": {
+                "3D": 0,
+                "Copy": 0,
+                "Compute 0": 0,
+                "Timer 0": 0,
+                "Security 1": 0,
+                "Video JPEG 0": 0,
+                "Video Processor": 0,
+                "Video Codec Engine": 0
+              },
+              "mean_engine_percent": {
+                "3D": 0.0,
+                "Copy": 0.0,
+                "Compute 0": 0.0,
+                "Timer 0": 0.0,
+                "Security 1": 0.0,
+                "Video JPEG 0": 0.0,
+                "Video Processor": 0.0,
+                "Video Codec Engine": 0.0
+              }
+            },
+            "average_cpu_machine_percent": 3.09,
+            "peak_summed_working_set_MiB": 450.8,
+            "sampled_cpu_seconds": 0.41,
+            "process_read_MiB": 5.3,
+            "process_write_MiB": 0.0
+          },
+          "mode": "hardware",
+          "layers": 1,
+          "width": 3840,
+          "height": 2160,
+          "frames": 60,
+          "setup_seconds": 0.095034,
+          "first_frame_seconds": 0.172043,
+          "seek_seconds": 0,
+          "processing_seconds": 0.345363,
+          "composited_fps": 173.73,
+          "decode_api_seconds": 0.0679508,
+          "transfer_seconds": 0,
+          "upload_seconds": 0,
+          "draw_submit_seconds": 0.0005582,
+          "gpu_wait_seconds": 0.276831,
+          "float16_output": true,
+          "presented": false,
+          "audio": false
+        }
+      ],
+      "median_full_wall_fps": 108.37629550066627,
+      "min_full_wall_fps": 101.83385805923494,
+      "max_full_wall_fps": 110.98717542564027
+    },
+    {
+      "engine": "download",
+      "width": 3840,
+      "height": 2160,
+      "layers": 1,
+      "frames": 60,
+      "audio": false,
+      "presented": false,
+      "runs": [
+        {
+          "wall_seconds": 0.9784905000124127,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 0.968,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 7.0,
+                "Shared Usage": 554.11
+              },
+              "memory_counter_errors": {},
+              "samples": 8,
+              "unavailable": null,
+              "peak_engine_percent": {
+                "3D": 0,
+                "Copy": 0,
+                "Compute 0": 0,
+                "Timer 0": 0,
+                "Security 1": 0,
+                "Video JPEG 0": 0,
+                "Video Processor": 0,
+                "Video Codec Engine": 0
+              },
+              "mean_engine_percent": {
+                "3D": 0.0,
+                "Copy": 0.0,
+                "Compute 0": 0.0,
+                "Timer 0": 0.0,
+                "Security 1": 0.0,
+                "Video JPEG 0": 0.0,
+                "Video Processor": 0.0,
+                "Video Codec Engine": 0.0
+              }
+            },
+            "average_cpu_machine_percent": 2.15,
+            "peak_summed_working_set_MiB": 602.9,
+            "sampled_cpu_seconds": 0.5,
+            "process_read_MiB": 5.3,
+            "process_write_MiB": 0.0
+          },
+          "mode": "download",
+          "layers": 1,
+          "width": 3840,
+          "height": 2160,
+          "frames": 60,
+          "setup_seconds": 0.095632,
+          "first_frame_seconds": 0.183238,
+          "seek_seconds": 0,
+          "processing_seconds": 0.72767,
+          "composited_fps": 82.4549,
+          "decode_api_seconds": 0.0753957,
+          "transfer_seconds": 0.3534,
+          "upload_seconds": 0.0785437,
+          "draw_submit_seconds": 0.432947,
+          "gpu_wait_seconds": 0.219259,
+          "float16_output": true,
+          "presented": false,
+          "audio": false
+        },
+        {
+          "wall_seconds": 1.0249550000298768,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 1.016,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 7.0,
+                "Shared Usage": 554.11
+              },
+              "memory_counter_errors": {},
+              "samples": 8,
+              "unavailable": null,
+              "peak_engine_percent": {
+                "3D": 0,
+                "Copy": 0,
+                "Compute 0": 0,
+                "Timer 0": 0,
+                "Security 1": 0,
+                "Video JPEG 0": 0,
+                "Video Processor": 0,
+                "Video Codec Engine": 0
+              },
+              "mean_engine_percent": {
+                "3D": 0.0,
+                "Copy": 0.0,
+                "Compute 0": 0.0,
+                "Timer 0": 0.0,
+                "Security 1": 0.0,
+                "Video JPEG 0": 0.0,
+                "Video Processor": 0.0,
+                "Video Codec Engine": 0.0
+              }
+            },
+            "average_cpu_machine_percent": 2.5,
+            "peak_summed_working_set_MiB": 602.8,
+            "sampled_cpu_seconds": 0.61,
+            "process_read_MiB": 5.3,
+            "process_write_MiB": 0.0
+          },
+          "mode": "download",
+          "layers": 1,
+          "width": 3840,
+          "height": 2160,
+          "frames": 60,
+          "setup_seconds": 0.0943923,
+          "first_frame_seconds": 0.179827,
+          "seek_seconds": 0,
+          "processing_seconds": 0.784623,
+          "composited_fps": 76.4699,
+          "decode_api_seconds": 0.0760682,
+          "transfer_seconds": 0.388425,
+          "upload_seconds": 0.0777831,
+          "draw_submit_seconds": 0.467223,
+          "gpu_wait_seconds": 0.241257,
+          "float16_output": true,
+          "presented": false,
+          "audio": false
+        },
+        {
+          "wall_seconds": 0.9831804999848828,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 0.969,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 7.0,
+                "Shared Usage": 554.11
+              },
+              "memory_counter_errors": {},
+              "samples": 8,
+              "unavailable": null,
+              "peak_engine_percent": {
+                "3D": 0,
+                "Copy": 0,
+                "Compute 0": 0,
+                "Timer 0": 0,
+                "Security 1": 0,
+                "Video JPEG 0": 0,
+                "Video Processor": 0,
+                "Video Codec Engine": 0
+              },
+              "mean_engine_percent": {
+                "3D": 0.0,
+                "Copy": 0.0,
+                "Compute 0": 0.0,
+                "Timer 0": 0.0,
+                "Security 1": 0.0,
+                "Video JPEG 0": 0.0,
+                "Video Processor": 0.0,
+                "Video Codec Engine": 0.0
+              }
+            },
+            "average_cpu_machine_percent": 2.22,
+            "peak_summed_working_set_MiB": 602.8,
+            "sampled_cpu_seconds": 0.52,
+            "process_read_MiB": 5.3,
+            "process_write_MiB": 0.0
+          },
+          "mode": "download",
+          "layers": 1,
+          "width": 3840,
+          "height": 2160,
+          "frames": 60,
+          "setup_seconds": 0.0930362,
+          "first_frame_seconds": 0.177352,
+          "seek_seconds": 0,
+          "processing_seconds": 0.740361,
+          "composited_fps": 81.0415,
+          "decode_api_seconds": 0.0724484,
+          "transfer_seconds": 0.366458,
+          "upload_seconds": 0.0726282,
+          "draw_submit_seconds": 0.44009,
+          "gpu_wait_seconds": 0.227772,
+          "float16_output": true,
+          "presented": false,
+          "audio": false
+        }
+      ],
+      "median_full_wall_fps": 61.02643410942604,
+      "min_full_wall_fps": 58.53915537584678,
+      "max_full_wall_fps": 61.318939733435194
+    },
+    {
+      "engine": "software",
+      "width": 3840,
+      "height": 2160,
+      "layers": 1,
+      "frames": 60,
+      "audio": false,
+      "presented": false,
+      "runs": [
+        {
+          "wall_seconds": 1.5282341999700293,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 1.484,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 3.88,
+                "Shared Usage": 398.41
+              },
+              "memory_counter_errors": {},
+              "samples": 12,
+              "unavailable": null,
+              "peak_engine_percent": {
+                "3D": 0,
+                "Copy": 0,
+                "Compute 0": 0,
+                "Timer 0": 0,
+                "Security 1": 0,
+                "Video JPEG 0": 0,
+                "Video Processor": 0,
+                "Video Codec Engine": 0
+              },
+              "mean_engine_percent": {
+                "3D": 0.0,
+                "Copy": 0.0,
+                "Compute 0": 0.0,
+                "Timer 0": 0.0,
+                "Security 1": 0.0,
+                "Video JPEG 0": 0.0,
+                "Video Processor": 0.0,
+                "Video Codec Engine": 0.0
+              }
+            },
+            "average_cpu_machine_percent": 3.42,
+            "peak_summed_working_set_MiB": 559.9,
+            "sampled_cpu_seconds": 1.22,
+            "process_read_MiB": 5.3,
+            "process_write_MiB": 0.0
+          },
+          "mode": "software",
+          "layers": 1,
+          "width": 3840,
+          "height": 2160,
+          "frames": 60,
+          "setup_seconds": 0.10686,
+          "first_frame_seconds": 0.186244,
+          "seek_seconds": 0,
+          "processing_seconds": 1.2814,
+          "composited_fps": 46.8236,
+          "decode_api_seconds": 0.870967,
+          "transfer_seconds": 1.5e-06,
+          "upload_seconds": 0.0781924,
+          "draw_submit_seconds": 0.0795203,
+          "gpu_wait_seconds": 0.330822,
+          "float16_output": true,
+          "presented": false,
+          "audio": false
+        },
+        {
+          "wall_seconds": 1.4457920999848284,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 1.438,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 3.88,
+                "Shared Usage": 398.41
+              },
+              "memory_counter_errors": {},
+              "samples": 12,
+              "unavailable": null,
+              "peak_engine_percent": {
+                "3D": 0,
+                "Copy": 0,
+                "Compute 0": 0,
+                "Timer 0": 0,
+                "Security 1": 0,
+                "Video JPEG 0": 0,
+                "Video Processor": 0,
+                "Video Codec Engine": 0
+              },
+              "mean_engine_percent": {
+                "3D": 0.0,
+                "Copy": 0.0,
+                "Compute 0": 0.0,
+                "Timer 0": 0.0,
+                "Security 1": 0.0,
+                "Video JPEG 0": 0.0,
+                "Video Processor": 0.0,
+                "Video Codec Engine": 0.0
+              }
+            },
+            "average_cpu_machine_percent": 3.44,
+            "peak_summed_working_set_MiB": 559.8,
+            "sampled_cpu_seconds": 1.19,
+            "process_read_MiB": 5.3,
+            "process_write_MiB": 0.0
+          },
+          "mode": "software",
+          "layers": 1,
+          "width": 3840,
+          "height": 2160,
+          "frames": 60,
+          "setup_seconds": 0.093942,
+          "first_frame_seconds": 0.170494,
+          "seek_seconds": 0,
+          "processing_seconds": 1.23777,
+          "composited_fps": 48.4742,
+          "decode_api_seconds": 0.843731,
+          "transfer_seconds": 1.2e-06,
+          "upload_seconds": 0.0764819,
+          "draw_submit_seconds": 0.0779238,
+          "gpu_wait_seconds": 0.316026,
+          "float16_output": true,
+          "presented": false,
+          "audio": false
+        },
+        {
+          "wall_seconds": 1.4547797999694012,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 1.453,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 3.88,
+                "Shared Usage": 398.41
+              },
+              "memory_counter_errors": {},
+              "samples": 12,
+              "unavailable": null,
+              "peak_engine_percent": {
+                "3D": 0,
+                "Copy": 0,
+                "Compute 0": 0,
+                "Timer 0": 0,
+                "Security 1": 0,
+                "Video JPEG 0": 0,
+                "Video Processor": 0,
+                "Video Codec Engine": 0
+              },
+              "mean_engine_percent": {
+                "3D": 0.0,
+                "Copy": 0.0,
+                "Compute 0": 0.0,
+                "Timer 0": 0.0,
+                "Security 1": 0.0,
+                "Video JPEG 0": 0.0,
+                "Video Processor": 0.0,
+                "Video Codec Engine": 0.0
+              }
+            },
+            "average_cpu_machine_percent": 3.54,
+            "peak_summed_working_set_MiB": 559.7,
+            "sampled_cpu_seconds": 1.23,
+            "process_read_MiB": 5.3,
+            "process_write_MiB": 0.0
+          },
+          "mode": "software",
+          "layers": 1,
+          "width": 3840,
+          "height": 2160,
+          "frames": 60,
+          "setup_seconds": 0.0932093,
+          "first_frame_seconds": 0.16396,
+          "seek_seconds": 0,
+          "processing_seconds": 1.24108,
+          "composited_fps": 48.3449,
+          "decode_api_seconds": 0.849067,
+          "transfer_seconds": 1.9e-06,
+          "upload_seconds": 0.0745444,
+          "draw_submit_seconds": 0.0759135,
+          "gpu_wait_seconds": 0.316025,
+          "float16_output": true,
+          "presented": false,
+          "audio": false
+        }
+      ],
+      "median_full_wall_fps": 41.243355180806056,
+      "min_full_wall_fps": 39.260998086011085,
+      "max_full_wall_fps": 41.49974259828202
+    },
+    {
+      "engine": "ffmpeg",
+      "width": 3840,
+      "height": 2160,
+      "layers": 3,
+      "frames": 60,
+      "audio": false,
+      "presented": false,
+      "runs": [
+        {
+          "wall_seconds": 3.528575500007719,
+          "first_output_frame_seconds": 0.30775140004698187,
+          "resources": {
+            "duration_seconds": 3.516,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 0.0,
+                "Shared Usage": 0.0
+              },
+              "memory_counter_errors": {},
+              "samples": 28,
+              "unavailable": null,
+              "peak_engine_percent": {},
+              "mean_engine_percent": {}
+            },
+            "average_cpu_machine_percent": 6.72,
+            "peak_summed_working_set_MiB": 652.3,
+            "sampled_cpu_seconds": 5.67,
+            "process_read_MiB": 17.8,
+            "process_write_MiB": 0.0
+          },
+          "frames": 60,
+          "composited_fps": 17.004028962925336
+        },
+        {
+          "wall_seconds": 3.665832400030922,
+          "first_output_frame_seconds": 0.29563050001161173,
+          "resources": {
+            "duration_seconds": 3.656,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 0.0,
+                "Shared Usage": 0.0
+              },
+              "memory_counter_errors": {},
+              "samples": 29,
+              "unavailable": null,
+              "peak_engine_percent": {},
+              "mean_engine_percent": {}
+            },
+            "average_cpu_machine_percent": 6.73,
+            "peak_summed_working_set_MiB": 663.6,
+            "sampled_cpu_seconds": 5.91,
+            "process_read_MiB": 18.0,
+            "process_write_MiB": 0.0
+          },
+          "frames": 60,
+          "composited_fps": 16.367360384368332
+        },
+        {
+          "wall_seconds": 3.587473699997645,
+          "first_output_frame_seconds": 0.3445107000297867,
+          "resources": {
+            "duration_seconds": 3.547,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 0.0,
+                "Shared Usage": 0.0
+              },
+              "memory_counter_errors": {},
+              "samples": 29,
+              "unavailable": null,
+              "peak_engine_percent": {},
+              "mean_engine_percent": {}
+            },
+            "average_cpu_machine_percent": 6.92,
+            "peak_summed_working_set_MiB": 651.4,
+            "sampled_cpu_seconds": 5.89,
+            "process_read_MiB": 18.4,
+            "process_write_MiB": 0.0
+          },
+          "frames": 60,
+          "composited_fps": 16.72486128610208
+        }
+      ],
+      "median_full_wall_fps": 16.72486128610208,
+      "min_full_wall_fps": 16.367360384368332,
+      "max_full_wall_fps": 17.004028962925336
+    },
+    {
+      "engine": "mlt",
+      "width": 3840,
+      "height": 2160,
+      "layers": 3,
+      "frames": 60,
+      "audio": false,
+      "presented": false,
+      "runs": [
+        {
+          "wall_seconds": 10.688051600009203,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 10.672,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 0.0,
+                "Shared Usage": 0.0
+              },
+              "memory_counter_errors": {},
+              "samples": 86,
+              "unavailable": null,
+              "peak_engine_percent": {},
+              "mean_engine_percent": {}
+            },
+            "average_cpu_machine_percent": 6.34,
+            "peak_summed_working_set_MiB": 900.4,
+            "sampled_cpu_seconds": 16.25,
+            "process_read_MiB": 25.0,
+            "process_write_MiB": 0.0
+          },
+          "engine": "MLT C ABI",
+          "frames": 60,
+          "layers": 3,
+          "width": 3840,
+          "audio": false,
+          "setup_seconds": 0.25256769999396056,
+          "first_frame_seconds": 0.7342083000112325,
+          "processing_seconds": 10.217897400027141,
+          "composited_fps": 5.872049566659441,
+          "seeks_seconds": [],
+          "audio_samples": 0,
+          "captures": [],
+          "presented": false
+        },
+        {
+          "wall_seconds": 10.71301669999957,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 10.703,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 0.0,
+                "Shared Usage": 0.0
+              },
+              "memory_counter_errors": {},
+              "samples": 86,
+              "unavailable": null,
+              "peak_engine_percent": {},
+              "mean_engine_percent": {}
+            },
+            "average_cpu_machine_percent": 6.56,
+            "peak_summed_working_set_MiB": 893.5,
+            "sampled_cpu_seconds": 16.86,
+            "process_read_MiB": 25.0,
+            "process_write_MiB": 0.0
+          },
+          "engine": "MLT C ABI",
+          "frames": 60,
+          "layers": 3,
+          "width": 3840,
+          "audio": false,
+          "setup_seconds": 0.2463973000412807,
+          "first_frame_seconds": 0.7304801000864245,
+          "processing_seconds": 10.2625040000421,
+          "composited_fps": 5.846526344813494,
+          "seeks_seconds": [],
+          "audio_samples": 0,
+          "captures": [],
+          "presented": false
+        },
+        {
+          "wall_seconds": 10.69466320000356,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 10.688,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 0.0,
+                "Shared Usage": 0.0
+              },
+              "memory_counter_errors": {},
+              "samples": 86,
+              "unavailable": null,
+              "peak_engine_percent": {},
+              "mean_engine_percent": {}
+            },
+            "average_cpu_machine_percent": 6.4,
+            "peak_summed_working_set_MiB": 898.7,
+            "sampled_cpu_seconds": 16.41,
+            "process_read_MiB": 25.0,
+            "process_write_MiB": 0.0
+          },
+          "engine": "MLT C ABI",
+          "frames": 60,
+          "layers": 3,
+          "width": 3840,
+          "audio": false,
+          "setup_seconds": 0.2732823999831453,
+          "first_frame_seconds": 0.7548903999850154,
+          "processing_seconds": 10.225961499963887,
+          "composited_fps": 5.867418921948014,
+          "seeks_seconds": [],
+          "audio_samples": 0,
+          "captures": [],
+          "presented": false
+        }
+      ],
+      "median_full_wall_fps": 5.610274851851345,
+      "min_full_wall_fps": 5.600663350034954,
+      "max_full_wall_fps": 5.613745352796419
+    },
+    {
+      "engine": "hardware",
+      "width": 3840,
+      "height": 2160,
+      "layers": 3,
+      "frames": 60,
+      "audio": false,
+      "presented": false,
+      "runs": [
+        {
+          "wall_seconds": 1.1316648999927565,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 1.109,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 10.7,
+                "Shared Usage": 791.1
+              },
+              "memory_counter_errors": {},
+              "samples": 9,
+              "unavailable": null,
+              "peak_engine_percent": {
+                "3D": 0,
+                "Copy": 0,
+                "Compute 0": 0,
+                "Timer 0": 0,
+                "Security 1": 0,
+                "Video JPEG 0": 0,
+                "Video Processor": 0,
+                "Video Codec Engine": 0
+              },
+              "mean_engine_percent": {
+                "3D": 0.0,
+                "Copy": 0.0,
+                "Compute 0": 0.0,
+                "Timer 0": 0.0,
+                "Security 1": 0.0,
+                "Video JPEG 0": 0.0,
+                "Video Processor": 0.0,
+                "Video Codec Engine": 0.0
+              }
+            },
+            "average_cpu_machine_percent": 2.7,
+            "peak_summed_working_set_MiB": 798.6,
+            "sampled_cpu_seconds": 0.72,
+            "process_read_MiB": 15.6,
+            "process_write_MiB": 0.0
+          },
+          "mode": "hardware",
+          "layers": 3,
+          "width": 3840,
+          "height": 2160,
+          "frames": 60,
+          "setup_seconds": 0.131272,
+          "first_frame_seconds": 0.368421,
+          "seek_seconds": 0,
+          "processing_seconds": 0.845923,
+          "composited_fps": 70.9284,
+          "decode_api_seconds": 0.257003,
+          "transfer_seconds": 0,
+          "upload_seconds": 0,
+          "draw_submit_seconds": 0.0008479,
+          "gpu_wait_seconds": 0.58794,
+          "float16_output": true,
+          "presented": false,
+          "audio": false
+        },
+        {
+          "wall_seconds": 1.1079752999939956,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 1.094,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 10.7,
+                "Shared Usage": 791.1
+              },
+              "memory_counter_errors": {},
+              "samples": 9,
+              "unavailable": null,
+              "peak_engine_percent": {
+                "3D": 0,
+                "Copy": 0,
+                "Compute 0": 0,
+                "Timer 0": 0,
+                "Security 1": 0,
+                "Video JPEG 0": 0,
+                "Video Processor": 0,
+                "Video Codec Engine": 0
+              },
+              "mean_engine_percent": {
+                "3D": 0.0,
+                "Copy": 0.0,
+                "Compute 0": 0.0,
+                "Timer 0": 0.0,
+                "Security 1": 0.0,
+                "Video JPEG 0": 0.0,
+                "Video Processor": 0.0,
+                "Video Codec Engine": 0.0
+              }
+            },
+            "average_cpu_machine_percent": 2.92,
+            "peak_summed_working_set_MiB": 798.5,
+            "sampled_cpu_seconds": 0.77,
+            "process_read_MiB": 15.6,
+            "process_write_MiB": 0.0
+          },
+          "mode": "hardware",
+          "layers": 3,
+          "width": 3840,
+          "height": 2160,
+          "frames": 60,
+          "setup_seconds": 0.131224,
+          "first_frame_seconds": 0.361599,
+          "seek_seconds": 0,
+          "processing_seconds": 0.84222,
+          "composited_fps": 71.2403,
+          "decode_api_seconds": 0.250868,
+          "transfer_seconds": 0,
+          "upload_seconds": 0,
+          "draw_submit_seconds": 0.0008362,
+          "gpu_wait_seconds": 0.59045,
+          "float16_output": true,
+          "presented": false,
+          "audio": false
+        },
+        {
+          "wall_seconds": 1.1447595999925397,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 1.141,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 10.7,
+                "Shared Usage": 791.1
+              },
+              "memory_counter_errors": {},
+              "samples": 9,
+              "unavailable": null,
+              "peak_engine_percent": {
+                "3D": 0,
+                "Copy": 0,
+                "Compute 0": 0,
+                "Timer 0": 0,
+                "Security 1": 0,
+                "Video JPEG 0": 0,
+                "Video Processor": 0,
+                "Video Codec Engine": 0
+              },
+              "mean_engine_percent": {
+                "3D": 0.0,
+                "Copy": 0.0,
+                "Compute 0": 0.0,
+                "Timer 0": 0.0,
+                "Security 1": 0.0,
+                "Video JPEG 0": 0.0,
+                "Video Processor": 0.0,
+                "Video Codec Engine": 0.0
+              }
+            },
+            "average_cpu_machine_percent": 2.85,
+            "peak_summed_working_set_MiB": 910.0,
+            "sampled_cpu_seconds": 0.78,
+            "process_read_MiB": 15.6,
+            "process_write_MiB": 0.0
+          },
+          "mode": "hardware",
+          "layers": 3,
+          "width": 3840,
+          "height": 2160,
+          "frames": 60,
+          "setup_seconds": 0.129087,
+          "first_frame_seconds": 0.356181,
+          "seek_seconds": 0,
+          "processing_seconds": 0.838587,
+          "composited_fps": 71.549,
+          "decode_api_seconds": 0.243132,
+          "transfer_seconds": 0,
+          "upload_seconds": 0,
+          "draw_submit_seconds": 0.000745,
+          "gpu_wait_seconds": 0.594659,
+          "float16_output": true,
+          "presented": false,
+          "audio": false
+        }
+      ],
+      "median_full_wall_fps": 53.019228572330945,
+      "min_full_wall_fps": 52.412751114199885,
+      "max_full_wall_fps": 54.15283174663294
+    },
+    {
+      "engine": "download",
+      "width": 3840,
+      "height": 2160,
+      "layers": 3,
+      "frames": 60,
+      "audio": false,
+      "presented": false,
+      "runs": [
+        {
+          "wall_seconds": 2.276220600004308,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 2.266,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 12.41,
+                "Shared Usage": 1229.7
+              },
+              "memory_counter_errors": {},
+              "samples": 19,
+              "unavailable": null,
+              "peak_engine_percent": {
+                "3D": 0,
+                "Copy": 0,
+                "Compute 0": 0,
+                "Timer 0": 0,
+                "Security 1": 0,
+                "Video JPEG 0": 0,
+                "Video Processor": 0,
+                "Video Codec Engine": 0
+              },
+              "mean_engine_percent": {
+                "3D": 0.0,
+                "Copy": 0.0,
+                "Compute 0": 0.0,
+                "Timer 0": 0.0,
+                "Security 1": 0.0,
+                "Video JPEG 0": 0.0,
+                "Video Processor": 0.0,
+                "Video Codec Engine": 0.0
+              }
+            },
+            "average_cpu_machine_percent": 2.13,
+            "peak_summed_working_set_MiB": 1242.7,
+            "sampled_cpu_seconds": 1.16,
+            "process_read_MiB": 15.6,
+            "process_write_MiB": 0.0
+          },
+          "mode": "download",
+          "layers": 3,
+          "width": 3840,
+          "height": 2160,
+          "frames": 60,
+          "setup_seconds": 0.133009,
+          "first_frame_seconds": 0.399941,
+          "seek_seconds": 0,
+          "processing_seconds": 1.86732,
+          "composited_fps": 32.1317,
+          "decode_api_seconds": 0.253999,
+          "transfer_seconds": 1.22597,
+          "upload_seconds": 0.197529,
+          "draw_submit_seconds": 1.42558,
+          "gpu_wait_seconds": 0.187644,
+          "float16_output": true,
+          "presented": false,
+          "audio": false
+        },
+        {
+          "wall_seconds": 2.3243784999940544,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 2.297,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 12.41,
+                "Shared Usage": 1229.7
+              },
+              "memory_counter_errors": {},
+              "samples": 19,
+              "unavailable": null,
+              "peak_engine_percent": {
+                "3D": 0,
+                "Copy": 0,
+                "Compute 0": 0,
+                "Timer 0": 0,
+                "Security 1": 0,
+                "Video JPEG 0": 0,
+                "Video Processor": 0,
+                "Video Codec Engine": 0
+              },
+              "mean_engine_percent": {
+                "3D": 0.0,
+                "Copy": 0.0,
+                "Compute 0": 0.0,
+                "Timer 0": 0.0,
+                "Security 1": 0.0,
+                "Video JPEG 0": 0.0,
+                "Video Processor": 0.0,
+                "Video Codec Engine": 0.0
+              }
+            },
+            "average_cpu_machine_percent": 2.64,
+            "peak_summed_working_set_MiB": 1242.8,
+            "sampled_cpu_seconds": 1.45,
+            "process_read_MiB": 15.6,
+            "process_write_MiB": 0.0
+          },
+          "mode": "download",
+          "layers": 3,
+          "width": 3840,
+          "height": 2160,
+          "frames": 60,
+          "setup_seconds": 0.135023,
+          "first_frame_seconds": 0.399736,
+          "seek_seconds": 0,
+          "processing_seconds": 1.90053,
+          "composited_fps": 31.5702,
+          "decode_api_seconds": 0.261663,
+          "transfer_seconds": 1.25001,
+          "upload_seconds": 0.196117,
+          "draw_submit_seconds": 1.44816,
+          "gpu_wait_seconds": 0.190602,
+          "float16_output": true,
+          "presented": false,
+          "audio": false
+        },
+        {
+          "wall_seconds": 2.300084699993022,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 2.297,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 13.66,
+                "Shared Usage": 1228.45
+              },
+              "memory_counter_errors": {},
+              "samples": 19,
+              "unavailable": null,
+              "peak_engine_percent": {
+                "3D": 0,
+                "Copy": 0,
+                "Compute 0": 0,
+                "Timer 0": 0,
+                "Security 1": 0,
+                "Video JPEG 0": 0,
+                "Video Processor": 0,
+                "Video Codec Engine": 0
+              },
+              "mean_engine_percent": {
+                "3D": 0.0,
+                "Copy": 0.0,
+                "Compute 0": 0.0,
+                "Timer 0": 0.0,
+                "Security 1": 0.0,
+                "Video JPEG 0": 0.0,
+                "Video Processor": 0.0,
+                "Video Codec Engine": 0.0
+              }
+            },
+            "average_cpu_machine_percent": 1.96,
+            "peak_summed_working_set_MiB": 1241.6,
+            "sampled_cpu_seconds": 1.08,
+            "process_read_MiB": 15.6,
+            "process_write_MiB": 0.0
+          },
+          "mode": "download",
+          "layers": 3,
+          "width": 3840,
+          "height": 2160,
+          "frames": 60,
+          "setup_seconds": 0.136078,
+          "first_frame_seconds": 0.411928,
+          "seek_seconds": 0,
+          "processing_seconds": 1.91149,
+          "composited_fps": 31.389,
+          "decode_api_seconds": 0.268389,
+          "transfer_seconds": 1.25556,
+          "upload_seconds": 0.195228,
+          "draw_submit_seconds": 1.45278,
+          "gpu_wait_seconds": 0.190224,
+          "float16_output": true,
+          "presented": false,
+          "audio": false
+        }
+      ],
+      "median_full_wall_fps": 26.085995876665773,
+      "min_full_wall_fps": 25.81335182723187,
+      "max_full_wall_fps": 26.359483786363434
+    },
+    {
+      "engine": "software",
+      "width": 3840,
+      "height": 2160,
+      "layers": 3,
+      "frames": 60,
+      "audio": false,
+      "presented": false,
+      "runs": [
+        {
+          "wall_seconds": 4.1471764000016265,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 4.109,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 8.43,
+                "Shared Usage": 1048.41
+              },
+              "memory_counter_errors": {},
+              "samples": 33,
+              "unavailable": null,
+              "peak_engine_percent": {
+                "3D": 0,
+                "Copy": 0,
+                "Compute 0": 0,
+                "Timer 0": 0,
+                "Security 1": 0,
+                "Video JPEG 0": 0,
+                "Video Processor": 0,
+                "Video Codec Engine": 0
+              },
+              "mean_engine_percent": {
+                "3D": 0.0,
+                "Copy": 0.0,
+                "Compute 0": 0.0,
+                "Timer 0": 0.0,
+                "Security 1": 0.0,
+                "Video JPEG 0": 0.0,
+                "Video Processor": 0.0,
+                "Video Codec Engine": 0.0
+              }
+            },
+            "average_cpu_machine_percent": 3.6,
+            "peak_summed_working_set_MiB": 1442.8,
+            "sampled_cpu_seconds": 3.55,
+            "process_read_MiB": 15.6,
+            "process_write_MiB": 0.0
+          },
+          "mode": "software",
+          "layers": 3,
+          "width": 3840,
+          "height": 2160,
+          "frames": 60,
+          "setup_seconds": 0.323183,
+          "first_frame_seconds": 0.562024,
+          "seek_seconds": 0,
+          "processing_seconds": 3.50043,
+          "composited_fps": 17.1407,
+          "decode_api_seconds": 2.58275,
+          "transfer_seconds": 5.6e-06,
+          "upload_seconds": 0.1962,
+          "draw_submit_seconds": 0.197893,
+          "gpu_wait_seconds": 0.719628,
+          "float16_output": true,
+          "presented": false,
+          "audio": false
+        },
+        {
+          "wall_seconds": 3.791252099967096,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 3.781,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 8.43,
+                "Shared Usage": 1048.41
+              },
+              "memory_counter_errors": {},
+              "samples": 31,
+              "unavailable": null,
+              "peak_engine_percent": {
+                "3D": 0,
+                "Copy": 0,
+                "Compute 0": 0,
+                "Timer 0": 0,
+                "Security 1": 0,
+                "Video JPEG 0": 0,
+                "Video Processor": 0,
+                "Video Codec Engine": 0
+              },
+              "mean_engine_percent": {
+                "3D": 0.0,
+                "Copy": 0.0,
+                "Compute 0": 0.0,
+                "Timer 0": 0.0,
+                "Security 1": 0.0,
+                "Video JPEG 0": 0.0,
+                "Video Processor": 0.0,
+                "Video Codec Engine": 0.0
+              }
+            },
+            "average_cpu_machine_percent": 3.68,
+            "peak_summed_working_set_MiB": 1443.0,
+            "sampled_cpu_seconds": 3.34,
+            "process_read_MiB": 15.6,
+            "process_write_MiB": 0.0
+          },
+          "mode": "software",
+          "layers": 3,
+          "width": 3840,
+          "height": 2160,
+          "frames": 60,
+          "setup_seconds": 0.13442,
+          "first_frame_seconds": 0.315192,
+          "seek_seconds": 0,
+          "processing_seconds": 3.38953,
+          "composited_fps": 17.7015,
+          "decode_api_seconds": 2.47979,
+          "transfer_seconds": 5.6e-06,
+          "upload_seconds": 0.193596,
+          "draw_submit_seconds": 0.195364,
+          "gpu_wait_seconds": 0.714238,
+          "float16_output": true,
+          "presented": false,
+          "audio": false
+        },
+        {
+          "wall_seconds": 3.803949599969201,
+          "first_output_frame_seconds": null,
+          "resources": {
+            "duration_seconds": 3.765,
+            "gpu": {
+              "peak_process_gpu_memory_MiB": {
+                "Dedicated Usage": 8.43,
+                "Shared Usage": 1048.41
+              },
+              "memory_counter_errors": {},
+              "samples": 30,
+              "unavailable": null,
+              "peak_engine_percent": {
+                "3D": 0,
+                "Copy": 0,
+                "Compute 0": 0,
+                "Timer 0": 0,
+                "Security 1": 0,
+                "Video JPEG 0": 0,
+                "Video Processor": 0,
+                "Video Codec Engine": 0
+              },
+              "mean_engine_percent": {
+                "3D": 0.0,
+                "Copy": 0.0,
+                "Compute 0": 0.0,
+                "Timer 0": 0.0,
+                "Security 1": 0.0,
+                "Video JPEG 0": 0.0,
+                "Video Processor": 0.0,
+                "Video Codec Engine": 0.0
+              }
+            },
+            "average_cpu_machine_percent": 3.49,
+            "peak_summed_working_set_MiB": 1443.1,
+            "sampled_cpu_seconds": 3.16,
+            "process_read_MiB": 15.6,
+            "process_write_MiB": 0.0
+          },
+          "mode": "software",
+          "layers": 3,
+          "width": 3840,
+          "height": 2160,
+          "frames": 60,
+          "setup_seconds": 0.133547,
+          "first_frame_seconds": 0.322382,
+          "seek_seconds": 0,
+          "processing_seconds": 3.4287,
+          "composited_fps": 17.4994,
+          "decode_api_seconds": 2.5132,
+          "transfer_seconds": 5.8e-06,
+          "upload_seconds": 0.190616,
+          "draw_submit_seconds": 0.192378,
+          "gpu_wait_seconds": 0.72297,
+          "float16_output": true,
+          "presented": false,
+          "audio": false
+        }
+      ],
+      "median_full_wall_fps": 15.773079643454214,
+      "min_full_wall_fps": 14.467674922141356,
+      "max_full_wall_fps": 15.825906169764004
+    }
+  ]
+}

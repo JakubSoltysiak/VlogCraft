@@ -120,6 +120,23 @@ def _fade_video(clip, start, dur):
     fade+=',setpts=PTS-STARTPTS'
     return fade
 
+def _opaque_base(video,assets,start,end,fps,width,height):
+    """Only bypass an alpha/background round trip when coverage is proven."""
+    if len(video)!=1:return False
+    _,clip=video[0]
+    if clip.get('kind')!='video':return False
+    asset=assets[clip['assetId']]
+    fmt=asset.get('pixelFormat','')
+    if not (fmt.startswith(('yuv','gray')) and not fmt.startswith('yuva') or fmt in ('nv12','p010le','uyvy422','yuyv422','rgb24','bgr24')):return False
+    if asset.get('sampleAspectRatio') not in ('1:1','1/1'):return False
+    if clip.get('fit','contain')!='cover':
+        if asset.get('width',0)*height!=asset.get('height',0)*width:return False
+    if any(clip.get(k,d)!=d or clip.get('keys',{}).get(k) for k,d in [('opacity',1),('scale',1),('x',0),('y',0),('rotation',0)]):return False
+    if clip.get('chroma') or clip.get('mask')=='ellipse' or clip.get('wipe','none')!='none':return False
+    if clip.get('fadeIn',0) or clip.get('fadeOut',0):return False
+    return timing.frame_at(clip['position'],fps)<=timing.frame_at(start,fps) and timing.frame_at(clip_finish(clip),fps)>=timing.frame_at(end,fps)
+
+
 def segment_command(state, start, end, target, jobdir, quality='final', stream=None):
     state=sequences.playback(state)
     assets={a['id']:a for a in state['assets']}
@@ -130,7 +147,8 @@ def segment_command(state, start, end, target, jobdir, quality='final', stream=N
     video,audio=active_clips(state,start,end)
     if stream=='video':audio=[]
     if stream=='audio':video=[]
-    background_size='16x16' if stream=='audio' else f'{w}x{h}'
+    opaque=_opaque_base(video,assets,start,end,fps,w,h)
+    background_size='16x16' if stream=='audio' or opaque else f'{w}x{h}'
     cmd=['ffmpeg','-hide_banner','-nostdin','-loglevel','error','-filter_complex_threads','1','-y',
          '-f','lavfi','-i',f'color=c=0x10131a:s={background_size}:r={fps}:d={_num(duration)}',
          '-f','lavfi','-i',f'anullsrc=channel_layout=stereo:sample_rate=48000:d={_num((samples+2)/48000)}']
@@ -205,7 +223,7 @@ def segment_command(state, start, end, target, jobdir, quality='final', stream=N
         if c.get('fit')=='cover':
             expr+=f',crop={targetw}:{targeth}'
         expr+=(GRADES.get(c.get('grade','neutral'), '')+
-               grading.filter_for(c,state,jobdir)+video_effects.filters(c,clip_start,count,jobdir)
+               grading.filter_for(c,state,jobdir)+video_effects.filters(c,clip_start,count,jobdir,alpha=not opaque)
                +_fade_video(c,clip_start,clip_end-clip_start))
         if continuous:
             local_frames=timing.frame_at(clip_end,fps)-timing.frame_at(clip_start,fps)
@@ -213,6 +231,10 @@ def segment_command(state, start, end, target, jobdir, quality='final', stream=N
         expr+=f'[lay{count}]'
         filters.append(expr)
         # Expressions are evaluated per frame; positions are in relative canvas units.
+        if opaque:
+            filters.append('[back0]nullsink')
+            filters.append(f'[lay{count}]setsar=1[base{count}]');last=f'base{count}'
+            continue
         x=animation.expression(c,'x',start);y=animation.expression(c,'y',start)
         filters.append(f'[{last}][lay{count}]overlay='
                        f"x='(W-w)/2+({x})*W':y='(H-h)/2+({y})*H':"

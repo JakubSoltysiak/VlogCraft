@@ -1,0 +1,226 @@
+{
+  "revision": "848ab6b60289b20e0c51a0bedf9c3c9adfee3dd4",
+  "fixture": {
+    "inputs": [
+      {
+        "name": "4k60.mp4",
+        "bytes": 193401089,
+        "sha256": "f53a3301419b0bc978b6d8b570801271197bb489ca254c6e227dac7e86beb127",
+        "metadata": {
+          "kind": "video",
+          "name": "4k60.mp4",
+          "size": 193401089,
+          "container": "mov,mp4,m4a,3gp,3g2,mj2",
+          "duration": 12.0,
+          "videoEnd": 12.0,
+          "timeBase": "1/15360",
+          "nominalRate": "60/1",
+          "averageRate": "60/1",
+          "formatStart": "0.000000",
+          "streamStartPts": 0,
+          "width": 3840,
+          "height": 2160,
+          "hasAudio": true,
+          "codec": "h264",
+          "fps": 60.0,
+          "pixelFormat": "yuv420p",
+          "sampleAspectRatio": "1:1",
+          "colorPrimaries": "unknown",
+          "colorSpace": "unknown",
+          "colorRange": "unknown",
+          "audioChannels": 1,
+          "audioChannelLayout": "mono",
+          "audioSampleRate": "48000",
+          "colorTransfer": "unknown",
+          "hdr": false
+        }
+      }
+    ],
+    "timeline_seconds": 3,
+    "width": 3840,
+    "height": 2160,
+    "layers": 1,
+    "effects": false,
+    "quality": "export",
+    "encoder": "libx264"
+  },
+  "runs": [
+    {
+      "seconds": 6.10149,
+      "frames": 180,
+      "fps": 29.501,
+      "file_bytes": 13344109,
+      "stages": [
+        {
+          "output": "segment_00000_video.mov",
+          "seconds": 5.66478,
+          "exit": 0,
+          "ffmpeg_user_s": 14.547,
+          "ffmpeg_system_s": 0.453,
+          "ffmpeg_runtime_s": 5.543,
+          "ffmpeg_peak_rss_MiB": 1239.97,
+          "bytes": 13268344
+        },
+        {
+          "output": "segment_00000_audio.wav",
+          "seconds": 0.081621,
+          "exit": 0,
+          "ffmpeg_user_s": 0.016,
+          "ffmpeg_system_s": 0.016,
+          "ffmpeg_runtime_s": 0.01,
+          "ffmpeg_peak_rss_MiB": 43.21,
+          "bytes": 576078
+        },
+        {
+          "output": "segment_00000.mov",
+          "seconds": 0.116082,
+          "exit": 0,
+          "ffmpeg_user_s": 0.047,
+          "ffmpeg_system_s": 0.016,
+          "ffmpeg_runtime_s": 0.032,
+          "ffmpeg_peak_rss_MiB": 40.82,
+          "bytes": 13845085
+        },
+        {
+          "output": "delivery.partial.mp4",
+          "seconds": 0.197477,
+          "exit": 0,
+          "ffmpeg_user_s": 0.031,
+          "ffmpeg_system_s": 0.047,
+          "ffmpeg_runtime_s": 0.11,
+          "ffmpeg_peak_rss_MiB": 41.41,
+          "bytes": 13344109
+        }
+      ],
+      "resources": {
+        "duration_seconds": 6.125,
+        "gpu": null,
+        "average_cpu_machine_percent": 10.95,
+        "peak_summed_working_set_MiB": 988.4,
+        "sampled_cpu_seconds": 16.09,
+        "process_read_MiB": 91.6,
+        "process_write_MiB": 51.7
+      },
+      "decoded": true
+    },
+    {
+      "seconds": 6.154562,
+      "frames": 180,
+      "fps": 29.247,
+      "file_bytes": 13344109,
+      "stages": [
+        {
+          "output": "segment_00000_video.mov",
+          "seconds": 5.562605,
+          "exit": 0,
+          "ffmpeg_user_s": 14.469,
+          "ffmpeg_system_s": 0.453,
+          "ffmpeg_runtime_s": 5.455,
+          "ffmpeg_peak_rss_MiB": 1240.36,
+          "bytes": 13268344
+        },
+        {
+          "output": "segment_00000_audio.wav",
+          "seconds": 0.099164,
+          "exit": 0,
+          "ffmpeg_user_s": 0.0,
+          "ffmpeg_system_s": 0.031,
+          "ffmpeg_runtime_s": 0.009,
+          "ffmpeg_peak_rss_MiB": 43.18,
+          "bytes": 576078
+        },
+        {
+          "output": "segment_00000.mov",
+          "seconds": 0.105011,
+          "exit": 0,
+          "ffmpeg_user_s": 0.016,
+          "ffmpeg_system_s": 0.0,
+          "ffmpeg_runtime_s": 0.023,
+          "ffmpeg_peak_rss_MiB": 40.81,
+          "bytes": 13845085
+        },
+        {
+          "output": "delivery.partial.mp4",
+          "seconds": 0.346239,
+          "exit": 0,
+          "ffmpeg_user_s": 0.156,
+          "ffmpeg_system_s": 0.047,
+          "ffmpeg_runtime_s": 0.225,
+          "ffmpeg_peak_rss_MiB": 41.41,
+          "bytes": 13344109
+        }
+      ],
+      "resources": {
+        "duration_seconds": 6.172,
+        "gpu": null,
+        "average_cpu_machine_percent": 10.78,
+        "peak_summed_working_set_MiB": 988.9,
+        "sampled_cpu_seconds": 15.97,
+        "process_read_MiB": 72.0,
+        "process_write_MiB": 32.6
+      },
+      "decoded": true
+    },
+    {
+      "seconds": 6.025161,
+      "frames": 180,
+      "fps": 29.875,
+      "file_bytes": 13344109,
+      "stages": [
+        {
+          "output": "segment_00000_video.mov",
+          "seconds": 5.525195,
+          "exit": 0,
+          "ffmpeg_user_s": 14.344,
+          "ffmpeg_system_s": 0.328,
+          "ffmpeg_runtime_s": 5.423,
+          "ffmpeg_peak_rss_MiB": 1239.66,
+          "bytes": 13268344
+        },
+        {
+          "output": "segment_00000_audio.wav",
+          "seconds": 0.088836,
+          "exit": 0,
+          "ffmpeg_user_s": 0.016,
+          "ffmpeg_system_s": 0.0,
+          "ffmpeg_runtime_s": 0.014,
+          "ffmpeg_peak_rss_MiB": 43.21,
+          "bytes": 576078
+        },
+        {
+          "output": "segment_00000.mov",
+          "seconds": 0.158367,
+          "exit": 0,
+          "ffmpeg_user_s": 0.016,
+          "ffmpeg_system_s": 0.016,
+          "ffmpeg_runtime_s": 0.074,
+          "ffmpeg_peak_rss_MiB": 40.8,
+          "bytes": 13845085
+        },
+        {
+          "output": "delivery.partial.mp4",
+          "seconds": 0.19922,
+          "exit": 0,
+          "ffmpeg_user_s": 0.062,
+          "ffmpeg_system_s": 0.031,
+          "ffmpeg_runtime_s": 0.109,
+          "ffmpeg_peak_rss_MiB": 41.46,
+          "bytes": 13344109
+        }
+      ],
+      "resources": {
+        "duration_seconds": 6.047,
+        "gpu": null,
+        "average_cpu_machine_percent": 10.78,
+        "peak_summed_working_set_MiB": 987.8,
+        "sampled_cpu_seconds": 15.64,
+        "process_read_MiB": 76.1,
+        "process_write_MiB": 38.5
+      },
+      "decoded": true
+    }
+  ],
+  "median_seconds": 6.10149,
+  "min_seconds": 6.025161,
+  "max_seconds": 6.154562
+}

@@ -23,14 +23,19 @@ def probe(path, *args):
     return json.loads(subprocess.check_output(['ffprobe','-v','error',*args,'-of','json',str(path)]))
 
 
-def test(executable, source, results, record_visual=False, second_source=None):
+def test(executable, source, results, record_visual=False, second_source=None, offline=False):
     results.mkdir(parents=True,exist_ok=True)
     with tempfile.TemporaryDirectory(prefix='workflow-', dir=results, ignore_cleanup_errors=True) as testdir:
         project = Path(testdir)/(Path(testdir).name+'.vlogcraft')
         with socket.socket() as sock:
             sock.bind(('127.0.0.1',0))
             port=sock.getsockname()[1]
-        env = dict(os.environ, WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS=f'--remote-debugging-port={port}')
+        env = dict(os.environ, WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS=f'--remote-debugging-port={port} --force-device-scale-factor=1 --force-color-profile=srgb')
+        if offline:
+            env.update(HTTP_PROXY='http://127.0.0.1:9',HTTPS_PROXY='http://127.0.0.1:9',http_proxy='http://127.0.0.1:9',https_proxy='http://127.0.0.1:9',NO_PROXY='127.0.0.1,localhost',OPENAI_API_KEY='')
+            env['WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS']+=' --proxy-server=http://127.0.0.1:9 --proxy-bypass-list="127.0.0.1;localhost"'
+            env['VLOGCRAFT_OFFLINE_TEST']='1';env['VLOGCRAFT_NETWORK_LOG']=str(results.resolve()/'network-guard.log')
+            env['PYTHONPATH']=str(ROOT/'tests/offline_guard')+os.pathsep+str(ROOT)
         cmd = [str(executable)]
         if executable.stem.lower() in ('python','pythonw'):
             cmd.append(str(ROOT/'desktop.py'))
@@ -51,17 +56,29 @@ def test(executable, source, results, record_visual=False, second_source=None):
                 errors=[]
                 page.on('pageerror',lambda err:errors.append(str(err)))
                 page.wait_for_function("document.documentElement.classList.contains('native-ready') && state?.desktop")
+                if offline:
+                    from urllib.parse import urlsplit
+                    context.route('**/*',lambda route:route.continue_() if urlsplit(route.request.url).hostname in ('127.0.0.1','localhost',None) else route.abort())
+                    assert page.evaluate("fetch('https://example.com/').then(()=>false,()=>true)"),'External browser fetch was not blocked'
                 page.evaluate('document.fonts.ready')
                 page.screenshot(path=str(results/'empty.png'))
                 baseline=ROOT/'tests'/'visual'
                 if record_visual:baseline.mkdir(exist_ok=True)
                 differences={}
+                dev=context.new_cdp_session(page)
+                native_dpr=page.evaluate('window.devicePixelRatio')
                 page.set_viewport_size({'width':1440,'height':850})
+                dev.send('Emulation.setDeviceMetricsOverride',{'width':1440,'height':850,'deviceScaleFactor':1,'mobile':False})
+                page.wait_for_timeout(250)
+                measured_dpr=page.evaluate('window.devicePixelRatio')
+                print(json.dumps({'native_dpr':native_dpr,'capture_dpr':measured_dpr}),flush=True)
+                assert abs(measured_dpr-1)<1e-6,measured_dpr
                 page.mouse.move(1,1)
                 page.evaluate('document.activeElement?.blur()')
                 page.wait_for_timeout(250)
                 for selector in ('linkBtn','snapBtn','previewSource'):
                     image=Image.open(io.BytesIO(page.locator('#'+selector).screenshot(scale='css'))).convert('RGB')
+                    image.save(results/(selector+'.png'))
                     reference=baseline/(selector+'.png')
                     if record_visual:image.save(reference)
                     else:
@@ -69,13 +86,13 @@ def test(executable, source, results, record_visual=False, second_source=None):
                         assert known.size==image.size,(selector,known.size,image.size)
                         differences[selector]=round(sum(ImageStat.Stat(ImageChops.difference(known,image)).mean)/3,3)
                         assert differences[selector]<3,differences
+                dev.send('Emulation.clearDeviceMetricsOverride')
                 for width in (1024,1440):
                     page.set_viewport_size({'width':width,'height':850})
                     page.wait_for_function("document.querySelector('.inspector-panel').getBoundingClientRect().width>100")
                     assert page.locator('#stepForward').is_visible()
                 page.set_viewport_size({'width':1440,'height':850})
                 meter=Resources(p.pid)
-                dev=context.new_cdp_session(page)
                 drop={'items':[],'files':[str(source)],'dragOperationsMask':1}
                 start=time.monotonic()
                 for event in ('dragEnter','dragOver','drop'):
@@ -122,7 +139,9 @@ def test(executable, source, results, record_visual=False, second_source=None):
                 streams=probe(target,'-show_streams')['streams']
                 video=next(s for s in streams if s['codec_type']=='video')
                 audio=next(s for s in streams if s['codec_type']=='audio')
-                assert (video['width'],video['height'],video['r_frame_rate'],video['nb_frames'])==(3840,2160,'60/1','24'),video
+                expected_frames=round((asset['duration']-4.6)*60)
+                assert (video['width'],video['height'],video['r_frame_rate'],int(video['nb_frames']))==(3840,2160,'60/1',expected_frames),video
+                subprocess.run(['ffmpeg','-nostdin','-v','error','-i',str(target),'-f','null','-'],capture_output=True,check=True,timeout=120)
                 assert abs(float(audio['duration'])-float(video['duration']))<1/60
                 packets=probe(source,'-select_streams','v:0','-read_intervals','4.6%+#1','-show_packets')['packets']
                 assert int(packets[0]['pos'])>2**32 and source.stat().st_size>4.5*1024**3
@@ -134,7 +153,7 @@ def test(executable, source, results, record_visual=False, second_source=None):
                 mae=sum(abs(a-b) for a,b in zip(original,rendered))/len(original)
                 assert mae<8,(mae,'Delivered frame differs from the selected original frame')
                 assert not errors, errors
-                summary={'resources':meter.finish(),'drop_through_proxy_ready_seconds':round(proxy_seconds,3),'single_seek_seconds':round(seek_seconds,3),'visual_RGB_differences':differences,'source_bytes':source.stat().st_size,'first_edited_packet_offset':int(packets[0]['pos']),
+                summary={'resources':meter.finish(),'drop_through_proxy_ready_seconds':round(proxy_seconds,3),'single_seek_seconds':round(seek_seconds,3),'visual_RGB_differences':differences,'visual_capture_dpr':1,'native_dpr':native_dpr,'source_bytes':source.stat().st_size,'first_edited_packet_offset':int(packets[0]['pos']),
                          'native_drop_to_timeline_seconds':round(link_seconds,3),'proxy_monitor_distinct_byte_values':sample,
                          'decoded_rgb_mean_absolute_error':round(mae,3),'export_seconds':round(export_seconds,3),'video_frames':int(video['nb_frames']),
                          'resolution':[video['width'],video['height']],'rate':video['r_frame_rate'],
@@ -245,6 +264,12 @@ def test(executable, source, results, record_visual=False, second_source=None):
                 page.wait_for_function('readyProxies.size===3',timeout=120000)
                 summary.update(ai_redo=True,multiple_large_native_paths=True,batch_independent_source=bool(second_source),proxy_cancel_retry=True,batch_resources=batch_meter.finish())
                 assert not errors,errors
+                if offline:
+                    guard=results/'network-guard.log'
+                    if executable.stem.lower() in ('python','pythonw'):assert guard.is_file() and 'guard active' in guard.read_text()
+                    summary['offline_network']={'browser_external_fetch_blocked':True,'loopback_allowed':True,
+                        'python_socket_guard':guard.is_file() and 'guard active' in guard.read_text(),
+                        'media_process_proxy':'closed loopback port','os_firewall_test':False}
                 summary.update(installed_motion_apply_undo=True,offline_proposal_approve_undo=True,
                                source_monitor=True,project_reload=True)
                 print(json.dumps(summary,indent=2),flush=True)
@@ -277,5 +302,6 @@ if __name__=='__main__':
     parser.add_argument('results',type=Path)
     parser.add_argument('--record-visual',action='store_true')
     parser.add_argument('--second-source',type=Path)
+    parser.add_argument('--offline',action='store_true')
     args=parser.parse_args()
-    test(args.executable.resolve(),args.source.resolve(),args.results.resolve(),args.record_visual,args.second_source.resolve() if args.second_source else None)
+    test(args.executable.resolve(),args.source.resolve(),args.results.resolve(),args.record_visual,args.second_source.resolve() if args.second_source else None,args.offline)

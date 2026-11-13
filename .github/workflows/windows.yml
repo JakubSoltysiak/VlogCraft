@@ -48,8 +48,34 @@ jobs:
         env:
           PYTHONUTF8: "1"
         run: python -m unittest discover -s tests -p "test_*.py" -v
+      - name: Offline Python regression (loopback only)
+        shell: pwsh
+        env:
+          PYTHONUTF8: "1"
+          VLOGCRAFT_OFFLINE_TEST: "1"
+        run: |
+          $env:PYTHONPATH = Join-Path (Get-Location) 'tests/offline_guard'
+          python -m unittest discover -s tests -p "test_*.py" -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Historical render-drain stress (20 decoded repetitions)
+        env:
+          PYTHONUTF8: "1"
+        run: python benchmarks/drain_stress.py --repeat 20
       - name: JavaScript timeline commands
         run: node --test tests/timeline_commands.test.js
+  native-compile:
+    runs-on: windows-2022
+    timeout-minutes: 20
+    needs: regression
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.11"
+      - name: Compile isolated native experiment (no GPU execution)
+        run: python tools/setup_architecture_lab.py --component zig --component ffmpeg-shared --build-native
+      # Hosted runners do not qualify hardware decode, presentation or GPU timing.
+      # No experimental dependency binaries are uploaded.
   package:
     runs-on: windows-2022
     timeout-minutes: 30
@@ -79,5 +105,7 @@ jobs:
         run: |
           $msi=Get-ChildItem release -Filter *.msi | Select-Object -First 1
           python tests/windows_release.py $msi.FullName build/qa/lifecycle
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tests/verify_bundle.py dist/VlogCraftStudio build/qa/bundle.json --installed "$env:LOCALAPPDATA/Programs/VlogCraft Studio"
       # Bundled dependencies need corresponding-source review before binary distribution.
       # This job checks packaging and installation. It does not create a public release.
