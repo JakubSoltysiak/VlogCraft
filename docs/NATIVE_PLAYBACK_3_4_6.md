@@ -51,7 +51,7 @@ Private float comparisons use FFmpeg/zscale linear PQ/reference conversion follo
 
 ## Qualification boundaries
 
-See VERIFICATION.md for final measured test/package results and sanitized machine-readable evidence. Earlier failures are retained: oversized PCM network reads initially deadlocked playback; resetting a decoder at every adjacent cut reduced presentation to about 36 FPS; a padded chroma-edge read corrupted the last visible row; and seek audio initially resumed before its queue was ready. Fixes address the measured causes.
+See [VERIFICATION.md](../VERIFICATION.md) for final measured test/package results and [sanitized machine-readable evidence](benchmarks/2026-11-13-native346). [Draft PR #3](https://github.com/JakubSoltysiak/VlogCraft/pull/3) is stacked on PR #2. Earlier failures are retained: oversized PCM network reads initially deadlocked playback; resetting a decoder at every adjacent cut reduced presentation to about 36 FPS; a padded chroma-edge read corrupted the last visible row; and seek audio initially resumed before its queue was ready. Fixes address the measured causes.
 
 Remaining release gates include sustained original4K60 with no frame losses, 10–60 minute real-camera sessions, calibrated HDR/mixed-color/effect parity, acoustic sync, actual device removal/recovery, independent long-source stress, other GPU vendors, accessibility/DPI/display qualification, code signing and dependency corresponding-source review. The native engine stays experimental and the full FFmpeg path stays available.
 

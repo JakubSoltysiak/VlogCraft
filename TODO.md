@@ -45,6 +45,8 @@ The owner added this canonical roadmap on main; the investigation branch merged 
 
 ## Native integration checkpoint (3.4.6 development)
 
+Review: [draft PR #3](https://github.com/JakubSoltysiak/VlogCraft/pull/3), stacked on PR #2. [Hosted checks](https://github.com/JakubSoltysiak/VlogCraft/pull/3/checks) compile/package only; local GPU evidence has separate scope.
+
 See [implementation and capability matrix](docs/NATIVE_PLAYBACK_3_4_6.md) and [measured verification](VERIFICATION.md). The three private originals are ignored and used read-only; technical public reports contain aliases only. All raw media, private metadata, images and source identifiers stay local. Prior PRs remain unmerged and historical tags remain intact.
 
 - [x] **VC-NATIVE-001 — Opt-in bounded scheduler.** Three active original H.264/HEVC decoders, four queued frames/source, three FP16 GPU slots, async completion, rational sequence/source units, held-PTS seek, adjacent-cut decoder reuse and owned cancellation. Scope: tests/report; not full-corpus acceptance.
