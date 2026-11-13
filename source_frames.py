@@ -20,6 +20,7 @@ class FrameIndex:
         self.folder=folder
         self.guard=threading.Lock()
         self.running={}
+        self.closed=False
 
     def path(self,asset):
         path=Path(asset['path'])
@@ -35,6 +36,20 @@ class FrameIndex:
                 p=task['process']
                 if p and p.poll() is None:p.terminate()
 
+    def close(self):
+        with self.guard:
+            self.closed=True
+            tasks=list(self.running.values())
+            for task in tasks:task['cancel'].set()
+            processes=[task['process'] for task in tasks if task['process']]
+        for process in processes:
+            if process.poll() is None:
+                try:process.terminate()
+                except OSError:pass
+        for process in processes:
+            try:process.wait(timeout=2)
+            except subprocess.TimeoutExpired:process.kill();process.wait()
+
     def status(self,aid):
         with self.guard:
             task=self.running.get(aid)
@@ -43,6 +58,7 @@ class FrameIndex:
     def build(self,asset,dest):
         aid=asset['id']
         with self.guard:
+            if self.closed:raise ValueError('Frame indexing service is closed')
             if dest.is_file():return
             if aid in self.running:raise ValueError('The frame index is already being generated')
             task={'process':None,'cancel':threading.Event(),'count':0}
@@ -54,11 +70,12 @@ class FrameIndex:
                 temp=Path(file.name)
                 cmd=['ffprobe','-v','error','-select_streams','v:0','-show_frames',
                      '-show_entries','frame=best_effort_timestamp','-of','compact=p=0:nk=0',asset['path']]
-                with subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,creationflags=CREATE_FLAGS) as p:
+                with self.guard:
+                    if task['cancel'].is_set():raise ValueError('Frame indexing cancelled')
+                    process=subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,creationflags=CREATE_FLAGS)
+                    task['process']=process
+                with process as p:
                     try:
-                        with self.guard:
-                            task['process']=p
-                            if task['cancel'].is_set():p.terminate()
                         last=None
                         for line in p.stdout:
                             for field in line.split(b'|'):
