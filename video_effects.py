@@ -12,12 +12,12 @@ def value(c,prop,time,default):
     return animation.expression({prop:default,**c},prop,time)
 
 
-def filters(c,start,count,jobdir):
+def filters(c,start,count,jobdir,*,alpha=True):
     parts=[]
     if any(active(c,k,d) for k,d in [('brightness',0),('contrast',1),('saturation',1)]):
         params=[f"{p}='{value(c,p,start,d)}'" for p,d in [('brightness',0),('contrast',1),('saturation',1)]]
         parts.append('eq='+':'.join(params)+':eval=frame')
-    parts.append('format=rgba')
+    if alpha:parts.append('format=rgba')
     if c.get('chroma'):
         parts.append(f"colorkey=0x{c.get('keyColor','#00ff00')[1:]}:{c.get('similarity',.16)}:{c.get('keyBlend',.08)}")
     if c.get('mask')=='ellipse':
@@ -46,4 +46,4 @@ def filters(c,start,count,jobdir):
     if c.get('keys',{}).get('scale'):
         scale=value(c,'scale',start,1)
         parts.append(f"scale=w='max(2,2*round(iw*({scale})/2))':h='max(2,2*round(ih*({scale})/2))':eval=frame")
-    return ','+','.join(parts)
+    return ','+','.join(parts) if parts else ''
