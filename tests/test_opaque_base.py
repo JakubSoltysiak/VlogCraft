@@ -7,6 +7,19 @@ import render_engine as engine
 import server
 
 class OpaqueBaseTests(unittest.TestCase):
+    def test_camera_display_rotation_keeps_full_canvas(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder);src=root/'coded.mp4';rotated=root/'rotated.mp4'
+            subprocess.run(['ffmpeg','-v','error','-f','lavfi','-i','testsrc2=s=160x90:r=24:d=0.5','-c:v','libx264',str(src)],capture_output=True,check=True)
+            subprocess.run(['ffmpeg','-v','error','-display_rotation','90','-i',str(src),'-c','copy',str(rotated)],capture_output=True,check=True)
+            a=dict(id='a'*32,kind='video',name='rotated',path=str(rotated),**server.probe(rotated))
+            self.assertEqual(abs(a['rotation']),90)
+            s=server.default_state();s['assets']=[a];s['output'].update(width=160,height=90,fps=24,preset='ultrafast')
+            s['tracks'][1]['clips']=[server.default_clip(a)]
+            out=root/'out.mp4';engine.render(s,out,root/'work')
+            meta=server.probe(out);self.assertEqual((meta['width'],meta['height']),(160,90))
+            subprocess.run(['ffmpeg','-v','error','-i',str(out),'-f','null','-'],check=True,capture_output=True)
+
     def test_opaque_picture_uses_direct_base_and_matches_reference(self):
         with tempfile.TemporaryDirectory() as folder:
             root=Path(folder);src=root/'source.mp4'

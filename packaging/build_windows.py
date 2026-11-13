@@ -16,7 +16,7 @@ from PIL import Image, ImageDraw
 ROOT = Path(__file__).resolve().parents[1]
 BUILD = ROOT / 'build'
 RELEASE = ROOT / 'release'
-VERSION = '3.4.5'
+VERSION = '3.4.6'
 WIX_NS = 'http://schemas.microsoft.com/wix/2006/wi'
 UPGRADE_CODE = '09FA364C-4D7B-4B43-A1CF-7D82A0B62F02'
 ET.register_namespace('', WIX_NS)
@@ -30,7 +30,7 @@ def identifier(prefix, path):
     return prefix + hashlib.sha256(str(path).casefold().encode()).hexdigest()[:28]
 
 
-def build(wix):
+def build(wix,experimental_native=False):
     os.chdir(ROOT)
     RELEASE.mkdir(exist_ok=True)
     BUILD.mkdir(exist_ok=True)
@@ -64,6 +64,19 @@ def build(wix):
                     '--collect-data', 'webview', '--exclude-module', 'playwright',
                     '--exclude-module', 'tkinter', 'desktop.py'], check=True)
     bundle = ROOT / 'dist' / 'VlogCraftStudio'
+    if experimental_native:
+        import json
+        runtime=ROOT/'build/tools/architecture'
+        sdk=runtime/'ffmpeg-shared/ffmpeg-9.0.2-full_build-shared'
+        executable=runtime/'VlogCraftNative.exe'
+        if not executable.is_file() or not (sdk/'bin').is_dir():
+            raise RuntimeError('Build the optional native runtime with tools/setup_architecture_lab.py first')
+        target=bundle/'_internal/engine/native';target.mkdir(parents=True,exist_ok=True)
+        shutil.copy2(executable,target/executable.name)
+        for library in (sdk/'bin').glob('*.dll'):shutil.copy2(library,target/library.name)
+        for license_file in sdk.glob('LICENSE*'):shutil.copy2(license_file,target/license_file.name)
+        manifest={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in target.iterdir() if p.is_file()}
+        (target/'runtime.json').write_text(json.dumps({'files':manifest,'experimental':True,'default':False},indent=2))
     root = ET.Element('{' + WIX_NS + '}Wix')
     product = element(root, 'Product', Id='*', Name='VlogCraft Studio', Language='1033',
                       Version=VERSION, Manufacturer='VlogCraft Private', UpgradeCode=UPGRADE_CODE)
@@ -112,4 +125,5 @@ def build(wix):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--wix', type=Path, default=BUILD / 'tools' / 'wix')
-    build(parser.parse_args().wix)
+    parser.add_argument('--experimental-native',action='store_true',help='Bundle the already compiled local native runtime; keep the default renderer')
+    options=parser.parse_args();build(options.wix,options.experimental_native)

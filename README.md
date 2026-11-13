@@ -2,15 +2,21 @@
 
 > **[MASTER TO-DO LIST & PRODUCT ROADMAP](TODO.md)** — shared living backlog for the owner, Codex and ChatGPT. Check priorities and update it with each feature PR.
 
-Windows 11 x64 development project. The local development installer is **release/VlogCraft-Studio-3.4-x64.msi**, currently version 3.4.5 (architecture-investigation development build). The installer adds VlogCraft Studio to the Start menu and offers a desktop shortcut. Python, FFmpeg, FFprobe and OpenCV are bundled. WebView2 is required and was present on the qualification machine. Source and preserved tags are on the public repository, with 3.4 development reviewed in pull request 1. [GitHub repository](https://github.com/JakubSoltysiak/VlogCraft), [development PR](https://github.com/JakubSoltysiak/VlogCraft/pull/1).
+Windows 11 x64 development project. The local development installer is **release/VlogCraft-Studio-3.4-x64.msi**, currently version 3.4.6 (experimental native-playback development build). The installer adds VlogCraft Studio to the Start menu and offers a desktop shortcut. Python, FFmpeg, FFprobe and OpenCV are bundled. WebView2 is required and was present on the qualification machine. Source and preserved tags are on the public repository, with 3.4 development reviewed in pull request 1. [GitHub repository](https://github.com/JakubSoltysiak/VlogCraft), [development PR](https://github.com/JakubSoltysiak/VlogCraft/pull/1).
 
-## Architecture investigation
+## Experimental native playback — 3.4.6
 
-The investigation preserves the editor and PR #1. The [architecture audit](docs/ARCHITECTURE_AUDIT.md), [measured comparisons](docs/ENGINE_BENCHMARKS.md), [decision](docs/ARCHITECTURE_DECISION.md) and [next implementation gates](docs/PERFORMANCE_ROADMAP.md) document the working FFmpeg, MLT and native D3D11 experiments. Native GPU composition is the preferred next video-engine slice; it is not enabled in ordinary editing. Full effect/VFR/audio/HDR parity remains open.
+The **Native GPU · experimental** preview choice integrates original-media libav/D3D11 decoding, bounded float16 composition and a stereo PCM audio clock into the existing Windows editor. The production FFmpeg renderer remains available and the default is unchanged. Supported cuts, transforms and keys use the native path; unsupported effects switch the whole SDR program to the reference compositor. PQ display requires active Windows HDR and never silently tone-maps to SDR.
+
+A 125-second, 1,500-clip, three-original4K/three-audio test completed with exact audio sample count and no underruns, but presented about **57.2 FPS at 540p**, still below 60 FPS. Three private camera recordings supplied additional PTS, precision, orientation and audio checks. Actual HDR display, full effect parity, hour-long/acoustic sync and real device-reset acceptance remain open. See the [3.4.6 integration report](docs/NATIVE_PLAYBACK_3_4_6.md), [verification](VERIFICATION.md) and [feature matrix](FEATURES.md). PRs #1 and #2 stay unmerged drafts; this milestone is a new stacked draft, not a stable release.
+
+## Architecture investigation — historical 3.4.5
+
+The investigation preserves the editor and PR #1. The [architecture audit](docs/ARCHITECTURE_AUDIT.md), [measured comparisons](docs/ENGINE_BENCHMARKS.md), [decision](docs/ARCHITECTURE_DECISION.md) and [next implementation gates](docs/PERFORMANCE_ROADMAP.md) document the working FFmpeg, MLT and native D3D11 experiments. At that checkpoint native GPU composition was the preferred next slice; 3.4.6 now exposes a limited opt-in preview. Full effect/VFR/audio/HDR parity remains open.
 
 3.4.5 adds a conservative opaque-picture render fastpath, range-dependent persistent preview caching with bounded pending work, and deterministic source-index child shutdown. The matched three-second 4K60 single-stream export improved from 7.326 to 6.101 seconds in the tested fixture; unrelated caption edits reuse unaffected preview ranges. See VERIFICATION.md for exact scope, failures and current package checks. [Reproduction scripts](benchmarks/README.md) use generated media; no private camera files or dependency binaries are published.
 
-Final scoped qualification includes a complete ten-minute generated sequence (1,500 clips/32 distinct sources), decoded long low-resolution export with exact frame/sample counts, two independent >5 GiB native originals and Windows installer retention. Sustained playback averaged 51.76 callbacks/s and still misses 60 FPS. Current source and installed bytes match; detailed evidence and limits are in VERIFICATION.md. Both development PRs remain unmerged drafts.
+Final scoped qualification includes a complete ten-minute generated sequence (1,500 clips/32 distinct sources), decoded long low-resolution export with exact frame/sample counts, two independent >5 GiB native originals and Windows installer retention. Sustained playback averaged 51.76 callbacks/s and still misses 60 FPS. Current source and installed bytes match; detailed evidence and limits are in VERIFICATION.md. The earlier two development PRs remain unmerged drafts.
 
 ## Editing
 

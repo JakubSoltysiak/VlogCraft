@@ -2,6 +2,8 @@
 
 The canonical requirements remain [TODO.md](../TODO.md). These are engineering milestones, not a promise of dates or complete professional readiness.
 
+3.4.6 implements the initial bounded native scheduler, PCM clock, child surface and explicit parity fallback. The scoped 125-second test reached its end below 60 FPS; high precision and private-camera checks do not close calibrated HDR, complex effects, actual device reset or 10–60 minute acceptance. See [current evidence](NATIVE_PLAYBACK_3_4_6.md).
+
 | Order | Work | Acceptance evidence before switching behavior |
 |---|---|---|
 | 1 — this draft | Guarded opaque base; range dependency cache; deterministic index shutdown | Decoded output, cache restart/stale/corrupt/budget cases, launch/cancel race, native-close child ownership, full regression and package checks. Measured scope in ENGINE_BENCHMARKS. |

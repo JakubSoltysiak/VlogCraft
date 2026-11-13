@@ -105,6 +105,8 @@ def run(project):
     server.choose_files = select_media
     server.choose_save_path = choose_export
     server.DESKTOP_ACTION = project_action
+    import native_playback
+    server.NATIVE_PLAYBACK=native_playback.Controller(window,cache,BUNDLE)
 
     def on_drop(event):
         files = event.get('dataTransfer', {}).get('files', [])
@@ -163,6 +165,7 @@ def run(project):
         webview.start(gui='edgechromium', private_mode=False, storage_path=str(cache / 'webview'))
     finally:
         import audio_cache
+        server.NATIVE_PLAYBACK.close()
         audio_cache.cancel()
         server.FRAME_INDEX.close()
         server.PROGRAM_PREVIEW.close()

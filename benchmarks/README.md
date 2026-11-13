@@ -1,6 +1,8 @@
 # Optional architecture lab
 
-These programs are opt-in local measurements, not editor features or dependencies. They operate on generated fixtures by default. Do not point them at private camera media for publication or upload their output blindly. Raw local logs may contain paths; public records are curated under docs/benchmarks.
+These programs are opt-in local measurements. In 3.4.6 a separate native player is optionally integrated into the editor; benchmark programs and MLT remain isolated. They operate on generated fixtures by default. Do not point them at private camera media for publication or upload their output blindly. Raw local logs may contain paths; public records are curated under docs/benchmarks.
+
+For 3.4.6, run benchmarks/native_precision.py RESULTS, tests/native_windows.py EXECUTABLE GENERATED_MEDIA RESULTS, and benchmarks/native_playback.py EXECUTABLE GENERATED_MEDIA RESULTS --seconds 125 after building the runtime. These use generated media. benchmarks/camera_native.py PRIVATE_MANIFEST PRIVATE_RESULTS is strictly local; its raw plans, captures and logs must remain ignored. tools/audit_private_media.py PRIVATE_MANIFEST --verify-hashes checks integrity without disclosing names/hashes. See [current scope](../docs/NATIVE_PLAYBACK_3_4_6.md).
 
 Use the build virtualenv's Python 3.11 and FFmpeg/FFprobe 9.0.2 on PATH. Native/MLT tests require Windows x64; GPU runs need a supported local adapter. Install packaging/requirements.txt first. Run from the repository root:
 

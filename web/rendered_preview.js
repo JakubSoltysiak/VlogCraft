@@ -87,7 +87,7 @@ function renderedPreview(force){
 }
 function setupRenderedPreview(){
   const change=()=>{
-    stopPlayback();invalidateRendered();refreshPlayers();
+    stopPlayback();nativeState.blocked=false;if(!nativeSelected())void nativeStop();invalidateRendered();refreshPlayers();
     if(!renderedEnabled())void request('preview/cancel','POST',{}).catch(e=>toast(e.message,true));
     $('previewLayers').hidden=renderedEnabled();
     $('programResolution').hidden=!renderedEnabled();$('programPreviewStatus').hidden=!renderedEnabled();

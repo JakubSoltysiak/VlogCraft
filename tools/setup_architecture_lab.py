@@ -42,7 +42,9 @@ def build(folder):
       str(ROOT/'experiments/native_d3d11/main.cpp'),'-I'+str(sdk/'include'),'-L'+str(sdk/'lib'),
       '-lavformat','-lavcodec','-lavutil','-lswscale','-ld3d11','-ldxgi','-o',str(folder/'native_d3d11.exe')]
  subprocess.run(cmd,cwd=ROOT,check=True)
- print(json.dumps({'native_binary_sha256':digest(folder/'native_d3d11.exe')}),flush=True)
+ player=list(cmd);player[player.index(str(ROOT/'experiments/native_d3d11/main.cpp'))]=str(ROOT/'native/player.cpp');player[-1]=str(folder/'VlogCraftNative.exe')
+ subprocess.run(player,cwd=ROOT,check=True)
+ print(json.dumps({'native_binary_sha256':digest(folder/'native_d3d11.exe'),'player_binary_sha256':digest(folder/'VlogCraftNative.exe')}),flush=True)
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('--component',choices=list(SPECS),action='append');p.add_argument('--build-native',action='store_true')
  a=p.parse_args();folder=ROOT/'build/tools/architecture';folder.mkdir(parents=True,exist_ok=True)

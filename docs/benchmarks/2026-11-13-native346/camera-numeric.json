@@ -1,0 +1,124 @@
+{
+  "cameras": [
+    {
+      "alias": "CameraA",
+      "seeks": [
+        {
+          "target_seconds": 0,
+          "process_seconds": 0.2656734000011056,
+          "pts_matches_reference": true
+        },
+        {
+          "target_seconds": 1.1,
+          "process_seconds": 0.2963823999998567,
+          "pts_matches_reference": true
+        },
+        {
+          "target_seconds": 3.217,
+          "process_seconds": 0.5727852999989409,
+          "pts_matches_reference": true
+        }
+      ],
+      "hdr10plus_retained_at_decode": true,
+      "float_readback": {
+        "finite": true,
+        "rgb_max": 17.953125,
+        "rgb_min": 0.0,
+        "hdr_linear_output": true
+      },
+      "offscreen180_process_seconds": 1.181685399998969
+    },
+    {
+      "alias": "CameraB",
+      "seeks": [
+        {
+          "target_seconds": 0,
+          "process_seconds": 0.3037815999996383,
+          "pts_matches_reference": true
+        },
+        {
+          "target_seconds": 1.1,
+          "process_seconds": 0.3048441000028106,
+          "pts_matches_reference": true
+        },
+        {
+          "target_seconds": 3.217,
+          "process_seconds": 0.36157810000077006,
+          "pts_matches_reference": true
+        }
+      ],
+      "hdr10plus_retained_at_decode": true,
+      "float_readback": {
+        "finite": true,
+        "rgb_max": 14.3515625,
+        "rgb_min": -0.00024318695068359375,
+        "hdr_linear_output": true
+      },
+      "offscreen180_process_seconds": 1.1326326999987941
+    },
+    {
+      "alias": "CameraC",
+      "seeks": [
+        {
+          "target_seconds": 0,
+          "process_seconds": 0.35917439999684575,
+          "pts_matches_reference": true
+        },
+        {
+          "target_seconds": 1.1,
+          "process_seconds": 0.6118711999988591,
+          "pts_matches_reference": true
+        },
+        {
+          "target_seconds": 3.217,
+          "process_seconds": 1.1946008000013535,
+          "pts_matches_reference": true
+        }
+      ],
+      "hdr10plus_retained_at_decode": false,
+      "float_readback": {
+        "finite": true,
+        "rgb_max": 1.0,
+        "rgb_min": 0.0,
+        "hdr_linear_output": false
+      },
+      "offscreen180_process_seconds": 1.0865650000014284
+    }
+  ],
+  "float_reference": [
+    {
+      "alias": "CameraA",
+      "cpu_reference_rgb_max": 22.660409927368164,
+      "native_rgb_max": 17.953125,
+      "float_rgb_mae": 0.0034986173268407583,
+      "p95_difference": 0.0109100341796875,
+      "hdr": true,
+      "reference_resize": "float-only NumPy/OpenCV; excludes clipping FFmpeg scale/pad conversion"
+    },
+    {
+      "alias": "CameraB",
+      "cpu_reference_rgb_max": 21.32631492614746,
+      "native_rgb_max": 14.3515625,
+      "float_rgb_mae": 0.009812423959374428,
+      "p95_difference": 0.04710826277732849,
+      "hdr": true,
+      "reference_resize": "float-only NumPy/OpenCV; excludes clipping FFmpeg scale/pad conversion"
+    },
+    {
+      "alias": "CameraC",
+      "cpu_reference_rgb_max": 1.0,
+      "native_rgb_max": 1.0,
+      "float_rgb_mae": 0.0018288535065948963,
+      "p95_difference": 0.0034998967312276363,
+      "hdr": false,
+      "reference_resize": "float-only NumPy/OpenCV; excludes clipping FFmpeg scale/pad conversion"
+    }
+  ],
+  "installed_camera_audio": {
+    "seconds": 10,
+    "first_ready_seconds": 0.7983329000053345,
+    "browser_error_count": 0,
+    "samples": 480000,
+    "underruns": 0
+  }
+}

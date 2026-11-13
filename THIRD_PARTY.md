@@ -8,7 +8,7 @@ The tracked repository contains application source, build scripts, documentation
 
 ## Optional architecture lab
 
-The opt-in setup script fetches checksum-pinned Zig 0.17.1, a Gyan FFmpeg 9.0.2 shared SDK and Shotcut 26.9.27/MLT 7.41.0 into ignored build storage. These tools are not new packaged-editor dependencies. MLT framework/modules and Shotcut have distinct LGPL/GPL obligations; the exact selected modules/build determine redistribution terms. The tested shared FFmpeg build includes GPL components. No tool archives, SDK/DLL/native binaries or generated media are published. Native CI compiles only and does not upload these outputs. Adoption and binary distribution require a separate exact-build/corresponding-source review; no project license is selected here.
+The opt-in setup script fetches checksum-pinned Zig 0.17.1, a Gyan FFmpeg 9.0.2 shared SDK and Shotcut 26.9.27/MLT 7.41.0 into ignored build storage. In 3.4.5 these tools were isolated experiments. The 3.4.6 --experimental-native local packaging option includes VlogCraftNative plus the pinned shared FFmpeg DLLs and exact SDK license/hash manifest; Zig/MLT/Shotcut are not editor runtime dependencies. MLT framework/modules and Shotcut have distinct LGPL/GPL obligations; the exact selected modules/build determine redistribution terms. The tested shared FFmpeg build includes GPL components. No tool archives, SDK/DLL/native binaries or generated media are published to GitHub; local installer qualification does not authorize public binary redistribution. Native CI compiles only and does not upload these outputs. Adoption and binary distribution require a separate exact-build/corresponding-source review; no project license is selected here.
 
 ## Runtime and build components
 
