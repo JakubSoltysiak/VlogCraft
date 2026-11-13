@@ -114,6 +114,7 @@ Browser quality counters count decoder/presentation behavior of one composed str
 - FFmpeg raw-page inline JavaScript initially failed syntax preflight. It was corrected; only completed canvas runs are reported.
 - Native per-frame fences verify finished GPU work but serialize the pipeline. The display proof exposes this limitation rather than counting submissions as presentation.
 - Offline visual regression initially failed because historical control references used another DPI capture configuration. Expected controls were regenerated from the independently verified installed 3.4.4 binary under explicit DPR1, inspected, and both baseline and changed source passed at unchanged pixel tolerance.
+- The first hosted native-compile job failed before compilation because Windows Server 2022 tar lacked LZMA support. Setup now selects installed 7-Zip when available, with tar retained for compatible systems. This was a tool-extraction failure, not a GPU run; final hosted status is in VERIFICATION.md.
 - The installed PyInstaller executable does not load the optional Python sitecustomize socket guard. Browser proxy/routing blocks still apply. Source Python is guarded; neither is an OS-firewall/physically disconnected qualification.
 - Current candidate comparison omits equivalent advanced effects/audio; no performance winner is declared for those missing scenarios.
 

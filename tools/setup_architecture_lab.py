@@ -1,5 +1,5 @@
 """Fetch pinned optional lab tools into ignored build storage; never install globally."""
-import argparse,hashlib,json,subprocess,urllib.request,zipfile
+import argparse,hashlib,json,os,shutil,subprocess,urllib.request,zipfile
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 SPECS={
@@ -26,7 +26,13 @@ def setup(name,folder):
     for entry in entries.infolist():
      if not (destination/entry.filename).resolve().is_relative_to(destination.resolve()):raise ValueError('Archive path escapes lab storage')
     entries.extractall(destination)
-  else:subprocess.run(['tar','-xf',str(archive),'-C',str(destination)],check=True)
+  else:
+   seven=shutil.which('7z')
+   installed=Path(os.environ.get('ProgramFiles','C:/Program Files'))/'7-Zip/7z.exe'
+   if not seven and installed.is_file():seven=str(installed)
+   # Windows Server 2022's built-in tar lacks the archive's LZMA codec.
+   if seven:subprocess.run([seven,'x','-y','-o'+str(destination),str(archive)],check=True,stdout=subprocess.DEVNULL)
+   else:subprocess.run(['tar','-xf',str(archive),'-C',str(destination)],check=True)
   stamp.write_text(json.dumps({'url':url,'sha256':sha},indent=2))
  print(json.dumps({'component':name,'sha256':sha}),flush=True)
 def build(folder):

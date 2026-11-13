@@ -101,5 +101,7 @@ jobs:
         run: |
           $msi=Get-ChildItem release -Filter *.msi | Select-Object -First 1
           python tests/windows_release.py $msi.FullName build/qa/lifecycle
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tests/verify_bundle.py dist/VlogCraftStudio build/qa/bundle.json --installed "$env:LOCALAPPDATA/Programs/VlogCraft Studio"
       # Bundled dependencies need corresponding-source review before binary distribution.
       # This job checks packaging and installation. It does not create a public release.
