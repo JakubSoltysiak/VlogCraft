@@ -26,6 +26,7 @@ secrets*.json
 .idea/
 
 # Personal projects, source footage, derived media and local databases
+/Sample Videos/
 workspace/*
 !workspace/README.txt
 *.vlogcraft
