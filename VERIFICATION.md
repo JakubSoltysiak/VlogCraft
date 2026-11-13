@@ -1,5 +1,31 @@
 # VlogCraft Studio 3.4 development qualification
 
+## 3.4.5 architecture investigation — 13 November 2026
+
+Development only. This work branches from the existing 3.4.4 development tip and preserves PR #1 and all previous tags. The [audit](docs/ARCHITECTURE_AUDIT.md), [engine benchmarks](docs/ENGINE_BENCHMARKS.md), [decision](docs/ARCHITECTURE_DECISION.md), [roadmap](docs/PERFORMANCE_ROADMAP.md) and [curated generated-fixture JSON](docs/benchmarks/2026-11-13) are the current report. Sections below this checkpoint retain historical 3.4.4/3.3/3.1 results.
+
+The final local Python regression passed **41 tests in 33.378 s** with the opt-in Python socket/DNS guard active and external connections blocked; **six JavaScript tests** passed in 72.345 ms. Additional prior full runs passed after each substantial production change (opaque fastpath: 34 Python; cache: 39; shutdown: 40, followed by the launch-race test and final 41). Cache tests include restart, output corruption, source/proxy mutation, nested/solo dependencies, budget eviction and protection of linked originals. Two index lifecycle tests cover actual child termination and cancellation before launch.
+
+Local **3.4.5** MSI built successfully. SHA-256 **E2EC33BA5649CE2E43F95092EFE2D370F8EB7C4E81DAC9231EE78B6FB810A189**. Upgrade from 3.4.4, uninstall and reinstall returned **0**; executable/shortcut removal/restoration and byte-identical project/settings retention passed (one controlled retained document in this profile). No public binary release is created. The former 3.4.4 MSI is retained locally under a version-specific filename.
+
+The installed 3.4.5 workflow passed with two independently allocated **4,977,125,566-byte** sources, native path drop, original linking, proxy cancel/retry, exact original source step, selected-frame review, curves/reference/scopes, linked audio/nest/expand/undo, motion apply/undo, explicit offline AI approval/redo/reload, recovery behavior and normal exit. Export selected packet offset **4,578,951,204**, produced **24 decoded 3840×2160 frames at 60/1**, with audio/video both .400000 s. Source comparison RGB MAE .052 at the test's reduced comparison size. Browser errors were empty. One run measured .656 s native drop→timeline, 3.297 s through proxy-ready, 1.000 s seek, 1.281 s export; peak summed workflow working set 1,724.9 MiB.
+
+Offline scope is explicit: Python source regression blocks external sockets/DNS; native workflow blocks external browser requests and uses a closed loopback proxy. An external test fetch failed as required. The frozen installed executable does not load sitecustomize, so its Python socket guard is reported false. This is not a physical disconnect or OS firewall test.
+
+Visual failure was investigated rather than ignored: DPR alone did not stabilize a systematic flat-color shift. Explicit DPR1 and sRGB capture profile removed display-color dependence. References were regenerated from the preserved, independently verified 3.4.4 MSI, inspected, then all three installed 3.4.5 control images matched exactly at the existing tolerance. This qualifies that capture configuration, not high-DPI/HDR monitor appearance.
+
+Safe production changes: conservative opaque-picture fastpath (three-second original4K60 single-stream median 7.326→6.101 s); range dependencies/persistent bounded program cache (unrelated caption rebuild 12.717 s→.001731 s cache hit with identical MP4); deterministic index-process cancellation/reaping. Independent video/PCM draining, original exports, schema migration and live API integration remain.
+
+All 60 current-source matched video-only engine invocations completed: FFmpeg, MLT 7.41 and native resident/download/software controls at 540p/4K, one/three original4K60 inputs. Native GPU resident won this limited throughput comparison. Its visible SDR child surface, float16/ramp precision and MLT six-channel PCM checks also passed. Complex effect equivalence, integrated audio/VFR/HDR and sustained native presentation remain unqualified. These experiments are not packaged editor features.
+
+The 70-second distinct-source source smoke completed, but recorded 52.04 callbacks/s and 548 browser-dropped frames; it is not a 60 FPS success. Full installed sequence playback, long rendering and final encoder/stall repetitions are pending at this checkpoint. Hosted CI results will be recorded after the draft is published.
+
+Remaining release blockers include dropped frames/range handoff, native scheduler/source-PTS/audio/effect parity, managed color/HDR/Log/HDR10+, multichannel product routing, pending real-camera corpus, one-hour acoustic sync, unified cache/storage pressure, device-loss/corrupt/clean-Windows/multiple-GPU/high-DPI qualification, signing and corresponding-source/licensing review. No paid request, camera upload or automatic AI edit was used.
+
+---
+
+## Historical 3.4.4 qualification
+
 12 November 2026. Local Windows build **3.4.4**, delivered as release/VlogCraft-Studio-3.4-x64.msi. SHA-256 **D90488F38D5D14ECE6A55FC86548CBDE7F5B7921AB53EFDA05B09CA1FC0D5A2D**. The installed application passed the native workflow. This remains a development build with an experimental buffered playback mode.
 
 ## GitHub integration and publication audit

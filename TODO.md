@@ -2,9 +2,9 @@
 
 **Canonical living document for the owner, ChatGPT, and Codex.**  
 **Project:** [JakubSoltysiak/VlogCraft](https://github.com/JakubSoltysiak/VlogCraft)  
-**Last consolidated:** 2026-11-12  
+**Last consolidated:** 2026-11-13\
 **Source of requirements:** discussions about VlogCraft Studio, the Kenya travel vlog, Samsung Galaxy footage, the 3.0–3.4 development history, and GitHub PR #1.  
-**Current development state:** 3.3 verified baseline on main; **3.4.4 remains an unmerged DRAFT** on [PR #1](https://github.com/JakubSoltysiak/VlogCraft/pull/1), tagged studio-3.4-development. Do **not** treat draft functionality as a stable release.
+**Current development state:** 3.3 verified baseline on main; **3.4.5 architecture investigation is a separate development draft**, based on the existing **3.4.4 unmerged DRAFT** on [PR #1](https://github.com/JakubSoltysiak/VlogCraft/pull/1), tagged studio-3.4-development. Do **not** treat draft functionality as a stable release.
 
 > **Mission:** A free, private, offline-first, genuinely capable Windows filmmaking editor. Give one person Premiere-like creative freedom and professional picture/audio quality without cloud processing, subscriptions, arbitrary source-size limits, or unnecessary complexity. Prioritize editing actual travel/wildlife footage over collecting features. It should be delightful for a casual annual vlog yet powerful when needed.
 
@@ -21,7 +21,7 @@
 - Verify hardware/device specifications from authoritative documentation and actual sample files; never fabricate camera calibration, sensor metadata, HDR support, or benchmark results.
 - Useful references: [README](README.md), [FEATURES](FEATURES.md), [ENGINEERING](ENGINEERING.md), [VERIFICATION](VERIFICATION.md), [third-party obligations](THIRD_PARTY.md), [PR #1](https://github.com/JakubSoltysiak/VlogCraft/pull/1).
 
-## Quick status snapshot (2026-11-12)
+## Quick status snapshot (2026-11-13)
 
 - **3.3 baseline:** native Windows desktop MSI, local media import, multiple video/audio tracks, basic nonlinear editing, nested tracks, keyframes, SDR grading, audio tools, recovery, AI review/proposals, and original-resolution exports. These have specific regression coverage, not blanket professional qualification.
 - **3.4.4 draft / PR #1:** buffered FFmpeg composited preview; exact 100/120/120000/1001 rates and 10% constant speed; 8K preset and short real decode/encode tests; independently drained video/audio render fix; hosted Windows CI passed **33 Python + 6 JavaScript tests** and MSI lifecycle. Two independently allocated ~4.98 GB sources passed the reported installed workflow.
@@ -29,6 +29,18 @@
 - **3.4.4 measured 4K60 export:** ~16.27 encoded FPS on libx264, ~19.52 on AMD AMF in a three-second synthetic case. These numbers are too slow to call optimized.
 - **Current limitations:** CPU composition, eight-second pre-rendered preview ranges, cache-miss stalls and handoff gaps, unreliable GPU-utilization metrics, no verified hour-long sync, no full real-camera corpus, limited HDR tone-mapping/SDR export, stereo-oriented audio, no native HDR10+ authoring.
 - The current source is a **standalone VlogCraft codebase**, not a fork containing an ArtCraft editor engine; residual historical ArtCraft text in old README files is background only. Keep investigating real bottlenecks rather than deleting unrelated code.
+
+## Architecture investigation checkpoint (3.4.5 development)
+
+The owner added this canonical roadmap on main; the investigation branch merged that revision before editing it. Existing requirements and stable identifiers remain. See [audit](docs/ARCHITECTURE_AUDIT.md), [benchmarks and raw results](docs/ENGINE_BENCHMARKS.md), [decision](docs/ARCHITECTURE_DECISION.md) and [engineering gates](docs/PERFORMANCE_ROADMAP.md). Broad P0 requirements remain unchecked where camera/long-form/parity acceptance is incomplete.
+
+- [x] **VC-ARCH-001 — Scoped competing-engine experiment.** Real moving images through FFmpeg software, MLT 7.41 CPU C ABI and C++ libav/D3D11 resident/download/software controls; 20 matched configurations × 3 repetitions at 540p/4K, static scale/position/alpha, original4K60 H.264. Not full editor/effect/audio parity or MLT 7.42 GPU qualification.
+- [x] **VC-ARCH-002 — Conservative opaque-base fastpath.** Actual format/SAR metadata gates the optimization; unknown/alpha/transformed cases retain fallback. Decoded test passed. Three-second original4K60 single-stream export median 7.326 → 6.101 s, unchanged bitrate/preset, three repeats/version; not a generalized layered throughput claim.
+- [x] **VC-ARCH-003 — Range-dependent persistent program cache.** Relevant nested clips, source/proxy identity, solo context, LUTs and renderer version; restart/corruption/budget tests; bounded two pending snapshots. Unrelated caption trial 12.717 s rebuild → .001731 s hit, identical MP4 bytes. Complete-file limit 12/512 MiB excludes in-flight outputs and other cache families.
+- [x] **VC-ARCH-004 — Source-index shutdown ownership.** Atomic process registration, cancel/terminate/wait/reap, native before/after reproduction and deterministic race/owned-child tests. Does not solve cancellable import probing or all background-job lifetimes.
+- [x] **VC-ARCH-005 — Narrow precision/channel capability proofs.** Native P010/float16 and MLT RGBA64 retain 877 ramp levels; isolated MLT six-channel 48 kHz PCM is bit-exact for 2 s. Not product HDR, managed color, multichannel routing or Atmos.
+- [ ] **VC-ARCH-006 — Continuous native engine integration.** Preferred next slice, with WebView2 retained. Current SDR child surface and FFmpeg canvas experiments are video-only; implement bounded asynchronous queue, source PTS/VFR, audio-master clock, effect parity and reliable fallback before enabling.
+- [ ] **VC-ARCH-007 — Complete architecture acceptance matrix.** Camera path pending, MLT 7.42 GPU, D3D12, native complex effects, long original4K/HEVC/VFR, acoustic drift, GPU occupancy, physical presentation/disk I/O and other GPU vendors remain unqualified. Partial synthetic coverage is documented rather than marking these complete.
 
 ## P0 — Make the editor usable, fast, safe, and truly offline
 
@@ -165,7 +177,7 @@
 
 ## Proposed implementation order (flexible, not a promise of release dates)
 
-1. **Next: architecture and performance study** on draft PR #1 (deep profiling + FFmpeg/MLT/native GPU comparative prototypes). Select a measured path; preserve fallbacks.
+1. **Architecture study now has measured prototypes and safe production fixes** on a separate architecture-investigation draft. Continue with the native scheduler/parity milestone in docs/PERFORMANCE_ROADMAP.md; retain PR #1 and all fallbacks.
 2. **Continuous local 4K60 editing engine**, quick preview/cache, no cut gaps, responsive projects, and long-form real-camera testing.
 3. **HDR-first color architecture** with high-precision precision-preserving frames and proper Windows/TV preview.
 4. **Full HDR10, HDR10+, HLG and Samsung Log workflows**, 10-bit HEVC exports, dynamic metadata correctness, and camera sample acceptance.

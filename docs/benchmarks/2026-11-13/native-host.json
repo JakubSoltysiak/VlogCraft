@@ -1,0 +1,32 @@
+{
+  "native_surface_parented": true,
+  "native_surface_visible": true,
+  "webview_animation_callbacks": 158,
+  "engine": {
+    "mode": "hardware",
+    "layers": 3,
+    "width": 960,
+    "height": 540,
+    "frames": 120,
+    "setup_seconds": 0.137923,
+    "first_frame_seconds": 0.337857,
+    "seek_seconds": 0,
+    "processing_seconds": 2.26465,
+    "composited_fps": 52.9883,
+    "decode_api_seconds": 0.261981,
+    "transfer_seconds": 0,
+    "upload_seconds": 0,
+    "draw_submit_seconds": 0.0011792,
+    "gpu_wait_seconds": 1.942,
+    "float16_output": true,
+    "presentation_enabled": true,
+    "present_calls": 120,
+    "late_frames": 114,
+    "dxgi_statistics_available": true,
+    "dxgi_present_count": 119,
+    "present_call_fps_after_first": 57.7198,
+    "dxgi_present_rate": 58.5102,
+    "present_wait_seconds": 0.0382973,
+    "audio": false
+  }
+}

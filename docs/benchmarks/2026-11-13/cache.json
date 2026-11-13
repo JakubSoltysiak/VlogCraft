@@ -1,0 +1,24 @@
+[
+  {
+    "engine": "3.4.4 whole-project",
+    "initial_prepare_seconds": 12.973125700023957,
+    "unrelated_edit_seconds": 12.71698979998473,
+    "same_range_id": false,
+    "same_bytes": true,
+    "cache_metrics": null
+  },
+  {
+    "engine": "range dependencies",
+    "initial_prepare_seconds": 12.853892499988433,
+    "unrelated_edit_seconds": 0.0017309999675489962,
+    "same_range_id": true,
+    "same_bytes": true,
+    "cache_metrics": {
+      "hits": 1,
+      "misses": 1,
+      "diskHits": 0,
+      "invalidated": 0,
+      "evicted": 0
+    }
+  }
+]

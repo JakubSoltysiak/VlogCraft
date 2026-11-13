@@ -1,0 +1,135 @@
+{
+  "width": 960,
+  "frames": 120,
+  "repeat": 3,
+  "variants": {
+    "lut": {
+      "runs": [
+        {
+          "output": "-",
+          "seconds": 2.06832,
+          "exit": 0,
+          "ffmpeg_user_s": 3.656,
+          "ffmpeg_system_s": 0.078,
+          "ffmpeg_runtime_s": 1.979,
+          "ffmpeg_peak_rss_MiB": 137.8
+        },
+        {
+          "output": "-",
+          "seconds": 2.075678,
+          "exit": 0,
+          "ffmpeg_user_s": 3.609,
+          "ffmpeg_system_s": 0.062,
+          "ffmpeg_runtime_s": 1.991,
+          "ffmpeg_peak_rss_MiB": 138.01
+        },
+        {
+          "output": "-",
+          "seconds": 2.064001,
+          "exit": 0,
+          "ffmpeg_user_s": 3.375,
+          "ffmpeg_system_s": 0.047,
+          "ffmpeg_runtime_s": 1.991,
+          "ffmpeg_peak_rss_MiB": 138.21
+        }
+      ],
+      "median_seconds": 2.06832
+    },
+    "opacity": {
+      "runs": [
+        {
+          "output": "-",
+          "seconds": 1.754067,
+          "exit": 0,
+          "ffmpeg_user_s": 2.344,
+          "ffmpeg_system_s": 0.141,
+          "ffmpeg_runtime_s": 1.694,
+          "ffmpeg_peak_rss_MiB": 124.91
+        },
+        {
+          "output": "-",
+          "seconds": 1.817427,
+          "exit": 0,
+          "ffmpeg_user_s": 2.453,
+          "ffmpeg_system_s": 0.109,
+          "ffmpeg_runtime_s": 1.761,
+          "ffmpeg_peak_rss_MiB": 124.87
+        },
+        {
+          "output": "-",
+          "seconds": 1.835058,
+          "exit": 0,
+          "ffmpeg_user_s": 2.406,
+          "ffmpeg_system_s": 0.078,
+          "ffmpeg_runtime_s": 1.776,
+          "ffmpeg_peak_rss_MiB": 124.91
+        }
+      ],
+      "median_seconds": 1.817427
+    },
+    "chroma": {
+      "runs": [
+        {
+          "output": "-",
+          "seconds": 1.755089,
+          "exit": 0,
+          "ffmpeg_user_s": 2.375,
+          "ffmpeg_system_s": 0.125,
+          "ffmpeg_runtime_s": 1.693,
+          "ffmpeg_peak_rss_MiB": 125.35
+        },
+        {
+          "output": "-",
+          "seconds": 1.738963,
+          "exit": 0,
+          "ffmpeg_user_s": 2.438,
+          "ffmpeg_system_s": 0.094,
+          "ffmpeg_runtime_s": 1.681,
+          "ffmpeg_peak_rss_MiB": 125.15
+        },
+        {
+          "output": "-",
+          "seconds": 1.7604,
+          "exit": 0,
+          "ffmpeg_user_s": 2.281,
+          "ffmpeg_system_s": 0.125,
+          "ffmpeg_runtime_s": 1.702,
+          "ffmpeg_peak_rss_MiB": 125.13
+        }
+      ],
+      "median_seconds": 1.755089
+    },
+    "color": {
+      "runs": [
+        {
+          "output": "-",
+          "seconds": 1.771885,
+          "exit": 0,
+          "ffmpeg_user_s": 2.141,
+          "ffmpeg_system_s": 0.047,
+          "ffmpeg_runtime_s": 1.709,
+          "ffmpeg_peak_rss_MiB": 123.27
+        },
+        {
+          "output": "-",
+          "seconds": 1.764665,
+          "exit": 0,
+          "ffmpeg_user_s": 2.047,
+          "ffmpeg_system_s": 0.062,
+          "ffmpeg_runtime_s": 1.706,
+          "ffmpeg_peak_rss_MiB": 122.95
+        },
+        {
+          "output": "-",
+          "seconds": 1.778168,
+          "exit": 0,
+          "ffmpeg_user_s": 2.0,
+          "ffmpeg_system_s": 0.062,
+          "ffmpeg_runtime_s": 1.722,
+          "ffmpeg_peak_rss_MiB": 123.38
+        }
+      ],
+      "median_seconds": 1.771885
+    }
+  }
+}

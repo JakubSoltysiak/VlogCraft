@@ -1,5 +1,15 @@
 # Architecture and continuation
 
+## 3.4.5 investigation — current continuation
+
+The dedicated feature/architecture-investigation branch starts at the existing 3.4 development tip and merges the owner's canonical main roadmap without rewriting history. PR #1 stays draft and unmerged. Read the full [module/ownership audit](docs/ARCHITECTURE_AUDIT.md), [benchmarks](docs/ENGINE_BENCHMARKS.md), [architecture decision](docs/ARCHITECTURE_DECISION.md) and [gates](docs/PERFORMANCE_ROADMAP.md).
+
+Production changes are deliberately narrow: render_engine._opaque_base conservatively bypasses background/alpha composition only with proven source and geometry metadata; preview_dependencies fingerprints actual range/nested/source/proxy/LUT dependencies; preview_cache owns one bounded worker and restart-verified manifests; source_frames atomically registers processes and closes/cancels/reaps them under desktop ownership. The independent video/PCM drains remain. Schema, editing commands and live API behavior are preserved.
+
+The native C++ experiment directly samples NV12/P010 D3D11 decoder textures into float16 and can display an SDR child swapchain beside WebView2. Software/download controls preserve ten-bit ramps. MLT 7.41 CPU image pull, RGBA64 and six-channel PCM were actually exercised. Neither engine is integrated with the project scheduler/effect/audio contract. New MLT 7.42 GPU behavior, D3D12 and Rust performance are unqualified. A continuous FFmpeg raw-frame canvas path is measured but video-only. No experimental dependencies enter the packaged editor.
+
+The records below describe the retained 3.4.4 implementation and historical work; newer scoped results and remaining blockers are in the linked investigation and VERIFICATION.md.
+
 The 3.4 work continues from ddb8b55 and studio-3.3-verified on feature/studio-3.4-playback, reviewed in GitHub pull request 1. Public main preserves the verified baseline plus the publication audit. Historical development started from the 3.2 source snapshot, preserved at studio-3.2-source. The 3.1 Windows qualification remains at studio-3.1-verified. The extracted archive is at studio-3.0-original.
 
 ## Retained architecture
@@ -12,7 +22,7 @@ The archive's decimal timeline, unvalidated recovery, independent media clocks a
 
 The buffered transport composes an eight-second window with a continuous video graph and a separate audio graph, then muxes the completed streams. Clip visibility, title timing, source-time animation and sample-delayed mixed audio are evaluated on the sequence clock. Matching source/seek/speed inputs share a decoder within each media type. Decoded comparisons match the segmented export reference across cuts, titles, animated geometry and delayed audio.
 
-preview_cache.py owns a single render worker, two pending ranges, revision/fingerprint invalidation, cancellation, atomic publication and a twelve-file/512 MiB complete-file cache budget. Renderer format version participates in the cache key. Shutdown joins cancellation. Obsolete ranges never replace a newer monitor revision.
+preview_cache.py owns a single render worker, two pending ranges, range dependency and renderer-format invalidation, cancellation, atomic publication and a twelve-file/512 MiB complete-file cache budget. Renderer format version participates in the cache key. Shutdown joins cancellation. Obsolete ranges never replace a newer monitor revision.
 
 The browser plays one combined H.264/AAC stream at a time, with a prepared next range. Its clock drives the playhead and remains bounded by the exact range end. The default 540p trades cache preparation time for presentation load. A single AAC/video stream removes independent audio-element synchronization during that mode. Range handoff remains a buffered transport with possible gaps. MSE/native uninterrupted playback and hour-long audio qualification remain future work.
 

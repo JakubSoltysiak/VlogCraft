@@ -2,7 +2,13 @@
 
 > **[MASTER TO-DO LIST & PRODUCT ROADMAP](TODO.md)** — shared living backlog for the owner, Codex and ChatGPT. Check priorities and update it with each feature PR.
 
-Windows 11 x64 development project. The local development installer is **release/VlogCraft-Studio-3.4-x64.msi**, currently version 3.4.4. The installer adds VlogCraft Studio to the Start menu and offers a desktop shortcut. Python, FFmpeg, FFprobe and OpenCV are bundled. WebView2 is required and was present on the qualification machine. Source and preserved tags are on the public repository, with 3.4 development reviewed in pull request 1. [GitHub repository](https://github.com/JakubSoltysiak/VlogCraft), [development PR](https://github.com/JakubSoltysiak/VlogCraft/pull/1).
+Windows 11 x64 development project. The local development installer is **release/VlogCraft-Studio-3.4-x64.msi**, currently version 3.4.5 (architecture-investigation development build). The installer adds VlogCraft Studio to the Start menu and offers a desktop shortcut. Python, FFmpeg, FFprobe and OpenCV are bundled. WebView2 is required and was present on the qualification machine. Source and preserved tags are on the public repository, with 3.4 development reviewed in pull request 1. [GitHub repository](https://github.com/JakubSoltysiak/VlogCraft), [development PR](https://github.com/JakubSoltysiak/VlogCraft/pull/1).
+
+## Architecture investigation
+
+The investigation preserves the editor and PR #1. The [architecture audit](docs/ARCHITECTURE_AUDIT.md), [measured comparisons](docs/ENGINE_BENCHMARKS.md), [decision](docs/ARCHITECTURE_DECISION.md) and [next implementation gates](docs/PERFORMANCE_ROADMAP.md) document the working FFmpeg, MLT and native D3D11 experiments. Native GPU composition is the preferred next video-engine slice; it is not enabled in ordinary editing. Full effect/VFR/audio/HDR parity remains open.
+
+3.4.5 adds a conservative opaque-picture render fastpath, range-dependent persistent preview caching with bounded pending work, and deterministic source-index child shutdown. The matched three-second 4K60 single-stream export improved from 7.326 to 6.101 seconds in the tested fixture; unrelated caption edits reuse unaffected preview ranges. See VERIFICATION.md for exact scope, failures and current package checks. [Reproduction scripts](benchmarks/README.md) use generated media; no private camera files or dependency binaries are published.
 
 ## Editing
 
@@ -14,7 +20,7 @@ Windows 11 x64 development project. The local development installer is **release
 - **Composited preview** buffers eight-second program ranges through the export compositor and plays one combined audio/video stream. It renders ahead, reuses matching source decoders, cancels obsolete work and limits complete cache files. The default is 540p. Preparation and cache misses can pause playback. Live layers remains the initial interactive mode.
 - **Reference** renders a paused program frame with the export compositor. Paused scopes display that same frame. Interactive playback uses browser compositing, automatic 720p proxies, an audio master clock and bounded decoder reuse. Effects and audio processors have approximation differences during interactive playback.
 - Audio channel strips provide gain, pan, low/high shelves, compression and a master peak meter. Peak normalization and dialogue-track-driven music ducking measure original audio and write editable gain changes. A 48 kHz, 16-bit stereo FLAC preview cache avoids reading an entire video container for each independent audio track.
-- **Export film** renders original media to SDR MP4 and AAC. Select dimensions, exact frame rate, CPU encoder or an accelerator that passes a real local encode probe. Hardware failure automatically retries the corresponding software encoder. The compositor remains CPU-based.
+- **Export film** renders original media to 8-bit SDR MP4 and stereo AAC. The dialog explicitly states PQ/HLG-to-SDR delivery; managed HDR and multichannel export remain unavailable. Select dimensions, exact frame rate, CPU encoder or an accelerator that passes a real local encode probe. Hardware failure automatically retries the corresponding software encoder. The compositor remains CPU-based.
 
 Space toggles playback. Arrow keys step sequence frames. **S** splits. Ctrl+Z and Ctrl+Y undo and redo. Ctrl+D duplicates. Delete removes the selection and Shift+Delete closes its track gap. Ctrl+S saves.
 

@@ -6,6 +6,10 @@ The original VlogCraft 3.0 code and demonstration screenshots came from the user
 
 The tracked repository contains application source, build scripts, documentation and small demonstration/control screenshots. The archived screenshots show a mock timeline and application controls. It contains no camera footage, music recording, project document, virtual environment, FFmpeg executable or Windows installer. System font names in the stylesheet refer to fonts installed on the user's machine. Font binaries are not supplied in this repository. The build icon is drawn by the packaging script.
 
+## Optional architecture lab
+
+The opt-in setup script fetches checksum-pinned Zig 0.17.1, a Gyan FFmpeg 9.0.2 shared SDK and Shotcut 26.9.27/MLT 7.41.0 into ignored build storage. These tools are not new packaged-editor dependencies. MLT framework/modules and Shotcut have distinct LGPL/GPL obligations; the exact selected modules/build determine redistribution terms. The tested shared FFmpeg build includes GPL components. No tool archives, SDK/DLL/native binaries or generated media are published. Native CI compiles only and does not upload these outputs. Adoption and binary distribution require a separate exact-build/corresponding-source review; no project license is selected here.
+
 ## Runtime and build components
 
 | Component | Role | Upstream license information |

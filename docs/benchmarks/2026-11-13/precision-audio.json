@@ -1,0 +1,36 @@
+{
+  "native_ramp": {
+    "distinct_luma_values": 877,
+    "mean_error_normalized": 0.0004742759218952601
+  },
+  "native_high_bit_controls": {
+    "download": {
+      "distinct_luma_values": 877,
+      "mean_error_normalized": 0.00016180674660287405
+    },
+    "software": {
+      "distinct_luma_values": 877,
+      "mean_error_normalized": 0.00016180674660287405
+    }
+  },
+  "mlt_rgba64_ramp": {
+    "distinct_luma_values": 877,
+    "mean_error_normalized": 0.0019239695146821046
+  },
+  "mlt_six_channel": {
+    "frames": 120,
+    "sample_frames": 96000,
+    "channels": 6,
+    "mean_absolute_pcm_error": 0.0,
+    "rms_per_channel": [
+      0.05656854250971847,
+      0.05656854251541237,
+      0.05656854257805845,
+      0.05656854253317079,
+      0.05656854244507356,
+      0.056568542501802176
+    ]
+  },
+  "hdr_management_qualified": false,
+  "atmos_qualified": false
+}
