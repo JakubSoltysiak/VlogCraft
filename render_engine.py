@@ -78,6 +78,7 @@ def boundaries(state,fps):
 def _num(v): return f'{float(v):.9f}'
 
 def _atempo(speed):
+    if speed==1:return 'anull'
     effects=[]
     while speed<.5:
         effects.append('atempo=.5'); speed*=2
@@ -97,7 +98,7 @@ def _add_audio(filters, input_idx, track, clip, start, end, dur, label):
     if fo:afades+=f',afade=t=out:st={_num(max(0,clip_length(clip)-fo))}:d={_num(fo)}'
     afades+=',asetpts=PTS-STARTPTS'
     gain=animation.expression(clip,'volume',start)
-    filters.append(f'[{input_idx}:a]atrim=start=0,aresample=48000,aformat=channel_layouts=stereo,'
+    filters.append(f'[{input_idx}:a]atrim=start=0,aresample=48000:first_pts=0,aformat=channel_layouts=stereo,'
                    f'asetpts=PTS-STARTPTS,{_atempo(float(clip.get("speed",1)) )}{audio_edit.filters(clip)},'
                    f"volume='{_num(track.get('volume',1))}*{gain}':eval=frame{afades},apad,"
                    f'atrim=duration={_num(dur)},asetpts=PTS-STARTPTS[{label}]')
@@ -126,6 +127,7 @@ def _opaque_base(video,assets,start,end,fps,width,height):
     _,clip=video[0]
     if clip.get('kind')!='video':return False
     asset=assets[clip['assetId']]
+    if float(asset.get('rotation',0))%360:return False
     fmt=asset.get('pixelFormat','')
     if not (fmt.startswith(('yuv','gray')) and not fmt.startswith('yuva') or fmt in ('nv12','p010le','uyvy422','yuyv422','rgb24','bgr24')):return False
     if asset.get('sampleAspectRatio') not in ('1:1','1/1'):return False

@@ -48,6 +48,7 @@ MEDIA=WORK/'media'; THUMBS=WORK/'thumbnails'; PROXIES=WORK/'proxies'; REVIEWS=WO
 AI_UNDO=WORK/'ai_undo.json'
 import preview_cache
 PROGRAM_PREVIEW=preview_cache.PreviewCache(WORK/'preview-cache')
+NATIVE_PLAYBACK=None
 LOCK=threading.RLock(); UPLOAD_LOCK=threading.RLock(); JOB_LOCK=threading.RLock()
 VIDEO={'.mp4','.mov','.mkv','.m4v','.avi','.wmv','.webm','.mpg','.mpeg','.mts','.m2ts'}
 IMAGE={'.jpg','.jpeg','.png','.webp','.bmp','.tif','.tiff'}
@@ -137,7 +138,7 @@ def save_state(candidate=None):
 
 def probe(path):
     p=subprocess.run(['ffprobe','-v','error','-show_entries',
-                      'format=format_name,duration,start_time:stream=time_base,start_pts,duration_ts,avg_frame_rate,codec_type,codec_name,width,height,r_frame_rate,channels,channel_layout,sample_rate,sample_aspect_ratio,bits_per_raw_sample,color_transfer,color_primaries,color_space,color_range,pix_fmt',
+                      'format=format_name,duration,start_time:stream=time_base,start_pts,duration_ts,avg_frame_rate,codec_type,codec_name,width,height,r_frame_rate,channels,channel_layout,sample_rate,sample_aspect_ratio,bits_per_raw_sample,color_transfer,color_primaries,color_space,color_range,pix_fmt:stream_side_data=rotation',
                       '-of','json',str(path)],capture_output=True,text=True,timeout=75)
     if p.returncode:raise ValueError(f'FFprobe could not read {Path(path).name}: {p.stderr[-500:]}')
     info=json.loads(p.stdout);streams=info.get('streams',[])
@@ -159,6 +160,7 @@ def probe(path):
             'width':(v or {}).get('width') or 0,
             'height':(v or {}).get('height') or 0,'hasAudio':bool(a),
             'codec':(v or a or {}).get('codec_name','unknown'),'fps':fps,
+            'rotation':next((d['rotation'] for d in (v or {}).get('side_data_list',[]) if 'rotation' in d),0),
             'pixelFormat':(v or {}).get('pix_fmt','unknown'),'sampleAspectRatio':(v or {}).get('sample_aspect_ratio','unknown'),
             'colorPrimaries':(v or {}).get('color_primaries','unknown'),'colorSpace':(v or {}).get('color_space','unknown'),
             'colorRange':(v or {}).get('color_range','unknown'),'audioChannels':(a or {}).get('channels'),
@@ -681,6 +683,18 @@ class Handler(BaseHTTPRequestHandler):
         try:
             if path=='/api/state':
                 return self.json_response(client_state())
+            if path=='/api/native/capabilities':return self.json_response(NATIVE_PLAYBACK.capabilities() if NATIVE_PLAYBACK else {'available':False,'experimental':True})
+            if path=='/api/native/status':return self.json_response(NATIVE_PLAYBACK.status() if NATIVE_PLAYBACK else {'running':False})
+            if path=='/api/native/audio':
+                if not self.check_origin() or self.headers.get('Sec-Fetch-Site')=='cross-site':return self.json_response({'error':'Forbidden origin'},403)
+                if not NATIVE_PLAYBACK:raise ValueError('Native preview is unavailable')
+                args=parse_qs(parsed.query);samples,end,stream=NATIVE_PLAYBACK.audio(int(args['generation'][0]),int(args['frame'][0]))
+                self.send_response(200);self.send_header('Content-Type','application/octet-stream');self.send_header('Content-Length',str(samples*4));self.send_header('X-End-Frame',str(end));self.send_header('Cache-Control','no-store');self.end_headers()
+                try:
+                    for chunk in stream:self.wfile.write(chunk)
+                except (BrokenPipeError,ConnectionError,ValueError):self.close_connection=True
+                finally:stream.close()
+                return
             if path=='/api/preview/status':
                 return self.json_response(PROGRAM_PREVIEW.status(parse_qs(parsed.query).get('id',[''])[0]))
             if path.startswith('/preview/'):
@@ -740,7 +754,7 @@ class Handler(BaseHTTPRequestHandler):
                 if not target.exists():target=EXPORTS/name
                 return self.file_response(target)
             if path=='/' or path=='/index.html':return self.file_response(WEB/'index.html','text/html; charset=utf-8')
-            if path in ('/app.js','/studio.js','/animation.js','/motion.js','/timeline.js','/timebase.js','/edit_ops.js','/edit_commands.js','/monitor.js','/rendered_preview.js','/playback_cache.js','/effects.js','/grade.js','/audio.js','/nesting.js','/source_frames.js','/style.css'):
+            if path in ('/app.js','/studio.js','/animation.js','/motion.js','/timeline.js','/timebase.js','/edit_ops.js','/edit_commands.js','/monitor.js','/rendered_preview.js','/native_preview.js','/native_audio_worklet.js','/playback_cache.js','/effects.js','/grade.js','/audio.js','/nesting.js','/source_frames.js','/style.css'):
                 return self.file_response(WEB/path.lstrip('/'))
             return self.json_response({'error':'Not found'},404)
         except (BrokenPipeError,ConnectionAbortedError,ConnectionResetError):return
@@ -808,6 +822,17 @@ class Handler(BaseHTTPRequestHandler):
                 with UPLOAD_LOCK:u=UPLOADS.pop(uid,None)
                 if u:Path(u['tmp']).unlink(missing_ok=True)
                 return self.json_response({'cancelled':bool(u)})
+            if path.startswith('/api/native/'):
+                if not NATIVE_PLAYBACK:raise ValueError('Native preview is unavailable')
+                command=path.rsplit('/',1)[-1]
+                if command=='start':
+                    with LOCK:snap=deepcopy(STATE)
+                    return self.json_response(NATIVE_PLAYBACK.start(snap,data))
+                if command=='clock':return self.json_response(NATIVE_PLAYBACK.clock(data.get('microseconds',0),data.get('playing',False),int(data.get('generation',-1))))
+                if command=='seek':return self.json_response(NATIVE_PLAYBACK.seek(data['frame'],data.get('generation')))
+                if command=='bounds':NATIVE_PLAYBACK.bounds(data['rect'],data.get('visible',True));return self.json_response({'updated':True})
+                if command=='stop':NATIVE_PLAYBACK.stop();return self.json_response({'stopped':True})
+                raise ValueError('Unknown native command')
             if path=='/api/preview/cancel':
                 PROGRAM_PREVIEW.cancel()
                 return self.json_response({'cancelRequested':True})

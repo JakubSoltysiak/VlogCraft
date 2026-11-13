@@ -8,7 +8,7 @@ import render_engine
 import sequences
 import timing
 
-FORMAT='program-preview/3.4.5/1'
+FORMAT='program-preview/3.4.6/1'
 
 
 def file_identity(path):

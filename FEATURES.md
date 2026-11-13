@@ -2,12 +2,22 @@
 
 Tested means the specific check in VERIFICATION.md passed. Implemented means code is available with further acceptance coverage needed. Partial identifies implemented behavior with material gaps. Missing identifies an unavailable capability. A test result qualifies its fixture and environment.
 
-3.4.5 investigation results are scoped in [VERIFICATION.md](VERIFICATION.md) and the [benchmark report](docs/ENGINE_BENCHMARKS.md). Experimental engines remain separate from ordinary editor features.
+3.4.6 adds an opt-in experimental native preview. The existing full FFmpeg renderer/exporter remains. [Current native scope and fallback matrix](docs/NATIVE_PLAYBACK_3_4_6.md), [verification](VERIFICATION.md) and historical [3.4.5 benchmarks](docs/ENGINE_BENCHMARKS.md) distinguish working behavior from remaining acceptance gates.
+
+| Native 3.4.6 capability | Status | Verification / gap |
+|---|---|---|
+| Continuous D3D11 preview | Partial, tested subset | Async original H.264/HEVC decode; queues 4/source, GPU ring 3, max 3 active decoders. 125 s / 1,500 clips completed, ~57.2 presented FPS at 540p, 345 skipped frames; no 60 FPS qualification. |
+| PCM/audio clock | Tested subset | Exact 6,000,000 samples in 125 s, zero underruns; mono/stereo only, source offsets retained. Acoustic/hour-long/device-change drift pending. |
+| PTS/VFR/rational seek | Tested subset | Real-camera bounded PTS seeks and 60000/1001 transport; pause/resume/cancel. Full corpus/long VFR pending. |
+| Transforms/keys/nests | Partial | Position/scale/opacity/rotation and supported source-time keys; flatten existing nests. Reference fallback for unsupported visual operations. |
+| FP16/PQ/HDR10+ | Partial | 877 ramp levels; linear PQ above SDR white; side data retained at decode. Inactive-HDR display rejection verified. No HLG/Log/mixed-color transform, HDR10+ mastering or HDR export. |
+| Native GPU export | Missing | Existing original-media FFmpeg CPU/hardware fallback remains the delivery engine. |
+| Actual device reset / calibrated HDR | Missing qualification | Owned-child kill/fallback/retry differs from GPU removal; no physical HDR scanout claim. |
 
 | Capability | Status | Available behavior and remaining gaps |
 |---|---|---|
 | Windows desktop and MSI | Tested | Per-user installation, native WebView2, bundled codecs, Start menu and optional desktop shortcut. Release lifecycle evidence is in VERIFICATION.md. Code signing, clean Windows images, WebView2 deployment and DPI/accessibility qualification remain. |
-| Large native imports | Tested | Two new independent 5,972,550,422-byte (>5 GiB), six-second 4K60 raw MOVs passed the installed 3.4.5 workflow and 84-frame original export. Earlier allocated 4,977,125,566-byte MOV checks retain their 24-frame scope. Native drop bridge, linked paths, frame beyond 4 GiB, proxy, split, trim, undo, original export. Multi-file tests use two independently allocated MOVs with different picture and audio content, exposed through separate NTFS paths. Structural HTTP/chunk offsets exceed 4 GiB. Physical Explorer gestures and a complete multi-GB browser upload remain unqualified. |
+| Large native imports | Tested | Two independent 5,972,550,422-byte (>5 GiB), six-second 4K60 raw MOVs passed the installed 3.4.6 regression as well as the earlier 3.4.5 workflow and 84-frame original export. Earlier allocated 4,977,125,566-byte MOV checks retain their 24-frame scope. Native drop bridge, linked paths, frame beyond 4 GiB, proxy, split, trim, undo, original export. Multi-file tests use two independently allocated MOVs with different picture and audio content, exposed through separate NTFS paths. Structural HTTP/chunk offsets exceed 4 GiB. Physical Explorer gestures and a complete multi-GB browser upload remain unqualified. |
 | Media formats | Partial | H.264 MP4, HEVC MOV, raw MOV, FFV1 MOV/MKV, images and audio fixtures. Unknown extensions can be classified from detected media metadata. MTS/M2TS, rotated phone media, long-GOP camera collections, 6K, broad 8K camera-media coverage and corrupt-media fuzzing remain. |
 | Rational sequence and source timing | Tested | 3.4 adds 100, 120 and 120000/1001 with 10–400% constant-speed editing. Decoded short 4K120/119.88 and trimmed 8K59.94 H.264 tests pass.  Exact integer and NTSC rational rates, schema-4 sequence frames and source ticks, original VFR PTS index, exclusive out-points, reordered single-frame edits and decoded identifiers. Integer audio sample budgeting avoids join drift. SMPTE drop-frame timecode and frame-exact interactive playback remain. |
 | Track and clip editing | Partial | Track controls, snapping, trim, split, move, duplicate/delete, track-local ripple, Ctrl-click multiselection, roll, slip, slide, insert/overwrite and linked camera audio. Commands validate before publishing. Cross-track ripple policy, markers, persistent general edit history, configurable shortcuts and timeline clipboard remain. |

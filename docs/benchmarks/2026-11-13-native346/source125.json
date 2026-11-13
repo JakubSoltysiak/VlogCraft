@@ -1,0 +1,175 @@
+{
+  "seconds": 125.0,
+  "measured_seconds": 125.0885,
+  "first_ready_seconds": 0.988286199997674,
+  "samples": 6000000,
+  "underruns": 0,
+  "reached_end": true,
+  "video_tracks": 3,
+  "audio_tracks": 3,
+  "original_resolution": [
+    3840,
+    2160
+  ],
+  "program_resolution": [
+    960,
+    540
+  ],
+  "rate": "60/1",
+  "proxies": false,
+  "completed_frames_per_second": 57.183514072037,
+  "present_calls_per_second": 57.19950275205155,
+  "dxgi_present_count_per_second": 57.159531052015176,
+  "intermediate_encoded_video_files": 0,
+  "working_set_history": [
+    {
+      "seconds": 0.015,
+      "summed_working_set_MiB": 1994.28
+    },
+    {
+      "seconds": 5.046,
+      "summed_working_set_MiB": 1928.34
+    },
+    {
+      "seconds": 10.078,
+      "summed_working_set_MiB": 1924.25
+    },
+    {
+      "seconds": 15.093,
+      "summed_working_set_MiB": 1756.45
+    },
+    {
+      "seconds": 20.125,
+      "summed_working_set_MiB": 1778.66
+    },
+    {
+      "seconds": 25.156,
+      "summed_working_set_MiB": 1780.88
+    },
+    {
+      "seconds": 30.187,
+      "summed_working_set_MiB": 1834.34
+    },
+    {
+      "seconds": 35.218,
+      "summed_working_set_MiB": 1821.25
+    },
+    {
+      "seconds": 40.234,
+      "summed_working_set_MiB": 1836.25
+    },
+    {
+      "seconds": 45.281,
+      "summed_working_set_MiB": 1826.79
+    },
+    {
+      "seconds": 50.296,
+      "summed_working_set_MiB": 1840.54
+    },
+    {
+      "seconds": 55.328,
+      "summed_working_set_MiB": 1847.56
+    },
+    {
+      "seconds": 60.375,
+      "summed_working_set_MiB": 1861.01
+    },
+    {
+      "seconds": 65.39,
+      "summed_working_set_MiB": 1868.38
+    },
+    {
+      "seconds": 70.437,
+      "summed_working_set_MiB": 1924.09
+    },
+    {
+      "seconds": 75.468,
+      "summed_working_set_MiB": 1876.97
+    },
+    {
+      "seconds": 80.5,
+      "summed_working_set_MiB": 1892.92
+    },
+    {
+      "seconds": 85.531,
+      "summed_working_set_MiB": 1892.65
+    },
+    {
+      "seconds": 90.546,
+      "summed_working_set_MiB": 1904.63
+    },
+    {
+      "seconds": 95.578,
+      "summed_working_set_MiB": 1907.79
+    },
+    {
+      "seconds": 100.593,
+      "summed_working_set_MiB": 1909.38
+    },
+    {
+      "seconds": 105.64,
+      "summed_working_set_MiB": 1912.54
+    },
+    {
+      "seconds": 110.656,
+      "summed_working_set_MiB": 1925.22
+    },
+    {
+      "seconds": 115.687,
+      "summed_working_set_MiB": 1950.7
+    },
+    {
+      "seconds": 120.718,
+      "summed_working_set_MiB": 1948.65
+    }
+  ],
+  "resources": {
+    "duration_seconds": 125.344,
+    "gpu": {
+      "peak_process_gpu_memory_MiB": {
+        "Dedicated Usage": 17.46,
+        "Shared Usage": 1419.14
+      },
+      "memory_counter_errors": {},
+      "samples": 981,
+      "unavailable": null,
+      "peak_engine_percent": {
+        "3D": 10.38,
+        "Copy": 3.08,
+        "Compute 0": 0,
+        "Timer 0": 0,
+        "Security 1": 0,
+        "Video JPEG 0": 0,
+        "Video Processor": 0,
+        "Video Codec Engine": 100.0
+      },
+      "mean_engine_percent": {
+        "3D": 5.16,
+        "Copy": 0.04,
+        "Compute 0": 0.0,
+        "Timer 0": 0.0,
+        "Security 1": 0.0,
+        "Video JPEG 0": 0.0,
+        "Video Processor": 0.0,
+        "Video Codec Engine": 83.79
+      }
+    },
+    "average_cpu_machine_percent": 6.65,
+    "peak_summed_working_set_MiB": 2060.0,
+    "sampled_cpu_seconds": 200.08,
+    "process_read_MiB": 2430.7,
+    "process_write_MiB": 246.8
+  },
+  "last": {
+    "completed_frames": 7154,
+    "present_calls": 7156,
+    "dxgi_present_count": 7151,
+    "dxgi_statistics_available": true,
+    "surface_width": 356,
+    "surface_height": 200,
+    "skipped_sequence_frames": 345,
+    "peak_decoder_count": 3,
+    "peak_source_queue_frames": 4,
+    "peak_inflight_gpu_frames": 3
+  }
+}

@@ -23,7 +23,11 @@ The environment had no MSVC SDK/Rust toolchain on PATH. An isolated checksum-pin
 
 Rust could enforce ownership around queues, generations and resource handles, but FFmpeg/COM/shader boundaries still require audited unsafe FFI and wrapper/toolchain packaging. No Rust implementation was benchmarked. There is no evidence here for a language speed difference. Choose a stable narrow C ABI now; consider Rust for the scheduler or engine once equivalent tooling, Windows integration and maintenance costs are evaluated. Do not rewrite the Python/UI to obtain a different language.
 
-## Proposed engine contract (not yet implemented)
+## 3.4.6 implementation checkpoint
+
+The limited scheduler/audio/panel contract is now experimentally integrated. See [current implementation, parity/fallback and measured limits](NATIVE_PLAYBACK_3_4_6.md). The 125-second original4K/540p monitor test remained below 60 presented FPS; default adoption and full HDR/effect qualification remain blocked. The contract below records the earlier design, not a claim that every gate is now complete.
+
+## Proposed engine contract — historical 3.4.5
 
 - Input: existing immutable project snapshot plus generation, exact Fraction sequence rate, source tick ranges and track evaluation. UI commands remain unchanged.
 - Frame: sequence frame number, original source PTS/timebase, duration, orientation/SAR, alpha convention, color description, optional dynamic metadata reference and owned GPU surface. Never substitute nominal FPS for VFR source PTS.

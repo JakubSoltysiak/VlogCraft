@@ -21,6 +21,17 @@ def mark_sparse(path):
         subprocess.run(['fsutil','sparse','setflag',str(path)],check=True,capture_output=True)
 
 
+def sparse_length(file,size):
+    """Set sparse EOF with Win32; CRT truncate may physically zero-fill multi-GB holes."""
+    if os.name!='nt':
+        file.truncate(size);return
+    import ctypes,msvcrt
+    kernel=ctypes.WinDLL('kernel32',use_last_error=True)
+    seek=kernel.SetFilePointerEx;seek.argtypes=[ctypes.c_void_p,ctypes.c_longlong,ctypes.c_void_p,ctypes.c_uint32];seek.restype=ctypes.c_int
+    end=kernel.SetEndOfFile;end.argtypes=[ctypes.c_void_p];end.restype=ctypes.c_int
+    handle=msvcrt.get_osfhandle(file.fileno())
+    if not seek(handle,size,None,0) or not end(handle):raise ctypes.WinError(ctypes.get_last_error())
+
 class StudioTests(unittest.TestCase):
     def setUp(self):
         self._tmp=tempfile.TemporaryDirectory();self.root=Path(self._tmp.name)
@@ -134,7 +145,7 @@ class StudioTests(unittest.TestCase):
         video=self.root/'sparse-range.bin';size=4*1024**3+615000000
         video.touch();mark_sparse(video)
         with video.open('r+b') as file:
-            file.truncate(size)
+            sparse_length(file,size)
             file.seek(size-4);file.write(b'END!')
         aid='a'*32
         server.STATE['assets'].append({'id':aid,'name':video.name,'path':str(video),'kind':'video',
@@ -160,7 +171,7 @@ class StudioTests(unittest.TestCase):
             with server.UPLOAD_LOCK:
                 u=server.UPLOADS[id];u['offset']=big_size-64
                 mark_sparse(u['tmp'])
-                with Path(u['tmp']).open('r+b') as f:f.truncate(big_size-64)
+                with Path(u['tmp']).open('r+b') as f:sparse_length(f,big_size-64)
             c=http.client.HTTPConnection('127.0.0.1',port,timeout=10)
             c.request('PUT',f'/api/upload/chunk?id={id}&offset={big_size-64}',body=b'X'*64)
             resp=c.getresponse();payload=json.loads(resp.read());c.close()

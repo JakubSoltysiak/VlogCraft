@@ -62,7 +62,7 @@ jobs:
           PYTHONUTF8: "1"
         run: python benchmarks/drain_stress.py --repeat 20
       - name: JavaScript timeline commands
-        run: node --test tests/timeline_commands.test.js
+        run: node --test tests/timeline_commands.test.js tests/native_audio_worklet.test.js tests/native_clock.test.js
   native-compile:
     runs-on: windows-2022
     timeout-minutes: 20
@@ -96,8 +96,10 @@ jobs:
           New-Item -ItemType Directory -Force build/tools/wix | Out-Null
           Invoke-WebRequest https://github.com/wixtoolset/wix3/releases/download/wix3141rtm/wix314-binaries.zip -OutFile build/tools/wix.zip
           Expand-Archive build/tools/wix.zip build/tools/wix -Force
+      - name: Build optional native runtime for packaging (no GPU execution)
+        run: python tools/setup_architecture_lab.py --component zig --component ffmpeg-shared --build-native
       - name: Build Windows installer
-        run: python packaging/build_windows.py
+        run: python packaging/build_windows.py --experimental-native
       - name: Validate MSI lifecycle and retained data
         env:
           PYTHONUTF8: "1"

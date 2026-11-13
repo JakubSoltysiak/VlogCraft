@@ -1,6 +1,14 @@
 # Architecture and continuation
 
-## 3.4.5 investigation — current continuation
+## 3.4.6 native integration — current continuation
+
+See [native contract, ownership, privacy and acceptance](docs/NATIVE_PLAYBACK_3_4_6.md). native_plan.py conservatively admits a supported whole program; native_playback.py owns the child/panel and cancellable raw-PCM producers; native/player.cpp schedules original PTS into a bounded float16 ring. web/native_preview.js coordinates generations, coalesced seeks and the sample-counted AudioWorklet. Shared compiler audio now preserves initial PTS via aresample first_pts=0 and uses anull at 1×. Program preview dependency format 3.4.6/1 invalidates older cached audio.
+
+Actual stream orientation is probed and evaluated; the opaque reference optimization excludes rotated pictures. The D3D sampler clamps each plane to visible bounds to avoid padded chroma edges. Unsupported effects/layout/color contracts fail explicitly into the existing complete SDR renderer; PQ needs an explicit user SDR choice if HDR display is unavailable. Optional packaging includes the already-built native runtime with DLL/license hashes; no schema, cloud or live API change.
+
+The 3.4.6 sustained test reached 125 seconds / 1,500 clips without audio count drift or queue growth beyond fixed bounds, while ~57.2 FPS presentation and skipped frames keep adoption gates open. See VERIFICATION.md for current final package/regression status.
+
+## 3.4.5 investigation — historical checkpoint
 
 The dedicated feature/architecture-investigation branch starts at the existing 3.4 development tip and merges the owner's canonical main roadmap without rewriting history. PR #1 stays draft and unmerged. Read the full [module/ownership audit](docs/ARCHITECTURE_AUDIT.md), [benchmarks](docs/ENGINE_BENCHMARKS.md), [architecture decision](docs/ARCHITECTURE_DECISION.md) and [gates](docs/PERFORMANCE_ROADMAP.md).
 
