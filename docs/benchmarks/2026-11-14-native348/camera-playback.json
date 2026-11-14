@@ -1,0 +1,77 @@
+[
+  {
+    "alias": "CameraA",
+    "timeline_seconds": 81.68333333333334,
+    "samples": 3920800,
+    "expected_samples": 3920800,
+    "underruns": 0,
+    "first_ready_seconds": 0.6748507000011159,
+    "native_complete": true,
+    "HDR_linear": true,
+    "completed_last_frame": 4900,
+    "skips": 0,
+    "playback_interval": {
+      "count": 4899,
+      "mean_ms": 16.6668,
+      "p50_upper_ms": 16.7,
+      "p95_upper_ms": 17.7,
+      "p99_upper_ms": 18.2,
+      "max_ms": 21.4538,
+      "overflow_100ms": 0
+    },
+    "pool_frames": [
+      37
+    ],
+    "hdr10plus_retained_at_decode": true
+  },
+  {
+    "alias": "CameraB",
+    "timeline_seconds": 49.266666666666666,
+    "samples": 2364800,
+    "expected_samples": 2364800,
+    "underruns": 0,
+    "first_ready_seconds": 0.48162999999476597,
+    "native_complete": true,
+    "HDR_linear": true,
+    "completed_last_frame": 2955,
+    "skips": 0,
+    "playback_interval": {
+      "count": 2954,
+      "mean_ms": 16.666,
+      "p50_upper_ms": 16.7,
+      "p95_upper_ms": 17.7,
+      "p99_upper_ms": 18.1,
+      "max_ms": 24.0855,
+      "overflow_100ms": 0
+    },
+    "pool_frames": [
+      37
+    ],
+    "hdr10plus_retained_at_decode": true
+  },
+  {
+    "alias": "CameraC",
+    "timeline_seconds": 18.016666666666666,
+    "samples": 864800,
+    "expected_samples": 864800,
+    "underruns": 0,
+    "first_ready_seconds": 0.6106808000040473,
+    "native_complete": true,
+    "HDR_linear": false,
+    "completed_last_frame": 1080,
+    "skips": 0,
+    "playback_interval": {
+      "count": 1079,
+      "mean_ms": 16.6647,
+      "p50_upper_ms": 16.7,
+      "p95_upper_ms": 17.7,
+      "p99_upper_ms": 18.4,
+      "max_ms": 29.5516,
+      "overflow_100ms": 0
+    },
+    "pool_frames": [
+      37
+    ],
+    "hdr10plus_retained_at_decode": false
+  }
+]

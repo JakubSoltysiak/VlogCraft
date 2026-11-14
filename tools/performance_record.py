@@ -2,9 +2,11 @@
 import argparse,hashlib,json,sys
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
-FILES=['render_engine.py','native_plan.py','native_playback.py','performance_profile.py','desktop.py','server.py',
- 'web/app.js','web/index.html','web/native_preview.js','web/native_audio_worklet.js','web/performance.js','web/rendered_preview.js',
- *[str(p.relative_to(ROOT)).replace('\\','/') for p in sorted((ROOT/'native').glob('*')) if p.suffix in ('.cpp','.h')]]
+FILES=sorted({str(p.relative_to(ROOT)).replace('\\','/') for p in ROOT.glob('*.py')} |
+ {str(p.relative_to(ROOT)).replace('\\','/') for p in (ROOT/'web').iterdir() if p.suffix in ('.js','.html','.css')} |
+ {str(p.relative_to(ROOT)).replace('\\','/') for p in (ROOT/'native').iterdir() if p.suffix in ('.cpp','.h')} |
+ {'packaging/requirements.txt','packaging/build_windows.py','web/branding/manifest.json'})
+
 def fingerprint():
  h=hashlib.sha256()
  for name in sorted(FILES):

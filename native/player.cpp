@@ -22,6 +22,8 @@ int main(int argc,char** argv){
   std::map<std::string,std::string> currentClip;std::map<std::string,const Clip*> clipLookup;for(auto& c:plan.clips)clipLookup[c.id]=&c;
   auto start=Clock::now(),lastReport=start;int64_t previous=-1,generation=-1,drawnGeneration=-1;uint64_t waiting=0,skipped=0,sourceWait=0,gpuWait=0,sourceSkipped=0,gpuSkipped=0,clockSkipped=0,clockBackwards=0,repeatedSource=0,clockHolds=0,distinctFrames=0,redraws=0;int64_t highest=-1;bool sawSourceWait=false,sawGpuWait=false;std::map<std::string,int64_t> lastPTS;size_t maxDecoders=0,maxQueue=0;
   std::vector<std::pair<const Clip*,Frame>> selected;bool ready=false,eos=false;double first=0;
+  struct Miss {int64_t frame,lost,adjustment;double loopGap,sourceMs,clockAge,presentMs,contextMs;bool source,gpu;};
+  std::deque<Miss> misses;auto lastLoop=Clock::now();Distribution selectTime;double clockAge=0;int64_t adjustment=0;
   auto report=[&](const char* event,int64_t frame){
    if(renderer.display)renderer.display->stats();
    std::cout<<"{\"event\":\""<<event<<"\",\"sequence_frame\":"<<frame<<",\"generation\":"<<generation
@@ -37,23 +39,24 @@ int main(int argc,char** argv){
     auto& p=*producers[item.first->asset];std::cout<<"{\"clip\":\""<<item.first->id<<"\",\"pts\":"<<item.second->best_effort_timestamp<<",\"timebase_num\":"<<p.base.num<<",\"timebase_den\":"<<p.base.den<<",\"hdr10plus_retained\":"<<(av_frame_get_side_data(item.second.get(),AV_FRAME_DATA_DYNAMIC_HDR_PLUS)?"true":"false")<<",\"target_tick\":"<<av_rescale_q(plan.sourceTick(*item.first,frame),item.first->timebase,p.base)+p.origin<<"}";}
    std::cout<<"],\"source_wait_iterations\":"<<sourceWait<<",\"gpu_wait_iterations\":"<<gpuWait<<",\"skipped_after_source_wait\":"<<sourceSkipped<<",\"skipped_after_gpu_wait\":"<<gpuSkipped<<",\"skipped_without_queue_wait\":"<<clockSkipped<<",\"distinct_sequence_submissions\":"<<distinctFrames<<",\"nonadvancing_redraws\":"<<redraws<<",\"clock_rewind_hold_iterations\":"<<clockHolds<<",\"clock_backwards_frames\":"<<clockBackwards<<",\"repeated_source_layer_frames\":"<<repeatedSource;
    std::cout<<",\"timings\":{\"context_wait\":";renderer.contextWait.json();std::cout<<",\"submit_cpu\":";renderer.submitTime.json();std::cout<<",\"completion_observation\":";renderer.completionAge.json();std::cout<<",\"composition_gpu\":";renderer.gpuTime.json();
-   if(renderer.display){std::cout<<",\"present_call\":";renderer.display->presentTime.json();std::cout<<",\"present_call_interval\":";renderer.display->presentIntervals.json();}
-   std::cout<<",\"wake_overshoot\":";deadline.overshoot.json();std::cout<<"},\"high_resolution_wait\":"<<(deadline.timer?"true":"false")<<",\"decoder_statistics\":[";bool dc=false;
+   if(renderer.display){std::cout<<",\"present_call\":";renderer.display->presentTime.json();std::cout<<",\"present_call_interval\":";renderer.display->presentIntervals.json();std::cout<<",\"playback_present_interval\":";renderer.display->playIntervals.json();}
+   std::cout<<",\"source_selection\":";selectTime.json();std::cout<<",\"wake_overshoot\":";deadline.overshoot.json();std::cout<<"},\"high_resolution_wait\":"<<(deadline.timer?"true":"false")<<",\"decoder_statistics\":[";bool dc=false;
    for(auto& entry:producers){auto& p=*entry.second;std::lock_guard<std::mutex> lock(p.guard);if(dc)std::cout<<",";dc=true;
-    std::cout<<"{\"decoded_frames\":"<<p.decoded<<",\"decode_wall_seconds\":"<<p.decodedSeconds<<",\"seeks\":"<<p.seeks<<",\"queued_frames\":"<<p.queue.size()<<",\"warm_cache_frames\":"<<p.warm.size()<<",\"warm_cache_hits\":"<<p.warmHits<<"}";}
-   std::cout<<"]}"<<std::endl;
+    std::cout<<"{\"decoded_frames\":"<<p.decoded<<",\"decode_wall_seconds\":"<<p.decodedSeconds<<",\"seeks\":"<<p.seeks<<",\"queued_frames\":"<<p.queue.size()<<",\"warm_cache_frames\":"<<p.warm.size()<<",\"warm_cache_hits\":"<<p.warmHits<<",\"warm_budget_frames\":"<<p.warmBudget<<",\"decoder_threads\":"<<p.decoder->codec->thread_count<<",\"active_thread_type\":"<<p.decoder->codec->active_thread_type<<",\"hardware_pool_frames\":"<<(p.decoder->codec->hw_frames_ctx?((AVHWFramesContext*)p.decoder->codec->hw_frames_ctx->data)->initial_pool_size:0)<<"}";}
+   std::cout<<"]";input.clockStats();std::cout<<",\"retained_surface_views\":"<<renderer.textures.views.size()<<",\"retained_texture_pools\":"<<renderer.textures.pools.size()<<",\"retained_texture_estimated_MiB\":"<<renderer.textures.estimatedBytes()/1048576.<<"}"<<std::endl;
   };
   while(!input.stop){
+   double loopGap=seconds(lastLoop)*1000;lastLoop=Clock::now();
    MSG message;while(PeekMessageW(&message,nullptr,0,0,PM_REMOVE)){TranslateMessage(&message);DispatchMessageW(&message);}
    int64_t us,epoch;bool playing;if(limit){us=av_rescale_q(renderer.submitted,av_inv_q(plan.rate),AV_TIME_BASE_Q);epoch=0;playing=false;}
-   else input.snapshot(us,epoch,playing);
+   else input.snapshot(us,epoch,playing,&clockAge,&adjustment);
    int64_t frame=limit?(int64_t)renderer.submitted:av_rescale_q_rnd(us+1,AV_TIME_BASE_Q,av_inv_q(plan.rate),(AVRounding)AV_ROUND_DOWN);
    // The clock anchor is an exact sequence frame plus an independently advancing audio sample clock.
    frame=std::max<int64_t>(0,frame);eos=frame>=plan.end;frame=std::min(frame,plan.end-1);
    renderer.available();
    if(playing&&drawnGeneration==epoch&&frame<previous){clockHolds++;frame=previous;}
    if(drawnGeneration==epoch&&frame==previous&&!(renderer.display&&renderer.display->needsResize())){if(seconds(lastReport)>.1){report("status",frame);lastReport=Clock::now();}deadline.wait(playing?std::clamp<int64_t>(av_rescale_q(previous+1,av_inv_q(plan.rate),AV_TIME_BASE_Q)-us,100,5000):20000);continue;}
-   bool reset=generation!=epoch;generation=epoch;
+   auto selectionStart=Clock::now();bool reset=generation!=epoch;generation=epoch;
    std::vector<Clip*> active;std::map<std::string,bool> wanted;
    for(auto& c:plan.clips)if(c.position<=frame&&frame<c.end){active.push_back(&c);wanted[c.asset]=true;}
    if(active.size()>3)throw std::runtime_error("Native layer budget exceeded");
@@ -71,20 +74,24 @@ int main(int argc,char** argv){
     {std::lock_guard<std::mutex> lock(p.guard);maxQueue=std::max(maxQueue,p.peak);}
     if(!available){ready=false;break;}selected.push_back({c,f});
    }
+   double sourceMs=seconds(selectionStart)*1000;selectTime.add(sourceMs);
    Slot* slot=renderer.available();
    if(!ready||!slot){waiting++;if(!ready){sourceWait++;sawSourceWait=true;}else{gpuWait++;sawGpuWait=true;}if(seconds(lastReport)>.1){report("status",frame);lastReport=Clock::now();}deadline.wait(1000);continue;}
-   if(previous>=0&&drawnGeneration==generation&&frame>previous+1){auto lost=frame-previous-1;skipped+=lost;if(sawSourceWait)sourceSkipped+=lost;else if(sawGpuWait)gpuSkipped+=lost;else clockSkipped+=lost;}
+   if(previous>=0&&drawnGeneration==generation&&frame>previous+1){auto lost=frame-previous-1;skipped+=lost;if(sawSourceWait)sourceSkipped+=lost;else if(sawGpuWait)gpuSkipped+=lost;else clockSkipped+=lost;
+    if(misses.size()==256)misses.pop_front();misses.push_back({frame,lost,adjustment,loopGap,sourceMs,clockAge,renderer.display?renderer.display->lastPresentMs:0,renderer.contextWait.last,sawSourceWait,sawGpuWait});}
    if(drawnGeneration==generation&&frame<previous)clockBackwards++;
    for(auto& item:selected){auto pts=item.second->best_effort_timestamp;if(drawnGeneration==generation&&frame>previous&&lastPTS.count(item.first->asset)&&lastPTS[item.first->asset]==pts)repeatedSource++;lastPTS[item.first->asset]=pts;}
    sawSourceWait=sawGpuWait=false;
    if(drawnGeneration!=generation){highest=frame;distinctFrames++;}else if(frame>highest){highest=frame;distinctFrames++;}else redraws++;
-   renderer.draw(*slot,plan,frame,generation,selected);
+   renderer.draw(*slot,plan,frame,generation,selected,playing);
    if(!first)first=seconds(launch);
    previous=frame;drawnGeneration=generation;
    if(!capture.empty()&&(renderer.submitted==1||(limit&&renderer.submitted==(uint64_t)limit)))renderer.capture(*slot,capture+"-"+std::to_string(frame)+".rgba16f");
    if(seconds(lastReport)>.1){report("status",frame);lastReport=Clock::now();}
    if(limit&&renderer.submitted>=(uint64_t)limit)break;
   }
-  renderer.drain();report("closed",previous);return 0;
+  renderer.drain();report("closed",previous);
+  if(const char* trace=std::getenv("VLOGCRAFT_NATIVE_TRACE_FILE")){std::ofstream out(std::filesystem::u8path(trace));out<<"{\"bounded_missed_events\":[";bool comma=false;for(auto& m:misses){if(comma)out<<",";comma=true;out<<"{\"frame\":"<<m.frame<<",\"lost\":"<<m.lost<<",\"loop_gap_ms\":"<<m.loopGap<<",\"source_selection_ms\":"<<m.sourceMs<<",\"clock_age_ms\":"<<m.clockAge<<",\"clock_adjustment_us\":"<<m.adjustment<<",\"previous_present_ms\":"<<m.presentMs<<",\"context_wait_ms\":"<<m.contextMs<<",\"source_wait\":"<<m.source<<",\"gpu_wait\":"<<m.gpu<<"}";}out<<"]}";}
+  return 0;
  }catch(const std::exception& error){std::string message=error.what();const char* code=message.find("HDR display is not active")!=std::string::npos?"hdr_display_inactive":message.find("color contract")!=std::string::npos?"color_contract":"native_failure";std::cout<<"{\"event\":\"error\",\"code\":\""<<code<<"\",\"hresult\":"<<(uint32_t)nativeHResult<<",\"av_error\":"<<nativeAVError<<",\"reason\":\"Native decode, display or device failure; use the reference renderer\"}"<<std::endl;return 1;}
 }

@@ -121,7 +121,32 @@ def run(project):
             return
         window.run_js('void importNative(' + json.dumps(paths) + ')')
 
+    diagnostics_attached=False
     def on_loaded():
+        def attach_diagnostics():
+            nonlocal diagnostics_attached
+            if diagnostics_attached:return
+            try:
+                core=window.native.webview.CoreWebView2
+                def process_failed(sender,event):
+                    try:
+                        logging.error('WebView process failed kind=%s reason=%s exit=%s',
+                                      str(event.ProcessFailedKind),str(getattr(event,'Reason','unavailable')),getattr(event,'ExitCode',None))
+                    except Exception:
+                        logging.error('WebView process failed; extended numeric diagnostics unavailable')
+                def browser_exited(sender,event):
+                    kind=str(event.BrowserProcessExitKind)
+                    logging.log(logging.INFO if kind=='Normal' else logging.ERROR,'WebView browser exited kind=%s',kind)
+                def form_closing(sender,event):
+                    logging.info('Window close reason=%s accepted=%s',str(event.CloseReason),allow_close.is_set())
+                core.ProcessFailed += process_failed
+                core.Environment.BrowserProcessExited += browser_exited
+                window.native.FormClosing += form_closing
+                diagnostics_attached=True
+            except Exception:
+                logging.exception('Attaching local browser failure diagnostics')
+        from System import Action
+        window.native.Invoke(Action(attach_diagnostics))
         window.dom.document.events.drop += DOMEventHandler(on_drop, prevent_default=True)
         window.run_js("document.documentElement.classList.add('native-ready')")
 

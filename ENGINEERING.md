@@ -99,3 +99,13 @@ The optional legacy online connector is preserved at the user's request. Its mai
 VERIFICATION.md is the release report. Test tools preserve logs and measurement JSON under build/qa. Windows lifecycle tests hash project/settings documents through upgrade, removal and reinstall. A subprocess deliberately exits before project replacement to check crash recovery. Large native tests use actual allocated media and additional NTFS paths into two independently allocated large sources.
 
 Priority work is a continuous playback prototype, a real camera acceptance corpus, one-hour synchronization, cache eviction, cancellable probing, clean-Windows and multiple-GPU validation, then HDR/interchange and professional finishing. The current release retains these blockers in FEATURES.md.
+
+## 3.4.8 consistency checkpoint
+
+The measured hot path included WebView DOM/layout and clock IPC, while GPU composition was roughly .7–.8ms. Playhead translation, duplicate-frame/text suppression, accumulated30Hz meter paints and invalidation-driven monitor geometry reduce this work. Meter sampling remains at every animation callback. The native scheduler/PTS selection and PCM clock algorithm are retained; instrumentation adds bounded missed-event traces, playback-only p99, clock/source/Present/lock distinctions and texture-pool estimates. Do not infer GPU occupancy or thread/core placement from these counters.
+
+libx264 uses eight encoder workers only for3840×2160 at most60FPS on16+ logical processors with4GiB available RAM. Other cases retain four; decoder/filter worker defaults remain one. Decoder2/4 and filter-thread experiments were not adopted. The independent video/audio drain and hardware/software fallback paths remain intact.
+
+FULL now runs ten125s trials, five resolutions and600s endurance. Whole-run FPS retains historical end polling. Raw counter windows remain alongside separately labeled active windows excluding terminal holds. Baseline p99 and per-frame variance were not collected; run-mean variance is explicitly distinct. Failure retention must preserve incomplete attempts. windows_session records observer disconnects separately from host status, including intentional diagnostic detach; page-closed state after automation shutdown is not evidence of a physical window closure.
+
+The packaged candidate passed initial repeated targets, but lost WebView targets and longer WebView commit growth remain open. Further work should classify/reproduce those failures, verify recovery/save integrity, diagnose presentation/clock tails, and establish longer heap/physical-sync/full-size gates before HDR integration. See docs/PERFORMANCE_CONSISTENCY_3_4_8.md and canonical TODO.md. No global power/affinity/timer changes or default-native switch were made.

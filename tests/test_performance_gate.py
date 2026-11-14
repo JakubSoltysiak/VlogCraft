@@ -15,6 +15,11 @@ class PerformanceGateTests(unittest.TestCase):
   b={'contract':contract(power='AC'),'trials':[{'present_fps':56,'seek_p95_ms':120}]*3}
   r=performance_gate.compare(a,b);self.assertTrue(r['compatible']);self.assertTrue(r['investigate'])
   self.assertTrue(r['metrics']['present_fps']['repeated']);self.assertTrue(r['metrics']['seek_p95_ms']['investigate'])
+ def test_better_median_does_not_hide_worse_outlier(self):
+  a={'contract':contract(),'trials':[{'present_fps':59}]*3}
+  b={'contract':contract(),'trials':[{'present_fps':50},{'present_fps':60},{'present_fps':60}]}
+  r=performance_gate.compare(a,b);self.assertTrue(r['investigate'])
+  self.assertFalse(r['metrics']['present_fps']['median_investigate']);self.assertTrue(r['metrics']['present_fps']['worst_investigate'])
  def test_variation_is_retained_for_review(self):
   a={'contract':contract(),'trials':[{'present_fps':50},{'present_fps':59},{'present_fps':60}]}
   b={'contract':contract(),'trials':[{'present_fps':57},{'present_fps':60},{'present_fps':61}]}

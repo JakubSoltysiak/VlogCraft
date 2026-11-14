@@ -1,0 +1,364 @@
+{
+  "rows": [
+    {
+      "repeat": 0,
+      "workers_requested": 1,
+      "seconds": 2.0227939000033075,
+      "completed_frames": 180,
+      "fps": 88.98583291145266,
+      "threads_active": [
+        0,
+        0,
+        0
+      ],
+      "threads_configured": [
+        1,
+        1,
+        1
+      ],
+      "pool_frames": [
+        37,
+        37,
+        37
+      ],
+      "GPU_ms": {
+        "count": 180,
+        "mean_ms": 0.759972,
+        "p50_upper_ms": 0.8,
+        "p95_upper_ms": 1,
+        "p99_upper_ms": 1.1,
+        "max_ms": 1.06748,
+        "overflow_100ms": 0
+      },
+      "context_wait_ms": {
+        "count": 1217,
+        "mean_ms": 0.8489,
+        "p50_upper_ms": 0.1,
+        "p95_upper_ms": 6.8,
+        "p99_upper_ms": 8.1,
+        "max_ms": 43.7177,
+        "overflow_100ms": 0
+      }
+    },
+    {
+      "repeat": 0,
+      "workers_requested": 2,
+      "seconds": 1.8292808999976842,
+      "completed_frames": 180,
+      "fps": 98.3993218319985,
+      "threads_active": [
+        1,
+        1,
+        1
+      ],
+      "threads_configured": [
+        2,
+        2,
+        2
+      ],
+      "pool_frames": [
+        39,
+        39,
+        39
+      ],
+      "GPU_ms": {
+        "count": 180,
+        "mean_ms": 0.739008,
+        "p50_upper_ms": 0.8,
+        "p95_upper_ms": 0.9,
+        "p99_upper_ms": 1,
+        "max_ms": 0.98248,
+        "overflow_100ms": 0
+      },
+      "context_wait_ms": {
+        "count": 1165,
+        "mean_ms": 0.829009,
+        "p50_upper_ms": 0.1,
+        "p95_upper_ms": 6,
+        "p99_upper_ms": 7.3,
+        "max_ms": 46.7665,
+        "overflow_100ms": 0
+      }
+    },
+    {
+      "repeat": 0,
+      "workers_requested": 4,
+      "seconds": 1.8179854000045452,
+      "completed_frames": 180,
+      "fps": 99.0106961252549,
+      "threads_active": [
+        1,
+        1,
+        1
+      ],
+      "threads_configured": [
+        4,
+        4,
+        4
+      ],
+      "pool_frames": [
+        41,
+        41,
+        41
+      ],
+      "GPU_ms": {
+        "count": 180,
+        "mean_ms": 0.730956,
+        "p50_upper_ms": 0.8,
+        "p95_upper_ms": 0.9,
+        "p99_upper_ms": 1.1,
+        "max_ms": 1.48704,
+        "overflow_100ms": 0
+      },
+      "context_wait_ms": {
+        "count": 664,
+        "mean_ms": 1.96812,
+        "p50_upper_ms": 0.1,
+        "p95_upper_ms": 7.2,
+        "p99_upper_ms": 8.3,
+        "max_ms": 35.2467,
+        "overflow_100ms": 0
+      }
+    },
+    {
+      "repeat": 1,
+      "workers_requested": 4,
+      "seconds": 1.8271820999943884,
+      "completed_frames": 180,
+      "fps": 98.51234860529381,
+      "threads_active": [
+        1,
+        1,
+        1
+      ],
+      "threads_configured": [
+        4,
+        4,
+        4
+      ],
+      "pool_frames": [
+        41,
+        41,
+        41
+      ],
+      "GPU_ms": {
+        "count": 180,
+        "mean_ms": 0.724221,
+        "p50_upper_ms": 0.8,
+        "p95_upper_ms": 0.9,
+        "p99_upper_ms": 1,
+        "max_ms": 0.92924,
+        "overflow_100ms": 0
+      },
+      "context_wait_ms": {
+        "count": 650,
+        "mean_ms": 2.01743,
+        "p50_upper_ms": 0.1,
+        "p95_upper_ms": 6.9,
+        "p99_upper_ms": 8,
+        "max_ms": 25.2147,
+        "overflow_100ms": 0
+      }
+    },
+    {
+      "repeat": 1,
+      "workers_requested": 2,
+      "seconds": 1.8236997999920277,
+      "completed_frames": 180,
+      "fps": 98.70045497662876,
+      "threads_active": [
+        1,
+        1,
+        1
+      ],
+      "threads_configured": [
+        2,
+        2,
+        2
+      ],
+      "pool_frames": [
+        39,
+        39,
+        39
+      ],
+      "GPU_ms": {
+        "count": 180,
+        "mean_ms": 0.734009,
+        "p50_upper_ms": 0.8,
+        "p95_upper_ms": 0.9,
+        "p99_upper_ms": 1,
+        "max_ms": 0.9478,
+        "overflow_100ms": 0
+      },
+      "context_wait_ms": {
+        "count": 1216,
+        "mean_ms": 0.756734,
+        "p50_upper_ms": 0.1,
+        "p95_upper_ms": 5.9,
+        "p99_upper_ms": 7,
+        "max_ms": 38.9587,
+        "overflow_100ms": 0
+      }
+    },
+    {
+      "repeat": 1,
+      "workers_requested": 1,
+      "seconds": 1.846618599985959,
+      "completed_frames": 180,
+      "fps": 97.47546136563807,
+      "threads_active": [
+        0,
+        0,
+        0
+      ],
+      "threads_configured": [
+        1,
+        1,
+        1
+      ],
+      "pool_frames": [
+        37,
+        37,
+        37
+      ],
+      "GPU_ms": {
+        "count": 180,
+        "mean_ms": 0.725537,
+        "p50_upper_ms": 0.8,
+        "p95_upper_ms": 0.9,
+        "p99_upper_ms": 1,
+        "max_ms": 0.96428,
+        "overflow_100ms": 0
+      },
+      "context_wait_ms": {
+        "count": 1119,
+        "mean_ms": 0.909038,
+        "p50_upper_ms": 0.1,
+        "p95_upper_ms": 6.1,
+        "p99_upper_ms": 7.8,
+        "max_ms": 49.9208,
+        "overflow_100ms": 0
+      }
+    },
+    {
+      "repeat": 2,
+      "workers_requested": 1,
+      "seconds": 1.8753546999942046,
+      "completed_frames": 180,
+      "fps": 95.98184279515563,
+      "threads_active": [
+        0,
+        0,
+        0
+      ],
+      "threads_configured": [
+        1,
+        1,
+        1
+      ],
+      "pool_frames": [
+        37,
+        37,
+        37
+      ],
+      "GPU_ms": {
+        "count": 180,
+        "mean_ms": 0.737546,
+        "p50_upper_ms": 0.8,
+        "p95_upper_ms": 0.9,
+        "p99_upper_ms": 1.1,
+        "max_ms": 1.02568,
+        "overflow_100ms": 0
+      },
+      "context_wait_ms": {
+        "count": 1110,
+        "mean_ms": 0.940376,
+        "p50_upper_ms": 0.1,
+        "p95_upper_ms": 6.3,
+        "p99_upper_ms": 8.1,
+        "max_ms": 41.0186,
+        "overflow_100ms": 0
+      }
+    },
+    {
+      "repeat": 2,
+      "workers_requested": 2,
+      "seconds": 1.8141032999992603,
+      "completed_frames": 180,
+      "fps": 99.22257459102433,
+      "threads_active": [
+        1,
+        1,
+        1
+      ],
+      "threads_configured": [
+        2,
+        2,
+        2
+      ],
+      "pool_frames": [
+        39,
+        39,
+        39
+      ],
+      "GPU_ms": {
+        "count": 180,
+        "mean_ms": 0.724555,
+        "p50_upper_ms": 0.8,
+        "p95_upper_ms": 0.9,
+        "p99_upper_ms": 1,
+        "max_ms": 0.90844,
+        "overflow_100ms": 0
+      },
+      "context_wait_ms": {
+        "count": 1181,
+        "mean_ms": 0.790368,
+        "p50_upper_ms": 0.1,
+        "p95_upper_ms": 6,
+        "p99_upper_ms": 7.5,
+        "max_ms": 36.6258,
+        "overflow_100ms": 0
+      }
+    },
+    {
+      "repeat": 2,
+      "workers_requested": 4,
+      "seconds": 1.8491032000019914,
+      "completed_frames": 180,
+      "fps": 97.34448569436587,
+      "threads_active": [
+        1,
+        1,
+        1
+      ],
+      "threads_configured": [
+        4,
+        4,
+        4
+      ],
+      "pool_frames": [
+        41,
+        41,
+        41
+      ],
+      "GPU_ms": {
+        "count": 180,
+        "mean_ms": 0.73223,
+        "p50_upper_ms": 0.8,
+        "p95_upper_ms": 0.9,
+        "p99_upper_ms": 0.9,
+        "max_ms": 0.94768,
+        "overflow_100ms": 0
+      },
+      "context_wait_ms": {
+        "count": 636,
+        "mean_ms": 2.11761,
+        "p50_upper_ms": 0.1,
+        "p95_upper_ms": 7,
+        "p99_upper_ms": 8,
+        "max_ms": 49.4026,
+        "overflow_100ms": 0
+      }
+    }
+  ]
+}

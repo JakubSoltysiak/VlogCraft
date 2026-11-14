@@ -6,6 +6,8 @@ The canonical requirements remain [TODO.md](../TODO.md). These are engineering m
 
 3.4.7 adds an owned high-resolution deadline wait, memory-budgeted completion ring and original-PTS prefix cache, explicit native quality/DPI tests and reusable QUICK/STANDARD/FULL performance contracts. Matched 125 s median 57.71→59.67 FPS /279→28 skips; ten minutes59.87 FPS /62 skips /zero audio underruns. Memory rises; raw call/unique sequence rates are separate. [Workstation report](WORKSTATION_OPTIMIZATION_3_4_7.md) retains failed queue experiments, export/seek investigations and remaining gates.
 
+3.4.8 reaches the initial repeated target in10/10packaged trials (worst59.637FPS,2–16skips,zero underruns) at540p. Browser layout/meter and bounded encoder-worker improvements retain the source/PCM scheduler and FFmpeg fallback. The ten-minute retry passes, but the earlier lost target,WebView memory growth and191.8ms tail keep adoption/HDR gates open. [Consistency report](PERFORMANCE_CONSISTENCY_3_4_8.md) separates measured passes from missing production evidence.
+
 | Order | Work | Acceptance evidence before switching behavior |
 |---|---|---|
 | 1 — this draft | Guarded opaque base; range dependency cache; deterministic index shutdown | Decoded output, cache restart/stale/corrupt/budget cases, launch/cancel race, native-close child ownership, full regression and package checks. Measured scope in ENGINE_BENCHMARKS. |

@@ -1,0 +1,82 @@
+[
+  {
+    "composition": [
+      960,
+      540
+    ],
+    "surface": [
+      356,
+      200
+    ],
+    "seconds": 30.0,
+    "present_fps": 59.664007919783586,
+    "skips": 0,
+    "samples": 1440000,
+    "underruns": 0,
+    "reached_end": true
+  },
+  {
+    "composition": [
+      1280,
+      720
+    ],
+    "surface": [
+      356,
+      200
+    ],
+    "seconds": 30.0,
+    "present_fps": 59.62659631234747,
+    "skips": 0,
+    "samples": 1440000,
+    "underruns": 0,
+    "reached_end": true
+  },
+  {
+    "composition": [
+      1920,
+      1080
+    ],
+    "surface": [
+      356,
+      200
+    ],
+    "seconds": 30.0,
+    "present_fps": 59.53917538740286,
+    "skips": 0,
+    "samples": 1440000,
+    "underruns": 0,
+    "reached_end": true
+  },
+  {
+    "composition": [
+      2560,
+      1440
+    ],
+    "surface": [
+      356,
+      200
+    ],
+    "seconds": 30.0,
+    "present_fps": 59.509435834670285,
+    "skips": 0,
+    "samples": 1440000,
+    "underruns": 0,
+    "reached_end": true
+  },
+  {
+    "composition": [
+      3840,
+      2160
+    ],
+    "surface": [
+      356,
+      200
+    ],
+    "seconds": 30.0,
+    "present_fps": 59.58147003013426,
+    "skips": 3,
+    "samples": 1440000,
+    "underruns": 0,
+    "reached_end": true
+  }
+]

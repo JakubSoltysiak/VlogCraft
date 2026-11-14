@@ -12,7 +12,10 @@ function updateMeter(){
   const meter=$('masterMeter');if(!meter||!bus)return;
   bus.getFloatTimeDomainData(meterBuffer);let peak=0;
   for(const x of meterBuffer)peak=Math.max(peak,Math.abs(x));
-  const db=20*Math.log10(Math.max(.001,peak));meter.value=db;meter.title=db.toFixed(1)+' dBFS';
+  updateMeter.peak=Math.max(updateMeter.peak||0,peak);
+  const now=performance.now();if(now-(updateMeter.lastPaint??-Infinity)<1000/30)return;
+  const db=20*Math.log10(Math.max(.001,updateMeter.peak));updateMeter.peak=0;updateMeter.lastPaint=now;
+  if(Number(meter.value)!==db)meter.value=db;const title=db.toFixed(1)+' dBFS';if(meter.title!==title)meter.title=title;
 }
 function mixSource(media,c,gain){
   if(!mixer){media.volume=clamp(gain,0,1);return;}

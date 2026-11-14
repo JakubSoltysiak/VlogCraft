@@ -2,9 +2,9 @@
 
 **Canonical living document for the owner, ChatGPT, and Codex.**  
 **Project:** [JakubSoltysiak/VlogCraft](https://github.com/JakubSoltysiak/VlogCraft)  
-**Last consolidated:** 2026-11-13\
+**Last consolidated:** 2026-11-14\
 **Source of requirements:** discussions about VlogCraft Studio, the Kenya travel vlog, Samsung Galaxy footage, the 3.0–3.4 development history, and GitHub PR #1.  
-**Current development state:** 3.3 verified baseline on main; **3.4.6 native integration is a new stacked development draft**, based on the unmerged **3.4.5 architecture investigation / PR #2** and existing **3.4.4 unmerged DRAFT** on [PR #1](https://github.com/JakubSoltysiak/VlogCraft/pull/1), tagged studio-3.4-development. Do **not** treat draft functionality as a stable release.
+**Current development state:** 3.3 verified baseline on main; **3.4.8 consistency is a stacked development draft on codex/studio-3.4.8-consistency**, based on verified3.4.7 / unmerged PR #4. PRs #1–#4 and historical tags remain untouched. Scoped passing results do not make the native engine production-ready.
 
 > **Mission:** A free, private, offline-first, genuinely capable Windows filmmaking editor. Give one person Premiere-like creative freedom and professional picture/audio quality without cloud processing, subscriptions, arbitrary source-size limits, or unnecessary complexity. Prioritize editing actual travel/wildlife footage over collecting features. It should be delightful for a casual annual vlog yet powerful when needed.
 
@@ -59,6 +59,16 @@ The owner added this canonical roadmap on main; the investigation branch merged 
 - [ ] **VC-ARCH-006 — Continuous native engine integration.** Preferred next slice, with WebView2 retained. 3.4.6 opt-in preview now has bounded asynchronous queues, source PTS/VFR, PCM audio master, supported transforms/keys and whole-program SDR fallback. 125 s / 1,500 clips completed at ~57.2 presented FPS (540p from three originals4K); full effect/HDR/device-reset and sustained 60 FPS acceptance remain open.
 - [x] **VC-ARCH-008 — Scoped final synthetic endurance and large-file checks.** Installed 600-second/1,500-clip sequence across 32 distinct 720p sources reached its end; 51.76 callbacks/s remains below target. The full 320×180/60 export decoded 36,000 video and 28,800,000 stereo sample frames without accumulated count error. Two independent 5,972,550,422-byte originals passed installed native editing/export. This is not hour-long, real-camera, acoustic-sync or long4K qualification.
 - [ ] **VC-ARCH-007 — Complete architecture acceptance matrix.** Three private recordings now have bounded PTS/precision/orientation checks and scoped GUI/audio tests; long camera sessions, MLT 7.42 GPU, D3D12, native complex effects, long original4K/HEVC/VFR, acoustic drift, GPU occupancy, physical presentation/disk I/O and other GPU vendors remain unqualified. Partial synthetic coverage is documented rather than marking these complete.
+
+## Consistency checkpoint (3.4.8 development)
+
+[Complete report and ten-run comparison](docs/PERFORMANCE_CONSISTENCY_3_4_8.md), [verification](VERIFICATION.md) and curated source-bound evidence preserve the failed baseline attempt and first endurance attempt. Canonical main, including VC-FUT-009–015, is merged and retained. Broad P0 items remain unchecked where acceptance is incomplete.
+
+- [x] **VC-CONSIST-001 — Repeated initial target on the owner workstation.** Ten packaged125s trials: median59.810/worst59.637FPS,2–16skips,exact6M samples,zero underruns; three original4K/three audio at540p,AC120Hz. Unchanged engine7/10 target runs versus10/10; no full-size4K claim.
+- [x] **VC-CONSIST-002 — Scoped measured optimizations and retained fallbacks.** Reduced WebView layout/meter work; bounded UHD libx264 encoder workers; 67offline Python/13JS, precision, installed native/fallback/large-file/undo/recovery/offline approval and installer/icon checks. See exact scopes; decoder/filter defaults and source/PCM timing remain.
+- [ ] **VC-P0-032 — Classify lost WebView targets and verify robust recovery.** Baseline attempt8 and first3.4.8 endurance attempt failed with TargetClosed. Owner denied closing the baseline window; no matching WER crash event. Successful later trials do not prove a fix. Distinguish CDP disconnect, WebView failure, native/window close and system cause; preserve save/project integrity and test bounded recovery before adoption.
+- [ ] **VC-CONSIST-003 — Longer memory and tail qualification.** Ten-minute retry59.886FPS/59skips,zero underruns,191.8ms longest active interval. Native/host allocations largely stabilize while WebView commit grows. Two150s observer attached/detached controls show reclaimable growth and near-baseline post-GC JS/DOM; no general leak fix is established. Test longer independent media and pressure, and fix confirmed growth/tails without starving decode.
+- [ ] **VC-CONSIST-004 — Strengthen display/timing evidence before HDR.** Sustained full-size4K/high-quality preview, physical scanout/acoustic sync, complete per-frame variance/paired p99 baseline, source-cold/cache-controlled trials, actual GPU removal/reset and multiple displays/hardware remain open. No HDR production-readiness claim.
 
 ## Approved icon checkpoint (3.4.8 visual assets)
 

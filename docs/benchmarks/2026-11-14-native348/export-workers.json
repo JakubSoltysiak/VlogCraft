@@ -1,0 +1,172 @@
+{
+  "rows": [
+    {
+      "repeat": 0,
+      "workers": [
+        1,
+        1,
+        4
+      ],
+      "seconds": 4.914757499995176,
+      "frames": 180,
+      "fps": 36.62439092878472,
+      "decoded": true,
+      "SSIM_vs_source": 0.997753,
+      "SSIM_vs_first_baseline": 1.0
+    },
+    {
+      "repeat": 0,
+      "workers": [
+        1,
+        1,
+        8
+      ],
+      "seconds": 3.533889700003783,
+      "frames": 180,
+      "fps": 50.93537582675749,
+      "decoded": true,
+      "SSIM_vs_source": 0.997805,
+      "SSIM_vs_first_baseline": 0.997713
+    },
+    {
+      "repeat": 0,
+      "workers": [
+        2,
+        1,
+        4
+      ],
+      "seconds": 5.139546999998856,
+      "frames": 180,
+      "fps": 35.022541869943026,
+      "decoded": true,
+      "SSIM_vs_source": 0.997753,
+      "SSIM_vs_first_baseline": 1.0
+    },
+    {
+      "repeat": 0,
+      "workers": [
+        1,
+        2,
+        4
+      ],
+      "seconds": 5.289107399992645,
+      "frames": 180,
+      "fps": 34.03220740048695,
+      "decoded": true,
+      "SSIM_vs_source": 0.997753,
+      "SSIM_vs_first_baseline": 1.0
+    },
+    {
+      "repeat": 1,
+      "workers": [
+        1,
+        2,
+        4
+      ],
+      "seconds": 5.684682499995688,
+      "frames": 180,
+      "fps": 31.66403752542671,
+      "decoded": true,
+      "SSIM_vs_source": 0.997753,
+      "SSIM_vs_first_baseline": 1.0
+    },
+    {
+      "repeat": 1,
+      "workers": [
+        2,
+        1,
+        4
+      ],
+      "seconds": 5.930892999997013,
+      "frames": 180,
+      "fps": 30.34956118751268,
+      "decoded": true,
+      "SSIM_vs_source": 0.997753,
+      "SSIM_vs_first_baseline": 1.0
+    },
+    {
+      "repeat": 1,
+      "workers": [
+        1,
+        1,
+        8
+      ],
+      "seconds": 4.747671899996931,
+      "frames": 180,
+      "fps": 37.91331915756781,
+      "decoded": true,
+      "SSIM_vs_source": 0.997805,
+      "SSIM_vs_first_baseline": 0.997713
+    },
+    {
+      "repeat": 1,
+      "workers": [
+        1,
+        1,
+        4
+      ],
+      "seconds": 6.409208400000352,
+      "frames": 180,
+      "fps": 28.08459153863527,
+      "decoded": true,
+      "SSIM_vs_source": 0.997753,
+      "SSIM_vs_first_baseline": 1.0
+    },
+    {
+      "repeat": 2,
+      "workers": [
+        1,
+        1,
+        4
+      ],
+      "seconds": 7.105360600005952,
+      "frames": 180,
+      "fps": 25.33298591486676,
+      "decoded": true,
+      "SSIM_vs_source": 0.997753,
+      "SSIM_vs_first_baseline": 1.0
+    },
+    {
+      "repeat": 2,
+      "workers": [
+        1,
+        1,
+        8
+      ],
+      "seconds": 5.5627704999933485,
+      "frames": 180,
+      "fps": 32.35797701886411,
+      "decoded": true,
+      "SSIM_vs_source": 0.997805,
+      "SSIM_vs_first_baseline": 0.997713
+    },
+    {
+      "repeat": 2,
+      "workers": [
+        2,
+        1,
+        4
+      ],
+      "seconds": 7.876527200001874,
+      "frames": 180,
+      "fps": 22.852711027260487,
+      "decoded": true,
+      "SSIM_vs_source": 0.997753,
+      "SSIM_vs_first_baseline": 1.0
+    },
+    {
+      "repeat": 2,
+      "workers": [
+        1,
+        2,
+        4
+      ],
+      "seconds": 7.284543999994639,
+      "frames": 180,
+      "fps": 24.70985143340921,
+      "decoded": true,
+      "SSIM_vs_source": 0.997753,
+      "SSIM_vs_first_baseline": 1.0
+    }
+  ]
+}
