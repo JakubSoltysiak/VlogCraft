@@ -1,0 +1,156 @@
+{
+  "failed": null,
+  "failure_type": null,
+  "measured_seconds": 600.123299999997,
+  "samples": 28800000,
+  "expected_samples": 28800000,
+  "underruns": 0,
+  "reached_end": true,
+  "distinct_sequence_fps": 59.88602675483551,
+  "present_calls_per_second": 59.88602675483551,
+  "skips": 59,
+  "last_sampled_frame": 35998,
+  "final_completed_frame": 35999,
+  "timings": {
+    "context_wait": {
+      "count": 245462,
+      "mean_ms": 0.0682076,
+      "p50_upper_ms": 0.1,
+      "p95_upper_ms": 0.5,
+      "p99_upper_ms": 0.8,
+      "max_ms": 49.4901,
+      "overflow_100ms": 0
+    },
+    "submit_cpu": {
+      "count": 35940,
+      "mean_ms": 0.477826,
+      "p50_upper_ms": 0.5,
+      "p95_upper_ms": 0.8,
+      "p99_upper_ms": 1,
+      "max_ms": 7.2574,
+      "overflow_100ms": 0
+    },
+    "completion_observation": {
+      "count": 35940,
+      "mean_ms": 9.33613,
+      "p50_upper_ms": 6,
+      "p95_upper_ms": 44.2,
+      "p99_upper_ms": 66.6,
+      "max_ms": 105.708,
+      "overflow_100ms": 1
+    },
+    "composition_gpu": {
+      "count": 35940,
+      "mean_ms": 0.758272,
+      "p50_upper_ms": 0.8,
+      "p95_upper_ms": 0.9,
+      "p99_upper_ms": 1.2,
+      "max_ms": 3.98,
+      "overflow_100ms": 0
+    },
+    "present_call": {
+      "count": 35940,
+      "mean_ms": 0.730909,
+      "p50_upper_ms": 0.3,
+      "p95_upper_ms": 0.8,
+      "p99_upper_ms": 18.9,
+      "max_ms": 55.365,
+      "overflow_100ms": 0
+    },
+    "present_call_interval": {
+      "count": 35939,
+      "mean_ms": 16.7202,
+      "p50_upper_ms": 16.7,
+      "p95_upper_ms": 17.9,
+      "p99_upper_ms": 33.7,
+      "max_ms": 955.793,
+      "overflow_100ms": 4
+    },
+    "playback_present_interval": {
+      "count": 35938,
+      "mean_ms": 16.6941,
+      "p50_upper_ms": 16.7,
+      "p95_upper_ms": 17.9,
+      "p99_upper_ms": 33.6,
+      "max_ms": 191.769,
+      "overflow_100ms": 3
+    },
+    "source_selection": {
+      "count": 35992,
+      "mean_ms": 0.0615217,
+      "p50_upper_ms": 0.1,
+      "p95_upper_ms": 0.1,
+      "p99_upper_ms": 0.2,
+      "max_ms": 55.5951,
+      "overflow_100ms": 0
+    },
+    "wake_overshoot": {
+      "count": 99683,
+      "mean_ms": 0.338518,
+      "p50_upper_ms": 0.4,
+      "p95_upper_ms": 0.6,
+      "p99_upper_ms": 0.8,
+      "max_ms": 2.0744,
+      "overflow_100ms": 0
+    }
+  },
+  "queues": {
+    "sources": 3,
+    "source_frames": 4,
+    "GPU_inflight": 4,
+    "retained_pools": 3,
+    "retained_pool_estimate_MiB": 1317.04,
+    "surface_views": 48
+  },
+  "raw_throughput_windows": [
+    {
+      "window_seconds": 1,
+      "count": 1446,
+      "minimum_fps": 50.53057099545239,
+      "p05_fps": 59.1872791519432,
+      "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+    },
+    {
+      "window_seconds": 10,
+      "count": 1380,
+      "minimum_fps": 58.12275446121995,
+      "p05_fps": 59.62175032424163,
+      "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+    }
+  ],
+  "active_throughput_windows": [
+    {
+      "window_seconds": 1,
+      "count": 1446,
+      "minimum_fps": 50.53057099545239,
+      "p05_fps": 59.1872791519432,
+      "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+    },
+    {
+      "window_seconds": 10,
+      "count": 1380,
+      "minimum_fps": 58.12275446121995,
+      "p05_fps": 59.62175032424163,
+      "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+    }
+  ],
+  "peak_summed_RSS_MiB": 3451.8,
+  "CPU_machine_percent": 6.87,
+  "all_on_AC": true,
+  "memory": {
+    "rss_MiB": {
+      "first": 2656.46875,
+      "last": 3388.5,
+      "peak": 3440.22265625,
+      "first30_median": 2862.265625,
+      "last30_median": 3385.453125
+    },
+    "private_commit_MiB": {
+      "first": 4345.20703125,
+      "last": 4663.390625,
+      "peak": 4715.171875,
+      "first30_median": 4141.73046875,
+      "last30_median": 4657.927734375
+    }
+  }
+}

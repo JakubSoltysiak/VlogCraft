@@ -1,0 +1,86 @@
+[
+  {
+    "alias": "CameraA",
+    "frames": 180,
+    "seeks": [
+      {
+        "target_seconds": 0,
+        "process_seconds": 0.21950900000229012,
+        "pts_matches_reference": true
+      },
+      {
+        "target_seconds": 1.1,
+        "process_seconds": 0.2769082000013441,
+        "pts_matches_reference": true
+      },
+      {
+        "target_seconds": 3.217,
+        "process_seconds": 0.36261300000478514,
+        "pts_matches_reference": true
+      }
+    ],
+    "float_readback": {
+      "finite": true,
+      "rgb_max": 17.953125,
+      "rgb_min": 0.0,
+      "hdr_linear_output": true
+    },
+    "hdr10plus_retained_at_decode": true
+  },
+  {
+    "alias": "CameraB",
+    "frames": 180,
+    "seeks": [
+      {
+        "target_seconds": 0,
+        "process_seconds": 0.23860150000837166,
+        "pts_matches_reference": true
+      },
+      {
+        "target_seconds": 1.1,
+        "process_seconds": 0.2848839000071166,
+        "pts_matches_reference": true
+      },
+      {
+        "target_seconds": 3.217,
+        "process_seconds": 0.33589000000210945,
+        "pts_matches_reference": true
+      }
+    ],
+    "float_readback": {
+      "finite": true,
+      "rgb_max": 14.3515625,
+      "rgb_min": -0.00024318695068359375,
+      "hdr_linear_output": true
+    },
+    "hdr10plus_retained_at_decode": true
+  },
+  {
+    "alias": "CameraC",
+    "frames": 180,
+    "seeks": [
+      {
+        "target_seconds": 0,
+        "process_seconds": 0.30290949999471195,
+        "pts_matches_reference": true
+      },
+      {
+        "target_seconds": 1.1,
+        "process_seconds": 0.4619869000016479,
+        "pts_matches_reference": true
+      },
+      {
+        "target_seconds": 3.217,
+        "process_seconds": 0.7737818000023253,
+        "pts_matches_reference": true
+      }
+    ],
+    "float_readback": {
+      "finite": true,
+      "rgb_max": 1.0,
+      "rgb_min": 0.0,
+      "hdr_linear_output": false
+    },
+    "hdr10plus_retained_at_decode": false
+  }
+]

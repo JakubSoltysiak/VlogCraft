@@ -14,10 +14,22 @@ import sequences
 import timing
 import encoders
 import os
+import psutil
 import shutil
 import subprocess
 import tempfile
 from pathlib import Path
+
+def encode_workers(encoder, width, height, fps):
+    # Qualified UHD H.264 CPU case; keep other codecs/rates and constrained PCs unchanged.
+    if encoder == 'libx264' and (width, height) == (3840, 2160) and timing.rate(fps) <= 60 and (os.cpu_count() or 1) >= 16:
+        try:
+            if psutil.virtual_memory().available >= 4 * 1024**3:
+                return 8
+        except OSError:
+            pass
+    return 4
+
 
 GRADES = {
     'neutral': '',
@@ -282,13 +294,14 @@ def segment_command(state, start, end, target, jobdir, quality='final', stream=N
     encoder='libx264' if quality in ('review','preview') else state['output'].get('encoder','libx264')
     bitrate=0 if quality in ('review','preview') else state['output'].get('bitrate',0)
     video_options=encoders.options(encoder,preset,crf,bitrate)
+    workers=encode_workers(encoder,w,h,fps)
     if stream=='video':
         return cmd+['-/filter_complex',str(script),'-map','[finished]','-an','-t',_num(duration),
-                    '-r',str(fps),*video_options,'-pix_fmt','yuv420p','-threads','4',
+                    '-r',str(fps),*video_options,'-pix_fmt','yuv420p','-threads',str(workers),
                     '-movie_timescale','120000','-video_track_timescale','120000','-movflags','+faststart',str(target)]
     cmd+=['-/filter_complex',str(script),'-map','[finished]','-map','[mixed]',
           '-t',_num(duration),'-r',str(fps),*video_options,'-pix_fmt','yuv420p','-c:a','aac' if continuous else 'pcm_s16le',
-          '-threads','4','-ac','2','-ar','48000','-movie_timescale','120000','-video_track_timescale','120000','-movflags','+faststart',str(target)]
+          '-threads',str(workers),'-ac','2','-ar','48000','-movie_timescale','120000','-video_track_timescale','120000','-movflags','+faststart',str(target)]
     return cmd
 
 def render_range(state,start,end,target,jobdir,quality='final',runner=None):

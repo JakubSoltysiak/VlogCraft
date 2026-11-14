@@ -5,7 +5,7 @@ ROOT=Path(__file__).resolve().parents[1]
 def commands(level,executable,media,results):
  py=sys.executable
  steps=[('python',[py,'-m','unittest','discover','-s','tests','-p','test_*.py','-v']),
-        ('javascript',['node','--test','tests/timeline_commands.test.js','tests/native_audio_worklet.test.js','tests/native_clock.test.js']),
+        ('javascript',['node','--test','tests/timeline_commands.test.js','tests/native_audio_worklet.test.js','tests/native_clock.test.js','tests/meter.test.js']),
         ('native-precision',[py,'benchmarks/native_precision.py',str(results/'precision')])]
  if level!='QUICK':
   steps += [('transport',[py,'tests/native_windows.py',str(executable),str(media),str(results/'transport')]),
@@ -13,6 +13,9 @@ def commands(level,executable,media,results):
    ('playback',[py,'benchmarks/native_playback.py',str(executable),str(media),str(results/'playback'),'--seconds','30']),
    ('export',[py,'benchmarks/engine_profile.py',str(results/'export'),str(media/'h264-4k60-0.mp4'),'--width','3840','--seconds','3','--repeat','3','--gpu'])]
  if level=='FULL':
+  native=executable.parent/'_internal/engine/native/VlogCraftNative.exe'
+  if not native.is_file():native=ROOT/'build/tools/architecture/VlogCraftNative.exe'
+  steps.append(('consistency',[py,'benchmarks/consistency.py',str(executable),str(media),str(native),str(results/'consistency'),'--repeat','10','--seconds','125']))
   for width in (960,1280,1920,2560,3840):
    steps.append((f'quality-{width}',[py,'benchmarks/native_playback.py',str(executable),str(media),str(results/f'quality-{width}'),'--seconds','30','--width',str(width)]))
   steps.append(('endurance',[py,'benchmarks/native_playback.py',str(executable),str(media),str(results/'endurance'),'--seconds','600']))

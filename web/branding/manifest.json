@@ -1,0 +1,17 @@
+{
+  "source_sha256": "82c1661509be32262ec9356ac6801f761e0bb96bb74d7c1beea6f5aecccb2552",
+  "source_dimensions": [
+    1536,
+    1024
+  ],
+  "sizes": [
+    16,
+    24,
+    32,
+    48,
+    64,
+    128,
+    256
+  ],
+  "method": "Unmodified RGBA original, centered transparent square; premultiplied-alpha Lanczos; no crop, recolor or redraw."
+}

@@ -2,6 +2,18 @@
 
 Tested means the specific check in VERIFICATION.md passed. Implemented means code is available with further acceptance coverage needed. Partial identifies implemented behavior with material gaps. Missing identifies an unavailable capability. A test result qualifies its fixture and environment.
 
+3.4.8 is a scoped consistency checkpoint. [The report](docs/PERFORMANCE_CONSISTENCY_3_4_8.md) and VERIFICATION.md distinguish passing tests from remaining acceptance gates.
+
+| 3.4.8 capability | Status | Verified scope / remaining limits |
+|---|---|---|
+| Repeated native playback | Tested subset | Packaged 10/10 at least59.5 FPS, worst59.637, skips2–16, zero underruns; three original4K + three audio at540p. No sustained full-size4K/zero-skip claim. |
+| Browser layout and meter efficiency | Implemented, tested | Compositor playhead, cached monitor geometry, duplicate-paint suppression,30Hz accumulated-peak display. Audio sampling and picture requirements retained. |
+| Multicore UHD CPU export | Tested subset | Bounded8 libx264 workers on16+ logical CPUs with4GiB free; other cases retain4. Alternating short export median6.409→4.748s, all180frames decoded; longer/mixed-codec scaling open. |
+| Endurance and memory | Partial | Completed600s/7,200clips,59.886FPS,59skips,exact28.8M samples,zero underruns. Prior attempt lost WebView target; WebView memory growth and191.8ms tail remain investigated gates. |
+| Failure diagnostics / regression gates | Implemented, tested subset | Partial-trial retention, browser/window events, anonymous thread/core/commit traces, median+worst contracts, source-bound evidence. Automatic browser recovery and true GPU reset remain missing qualification. |
+| Original-camera / precision | Tested subset | Three full originals,zero skips/underruns;9PTS seeks,FP16/PQ and decode-sideHDR10+ retention. Explicit SDR exports decoded; calibrated HDR/dynamic metadata mastering unavailable. |
+| Windows/offline/icon | Tested subset | Installed two independent>5GiB originals,84decoded4K60frames,undo/recovery/offline approval; MSI lifecycle and seven-size approved icon. Clean-machine/signing/physical Explorer gesture remain open. |
+
 3.4.7 refines the opt-in native preview. [Workstation and performance framework scope](docs/WORKSTATION_OPTIMIZATION_3_4_7.md) documents the candidate and its qualification limits. The 3.4.6 matrix below is a historical checkpoint. The existing full FFmpeg renderer/exporter remains. [Current native scope and fallback matrix](docs/NATIVE_PLAYBACK_3_4_6.md), [verification](VERIFICATION.md) and historical [3.4.5 benchmarks](docs/ENGINE_BENCHMARKS.md) distinguish working behavior from remaining acceptance gates.
 
 | 3.4.7 capability | Status | Verified scope / remaining limits |
@@ -25,6 +37,7 @@ Tested means the specific check in VERIFICATION.md passed. Implemented means cod
 
 | Capability | Status | Available behavior and remaining gaps |
 |---|---|---|
+| Approved application icon | Tested on owner workstation | Seven exact icon sizes; EXE/MSI/shortcuts/live window/taskbar/favicon/web checks and lifecycle passed. Original artwork retained; [asset report](docs/ICON_UPDATE.md). |
 | Windows desktop and MSI | Tested | Per-user installation, native WebView2, bundled codecs, Start menu and optional desktop shortcut. Release lifecycle evidence is in VERIFICATION.md. Code signing, clean Windows images, WebView2 deployment and DPI/accessibility qualification remain. |
 | Large native imports | Tested | Two independent 5,972,550,422-byte (>5 GiB), six-second 4K60 raw MOVs passed the installed 3.4.6 regression as well as the earlier 3.4.5 workflow and 84-frame original export. Earlier allocated 4,977,125,566-byte MOV checks retain their 24-frame scope. Native drop bridge, linked paths, frame beyond 4 GiB, proxy, split, trim, undo, original export. Multi-file tests use two independently allocated MOVs with different picture and audio content, exposed through separate NTFS paths. Structural HTTP/chunk offsets exceed 4 GiB. Physical Explorer gestures and a complete multi-GB browser upload remain unqualified. |
 | Media formats | Partial | H.264 MP4, HEVC MOV, raw MOV, FFV1 MOV/MKV, images and audio fixtures. Unknown extensions can be classified from detected media metadata. MTS/M2TS, rotated phone media, long-GOP camera collections, 6K, broad 8K camera-media coverage and corrupt-media fuzzing remain. |

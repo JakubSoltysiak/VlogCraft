@@ -1,4 +1,5 @@
 #pragma once
+#include "telemetry.h"
 #include <algorithm>
 #include <atomic>
 #include <condition_variable>
@@ -121,16 +122,24 @@ struct Producer {
 struct Input {
  HANDLE changed=CreateEventW(nullptr,FALSE,FALSE,nullptr);~Input(){if(changed)CloseHandle(changed);}
  std::mutex guard;std::atomic<bool> stop{false};int64_t microseconds=0,generation=0;bool playing=false;
- Clock::time_point received=Clock::now();
+ Clock::time_point received=Clock::now();Distribution correction;int64_t lastCorrection=0;uint64_t updates=0;
  void command(const std::string& line){
   std::istringstream s(line);std::string op;s>>op;
   std::lock_guard<std::mutex> lock(guard);
-  if(op=="CLOCK"){s>>microseconds>>playing>>generation;received=Clock::now();}
+  if(op=="CLOCK"){
+   auto now=Clock::now();auto previous=microseconds+(playing?std::chrono::duration_cast<std::chrono::microseconds>(now-received).count():0);bool oldPlaying=playing;auto oldGeneration=generation;
+   s>>microseconds>>playing>>generation;
+   lastCorrection=(oldPlaying&&playing&&oldGeneration==generation)?microseconds-previous:0;
+   if(oldPlaying&&playing&&oldGeneration==generation)correction.add(std::abs((double)lastCorrection)/1000.);
+   updates++;received=now;
+  }
   else if(op=="CLOSE")stop=true;
   SetEvent(changed);
  }
- void snapshot(int64_t& us,int64_t& gen,bool& play){
+ void clockStats(){Distribution copy;uint64_t count;{std::lock_guard<std::mutex> lock(guard);copy=correction;count=updates;}std::cout<<",\"clock_updates\":"<<count<<",\"clock_correction_absolute\":";copy.json();}
+ void snapshot(int64_t& us,int64_t& gen,bool& play,double* age=nullptr,int64_t* adjustment=nullptr){
   std::lock_guard<std::mutex> lock(guard);us=microseconds;gen=generation;play=playing;
+  if(age)*age=seconds(received)*1000;if(adjustment)*adjustment=lastCorrection;
   if(play)us+=std::chrono::duration_cast<std::chrono::microseconds>(Clock::now()-received).count();
  }
 };

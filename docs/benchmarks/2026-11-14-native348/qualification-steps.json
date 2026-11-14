@@ -1,0 +1,155 @@
+{
+  "FULL": {
+    "level": "FULL",
+    "steps": [
+      {
+        "name": "python",
+        "exit_code": 0,
+        "seconds": 22.05622840000433
+      },
+      {
+        "name": "javascript",
+        "exit_code": 0,
+        "seconds": 0.15491630000178702
+      },
+      {
+        "name": "native-precision",
+        "exit_code": 0,
+        "seconds": 1.4750344000058249
+      },
+      {
+        "name": "transport",
+        "exit_code": 0,
+        "seconds": 13.089501200011
+      },
+      {
+        "name": "seeking",
+        "exit_code": 0,
+        "seconds": 11.882916300004581
+      },
+      {
+        "name": "playback",
+        "exit_code": 0,
+        "seconds": 39.94903360000171
+      },
+      {
+        "name": "export",
+        "exit_code": 0,
+        "seconds": 15.315906200004974
+      },
+      {
+        "name": "consistency",
+        "exit_code": 0,
+        "seconds": 1379.144860600005
+      },
+      {
+        "name": "quality-960",
+        "exit_code": 0,
+        "seconds": 39.54250670000329
+      },
+      {
+        "name": "quality-1280",
+        "exit_code": 0,
+        "seconds": 40.45292959999642
+      },
+      {
+        "name": "quality-1920",
+        "exit_code": 0,
+        "seconds": 39.57004579999193
+      },
+      {
+        "name": "quality-2560",
+        "exit_code": 0,
+        "seconds": 39.55677189999551
+      },
+      {
+        "name": "quality-3840",
+        "exit_code": 0,
+        "seconds": 40.84523189999163
+      },
+      {
+        "name": "endurance",
+        "exit_code": 1,
+        "seconds": 115.97408549999818
+      }
+    ]
+  },
+  "remaining": [
+    {
+      "name": "dpi-4k",
+      "exit_code": 0,
+      "seconds": 41.33862410001166
+    },
+    {
+      "name": "camera-native",
+      "exit_code": 0,
+      "seconds": 8.65729289999581
+    },
+    {
+      "name": "camera-playback",
+      "exit_code": 0,
+      "seconds": 165.82655149999482
+    },
+    {
+      "name": "camera-export",
+      "exit_code": 1,
+      "seconds": 24.833296899989364
+    },
+    {
+      "name": "installed-large",
+      "exit_code": 0,
+      "seconds": 30.90409229999932
+    },
+    {
+      "name": "installed-settings",
+      "exit_code": 0,
+      "seconds": 15.358873799996218
+    },
+    {
+      "name": "encoders",
+      "exit_code": 0,
+      "seconds": 4.815688200003933
+    },
+    {
+      "name": "drain",
+      "exit_code": 0,
+      "seconds": 5.216338700003689
+    },
+    {
+      "name": "offline-python",
+      "exit_code": 0,
+      "seconds": 23.541708999997354
+    },
+    {
+      "name": "bundle",
+      "exit_code": 0,
+      "seconds": 1.404216599999927
+    },
+    {
+      "name": "privacy",
+      "exit_code": 0,
+      "seconds": 4.158781100006308
+    }
+  ],
+  "endurance_recheck": {
+    "exit_code": 0,
+    "completed_last_frame": 35999
+  },
+  "camera_export_recheck": {
+    "exit_code": 0,
+    "method": "Retained CameraC export verified; valid full-range yuvj420p accepted without re-encoding"
+  },
+  "Python_offline": {
+    "tests": 67,
+    "seconds": 23.106,
+    "passed": true
+  },
+  "JavaScript": {
+    "tests": 13,
+    "passed": true
+  },
+  "drain": {
+    "decoded": 20,
+    "timeouts": 0
+  }
+}

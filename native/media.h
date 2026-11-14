@@ -47,6 +47,7 @@ struct Decoder {
     std::map<std::pair<ID3D11Texture2D*,int>,std::pair<ID3D11ShaderResourceView*,ID3D11ShaderResourceView*>> views;
     double decode_s=0,transfer_s=0,upload_s=0;int frames=0;bool direct=false;
     Decoder(const std::string& path,AVBufferRef* hw,bool useHardware,int extraHardwareFrames=8){
+        int workers=1;if(const char* value=std::getenv("VLOGCRAFT_NATIVE_DECODE_THREADS")){char* end=nullptr;long n=std::strtol(value,&end,10);if(*end||n<1||n>4)throw std::runtime_error("Invalid native decoder worker budget");workers=(int)n;}
         if(!std::filesystem::is_regular_file(std::filesystem::u8path(path)))throw std::runtime_error("A local media file is required");
         AVDictionary* options=nullptr;av_dict_set(&options,"protocol_whitelist","file",0);
         int opened=avformat_open_input(&file,path.c_str(),nullptr,&options);av_dict_free(&options);avcheck(opened,"open");
@@ -54,7 +55,7 @@ struct Decoder {
         stream=av_find_best_stream(file,AVMEDIA_TYPE_VIDEO,-1,-1,nullptr,0);avcheck(stream,"video stream");
         auto decoder=avcodec_find_decoder(file->streams[stream]->codecpar->codec_id);
         codec=avcodec_alloc_context3(decoder);avcheck(avcodec_parameters_to_context(codec,file->streams[stream]->codecpar),"parameters");
-        codec->thread_count=1;codec->extra_hw_frames=extraHardwareFrames;
+        codec->thread_count=workers;codec->extra_hw_frames=extraHardwareFrames;
         if(useHardware){codec->hw_device_ctx=av_buffer_ref(hw);codec->get_format=hardware_format;}
         avcheck(avcodec_open2(codec,decoder,nullptr),"codec open");
     }

@@ -1,0 +1,25 @@
+{
+  "layout": {
+    "window_dpi": 168,
+    "native_client_width": 2880,
+    "native_client_height": 1676,
+    "method": "Measured native client and matching CDP DPR",
+    "device_pixel_ratio": 1.75,
+    "css_width": 1646,
+    "css_height": 958
+  },
+  "surface": [
+    2545,
+    1432
+  ],
+  "composition": [
+    3840,
+    2160
+  ],
+  "seconds": 30.0,
+  "present_fps": 59.30404282812783,
+  "skips": 0,
+  "samples": 1440000,
+  "underruns": 0,
+  "final_frame": 1799
+}

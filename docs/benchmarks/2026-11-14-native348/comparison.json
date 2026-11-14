@@ -1,0 +1,67 @@
+{
+  "compatible": true,
+  "metrics": {
+    "present_fps": {
+      "baseline_median": 59.60767439478558,
+      "candidate_median": 59.81047770200998,
+      "change_percent": 0.3402301956644378,
+      "baseline_range": [
+        58.78234185149414,
+        59.85143419698251
+      ],
+      "candidate_range": [
+        59.63699773183497,
+        59.872492435081085
+      ],
+      "baseline_worst": 58.78234185149414,
+      "candidate_worst": 59.63699773183497,
+      "worst_change_percent": 1.453933023798209,
+      "median_investigate": false,
+      "worst_investigate": false,
+      "investigate": false,
+      "repeated": true
+    },
+    "first_frame_ms": {
+      "baseline_median": 980.1580500025011,
+      "candidate_median": 899.0818000020226,
+      "change_percent": -8.271752703584037,
+      "baseline_range": [
+        851.3509000040358,
+        1127.0470000017667
+      ],
+      "candidate_range": [
+        813.1429000059143,
+        961.9783999951323
+      ],
+      "baseline_worst": 1127.0470000017667,
+      "candidate_worst": 961.9783999951323,
+      "worst_change_percent": -14.64611502505003,
+      "median_investigate": false,
+      "worst_investigate": false,
+      "investigate": false,
+      "repeated": true
+    },
+    "startup_ms": {
+      "baseline_median": 2240.2283000010357,
+      "candidate_median": 1984.5093500043731,
+      "change_percent": -11.414861154844992,
+      "baseline_range": [
+        1995.7499000011012,
+        5262.97660000273
+      ],
+      "candidate_range": [
+        1748.6856000032276,
+        2031.5577000001213
+      ],
+      "baseline_worst": 5262.97660000273,
+      "candidate_worst": 2031.5577000001213,
+      "worst_change_percent": -61.39907405252253,
+      "median_investigate": false,
+      "worst_investigate": false,
+      "investigate": false,
+      "repeated": true
+    }
+  },
+  "investigate": false,
+  "interpretation": "Investigation trigger, not automatic failure; inspect variation, quality and completeness"
+}

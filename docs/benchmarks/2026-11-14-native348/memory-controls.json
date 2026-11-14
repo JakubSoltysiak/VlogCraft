@@ -1,0 +1,204 @@
+[
+  {
+    "diagnostic_only": true,
+    "timeline_seconds": 600,
+    "observed_seconds": 150,
+    "observer_detached": false,
+    "heap_samples": [
+      {
+        "stage": "before",
+        "seconds": 2.800006768666208e-06,
+        "metrics": {
+          "Documents": 1,
+          "Nodes": 4991,
+          "LayoutCount": 0,
+          "JSHeapUsedSize": 18939540,
+          "JSHeapTotalSize": 47857664
+        },
+        "frame": 0
+      },
+      {
+        "stage": "playing",
+        "seconds": 30.38465740000538,
+        "metrics": {
+          "Documents": 1,
+          "Nodes": 5521,
+          "LayoutCount": 2209,
+          "JSHeapUsedSize": 23417328,
+          "JSHeapTotalSize": 54013952
+        },
+        "frame": 1793
+      },
+      {
+        "stage": "playing",
+        "seconds": 60.50799200001347,
+        "metrics": {
+          "Documents": 1,
+          "Nodes": 5310,
+          "LayoutCount": 4409,
+          "JSHeapUsedSize": 17246204,
+          "JSHeapTotalSize": 56111104
+        },
+        "frame": 3612
+      },
+      {
+        "stage": "playing",
+        "seconds": 90.93949940000311,
+        "metrics": {
+          "Documents": 1,
+          "Nodes": 9412,
+          "LayoutCount": 6646,
+          "JSHeapUsedSize": 24828164,
+          "JSHeapTotalSize": 57421824
+        },
+        "frame": 5430
+      },
+      {
+        "stage": "playing",
+        "seconds": 120.95197280000139,
+        "metrics": {
+          "Documents": 1,
+          "Nodes": 5078,
+          "LayoutCount": 8812,
+          "JSHeapUsedSize": 11684660,
+          "JSHeapTotalSize": 57946112
+        },
+        "frame": 7235
+      },
+      {
+        "stage": "playing",
+        "seconds": 151.13900970001123,
+        "metrics": {
+          "Documents": 1,
+          "Nodes": 8871,
+          "LayoutCount": 10989,
+          "JSHeapUsedSize": 12133744,
+          "JSHeapTotalSize": 60305408
+        },
+        "frame": 9059
+      },
+      {
+        "stage": "stopped",
+        "seconds": 151.5414693000057,
+        "metrics": {
+          "Documents": 1,
+          "Nodes": 8902,
+          "LayoutCount": 11018,
+          "JSHeapUsedSize": 12639612,
+          "JSHeapTotalSize": 60305408
+        },
+        "frame": 9064
+      },
+      {
+        "stage": "after_forced_GC",
+        "seconds": 152.76739920000546,
+        "metrics": {
+          "Documents": 1,
+          "Nodes": 4994,
+          "LayoutCount": 11019,
+          "JSHeapUsedSize": 10327152,
+          "JSHeapTotalSize": 11022336
+        },
+        "frame": 9075
+      }
+    ],
+    "interpretation": "Forced GC occurs after stopping; no acceptance FPS is measured. CDP observer detach is tooling, not application networking; private commit is measured externally in both arms.",
+    "groups": {
+      "host": {
+        "first30_median_private_commit_MiB": 870.609375,
+        "last30_median_private_commit_MiB": 869.8203125,
+        "after_GC_private_commit_MiB": 869.48046875,
+        "peak_private_commit_MiB": 877.68359375
+      },
+      "webview": {
+        "first30_median_private_commit_MiB": 965.7734375,
+        "last30_median_private_commit_MiB": 1171.55078125,
+        "after_GC_private_commit_MiB": 983.92578125,
+        "peak_private_commit_MiB": 1196.60546875
+      },
+      "native": {
+        "first30_median_private_commit_MiB": 2279.0,
+        "last30_median_private_commit_MiB": 2312.6328125,
+        "after_GC_private_commit_MiB": 2319.25,
+        "peak_private_commit_MiB": 2565.96484375
+      }
+    }
+  },
+  {
+    "diagnostic_only": true,
+    "timeline_seconds": 600,
+    "observed_seconds": 150,
+    "observer_detached": true,
+    "heap_samples": [
+      {
+        "stage": "before",
+        "seconds": 4.099987563677132e-06,
+        "metrics": {
+          "Documents": 1,
+          "Nodes": 4993,
+          "LayoutCount": 0,
+          "JSHeapUsedSize": 19034196,
+          "JSHeapTotalSize": 47595520
+        },
+        "frame": 0
+      },
+      {
+        "stage": "reconnected",
+        "seconds": 151.54520059999777,
+        "metrics": {
+          "Documents": 1,
+          "Nodes": 5176,
+          "LayoutCount": 1,
+          "JSHeapUsedSize": 13476468,
+          "JSHeapTotalSize": 55848960
+        },
+        "frame": 9016
+      },
+      {
+        "stage": "stopped",
+        "seconds": 151.58257509999385,
+        "metrics": {
+          "Documents": 1,
+          "Nodes": 5182,
+          "LayoutCount": 2,
+          "JSHeapUsedSize": 13523000,
+          "JSHeapTotalSize": 55848960
+        },
+        "frame": 9040
+      },
+      {
+        "stage": "after_forced_GC",
+        "seconds": 152.93494279999868,
+        "metrics": {
+          "Documents": 1,
+          "Nodes": 4993,
+          "LayoutCount": 3,
+          "JSHeapUsedSize": 10501536,
+          "JSHeapTotalSize": 11284480
+        },
+        "frame": 9050
+      }
+    ],
+    "interpretation": "Forced GC occurs after stopping; no acceptance FPS is measured. CDP observer detach is tooling, not application networking; private commit is measured externally in both arms.",
+    "groups": {
+      "host": {
+        "first30_median_private_commit_MiB": 871.421875,
+        "last30_median_private_commit_MiB": 871.28125,
+        "after_GC_private_commit_MiB": 871.21484375,
+        "peak_private_commit_MiB": 877.93359375
+      },
+      "webview": {
+        "first30_median_private_commit_MiB": 1026.908203125,
+        "last30_median_private_commit_MiB": 1136.576171875,
+        "after_GC_private_commit_MiB": 978.0546875,
+        "peak_private_commit_MiB": 1160.6328125
+      },
+      "native": {
+        "first30_median_private_commit_MiB": 2311.1875,
+        "last30_median_private_commit_MiB": 2322.099609375,
+        "after_GC_private_commit_MiB": 2323.01171875,
+        "peak_private_commit_MiB": 2437.078125
+      }
+    }
+  }
+]

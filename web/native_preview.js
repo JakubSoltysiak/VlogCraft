@@ -10,6 +10,15 @@ function nativeQualityOptions(){
 }
 function nativeSelected(){return $('playbackEngine')?.value==='native';}
 function nativeRect(){const r=$('previewStage').getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height,dpr:devicePixelRatio};}
+function nativeBoundsRect(){
+ if(!nativeState.geometryObserver){
+  const dirty=()=>nativeState.geometryDirty=true;nativeState.geometryObserver=new ResizeObserver(dirty);
+  nativeState.geometryObserver.observe($('previewStage'));addEventListener('resize',dirty);
+  addEventListener('scroll',event=>{if(event.target===document||event.target===window||event.target?.contains?.($('previewStage')))dirty();},true);dirty();
+ }
+ if(nativeState.geometryDirty||nativeState.geometry?.dpr!==devicePixelRatio){nativeState.geometry=nativeRect();nativeState.geometryDirty=false;}
+ return nativeState.geometry;
+}
 function nativeSignature(){return JSON.stringify([$('programResolution').value,state.tracks,state.output,state.assets.map(a=>[a.id,a.path,a.size,a.cacheId])]);}
 function nativeDuration(){return frameIndex(duration())/sequenceRate();}
 function nativeSamplesAt(segments,now){
@@ -114,7 +123,7 @@ async function nativePrepare(){
    nativeState.polling=true;
    try{
     const generation=nativeState.generation,serial=nativeState.serial;
-    const rect=nativeRect(),visible=!nativeState.seeking&&!document.querySelector('dialog[open],.modal-overlay:not([hidden]),#dropOverlay:not([hidden]),#transferOverlay:not([hidden])')&&(isPlaying||!($('referenceButton').classList.contains('active')||$('scopeChoice').value)),bounds=JSON.stringify([rect,visible]);
+    const rect=nativeBoundsRect(),visible=!nativeState.seeking&&!document.querySelector('dialog[open],.modal-overlay:not([hidden]),#dropOverlay:not([hidden]),#transferOverlay:not([hidden])')&&(isPlaying||!($('referenceButton').classList.contains('active')||$('scopeChoice').value)),bounds=JSON.stringify([rect,visible]);
     if(bounds!==nativeState.bounds){nativeState.bounds=bounds;await request('native/bounds','POST',{rect,visible});}
     const metrics=await request('native/clock','POST',{generation,microseconds:Math.round(nativeClock()*1e6),playing:isPlaying&&!nativeState.seeking&&!!nativeState.ack&&!nativeState.ack.waiting});
     if(generation!==nativeState.generation||serial!==nativeState.serial||!nativeState.prepared)return;
@@ -130,7 +139,8 @@ async function nativePrepare(){
 function nativePreview(force){
  if(!nativeSelected())return false;
  if(nativeState.blocked)return true;
- $('previewLayers').hidden=true;$('emptyPreview').hidden=true;$('programPreviewStatus').hidden=false;$('programResolution').hidden=false;
+ if(!$('previewLayers').hidden)$('previewLayers').hidden=true;if(!$('emptyPreview').hidden)$('emptyPreview').hidden=true;
+ if($('programPreviewStatus').hidden)$('programPreviewStatus').hidden=false;if($('programResolution').hidden)$('programResolution').hidden=false;
  if(!nativeState.prepared){if(!nativeState.busy)void nativePrepare();return true;}
  if(force){
   if(nativeSignature()!==nativeState.signature){nativeState.prepared=false;void nativePrepare();}

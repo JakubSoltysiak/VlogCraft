@@ -33,7 +33,7 @@ struct DeviceLock {
 struct NativeDisplay {
  HWND window=nullptr,parent=nullptr;Com<IDXGISwapChain> swap;Com<ID3D11RenderTargetView> target;
  ID3D11Device* device;Com<ID3D11PixelShader> pixel;int width=0,height=0;bool hdr=false;
- uint64_t calls=0;UINT displayed=0;bool statistics=false,wasVisible=false;Distribution presentTime,presentIntervals;Clock::time_point lastFlip={};
+ uint64_t calls=0;UINT displayed=0;bool statistics=false,wasVisible=false;Distribution presentTime,presentIntervals,playIntervals;Clock::time_point lastFlip={};bool lastPlaying=false;double lastPresentMs=0;
  static LRESULT CALLBACK proc(HWND w,UINT m,WPARAM a,LPARAM b){return DefWindowProcW(w,m,a,b);}
  NativeDisplay(ID3D11Device* d,HWND p,int w,int h,bool pq,decltype(&D3DCompile) compile):parent(p),device(d),hdr(pq){
   if(parent)SetThreadDpiAwarenessContext(GetWindowDpiAwarenessContext(parent));
@@ -77,9 +77,9 @@ struct NativeDisplay {
   context->PSSetShader(pixel,nullptr,0);context->PSSetShaderResources(0,1,&image);context->Draw(3,0);
   ID3D11ShaderResourceView* empty=nullptr;context->PSSetShaderResources(0,1,&empty);
  }
- void flip(){
-  auto began=Clock::now();check(swap->Present(1,0),"Native Present");presentTime.add(seconds(began)*1000);calls++;
-  if(lastFlip!=Clock::time_point{})presentIntervals.add(seconds(lastFlip)*1000);lastFlip=Clock::now();
+ void flip(bool playing){
+  auto began=Clock::now();check(swap->Present(1,0),"Native Present");lastPresentMs=seconds(began)*1000;presentTime.add(lastPresentMs);calls++;
+  if(lastFlip!=Clock::time_point{}){double interval=seconds(lastFlip)*1000;presentIntervals.add(interval);if(playing&&lastPlaying)playIntervals.add(interval);}lastFlip=Clock::now();lastPlaying=playing;
   wasVisible=IsWindowVisible(window);stats();
  }
  void stats(){
@@ -134,7 +134,7 @@ struct Renderer {
   }return free;
  }
  void drain(){auto start=Clock::now();while(true){available();bool pending=false;for(auto& s:slots)pending|=s.pending;if(!pending)return;if(seconds(start)>5)throw std::runtime_error("Native GPU completion timeout");Sleep(1);}}
- void draw(Slot& slot,const Plan& plan,int64_t frame,int64_t gen,const std::vector<std::pair<const Clip*,Frame>>& layers){
+ void draw(Slot& slot,const Plan& plan,int64_t frame,int64_t gen,const std::vector<std::pair<const Clip*,Frame>>& layers,bool playing=false){
   auto began=Clock::now();{DeviceLock lock(hd,&contextWait);context->Begin(slot.disjoint);context->End(slot.beginStamp);float clear[4]={plan.hdr?0.f:16.f/255,plan.hdr?0.f:19.f/255,plan.hdr?0.f:26.f/255,1};context->ClearRenderTargetView(slot.target,clear);
   ID3D11RenderTargetView* rt=slot.target;context->OMSetRenderTargets(1,&rt,nullptr);context->OMSetBlendState(blend,nullptr,0xffffffff);
   D3D11_VIEWPORT vp={0,0,(float)plan.width,(float)plan.height,0,1};context->RSSetViewports(1,&vp);context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -163,7 +163,7 @@ struct Renderer {
   if(display)display->present(context,slot.view);
   context->End(slot.query);context->Flush();slot.queuedAt=Clock::now();slot.pending=true;slot.frame=frame;slot.generation=gen;submitted++;
   size_t pending=0;for(auto& s:slots)pending+=s.pending;peakPending=std::max(peakPending,pending);}
-  submitTime.add(seconds(began)*1000);if(display)display->flip();
+  submitTime.add(seconds(began)*1000);if(display)display->flip(playing);
  }
  void capture(Slot& slot,const std::string& path){
   drain();DeviceLock lock(hd);D3D11_TEXTURE2D_DESC d;slot.image->GetDesc(&d);d.BindFlags=0;d.Usage=D3D11_USAGE_STAGING;d.CPUAccessFlags=D3D11_CPU_ACCESS_READ;

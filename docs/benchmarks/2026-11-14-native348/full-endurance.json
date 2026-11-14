@@ -1,0 +1,125 @@
+{
+  "failed": true,
+  "failure_type": "TargetClosedError",
+  "measured_seconds": 95.39889999999106,
+  "samples": 4577920,
+  "expected_samples": 28800000,
+  "underruns": 0,
+  "reached_end": false,
+  "distinct_sequence_fps": null,
+  "present_calls_per_second": null,
+  "skips": 24,
+  "last_sampled_frame": 5716,
+  "final_completed_frame": 5715,
+  "timings": {
+    "context_wait": {
+      "count": 38935,
+      "mean_ms": 0.081863,
+      "p50_upper_ms": 0.1,
+      "p95_upper_ms": 0.6,
+      "p99_upper_ms": 0.9,
+      "max_ms": 51.2703,
+      "overflow_100ms": 0
+    },
+    "submit_cpu": {
+      "count": 5693,
+      "mean_ms": 0.542377,
+      "p50_upper_ms": 0.6,
+      "p95_upper_ms": 0.8,
+      "p99_upper_ms": 1,
+      "max_ms": 6.6652,
+      "overflow_100ms": 0
+    },
+    "completion_observation": {
+      "count": 5692,
+      "mean_ms": 8.5279,
+      "p50_upper_ms": 6,
+      "p95_upper_ms": 36.9,
+      "p99_upper_ms": 63,
+      "max_ms": 92.9872,
+      "overflow_100ms": 0
+    },
+    "composition_gpu": {
+      "count": 5692,
+      "mean_ms": 0.74599,
+      "p50_upper_ms": 0.8,
+      "p95_upper_ms": 0.9,
+      "p99_upper_ms": 1,
+      "max_ms": 3.16724,
+      "overflow_100ms": 0
+    },
+    "present_call": {
+      "count": 5693,
+      "mean_ms": 0.642839,
+      "p50_upper_ms": 0.3,
+      "p95_upper_ms": 0.7,
+      "p99_upper_ms": 10.8,
+      "max_ms": 41.4617,
+      "overflow_100ms": 0
+    },
+    "present_call_interval": {
+      "count": 5692,
+      "mean_ms": 16.8275,
+      "p50_upper_ms": 16.7,
+      "p95_upper_ms": 17.9,
+      "p99_upper_ms": 28,
+      "max_ms": 515.318,
+      "overflow_100ms": 2
+    },
+    "playback_present_interval": {
+      "count": 5691,
+      "mean_ms": 16.74,
+      "p50_upper_ms": 16.7,
+      "p95_upper_ms": 17.9,
+      "p99_upper_ms": 27.9,
+      "max_ms": 101.556,
+      "overflow_100ms": 1
+    },
+    "source_selection": {
+      "count": 5710,
+      "mean_ms": 0.0813837,
+      "p50_upper_ms": 0.1,
+      "p95_upper_ms": 0.1,
+      "p99_upper_ms": 0.2,
+      "max_ms": 56.4177,
+      "overflow_100ms": 0
+    },
+    "wake_overshoot": {
+      "count": 15810,
+      "mean_ms": 0.346573,
+      "p50_upper_ms": 0.4,
+      "p95_upper_ms": 0.7,
+      "p99_upper_ms": 0.9,
+      "max_ms": 13.0156,
+      "overflow_100ms": 0
+    }
+  },
+  "queues": {
+    "sources": 3,
+    "source_frames": 4,
+    "GPU_inflight": 4,
+    "retained_pools": 3,
+    "retained_pool_estimate_MiB": 1317.04,
+    "surface_views": 48
+  },
+  "raw_throughput_windows": null,
+  "active_throughput_windows": [
+    {
+      "window_seconds": 1,
+      "count": 0,
+      "minimum_fps": null,
+      "p05_fps": null,
+      "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+    },
+    {
+      "window_seconds": 10,
+      "count": 0,
+      "minimum_fps": null,
+      "p05_fps": null,
+      "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+    }
+  ],
+  "peak_summed_RSS_MiB": 3082.3,
+  "CPU_machine_percent": 6.85,
+  "all_on_AC": true
+}

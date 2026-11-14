@@ -756,6 +756,8 @@ class Handler(BaseHTTPRequestHandler):
                 if not target.exists():target=EXPORTS/name
                 return self.file_response(target)
             if path=='/' or path=='/index.html':return self.file_response(WEB/'index.html','text/html; charset=utf-8')
+            if path in ('/branding/vlogcraft-approved.ico',*(f'/branding/vlogcraft-{n}.png' for n in (16,24,32,48,64,128,256))):
+                return self.file_response(WEB/path.lstrip('/'))
             if path in ('/app.js','/studio.js','/animation.js','/motion.js','/timeline.js','/timebase.js','/edit_ops.js','/edit_commands.js','/monitor.js','/rendered_preview.js','/native_preview.js','/native_audio_worklet.js','/performance.js','/playback_cache.js','/effects.js','/grade.js','/audio.js','/nesting.js','/source_frames.js','/style.css'):
                 return self.file_response(WEB/path.lstrip('/'))
             return self.json_response({'error':'Not found'},404)

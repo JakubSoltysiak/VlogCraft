@@ -2,7 +2,9 @@
 struct Sampler {
 AVFrame* host=av_frame_alloc();SwsContext* scaler=nullptr;std::vector<unsigned char> packed;Com<ID3D11Texture2D> uploaded;bool direct=false;double transfer_s=0,upload_s=0;
 std::map<std::pair<ID3D11Texture2D*,int>,std::pair<ID3D11ShaderResourceView*,ID3D11ShaderResourceView*>> views;
-void clear(){for(auto& v:views){v.second.first->Release();v.second.second->Release();}views.clear();uploaded.out();}
+std::map<ID3D11Texture2D*,uint64_t> pools;
+uint64_t estimatedBytes()const{uint64_t total=0;for(auto& p:pools)total+=p.second;return total;}
+void clear(){for(auto& v:views){v.second.first->Release();v.second.second->Release();}views.clear();pools.clear();uploaded.out();}
 ~Sampler(){clear();av_frame_free(&host);sws_freeContext(scaler);}
     std::pair<ID3D11ShaderResourceView*,ID3D11ShaderResourceView*> texture(AVFrame* frame,ID3D11Device* device,ID3D11DeviceContext* context,bool download,float* uvscale,float* range){
         AVFrame* src=frame;ID3D11Texture2D* tex=nullptr;int slice=0;
@@ -41,6 +43,6 @@ void clear(){for(auto& v:views){v.second.first->Release();v.second.second->Relea
         d.Format=ten?DXGI_FORMAT_R16G16_UNORM:DXGI_FORMAT_R8G8_UNORM;
         HRESULT r=device->CreateShaderResourceView(tex,&d,&uv);if(FAILED(r)){y->Release();check(r,"chroma view");}
         if(views.size()>=192){y->Release();uv->Release();throw std::runtime_error("Surface view budget exceeded");}
-        views[key]={y,uv};return {y,uv};
+        views[key]={y,uv};pools[tex]=(uint64_t)desc.Width*desc.Height*desc.ArraySize*3/(ten?1:2);return {y,uv};
     }
 };

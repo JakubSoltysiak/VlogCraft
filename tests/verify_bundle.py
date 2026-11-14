@@ -12,6 +12,9 @@ def digest(path):return hashlib.sha256(path.read_bytes()).hexdigest()
 def main(a):
  archive=CArchiveReader(str(a.bundle/'VlogCraftStudio.exe'));pyz=archive.open_embedded_archive('PYZ.pyz')
  checks={}
+ from icon_assets import verify_assets,verify_executable
+ checks['approved_brand_assets']=verify_assets()
+ checks['approved_exe_icon']=verify_executable(a.bundle/'VlogCraftStudio.exe')
  for name in MODULES:
   expected=compile((ROOT/(name+'.py')).read_bytes(),str(ROOT/(name+'.py')),'exec')
   checks[name]=normalize(pyz.extract(name))==normalize(expected)
@@ -22,6 +25,7 @@ def main(a):
   manifest=json.loads((runtime/'runtime.json').read_text())['files'];checks['native_runtime']=all(digest(runtime/name)==sha for name,sha in manifest.items())
   if a.installed:checks['installed_native_runtime']=all(digest(a.installed/'_internal/engine/native'/name)==sha for name,sha in manifest.items())
  if a.installed:
+  checks['installed_icon']=verify_executable(a.installed/'VlogCraftStudio.exe')
   checks['installed_executable']=digest(a.bundle/'VlogCraftStudio.exe')==digest(a.installed/'VlogCraftStudio.exe')
   checks['installed_web']=all(digest(p)==digest(a.installed/'_internal/web'/p.relative_to(ROOT/'web')) for p in (ROOT/'web').rglob('*') if p.is_file())
  a.result.parent.mkdir(parents=True,exist_ok=True);a.result.write_text(json.dumps(checks,indent=2));print(json.dumps(checks))

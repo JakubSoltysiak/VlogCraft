@@ -10,13 +10,12 @@ import uuid
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-from PIL import Image, ImageDraw
 
 
 ROOT = Path(__file__).resolve().parents[1]
 BUILD = ROOT / 'build'
 RELEASE = ROOT / 'release'
-VERSION = '3.4.7'
+VERSION = '3.4.8'
 WIX_NS = 'http://schemas.microsoft.com/wix/2006/wi'
 UPGRADE_CODE = '09FA364C-4D7B-4B43-A1CF-7D82A0B62F02'
 ET.register_namespace('', WIX_NS)
@@ -34,17 +33,14 @@ def build(wix,experimental_native=False):
     os.chdir(ROOT)
     RELEASE.mkdir(exist_ok=True)
     BUILD.mkdir(exist_ok=True)
-    icon = BUILD / 'studio.ico'
-    image = Image.new('RGBA', (256, 256), (0, 0, 0, 0))
-    pen = ImageDraw.Draw(image)
-    pen.rounded_rectangle((6, 6, 250, 250), radius=50, fill='#142536')
-    pen.polygon([(44, 68), (80, 68), (124, 157), (175, 64), (210, 64), (141, 190), (110, 190)], fill='#99dfce')
-    pen.rounded_rectangle((154, 179, 213, 189), radius=5, fill='#f2b678')
-    image.save(icon, sizes=[(16, 16), (32, 32), (48, 48), (64, 64), (128, 128), (256, 256)])
+    sys.path.insert(0, str(ROOT / 'tools'))
+    from build_branding import build as build_branding
+    build_branding()
+    icon = ROOT / 'web/branding/vlogcraft-approved.ico'
     notices=BUILD/'notices'
     notices.mkdir(exist_ok=True)
     for name in ('pywebview','pythonnet','clr-loader','bottle','proxy_tools','opencv-python-headless',
-                 'numpy','Pillow','cffi','typing-extensions','pycparser'):
+                 'numpy','Pillow','cffi','typing-extensions','pycparser','psutil'):
         dist=importlib.metadata.distribution(name)
         for entry in dist.files or []:
             if ('license' in entry.name.lower() or 'copying' in entry.name.lower()) and entry.suffix.lower() not in ('.py','.pyc'):
@@ -84,8 +80,8 @@ def build(wix,experimental_native=False):
     element(product, 'Package', InstallerVersion='500', Compressed='yes', InstallScope='perUser', Platform='x64')
     element(product, 'MajorUpgrade', DowngradeErrorMessage='A newer VlogCraft Studio is installed.')
     element(product, 'MediaTemplate', EmbedCab='yes', CompressionLevel='medium')
-    element(product, 'Icon', Id='studio.ico', SourceFile=str(icon))
-    element(product, 'Property', Id='ARPPRODUCTICON', Value='studio.ico')
+    element(product, 'Icon', Id='VlogCraftApproved.ico', SourceFile=str(icon))
+    element(product, 'Property', Id='ARPPRODUCTICON', Value='VlogCraftApproved.ico')
     target = element(product, 'Directory', Id='TARGETDIR', Name='SourceDir')
     local = element(target, 'Directory', Id='LocalAppDataFolder')
     apps = element(local, 'Directory', Id='UserPrograms', Name='Programs')
@@ -109,8 +105,9 @@ def build(wix,experimental_native=False):
             element(c, 'File', Id=identifier('F', relative), Source=str(path), KeyPath='yes')
     for directory, label, feature in ((menu, 'StartMenu', core), (desktop, 'Desktop', optional)):
         c = component(directory, label, feature)
-        element(c, 'Shortcut', Id=label + 'Link', Name='VlogCraft Studio',
-                Target='[INSTALLDIR]VlogCraftStudio.exe', WorkingDirectory='INSTALLDIR', Icon='studio.ico')
+        shortcut = element(c, 'Shortcut', Id=label + 'Link', Name='VlogCraft Studio',
+                Target='[INSTALLDIR]VlogCraftStudio.exe', WorkingDirectory='INSTALLDIR', Icon='VlogCraftApproved.ico', IconIndex='0')
+        element(shortcut, 'ShortcutProperty', Key='System.AppUserModel.ID', Value='VlogCraft.Studio')
         element(c, 'RegistryValue', Root='HKCU', Key=r'Software\VlogCraft\Studio', Name=label,
                 Type='integer', Value='1', KeyPath='yes')
     element(product, 'WixVariable', Id='WixUILicenseRtf', Value=str(ROOT/'packaging'/'notice.rtf'))

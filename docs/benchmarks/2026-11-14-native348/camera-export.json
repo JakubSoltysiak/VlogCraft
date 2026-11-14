@@ -1,0 +1,35 @@
+[
+  {
+    "alias": "CameraA",
+    "output_frames": 60,
+    "output_resolution": [
+      3840,
+      2160
+    ],
+    "output_rate": "60/1",
+    "decoded": true,
+    "delivery": "Explicit existing 8bit SDR reference exporter; HDR mastering unqualified"
+  },
+  {
+    "alias": "CameraB",
+    "output_frames": 60,
+    "output_resolution": [
+      3840,
+      2160
+    ],
+    "output_rate": "60/1",
+    "decoded": true,
+    "delivery": "Explicit existing 8bit SDR reference exporter; HDR mastering unqualified"
+  },
+  {
+    "alias": "CameraC",
+    "output_frames": 60,
+    "output_resolution": [
+      3840,
+      2160
+    ],
+    "output_rate": "60/1",
+    "decoded": true,
+    "delivery": "Explicit existing 8bit SDR reference exporter; HDR mastering unqualified"
+  }
+]

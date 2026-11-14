@@ -1,9 +1,11 @@
 """Sustained native program transport: moving original4K layers, PCM and frequent cuts."""
 import argparse,json,sys,time
 from pathlib import Path
+from fractions import Fraction
 from windows_session import session
 from resource_history import History
 from conditions import Conditions
+from runtime_trace import RuntimeTrace,windows,active_windows
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'tests'))
 from performance import Resources
 SETUP="""({assets,seconds,cut})=>{
@@ -25,6 +27,10 @@ def main(a):
   page.evaluate(SETUP,{'assets':result['assets'],'seconds':a.seconds,'cut':a.cut})
   page.evaluate("""({width,rate})=>{state.output.fps=rate;const select=$('programResolution');if(![...select.options].some(o=>o.value===String(width)))select.add(new Option('Benchmark',width));select.value=width;save();return flushSave();}""",{'width':a.width,'rate':a.rate})
   page.wait_for_function("Array.from(document.querySelector('#playbackEngine').options).some(o=>o.value==='native'&&!o.disabled)")
+  ui_patch=None
+  if a.ui_source:
+   from ui_patch import inject
+   ui_patch=inject(page)
   display=None
   if a.actual_display:
    from display_layout import actual_display
@@ -34,24 +40,43 @@ def main(a):
   begin=time.perf_counter();page.select_option('#playbackEngine','native')
   page.wait_for_function('nativeState.metrics?.completed_frames>0',timeout=30000);ready=time.perf_counter()-begin
   meter=Resources(proc.pid,gpu=True);history=History(proc.pid,5);conditions=Conditions()
-  page.evaluate("""async()=>{
-   await nativePlayPause();window.nativeBench={start:performance.now(),base:{...nativeState.metrics},peak:-60};
-   nativeBench.timer=setInterval(()=>nativeBench.peak=Math.max(nativeBench.peak,Number($('masterMeter').value)),25);
-  }""")
-  deadline=time.monotonic()+a.seconds+20;checkpoint=0
-  while True:
-   data=page.evaluate("""()=>({measured_seconds:(performance.now()-nativeBench.start)/1000,base:nativeBench.base,last:nativeState.metrics,
-    samples:nativeState.ack?.samples,underruns:nativeState.ack?.underruns,playing:isPlaying,
-    reached_end:playhead>=nativeDuration()-.001,peak_meter_db:nativeBench.peak})""")
-   if data['measured_seconds']>=checkpoint:
-    (a.results/'checkpoint.json').write_text(json.dumps(data,indent=2));checkpoint+=5
-   if not data['playing'] or time.monotonic()>deadline:break
-   page.wait_for_timeout(250)
-  page.evaluate('clearInterval(nativeBench.timer)');page.wait_for_timeout(200)
+  trace=RuntimeTrace(proc.pid) if a.trace else None;status_rows=[];last_status=-1
+  failure=None;data={}
+  expected_samples=page.evaluate('Math.round(nativeDuration()*48000)')
+  try:
+   page.evaluate("""async()=>{
+    await nativePlayPause();window.nativeBench={start:performance.now(),base:{...nativeState.metrics},peak:-60};
+    nativeBench.timer=setInterval(()=>nativeBench.peak=Math.max(nativeBench.peak,Number($('masterMeter').value)),25);
+   }""")
+   deadline=time.monotonic()+a.seconds+20;checkpoint=0
+   while True:
+    data=page.evaluate("""()=>({measured_seconds:(performance.now()-nativeBench.start)/1000,base:nativeBench.base,last:nativeState.metrics,
+     samples:nativeState.ack?.samples,underruns:nativeState.ack?.underruns,playing:isPlaying,
+     reached_end:playhead>=nativeDuration()-.001,peak_meter_db:nativeBench.peak})""")
+    if a.trace and data['last'].get('wall_seconds',-1)>last_status:
+     row=data['last'];last_status=row['wall_seconds'];status_rows.append({k:row[k] for k in ('wall_seconds','sequence_frame','present_calls','completed_frames','skipped_sequence_frames','source_wait_iterations','gpu_wait_iterations','skipped_without_queue_wait','clock_rewind_hold_iterations') if k in row})
+    if data['measured_seconds']>=checkpoint:
+     (a.results/'checkpoint.json').write_text(json.dumps(data,indent=2));checkpoint+=5
+    if not data['playing'] or time.monotonic()>deadline:break
+    page.wait_for_timeout(250)
+   page.evaluate('clearInterval(nativeBench.timer)');page.wait_for_timeout(200)
+  except Exception as exc:
+   failure=exc
   data['working_set_history']=history.finish();data['resources']=meter.finish();data['conditions']=conditions.finish()
+  if trace:
+   data['runtime_trace']=trace.finish();data['status_trace']=status_rows
+   active_rows=[r for r in status_rows if r.get('sequence_frame',0)>0]
+   data['throughput_windows']=[windows(active_rows,n) for n in (1,10)]
+   data['active_throughput_windows']=[active_windows(status_rows,n,round(a.seconds*float(Fraction(a.rate)))-1) for n in (1,10)]
+   data['frame_interval_scope']=('Playback-only Present histogram excludes initial paused preparation; lifetime timing retained separately.' if 'playback_present_interval' in data.get('last',{}).get('timings',{}) else 'Native lifetime histogram includes initial paused-frame preparation; p99 unavailable in unchanged 3.4.7 binary. Active counter windows exclude frame-zero startup.')
+   if failure is None:data['drained_last']=page.evaluate('nativeState.metrics')
+  if failure is not None:
+   data.update(failed=True,failure_type=type(failure).__name__,expected_samples=expected_samples,reached_end=False)
+   (a.results/'native-playback.json').write_text(json.dumps(data,indent=2),encoding='utf8')
+   raise failure
   data['actual_display_layout']=display;data['native_rect']=page.evaluate('nativeRect()')
   if a.large_surface:assert abs(data['native_rect']['width']/data['native_rect']['height']-16/9)<.005,'Benchmark monitor aspect changed unexpectedly'
-  data.update(application_ready_seconds=getattr(page,'_vlogcraft_launch_seconds',None),first_ready_seconds=ready,seconds=a.seconds,cut_seconds=a.cut,video_tracks=a.layers,audio_tracks=a.layers,original_resolution=[3840,2160],
+  data.update(ui_source_patch_sha256=ui_patch,application_ready_seconds=getattr(page,'_vlogcraft_launch_seconds',None),first_ready_seconds=ready,seconds=a.seconds,cut_seconds=a.cut,video_tracks=a.layers,audio_tracks=a.layers,original_resolution=[3840,2160],
               program_resolution=[a.width,a.width*9//16],rate=a.rate,browser_errors=errors,proxies=False)
   data['expected_samples']=page.evaluate('Math.round(nativeDuration()*48000)')
   elapsed=data['measured_seconds']
@@ -64,9 +89,10 @@ def main(a):
   (a.results/'native-playback.json').write_text(json.dumps(data,indent=2));print(json.dumps(data),flush=True)
   assert data['reached_end'] and data['samples']==data['expected_samples'],data
   assert not errors and data['peak_meter_db']>-59,data
+  assert data['underruns']==0,'Audio underruns occurred; trial is not qualified'
   assert data['last']['peak_source_queue_frames']<=4 and data['last']['peak_inflight_gpu_frames']<=data['last'].get('gpu_slot_budget',3)<=6,data
   assert data['intermediate_encoded_video_files']==0,data
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('executable',type=Path);p.add_argument('media',type=Path);p.add_argument('results',type=Path)
  p.add_argument('--seconds',type=float,default=60);p.add_argument('--cut',type=float,default=.5)
- p.add_argument('--actual-display',action='store_true');p.add_argument('--large-surface',action='store_true');p.add_argument('--width',type=int,default=960);p.add_argument('--layers',type=int,choices=(1,3),default=3);p.add_argument('--rate',default='60/1');main(p.parse_args())
+ p.add_argument('--trace',action='store_true');p.add_argument('--ui-source',action='store_true');p.add_argument('--actual-display',action='store_true');p.add_argument('--large-surface',action='store_true');p.add_argument('--width',type=int,default=960);p.add_argument('--layers',type=int,choices=(1,3),default=3);p.add_argument('--rate',default='60/1');main(p.parse_args())

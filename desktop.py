@@ -20,6 +20,7 @@ BUNDLE = Path(getattr(sys, '_MEIPASS', Path(__file__).resolve().parent))
 
 
 def run(project):
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('VlogCraft.Studio')
     project = project.resolve()
     cache = project.parent / (project.name + '.data')
     cache.mkdir(parents=True, exist_ok=True)
@@ -120,7 +121,32 @@ def run(project):
             return
         window.run_js('void importNative(' + json.dumps(paths) + ')')
 
+    diagnostics_attached=False
     def on_loaded():
+        def attach_diagnostics():
+            nonlocal diagnostics_attached
+            if diagnostics_attached:return
+            try:
+                core=window.native.webview.CoreWebView2
+                def process_failed(sender,event):
+                    try:
+                        logging.error('WebView process failed kind=%s reason=%s exit=%s',
+                                      str(event.ProcessFailedKind),str(getattr(event,'Reason','unavailable')),getattr(event,'ExitCode',None))
+                    except Exception:
+                        logging.error('WebView process failed; extended numeric diagnostics unavailable')
+                def browser_exited(sender,event):
+                    kind=str(event.BrowserProcessExitKind)
+                    logging.log(logging.INFO if kind=='Normal' else logging.ERROR,'WebView browser exited kind=%s',kind)
+                def form_closing(sender,event):
+                    logging.info('Window close reason=%s accepted=%s',str(event.CloseReason),allow_close.is_set())
+                core.ProcessFailed += process_failed
+                core.Environment.BrowserProcessExited += browser_exited
+                window.native.FormClosing += form_closing
+                diagnostics_attached=True
+            except Exception:
+                logging.exception('Attaching local browser failure diagnostics')
+        from System import Action
+        window.native.Invoke(Action(attach_diagnostics))
         window.dom.document.events.drop += DOMEventHandler(on_drop, prevent_default=True)
         window.run_js("document.documentElement.classList.add('native-ready')")
 
@@ -164,7 +190,8 @@ def run(project):
     window.events.closing += on_closing
     threading.Thread(target=http.serve_forever, daemon=True).start()
     try:
-        webview.start(gui='edgechromium', private_mode=False, storage_path=str(cache / 'webview'))
+        webview.start(gui='edgechromium', private_mode=False, storage_path=str(cache / 'webview'),
+                      icon=str(BUNDLE / 'web/branding/vlogcraft-approved.ico'))
     finally:
         import audio_cache
         server.NATIVE_PLAYBACK.close()
