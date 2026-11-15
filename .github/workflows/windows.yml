@@ -36,7 +36,7 @@ jobs:
         run: |
           python tools/audit_repository.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          python tools/performance_record.py docs/benchmarks/studio-3.4.9-performance.json
+          python tools/performance_record.py docs/benchmarks/studio-3.4.10-performance.json
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python tests/icon_assets.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

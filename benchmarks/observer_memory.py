@@ -8,6 +8,7 @@ from native_playback import SETUP
 from runtime_trace import RuntimeTrace
 from conditions import Conditions
 from window_visibility import WindowVisibility
+from observation_window import observe
 
 def groups(proc):
  result={}
@@ -44,17 +45,18 @@ def main(a):
    cdp=page.context.new_cdp_session(page);cdp.send('Performance.enable')
   sample('prepared');base=page.evaluate('nativeState.metrics');page.evaluate('nativePlayPause()');play_started=time.perf_counter()
   if a.detach:disconnect()
-  for n in range(a.seconds):
-   if a.detach:time.sleep(1)
-   else:page.wait_for_timeout(1000)
-   if n%15==14:sample('active_detached' if a.detach else 'active_network_observer',not a.detach)
+  observation_elapsed=observe(a.seconds,time.sleep if a.detach else lambda seconds:page.wait_for_timeout(seconds*1000),
+      lambda:sample('active_detached' if a.detach else 'active_network_observer',not a.detach))
   if a.detach:reconnect()
   audio=page.evaluate('({underruns:nativeState.ack.underruns,samples:nativeState.ack.samples,playing:isPlaying})')
   elapsed=time.perf_counter()-play_started;last=page.evaluate('nativeState.metrics')
   transport={'measured_seconds':elapsed,'distinct_sequence_fps':(last['distinct_sequence_submissions']-base['distinct_sequence_submissions'])/elapsed,
              'skips':last['skipped_sequence_frames'],'physical_surface':[last['surface_width'],last['surface_height']]}
   assert audio['playing'] and audio['samples']>48000*max(1,a.seconds-10)
-  page.evaluate('stopPlayback()');sample('stopped');cdp.send('HeapProfiler.collectGarbage');page.wait_for_timeout(1000);sample('after_GC')
+  page.evaluate('stopPlayback()');sample('stopped')
+  idle_started=time.perf_counter();page.wait_for_timeout(a.idle_seconds*1000);sample('natural_idle_no_GC')
+  idle_elapsed=time.perf_counter()-idle_started
+  cdp.send('HeapProfiler.collectGarbage');page.wait_for_timeout(1000);sample('after_GC')
   if not a.detach:cdp.send('Network.disable')
   cdp.detach();disconnect();time.sleep(3);sample('all_observers_detached',False)
   reconnect();cdp.send('HeapProfiler.collectGarbage');page.wait_for_timeout(1000);sample('fresh_observer_GC')
@@ -63,6 +65,7 @@ def main(a):
   assert 'native' not in rows[-1]['groups'],'Native child survived Stop'
   error_count=page.evaluate('observerErrorCount')
   result={'seconds':a.seconds,'timeline_seconds':600,'active_observer':'detached' if a.detach else 'Playwright plus extra Network observer',
+          'observation_elapsed_seconds':observation_elapsed,'reconnection_and_query_tail_seconds':elapsed-observation_elapsed,'natural_idle_seconds':idle_elapsed,
           'rows':rows,'audio':audio,'transport':transport,'window_condition':visibility.finish(),'browser_errors':errors,'error_event_count':error_count,'runtime_trace':trace.finish(),'conditions':conditions.finish(),
           'scope':'Diagnostic only. GC after stop; full detach measures observer retention. Summed RSS may duplicate UMA pages. No physical sync/FPS qualification.'}
   (a.results/'observer-memory.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf8')
@@ -72,4 +75,4 @@ def main(a):
 
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('executable',type=Path);p.add_argument('media',type=Path);p.add_argument('results',type=Path)
- p.add_argument('--seconds',type=int,default=150);p.add_argument('--detach',action='store_true');main(p.parse_args())
+ p.add_argument('--seconds',type=int,default=150);p.add_argument('--idle-seconds',type=float,default=30);p.add_argument('--detach',action='store_true');main(p.parse_args())

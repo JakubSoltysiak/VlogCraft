@@ -1,0 +1,11 @@
+{
+  "version": "3.4.10",
+  "qualification": "partial: targeted diagnosis; production unchanged",
+  "baseline_commit": "b2df1cf9060b55fd52135c4e892366850c277a6e",
+  "report": "docs/STABILIZATION_3_4_10.md",
+  "evidence_scope": "New observer deadline/natural-idle protocol. Historical 3.4.9 scores are not relabelled as new measurements.",
+  "source_fingerprint": "daaa81cab9dfaaadaf64b38f0ff3589c840ba7d43bd44242c02d4d9e7ca8f112",
+  "fingerprint_method": "SHA256 sorted relevant relative path + NUL + LF-normalized source + NUL",
+  "benchmark_protocol_fingerprint": "ce18bd21e9f6b21fdfd2f3cdde662ddfe64baaf0377c3c23f1a2752074119ded",
+  "benchmark_protocol_fingerprint_method": "SHA256 sorted benchmark driver/observer relative path + NUL + LF-normalized source + NUL"
+}
