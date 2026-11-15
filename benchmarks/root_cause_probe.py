@@ -16,7 +16,8 @@ def main(a):
  native=a.executable.parent/'_internal/engine/native/VlogCraftNative.exe'
  os.environ['VLOGCRAFT_NATIVE_TRACE_FILE']=str(a.results/'native-events.json')
  metadata={'commit':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'mode':a.mode,'seconds':a.seconds,
-           'timeline_seconds':600,'video_tracks':3,'audio_tracks':3,'native_binary_sha256':hashlib.sha256(native.read_bytes()).hexdigest()}
+           'timeline_seconds':600,'video_tracks':3,'audio_tracks':3,'host_sha256':hashlib.sha256(a.executable.read_bytes()).hexdigest(),
+           'native_binary_sha256':hashlib.sha256(native.read_bytes()).hexdigest()}
  (a.results/'manifest.json').write_text(json.dumps(metadata,indent=2),encoding='utf8')
  with session(a.executable,a.results,offline=True) as (first,proc,project,errors),ExitStack() as owned:
   page=first;browser_type=page.context.browser.browser_type;endpoint=page._vlogcraft_cdp_endpoint
@@ -43,7 +44,8 @@ def main(a):
   audio=page.evaluate('({samples:nativeState.ack.samples,underruns:nativeState.ack.underruns,queued:nativeState.ack.queued,playing:isPlaying})')
   last=page.evaluate('nativeState.metrics');sample('active_end')
   result={'mode':a.mode,'requested_seconds':a.seconds,'elapsed_seconds':elapsed,'timeline_seconds':600,'geometry':geometry,'audio':audio,
-          'native_binary_sha256':hashlib.sha256(native.read_bytes()).hexdigest(),'commit':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),
+          'native_binary_sha256':metadata['native_binary_sha256'],'host_sha256':metadata['host_sha256'],'commit':metadata['commit'],
+          'actual_native_surface':[last['surface_width'],last['surface_height']],
           'skips':last['skipped_sequence_frames'],'timings':last['timings'],'native_last_wall_seconds':last['wall_seconds']}
   if a.mode=='allocation':
    profile=cdp.send('HeapProfiler.stopSampling')['profile']

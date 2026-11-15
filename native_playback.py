@@ -113,16 +113,28 @@ class Controller:
   self.stop()
  def audio(self,generation,frame):
   with self.guard:
-   if generation!=self.generation or self.snapshot is None:raise ValueError('Obsolete native audio request')
-   state=deepcopy(self.snapshot);fps=timing.rate(state['output']['fps']);total=timing.frame_at(render_engine.sequence_duration(state),fps)
-   frame=int(frame)
-   if frame<0 or frame>=total:raise ValueError('Native audio frame outside sequence')
-   end=min(total,frame+timing.nearest(8*fps));samples=timing.sample_at(end,fps)-timing.sample_at(frame,fps)
+   if self.closed or generation!=self.generation or self.snapshot is None:raise ValueError('Obsolete native audio request')
    if sum(p.poll() is None for p in self.audio_processes)>=2:raise ValueError('Native PCM stream budget is busy')
-   folder=tempfile.TemporaryDirectory(prefix='pcm-',dir=self.cache)
+   # Published snapshots are immutable: seek changes generation, start replaces
+   # the snapshot, and Stop releases it. Retain the old reference only while
+   # preparing, without blocking clock delivery or native status ingestion.
+   snapshot=self.snapshot
+  state=deepcopy(snapshot);fps=timing.rate(state['output']['fps']);total=timing.frame_at(render_engine.sequence_duration(state),fps)
+  frame=int(frame)
+  if frame<0 or frame>=total:raise ValueError('Native audio frame outside sequence')
+  end=min(total,frame+timing.nearest(8*fps));samples=timing.sample_at(end,fps)-timing.sample_at(frame,fps)
+  folder=tempfile.TemporaryDirectory(prefix='pcm-',dir=self.cache)
+  try:
    root=Path(folder.name);cmd=render_engine.segment_command(state,float(frame/fps),float(end/fps),root/'audio.wav',root,'preview','audio')
    cmd=cmd[:-1]+['-f','s16le','pipe:1']
-   error=(root/'error.log').open('wb');p=subprocess.Popen(cmd,cwd=root,stdout=subprocess.PIPE,stderr=error,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0));error.close();self.audio_processes.add(p)
+   with self.guard:
+    if self.closed or generation!=self.generation or self.snapshot is not snapshot:raise ValueError('Obsolete native audio preparation')
+    if sum(p.poll() is None for p in self.audio_processes)>=2:raise ValueError('Native PCM stream budget is busy')
+    with (root/'error.log').open('wb') as error:
+     p=subprocess.Popen(cmd,cwd=root,stdout=subprocess.PIPE,stderr=error,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
+    self.audio_processes.add(p)
+  except BaseException:
+   folder.cleanup();raise
   def chunks():
    count=0
    try:

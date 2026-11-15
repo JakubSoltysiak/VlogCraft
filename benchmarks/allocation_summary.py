@@ -5,7 +5,7 @@ def allocation_summary(profile):
     totals={}
     def visit(node):
         call=node['callFrame'];url=call.get('url','');name=url.split('?',1)[0].replace('\\','/').rsplit('/',1)[-1]
-        if name not in ('app.js','native_preview.js','recovery.js',''):name='other'
+        if name not in ('app.js','audio.js','timebase.js','native_preview.js','recovery.js',''):name='other'
         function=call.get('functionName','')[:120]
         if not re.fullmatch(r'[\w .$<>()[\]-]*',function):function='anonymous'
         key=(name,function);totals[key]=totals.get(key,0)+node.get('selfSize',0)

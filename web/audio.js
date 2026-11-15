@@ -11,7 +11,7 @@ function transportNow(){return transportClock?transportClock.currentTime*1000:pe
 function updateMeter(){
   const meter=$('masterMeter');if(!meter||!bus)return;
   bus.getFloatTimeDomainData(meterBuffer);let peak=0;
-  for(const x of meterBuffer)peak=Math.max(peak,Math.abs(x));
+  for(let i=0;i<meterBuffer.length;i++)peak=Math.max(peak,Math.abs(meterBuffer[i]));
   updateMeter.peak=Math.max(updateMeter.peak||0,peak);
   const now=performance.now();if(now-(updateMeter.lastPaint??-Infinity)<1000/30)return;
   const db=20*Math.log10(Math.max(.001,updateMeter.peak));updateMeter.peak=0;updateMeter.lastPaint=now;
