@@ -30,6 +30,9 @@ def main(a):
         inventory=json.loads(subprocess.check_output([str(probe)],env=env))
         (folder/'workstation.json').write_text(json.dumps(inventory,indent=2),encoding='utf8')
         cmd=[sys.executable,'benchmarks/native_playback.py',str(a.executable.resolve()),str(a.media.resolve()),str(folder),'--seconds',str(a.seconds),'--width',str(a.width),'--trace']
+        cmd+=['--window-mode',a.window_mode]
+        if a.legacy_viewport:cmd.append('--legacy-viewport')
+        if a.legacy_focus_emulation:cmd.append('--legacy-focus-emulation')
         began=time.monotonic()
         with (folder/'trial.log').open('wb') as log:result=subprocess.run(cmd,cwd=ROOT,env=env,stdout=log,stderr=log)
         row={'trial':n,'exit_code':result.returncode,'wall_seconds':round(time.monotonic()-began,3)}
@@ -42,13 +45,18 @@ def main(a):
                 present_intervals=d['last'].get('timings',{}).get('playback_present_interval',d['last'].get('timings',{}).get('present_call_interval')),throughput_windows=d.get('throughput_windows'),
                 source_skips=d['last'].get('skipped_after_source_wait'),gpu_skips=d['last'].get('skipped_after_gpu_wait'),
                 other_skips=d['last'].get('skipped_without_queue_wait'),mixed_power=d.get('conditions',{}).get('mixed_power',True),
+                window_condition=d.get('window_condition'),physical_alignment=d.get('physical_alignment'),
+                focus_emulation=d.get('focus_emulation'),browser_visibility_state=d.get('browser_visibility_state'),browser_focus_changes=d.get('browser_focus_changes'),
                 all_on_AC=all(r['ac_power'] is True for r in d.get('conditions',{}).get('samples',[])))
         rows.append(row)
-        record={'native_binary_sha256':native_sha,'seconds':a.seconds,'width':a.width,'layers':3,'audio_tracks':3,
+        record={'native_binary_sha256':native_sha,'seconds':a.seconds,'width':a.width,'layers':3,'audio_tracks':3,'window_mode':a.window_mode,
             'cache_policy':'Fresh application each trial; repeated original-source offsets; OS filesystem caches unmanaged',
-            'proxy':False,'rows':rows,'summary':summary(rows)}
+            'proxy':False,'legacy_viewport':a.legacy_viewport,'legacy_focus_emulation':a.legacy_focus_emulation,'rows':rows,'summary':summary(rows)}
         report.write_text(json.dumps(record,indent=2),encoding='utf8');print(json.dumps(row),flush=True)
         if result.returncode:raise SystemExit(result.returncode)
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('executable',type=Path);p.add_argument('media',type=Path);p.add_argument('native',type=Path);p.add_argument('results',type=Path)
+    p.add_argument('--window-mode',choices=('uncontrolled','visible','visible-unfocused','visible-browser-unfocused','preview-covered','editor-covered','editor-covered-unfocused'),default='visible')
+    p.add_argument('--legacy-viewport',action='store_true',help='Diagnostic reproduction only; fake DPR1 does not qualify physical placement')
+    p.add_argument('--legacy-focus-emulation',action='store_true')
     p.add_argument('--repeat',type=int,default=10);p.add_argument('--seconds',type=float,default=125);p.add_argument('--width',type=int,default=960);main(p.parse_args())

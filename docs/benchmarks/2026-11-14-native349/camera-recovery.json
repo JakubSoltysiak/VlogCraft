@@ -1,0 +1,215 @@
+[
+  {
+    "alias": "CameraA",
+    "renderer_recovered": true,
+    "draft_and_position_preserved": true,
+    "color_contract_preserved": true,
+    "HDR_linear": true,
+    "post_recovery_samples": 288000,
+    "underruns": 0,
+    "native_released": true,
+    "window_condition": {
+      "mode": "visible",
+      "condition_held": true,
+      "scope": "Physical center hit-test and window state, not physical scanout. Owned QA topmost/cover windows only; no global Windows settings.",
+      "sample_count": 9,
+      "violations": [],
+      "boundary_samples": [
+        {
+          "seconds": 2.899998435168527e-06,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": false,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 8.096403099998497,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        }
+      ],
+      "selection_scope": "Every detected condition violation and first/last samples retained; full generated raw trace remains local. Scores and failed attempts are never excluded."
+    },
+    "reopen_window_condition": {
+      "mode": "visible",
+      "condition_held": true,
+      "scope": "Physical center hit-test and window state, not physical scanout. Owned QA topmost/cover windows only; no global Windows settings.",
+      "sample_count": 7,
+      "violations": [],
+      "boundary_samples": [
+        {
+          "seconds": 3.6999990697950125e-06,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 6.048701399999118,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        }
+      ],
+      "selection_scope": "Every detected condition violation and first/last samples retained; full generated raw trace remains local. Scores and failed attempts are never excluded."
+    },
+    "new_host_reopen_and_playback": true
+  },
+  {
+    "alias": "CameraB",
+    "renderer_recovered": true,
+    "draft_and_position_preserved": true,
+    "color_contract_preserved": true,
+    "HDR_linear": true,
+    "post_recovery_samples": 288000,
+    "underruns": 0,
+    "native_released": true,
+    "window_condition": {
+      "mode": "visible",
+      "condition_held": true,
+      "scope": "Physical center hit-test and window state, not physical scanout. Owned QA topmost/cover windows only; no global Windows settings.",
+      "sample_count": 9,
+      "violations": [],
+      "boundary_samples": [
+        {
+          "seconds": 3.700000888784416e-06,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": false,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 8.0606553000016,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        }
+      ],
+      "selection_scope": "Every detected condition violation and first/last samples retained; full generated raw trace remains local. Scores and failed attempts are never excluded."
+    },
+    "reopen_window_condition": {
+      "mode": "visible",
+      "condition_held": true,
+      "scope": "Physical center hit-test and window state, not physical scanout. Owned QA topmost/cover windows only; no global Windows settings.",
+      "sample_count": 7,
+      "violations": [],
+      "boundary_samples": [
+        {
+          "seconds": 3.600000127335079e-06,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": false,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 6.054958099999567,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        }
+      ],
+      "selection_scope": "Every detected condition violation and first/last samples retained; full generated raw trace remains local. Scores and failed attempts are never excluded."
+    },
+    "new_host_reopen_and_playback": true
+  },
+  {
+    "alias": "CameraC",
+    "renderer_recovered": true,
+    "draft_and_position_preserved": true,
+    "color_contract_preserved": true,
+    "HDR_linear": false,
+    "post_recovery_samples": 288000,
+    "underruns": 0,
+    "native_released": true,
+    "window_condition": {
+      "mode": "visible",
+      "condition_held": true,
+      "scope": "Physical center hit-test and window state, not physical scanout. Owned QA topmost/cover windows only; no global Windows settings.",
+      "sample_count": 9,
+      "violations": [],
+      "boundary_samples": [
+        {
+          "seconds": 2.9000002541579306e-06,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": false,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 8.118474900000365,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        }
+      ],
+      "selection_scope": "Every detected condition violation and first/last samples retained; full generated raw trace remains local. Scores and failed attempts are never excluded."
+    },
+    "reopen_window_condition": {
+      "mode": "visible",
+      "condition_held": true,
+      "scope": "Physical center hit-test and window state, not physical scanout. Owned QA topmost/cover windows only; no global Windows settings.",
+      "sample_count": 7,
+      "violations": [],
+      "boundary_samples": [
+        {
+          "seconds": 3.700000888784416e-06,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 6.065021700000216,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        }
+      ],
+      "selection_scope": "Every detected condition violation and first/last samples retained; full generated raw trace remains local. Scores and failed attempts are never excluded."
+    },
+    "new_host_reopen_and_playback": true
+  }
+]

@@ -1,9 +1,10 @@
 /* Bounded PCM consumer. Sample count, not UI wall time, owns experimental transport. */
 class VlogCraftPCM extends AudioWorkletProcessor {
  constructor(){
-  super();this.capacity=96000;this.ring=new Float32Array(this.capacity*2);this.reset(0);this.report=0;
+  super();this.active=true;this.capacity=96000;this.ring=new Float32Array(this.capacity*2);this.reset(0);this.report=0;
   this.port.onmessage=event=>{
    const m=event.data;
+   if(m.type==='dispose'){this.active=false;this.playing=false;this.queued=0;this.ring=null;this.segments=[];this.port.onmessage=null;this.port.close();return;}
    if(m.type==='reset')this.reset(m.generation);
    else if(m.generation===this.generation){
     if(m.type==='play')this.playing=m.playing;
@@ -19,6 +20,7 @@ class VlogCraftPCM extends AudioWorkletProcessor {
  }
  reset(generation){this.generation=generation;this.read=0;this.write=0;this.queued=0;this.samples=0;this.playing=false;this.ended=false;this.underruns=0;this.sampleContextEnd=0;this.segments=[];this.flowing=false;}
  process(inputs,outputs){
+  if(!this.active)return false;
   const output=outputs[0];if(!output.length)return true;const count=output[0].length;let used=0;
   if(this.playing){
    used=Math.min(count,this.queued);

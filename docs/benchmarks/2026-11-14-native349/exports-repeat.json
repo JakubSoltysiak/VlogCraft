@@ -1,0 +1,378 @@
+{
+  "settings": {
+    "codec": "libx264",
+    "resolution": [
+      3840,
+      2160
+    ],
+    "fps": "60/1",
+    "preset": "veryfast",
+    "bitrate_Mbps": 35,
+    "crf": 20
+  },
+  "rows": [
+    {
+      "arm": "baseline",
+      "repeat": 0,
+      "seconds": 5.914465200001359,
+      "frames": 180,
+      "rate": "60/1",
+      "decoded": true,
+      "SSIM_vs_source": 0.997805,
+      "audio_codec": "aac",
+      "audio_sample_rate": 48000,
+      "AV_endpoint_difference_seconds": 0.0,
+      "conditions": {
+        "samples": [
+          {
+            "seconds": 0.0,
+            "ac_power": true,
+            "battery_percent": 50,
+            "available_memory_MiB": 15442,
+            "system_cpu_percent": 35.7
+          },
+          {
+            "seconds": 1.016,
+            "ac_power": true,
+            "battery_percent": 50,
+            "available_memory_MiB": 13596,
+            "system_cpu_percent": 68.8
+          },
+          {
+            "seconds": 2.031,
+            "ac_power": true,
+            "battery_percent": 50,
+            "available_memory_MiB": 13715,
+            "system_cpu_percent": 85.7
+          },
+          {
+            "seconds": 3.047,
+            "ac_power": true,
+            "battery_percent": 50,
+            "available_memory_MiB": 13719,
+            "system_cpu_percent": 45.9
+          },
+          {
+            "seconds": 4.047,
+            "ac_power": true,
+            "battery_percent": 50,
+            "available_memory_MiB": 13720,
+            "system_cpu_percent": 44.6
+          },
+          {
+            "seconds": 5.047,
+            "ac_power": true,
+            "battery_percent": 50,
+            "available_memory_MiB": 13990,
+            "system_cpu_percent": 36.2
+          }
+        ],
+        "mixed_power": false,
+        "thermal_throttling": "not observable with available public sensors"
+      }
+    },
+    {
+      "arm": "candidate",
+      "repeat": 0,
+      "seconds": 4.795455600000423,
+      "frames": 180,
+      "rate": "60/1",
+      "decoded": true,
+      "SSIM_vs_source": 0.997805,
+      "audio_codec": "aac",
+      "audio_sample_rate": 48000,
+      "AV_endpoint_difference_seconds": 0.0,
+      "conditions": {
+        "samples": [
+          {
+            "seconds": 0.0,
+            "ac_power": true,
+            "battery_percent": 50,
+            "available_memory_MiB": 15711,
+            "system_cpu_percent": 0.0
+          },
+          {
+            "seconds": 1.0,
+            "ac_power": true,
+            "battery_percent": 50,
+            "available_memory_MiB": 13939,
+            "system_cpu_percent": 46.7
+          },
+          {
+            "seconds": 2.016,
+            "ac_power": true,
+            "battery_percent": 50,
+            "available_memory_MiB": 13918,
+            "system_cpu_percent": 52.2
+          },
+          {
+            "seconds": 3.016,
+            "ac_power": true,
+            "battery_percent": 50,
+            "available_memory_MiB": 13943,
+            "system_cpu_percent": 32.7
+          },
+          {
+            "seconds": 4.016,
+            "ac_power": true,
+            "battery_percent": 50,
+            "available_memory_MiB": 14193,
+            "system_cpu_percent": 41.4
+          }
+        ],
+        "mixed_power": false,
+        "thermal_throttling": "not observable with available public sensors"
+      }
+    },
+    {
+      "arm": "candidate",
+      "repeat": 1,
+      "seconds": 4.990073400000256,
+      "frames": 180,
+      "rate": "60/1",
+      "decoded": true,
+      "SSIM_vs_source": 0.997805,
+      "audio_codec": "aac",
+      "audio_sample_rate": 48000,
+      "AV_endpoint_difference_seconds": 0.0,
+      "conditions": {
+        "samples": [
+          {
+            "seconds": 0.0,
+            "ac_power": true,
+            "battery_percent": 50,
+            "available_memory_MiB": 15701,
+            "system_cpu_percent": 0.0
+          },
+          {
+            "seconds": 1.015,
+            "ac_power": true,
+            "battery_percent": 50,
+            "available_memory_MiB": 13948,
+            "system_cpu_percent": 49.1
+          },
+          {
+            "seconds": 2.015,
+            "ac_power": true,
+            "battery_percent": 50,
+            "available_memory_MiB": 13892,
+            "system_cpu_percent": 62.2
+          },
+          {
+            "seconds": 3.015,
+            "ac_power": true,
+            "battery_percent": 50,
+            "available_memory_MiB": 13922,
+            "system_cpu_percent": 38.4
+          },
+          {
+            "seconds": 4.031,
+            "ac_power": true,
+            "battery_percent": 50,
+            "available_memory_MiB": 14034,
+            "system_cpu_percent": 44.2
+          }
+        ],
+        "mixed_power": false,
+        "thermal_throttling": "not observable with available public sensors"
+      }
+    },
+    {
+      "arm": "baseline",
+      "repeat": 1,
+      "seconds": 6.347220499999821,
+      "frames": 180,
+      "rate": "60/1",
+      "decoded": true,
+      "SSIM_vs_source": 0.997805,
+      "audio_codec": "aac",
+      "audio_sample_rate": 48000,
+      "AV_endpoint_difference_seconds": 0.0,
+      "conditions": {
+        "samples": [
+          {
+            "seconds": 0.0,
+            "ac_power": true,
+            "battery_percent": 50,
+            "available_memory_MiB": 15689,
+            "system_cpu_percent": 0.0
+          },
+          {
+            "seconds": 1.0,
+            "ac_power": true,
+            "battery_percent": 50,
+            "available_memory_MiB": 14044,
+            "system_cpu_percent": 62.2
+          },
+          {
+            "seconds": 2.016,
+            "ac_power": true,
+            "battery_percent": 50,
+            "available_memory_MiB": 13880,
+            "system_cpu_percent": 63.0
+          },
+          {
+            "seconds": 3.016,
+            "ac_power": true,
+            "battery_percent": 50,
+            "available_memory_MiB": 13897,
+            "system_cpu_percent": 42.5
+          },
+          {
+            "seconds": 4.016,
+            "ac_power": true,
+            "battery_percent": 50,
+            "available_memory_MiB": 14051,
+            "system_cpu_percent": 45.9
+          },
+          {
+            "seconds": 5.032,
+            "ac_power": true,
+            "battery_percent": 50,
+            "available_memory_MiB": 14039,
+            "system_cpu_percent": 34.5
+          },
+          {
+            "seconds": 6.047,
+            "ac_power": true,
+            "battery_percent": 50,
+            "available_memory_MiB": 15168,
+            "system_cpu_percent": 28.7
+          }
+        ],
+        "mixed_power": false,
+        "thermal_throttling": "not observable with available public sensors"
+      }
+    },
+    {
+      "arm": "baseline",
+      "repeat": 2,
+      "seconds": 5.971189199999571,
+      "frames": 180,
+      "rate": "60/1",
+      "decoded": true,
+      "SSIM_vs_source": 0.997805,
+      "audio_codec": "aac",
+      "audio_sample_rate": 48000,
+      "AV_endpoint_difference_seconds": 0.0,
+      "conditions": {
+        "samples": [
+          {
+            "seconds": 0.0,
+            "ac_power": true,
+            "battery_percent": 50,
+            "available_memory_MiB": 15636,
+            "system_cpu_percent": 0.0
+          },
+          {
+            "seconds": 1.016,
+            "ac_power": true,
+            "battery_percent": 50,
+            "available_memory_MiB": 13979,
+            "system_cpu_percent": 62.8
+          },
+          {
+            "seconds": 2.031,
+            "ac_power": true,
+            "battery_percent": 50,
+            "available_memory_MiB": 13935,
+            "system_cpu_percent": 64.7
+          },
+          {
+            "seconds": 3.031,
+            "ac_power": true,
+            "battery_percent": 50,
+            "available_memory_MiB": 13954,
+            "system_cpu_percent": 40.0
+          },
+          {
+            "seconds": 4.031,
+            "ac_power": true,
+            "battery_percent": 50,
+            "available_memory_MiB": 14084,
+            "system_cpu_percent": 38.1
+          },
+          {
+            "seconds": 5.047,
+            "ac_power": true,
+            "battery_percent": 50,
+            "available_memory_MiB": 14252,
+            "system_cpu_percent": 27.8
+          }
+        ],
+        "mixed_power": false,
+        "thermal_throttling": "not observable with available public sensors"
+      }
+    },
+    {
+      "arm": "candidate",
+      "repeat": 2,
+      "seconds": 5.146866899998713,
+      "frames": 180,
+      "rate": "60/1",
+      "decoded": true,
+      "SSIM_vs_source": 0.997805,
+      "audio_codec": "aac",
+      "audio_sample_rate": 48000,
+      "AV_endpoint_difference_seconds": 0.0,
+      "conditions": {
+        "samples": [
+          {
+            "seconds": 0.0,
+            "ac_power": true,
+            "battery_percent": 50,
+            "available_memory_MiB": 15489,
+            "system_cpu_percent": 0.0
+          },
+          {
+            "seconds": 1.0,
+            "ac_power": true,
+            "battery_percent": 50,
+            "available_memory_MiB": 13741,
+            "system_cpu_percent": 48.6
+          },
+          {
+            "seconds": 2.031,
+            "ac_power": true,
+            "battery_percent": 50,
+            "available_memory_MiB": 13728,
+            "system_cpu_percent": 54.1
+          },
+          {
+            "seconds": 3.031,
+            "ac_power": true,
+            "battery_percent": 50,
+            "available_memory_MiB": 13717,
+            "system_cpu_percent": 38.1
+          },
+          {
+            "seconds": 4.047,
+            "ac_power": true,
+            "battery_percent": 50,
+            "available_memory_MiB": 13849,
+            "system_cpu_percent": 52.1
+          },
+          {
+            "seconds": 5.047,
+            "ac_power": true,
+            "battery_percent": 50,
+            "available_memory_MiB": 14953,
+            "system_cpu_percent": 34.7
+          }
+        ],
+        "mixed_power": false,
+        "thermal_throttling": "not observable with available public sensors"
+      }
+    }
+  ],
+  "summary": {
+    "baseline": {
+      "median_seconds": 5.971189199999571,
+      "worst_seconds": 6.347220499999821
+    },
+    "candidate": {
+      "median_seconds": 4.990073400000256,
+      "worst_seconds": 5.146866899998713
+    }
+  }
+}

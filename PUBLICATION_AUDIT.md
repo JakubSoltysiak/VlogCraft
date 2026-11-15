@@ -20,3 +20,11 @@ New published material consists of source experiments/measurement scripts, gener
 The reachable-history audit is repeated after the final commit before push. Full logs remain locally under build/qa; final remote refs and a fresh mirror are verified separately. Source publication grants no new project license and no approval for bundled binary redistribution.
 
 Pattern scanning and visual review establish the checks performed. They do not prove the absence of every possible secret or establish ownership of third-party material. The detailed machine-readable scan remains in the ignored local build/qa directory.
+
+## 3.4.9 finalization — 15 November 2026
+
+The requested JakubSoltysiak account, development branch and PR #5 base were verified before writes. Checkpoint A8c1e32f inspected848 reachable objects/620blobs with zero findings; Bbd34b4d869/634; C06fd13d952/709. Each push preserves main, all historical tags and unmerged PRs. Draft PR #6 is explicitly qualification incomplete. Final commit reachability/remote/CI receipts are recorded in that PR.
+
+The final working-file audit covers387 files and141 Python AST parses with zero credential/generated-type/large-file/personal-path findings. All three private originals pass final SHA256/mtime verification. Tracked paths, history/content identifiers and working text contain zero private-media matches. Generated measurements are selected technical statistics, CameraA/B/C aliases and every failed outcome; repetitive raw traces remain local. No originals, extracted images/thumbnails, identifying metadata, raw projects/logs, installers or dependency binaries are published.
+
+The Windows development MSI is available locally and passes its stated lifecycle/bundle/icon checks. Public binary redistribution is still outside this delivery: exact-build corresponding-source/licensing review, project licensing and signing/clean-machine acceptance remain open under THIRD_PARTY.md. No dependency/license change or stable release is implied by passing CI.

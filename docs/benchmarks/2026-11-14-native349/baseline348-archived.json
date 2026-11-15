@@ -1,0 +1,762 @@
+{
+  "contract": {
+    "hardware": "Ryzen AI 9 HX 370 / Radeon 890M / 32GiB / Windows11 build26300",
+    "workload": "125s / 1500 clips / 3 video + 3 audio / .5s cuts",
+    "input_class": "Three generated independent original H264 3840x2160 60/1 sources with repeated source offsets",
+    "composition": "960x540",
+    "surface": "356x200 physical pixels",
+    "rate": "60/1",
+    "proxy": false,
+    "cache_state": "Fresh frozen application each trial; repeated offsets; unmanaged OS cache",
+    "power": "AC / Balanced unchanged",
+    "driver": "32.0.32015.7029",
+    "active_refresh": "120Hz nominal",
+    "observer": "Native counter delta / wall time including end-observation tail; not physical scanout"
+  },
+  "summary": {
+    "completed": 10,
+    "valid": 10,
+    "fps_all": [
+      59.799772625051936,
+      59.74991044295321,
+      59.872492435081085,
+      59.82118277896803,
+      59.63699773183497,
+      59.85709677110535,
+      59.77668063608845,
+      59.85814243266558,
+      59.67033631937266,
+      59.848446742785185
+    ],
+    "skips_all": [
+      14,
+      10,
+      2,
+      2,
+      16,
+      3,
+      2,
+      5,
+      4,
+      3
+    ],
+    "fps_best": 59.872492435081085,
+    "fps_median": 59.81047770200998,
+    "fps_worst": 59.63699773183497,
+    "fps_p05_across_trials": 59.65200009622693,
+    "fps_population_stdev": 0.07742088579988764,
+    "at_least_59_5": 10,
+    "under_30_skips": 10,
+    "zero_underruns": true,
+    "failed_trials": 0
+  },
+  "rows": [
+    {
+      "trial": 1,
+      "exit_code": 0,
+      "wall_seconds": 138.015,
+      "fps": 59.799772625051936,
+      "skips": 14,
+      "samples": 6000000,
+      "expected_samples": 6000000,
+      "underruns": 0,
+      "first_ready_seconds": 0.9619783999951323,
+      "startup_seconds": 1.7486856000032276,
+      "peak_working_set_MiB": 3387.0,
+      "CPU_percent": 6.22,
+      "present_intervals": {
+        "count": 7484,
+        "mean_ms": 16.6977,
+        "p50_upper_ms": 16.7,
+        "p95_upper_ms": 17.9,
+        "p99_upper_ms": 33.7,
+        "max_ms": 58.6002,
+        "overflow_100ms": 0
+      },
+      "throughput_windows": [
+        {
+          "window_seconds": 1,
+          "count": 210,
+          "minimum_fps": 56.54509471303347,
+          "p05_fps": 58.82352941176471,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+        },
+        {
+          "window_seconds": 10,
+          "count": 200,
+          "minimum_fps": 59.53600952576153,
+          "p05_fps": 59.618062842207664,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+        }
+      ],
+      "source_skips": 0,
+      "gpu_skips": 0,
+      "other_skips": 14,
+      "mixed_power": false,
+      "all_on_AC": true,
+      "active_throughput_windows": [
+        {
+          "window_seconds": 1,
+          "count": 209,
+          "minimum_fps": 56.54509471303347,
+          "p05_fps": 58.82833564833726,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+        },
+        {
+          "window_seconds": 10,
+          "count": 199,
+          "minimum_fps": 59.53600952576153,
+          "p05_fps": 59.618062842207664,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+        }
+      ],
+      "private_commit_MiB": {
+        "first": 4779.67578125,
+        "last": 4158.62109375,
+        "peak": 4779.67578125
+      },
+      "timing_scope": "Playback-only histogram; initial paused preparation excluded"
+    },
+    {
+      "trial": 2,
+      "exit_code": 0,
+      "wall_seconds": 137.562,
+      "fps": 59.74991044295321,
+      "skips": 10,
+      "samples": 6000000,
+      "expected_samples": 6000000,
+      "underruns": 0,
+      "first_ready_seconds": 0.915414500006591,
+      "startup_seconds": 1.9739921000000322,
+      "peak_working_set_MiB": 3252.0,
+      "CPU_percent": 6.39,
+      "present_intervals": {
+        "count": 7488,
+        "mean_ms": 16.6926,
+        "p50_upper_ms": 16.7,
+        "p95_upper_ms": 17.8,
+        "p99_upper_ms": 32.1,
+        "max_ms": 55.454,
+        "overflow_100ms": 0
+      },
+      "throughput_windows": [
+        {
+          "window_seconds": 1,
+          "count": 313,
+          "minimum_fps": 45.99524187153069,
+          "p05_fps": 59.0753424657531,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+        },
+        {
+          "window_seconds": 10,
+          "count": 285,
+          "minimum_fps": 58.17038419966595,
+          "p05_fps": 59.71422478140328,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+        }
+      ],
+      "source_skips": 0,
+      "gpu_skips": 0,
+      "other_skips": 10,
+      "mixed_power": false,
+      "all_on_AC": true,
+      "active_throughput_windows": [
+        {
+          "window_seconds": 1,
+          "count": 312,
+          "minimum_fps": 56.594181350778406,
+          "p05_fps": 59.10390848427076,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+        },
+        {
+          "window_seconds": 10,
+          "count": 284,
+          "minimum_fps": 59.625914354963676,
+          "p05_fps": 59.716132010154624,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+        }
+      ],
+      "private_commit_MiB": {
+        "first": 4657.28515625,
+        "last": 4162.15234375,
+        "peak": 4657.28515625
+      },
+      "timing_scope": "Playback-only histogram; initial paused preparation excluded"
+    },
+    {
+      "trial": 3,
+      "exit_code": 0,
+      "wall_seconds": 137.422,
+      "fps": 59.872492435081085,
+      "skips": 2,
+      "samples": 6000000,
+      "expected_samples": 6000000,
+      "underruns": 0,
+      "first_ready_seconds": 0.8994681000040146,
+      "startup_seconds": 1.9719421000045259,
+      "peak_working_set_MiB": 3501.4,
+      "CPU_percent": 6.32,
+      "present_intervals": {
+        "count": 7496,
+        "mean_ms": 16.6712,
+        "p50_upper_ms": 16.7,
+        "p95_upper_ms": 17.8,
+        "p99_upper_ms": 25.5,
+        "max_ms": 50.2733,
+        "overflow_100ms": 0
+      },
+      "throughput_windows": [
+        {
+          "window_seconds": 1,
+          "count": 304,
+          "minimum_fps": 54.33829973707249,
+          "p05_fps": 59.32267027108217,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+        },
+        {
+          "window_seconds": 10,
+          "count": 268,
+          "minimum_fps": 59.35633069955676,
+          "p05_fps": 59.8802395209581,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+        }
+      ],
+      "source_skips": 0,
+      "gpu_skips": 0,
+      "other_skips": 2,
+      "mixed_power": false,
+      "all_on_AC": true,
+      "active_throughput_windows": [
+        {
+          "window_seconds": 1,
+          "count": 303,
+          "minimum_fps": 58.72042068361059,
+          "p05_fps": 59.32814880141125,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+        },
+        {
+          "window_seconds": 10,
+          "count": 267,
+          "minimum_fps": 59.818665401081674,
+          "p05_fps": 59.882035389383184,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+        }
+      ],
+      "private_commit_MiB": {
+        "first": 4751.6796875,
+        "last": 4177.89453125,
+        "peak": 4773.82421875
+      },
+      "timing_scope": "Playback-only histogram; initial paused preparation excluded"
+    },
+    {
+      "trial": 4,
+      "exit_code": 0,
+      "wall_seconds": 138.157,
+      "fps": 59.82118277896803,
+      "skips": 2,
+      "samples": 6000000,
+      "expected_samples": 6000000,
+      "underruns": 0,
+      "first_ready_seconds": 0.9196150000061607,
+      "startup_seconds": 1.979088000007323,
+      "peak_working_set_MiB": 3343.9,
+      "CPU_percent": 5.84,
+      "present_intervals": {
+        "count": 7496,
+        "mean_ms": 16.6712,
+        "p50_upper_ms": 16.7,
+        "p95_upper_ms": 17.7,
+        "p99_upper_ms": 24.1,
+        "max_ms": 44.0419,
+        "overflow_100ms": 0
+      },
+      "throughput_windows": [
+        {
+          "window_seconds": 1,
+          "count": 284,
+          "minimum_fps": 50.239234449760566,
+          "p05_fps": 59.325825212503155,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+        },
+        {
+          "window_seconds": 10,
+          "count": 253,
+          "minimum_fps": 58.75417567302026,
+          "p05_fps": 59.86532791457482,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+        }
+      ],
+      "source_skips": 0,
+      "gpu_skips": 0,
+      "other_skips": 2,
+      "mixed_power": false,
+      "all_on_AC": true,
+      "active_throughput_windows": [
+        {
+          "window_seconds": 1,
+          "count": 283,
+          "minimum_fps": 58.51375073142161,
+          "p05_fps": 59.33425464159111,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+        },
+        {
+          "window_seconds": 10,
+          "count": 252,
+          "minimum_fps": 59.823019420085,
+          "p05_fps": 59.866678482458454,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+        }
+      ],
+      "private_commit_MiB": {
+        "first": 4751.9375,
+        "last": 4142.44921875,
+        "peak": 4751.9375
+      },
+      "timing_scope": "Playback-only histogram; initial paused preparation excluded"
+    },
+    {
+      "trial": 5,
+      "exit_code": 0,
+      "wall_seconds": 138.157,
+      "fps": 59.63699773183497,
+      "skips": 16,
+      "samples": 6000000,
+      "expected_samples": 6000000,
+      "underruns": 0,
+      "first_ready_seconds": 0.8131429000059143,
+      "startup_seconds": 2.03026869999303,
+      "peak_working_set_MiB": 3413.7,
+      "CPU_percent": 6.4,
+      "present_intervals": {
+        "count": 7482,
+        "mean_ms": 16.7024,
+        "p50_upper_ms": 16.7,
+        "p95_upper_ms": 17.9,
+        "p99_upper_ms": 29.7,
+        "max_ms": 58.2314,
+        "overflow_100ms": 0
+      },
+      "throughput_windows": [
+        {
+          "window_seconds": 1,
+          "count": 247,
+          "minimum_fps": 44.390637610976945,
+          "p05_fps": 58.750222538721545,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+        },
+        {
+          "window_seconds": 10,
+          "count": 224,
+          "minimum_fps": 58.11090318132577,
+          "p05_fps": 59.32399583285104,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+        }
+      ],
+      "source_skips": 0,
+      "gpu_skips": 0,
+      "other_skips": 16,
+      "mixed_power": false,
+      "all_on_AC": true,
+      "active_throughput_windows": [
+        {
+          "window_seconds": 1,
+          "count": 246,
+          "minimum_fps": 56.90542859723589,
+          "p05_fps": 58.78030859661988,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+        },
+        {
+          "window_seconds": 10,
+          "count": 223,
+          "minimum_fps": 59.15602767761429,
+          "p05_fps": 59.345170097004626,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+        }
+      ],
+      "private_commit_MiB": {
+        "first": 4802.02734375,
+        "last": 4174.69921875,
+        "peak": 4802.02734375
+      },
+      "timing_scope": "Playback-only histogram; initial paused preparation excluded"
+    },
+    {
+      "trial": 6,
+      "exit_code": 0,
+      "wall_seconds": 137.187,
+      "fps": 59.85709677110535,
+      "skips": 3,
+      "samples": 6000000,
+      "expected_samples": 6000000,
+      "underruns": 0,
+      "first_ready_seconds": 0.8984956999920541,
+      "startup_seconds": 1.9728833000117447,
+      "peak_working_set_MiB": 3338.2,
+      "CPU_percent": 6.33,
+      "present_intervals": {
+        "count": 7495,
+        "mean_ms": 16.6734,
+        "p50_upper_ms": 16.7,
+        "p95_upper_ms": 17.7,
+        "p99_upper_ms": 24.7,
+        "max_ms": 52.5573,
+        "overflow_100ms": 0
+      },
+      "throughput_windows": [
+        {
+          "window_seconds": 1,
+          "count": 300,
+          "minimum_fps": 54.8611111111112,
+          "p05_fps": 59.23961096374963,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+        },
+        {
+          "window_seconds": 10,
+          "count": 271,
+          "minimum_fps": 59.29203539823008,
+          "p05_fps": 59.809804820670266,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+        }
+      ],
+      "source_skips": 0,
+      "gpu_skips": 0,
+      "other_skips": 3,
+      "mixed_power": false,
+      "all_on_AC": true,
+      "active_throughput_windows": [
+        {
+          "window_seconds": 1,
+          "count": 299,
+          "minimum_fps": 58.589348756853944,
+          "p05_fps": 59.23961096374963,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+        },
+        {
+          "window_seconds": 10,
+          "count": 270,
+          "minimum_fps": 59.73555272165916,
+          "p05_fps": 59.81182127989352,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+        }
+      ],
+      "private_commit_MiB": {
+        "first": 4727.23046875,
+        "last": 4161.03125,
+        "peak": 4727.23046875
+      },
+      "timing_scope": "Playback-only histogram; initial paused preparation excluded"
+    },
+    {
+      "trial": 7,
+      "exit_code": 0,
+      "wall_seconds": 138.203,
+      "fps": 59.77668063608845,
+      "skips": 2,
+      "samples": 6000000,
+      "expected_samples": 6000000,
+      "underruns": 0,
+      "first_ready_seconds": 0.9339763000025414,
+      "startup_seconds": 2.0315577000001213,
+      "peak_working_set_MiB": 3279.5,
+      "CPU_percent": 5.9,
+      "present_intervals": {
+        "count": 7496,
+        "mean_ms": 16.671,
+        "p50_upper_ms": 16.7,
+        "p95_upper_ms": 17.8,
+        "p99_upper_ms": 23.6,
+        "max_ms": 55.8774,
+        "overflow_100ms": 0
+      },
+      "throughput_windows": [
+        {
+          "window_seconds": 1,
+          "count": 287,
+          "minimum_fps": 46.774193548386755,
+          "p05_fps": 59.325477448191485,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+        },
+        {
+          "window_seconds": 10,
+          "count": 262,
+          "minimum_fps": 58.37763339240007,
+          "p05_fps": 59.82306403211351,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+        }
+      ],
+      "source_skips": 0,
+      "gpu_skips": 0,
+      "other_skips": 2,
+      "mixed_power": false,
+      "all_on_AC": true,
+      "active_throughput_windows": [
+        {
+          "window_seconds": 1,
+          "count": 286,
+          "minimum_fps": 58.48903330625534,
+          "p05_fps": 59.33029908972711,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+        },
+        {
+          "window_seconds": 10,
+          "count": 261,
+          "minimum_fps": 59.755805602106804,
+          "p05_fps": 59.828809572609494,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+        }
+      ],
+      "private_commit_MiB": {
+        "first": 4688.1171875,
+        "last": 4152.48046875,
+        "peak": 4688.1171875
+      },
+      "timing_scope": "Playback-only histogram; initial paused preparation excluded"
+    },
+    {
+      "trial": 8,
+      "exit_code": 0,
+      "wall_seconds": 137.688,
+      "fps": 59.85814243266558,
+      "skips": 5,
+      "samples": 6000000,
+      "expected_samples": 6000000,
+      "underruns": 0,
+      "first_ready_seconds": 0.8634804000030272,
+      "startup_seconds": 1.9942135000019334,
+      "peak_working_set_MiB": 3464.1,
+      "CPU_percent": 6.08,
+      "present_intervals": {
+        "count": 7493,
+        "mean_ms": 16.6778,
+        "p50_upper_ms": 16.7,
+        "p95_upper_ms": 17.7,
+        "p99_upper_ms": 21.3,
+        "max_ms": 60.2211,
+        "overflow_100ms": 0
+      },
+      "throughput_windows": [
+        {
+          "window_seconds": 1,
+          "count": 215,
+          "minimum_fps": 53.83936451897638,
+          "p05_fps": 59.30778082676819,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+        },
+        {
+          "window_seconds": 10,
+          "count": 205,
+          "minimum_fps": 59.35573672698354,
+          "p05_fps": 59.698305150556216,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+        }
+      ],
+      "source_skips": 2,
+      "gpu_skips": 0,
+      "other_skips": 3,
+      "mixed_power": false,
+      "all_on_AC": true,
+      "active_throughput_windows": [
+        {
+          "window_seconds": 1,
+          "count": 213,
+          "minimum_fps": 57.86249149081031,
+          "p05_fps": 59.32267027108217,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+        },
+        {
+          "window_seconds": 10,
+          "count": 204,
+          "minimum_fps": 59.54088243148351,
+          "p05_fps": 59.71485442718496,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+        }
+      ],
+      "private_commit_MiB": {
+        "first": 4686.4375,
+        "last": 4158.53125,
+        "peak": 4716.109375
+      },
+      "timing_scope": "Playback-only histogram; initial paused preparation excluded"
+    },
+    {
+      "trial": 9,
+      "exit_code": 0,
+      "wall_seconds": 137.828,
+      "fps": 59.67033631937266,
+      "skips": 4,
+      "samples": 6000000,
+      "expected_samples": 6000000,
+      "underruns": 0,
+      "first_ready_seconds": 0.8495302999945125,
+      "startup_seconds": 2.0023232999956235,
+      "peak_working_set_MiB": 3377.4,
+      "CPU_percent": 6.07,
+      "present_intervals": {
+        "count": 7494,
+        "mean_ms": 16.6756,
+        "p50_upper_ms": 16.7,
+        "p95_upper_ms": 17.8,
+        "p99_upper_ms": 31.6,
+        "max_ms": 58.3313,
+        "overflow_100ms": 0
+      },
+      "throughput_windows": [
+        {
+          "window_seconds": 1,
+          "count": 270,
+          "minimum_fps": 33.77110694183857,
+          "p05_fps": 59.21143348447121,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+        },
+        {
+          "window_seconds": 10,
+          "count": 231,
+          "minimum_fps": 57.13714913595048,
+          "p05_fps": 59.83191954181346,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+        }
+      ],
+      "source_skips": 0,
+      "gpu_skips": 0,
+      "other_skips": 4,
+      "mixed_power": false,
+      "all_on_AC": true,
+      "active_throughput_windows": [
+        {
+          "window_seconds": 1,
+          "count": 268,
+          "minimum_fps": 58.13390175370565,
+          "p05_fps": 59.273709483793255,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+        },
+        {
+          "window_seconds": 10,
+          "count": 229,
+          "minimum_fps": 59.80791899360373,
+          "p05_fps": 59.83846561990289,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+        }
+      ],
+      "private_commit_MiB": {
+        "first": 4754.7734375,
+        "last": 4151.203125,
+        "peak": 4754.7734375
+      },
+      "timing_scope": "Playback-only histogram; initial paused preparation excluded"
+    },
+    {
+      "trial": 10,
+      "exit_code": 0,
+      "wall_seconds": 137.688,
+      "fps": 59.848446742785185,
+      "skips": 3,
+      "samples": 6000000,
+      "expected_samples": 6000000,
+      "underruns": 0,
+      "first_ready_seconds": 0.8986955000000307,
+      "startup_seconds": 1.9899307000014232,
+      "peak_working_set_MiB": 3317.4,
+      "CPU_percent": 6.15,
+      "present_intervals": {
+        "count": 7495,
+        "mean_ms": 16.6733,
+        "p50_upper_ms": 16.7,
+        "p95_upper_ms": 17.7,
+        "p99_upper_ms": 21.8,
+        "max_ms": 47.9409,
+        "overflow_100ms": 0
+      },
+      "throughput_windows": [
+        {
+          "window_seconds": 1,
+          "count": 231,
+          "minimum_fps": 58.36575875486429,
+          "p05_fps": 59.32878774462053,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+        },
+        {
+          "window_seconds": 10,
+          "count": 212,
+          "minimum_fps": 59.76018064315191,
+          "p05_fps": 59.80944432853471,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+        }
+      ],
+      "source_skips": 0,
+      "gpu_skips": 0,
+      "other_skips": 3,
+      "mixed_power": false,
+      "all_on_AC": true,
+      "active_throughput_windows": [
+        {
+          "window_seconds": 1,
+          "count": 231,
+          "minimum_fps": 58.36575875486429,
+          "p05_fps": 59.32878774462053,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+        },
+        {
+          "window_seconds": 10,
+          "count": 212,
+          "minimum_fps": 59.76018064315191,
+          "p05_fps": 59.80944432853471,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+        }
+      ],
+      "private_commit_MiB": {
+        "first": 4615.29296875,
+        "last": 4154.49609375,
+        "peak": 4615.29296875
+      },
+      "timing_scope": "Playback-only histogram; initial paused preparation excluded"
+    }
+  ],
+  "metrics": {
+    "CPU_machine_percent": {
+      "minimum": 5.84,
+      "median": 6.1850000000000005,
+      "maximum": 6.4
+    },
+    "peak_summed_RSS_MiB": {
+      "minimum": 3252.0,
+      "median": 3360.65,
+      "maximum": 3501.4
+    },
+    "peak_summed_private_commit_MiB": {
+      "minimum": 4615.29296875,
+      "median": 4739.583984375,
+      "maximum": 4802.02734375
+    },
+    "startup_seconds": {
+      "minimum": 1.7486856000032276,
+      "median": 1.9845093500043731,
+      "maximum": 2.0315577000001213
+    },
+    "first_ready_seconds": {
+      "minimum": 0.8131429000059143,
+      "median": 0.8990818000020226,
+      "maximum": 0.9619783999951323
+    },
+    "skips": {
+      "minimum": 2,
+      "median": 3.5,
+      "maximum": 16
+    },
+    "active_worst_1s_fps": 56.54509471303347,
+    "active_worst_10s_fps": 59.15602767761429,
+    "playback_p95_ms": {
+      "minimum": 17.7,
+      "median": 17.8,
+      "maximum": 17.9
+    },
+    "playback_p99_ms": {
+      "minimum": 21.3,
+      "median": 25.1,
+      "maximum": 33.7
+    },
+    "playback_max_ms": 60.2211,
+    "variance_of_run_mean_interval_ms2": 0.00013184960000000665,
+    "per_frame_interval_variance": "Not retained by histogram; do not confuse run-mean variance with per-frame variance"
+  }
+}

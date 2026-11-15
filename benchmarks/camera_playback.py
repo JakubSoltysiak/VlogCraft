@@ -2,6 +2,7 @@
 import argparse,json,sys,time,traceback
 from pathlib import Path
 from windows_session import session
+from window_visibility import WindowVisibility
 
 def main(a):
  a.results=a.results.resolve();sources=json.loads(a.manifest.read_text('utf8'));rows=[]
@@ -10,7 +11,7 @@ def main(a):
  for n,source in enumerate(sources):
   folder=a.results/f'source-{n}';folder.mkdir()
   alias='Camera'+chr(65+n)
-  with session(a.executable,folder,offline=True) as (page,proc,project,errors):
+  with session(a.executable,folder,offline=True) as (page,proc,project,errors),WindowVisibility(proc,'visible') as visibility:
    result=page.evaluate("path=>request('import','POST',{paths:[path],autoProxy:false})",source['path'])
    assert not result['errors'],'Private media import failed; local diagnostics retained'
    page.evaluate("""assets=>{
@@ -28,15 +29,20 @@ def main(a):
    while page.evaluate('isPlaying'):
     if time.monotonic()>deadline:raise RuntimeError('Private media playback timeout')
     page.wait_for_timeout(250)
+   diagnostic=page.evaluate("({samples:nativeState.ack?.samples,underruns:nativeState.ack?.underruns,prepared:nativeState.prepared,blocked:nativeState.blocked,playhead,expectedDuration:nativeDuration(),native:nativeState.metrics,status:$('programPreviewStatus').textContent,toast:$('toast').textContent})")
+   (folder/'end-state-private.json').write_text(json.dumps(diagnostic,indent=2),encoding='utf8')
+   assert diagnostic['prepared'] and diagnostic['samples']==expected,'Private playback ended before its complete sample budget; diagnostics retained locally'
    page.wait_for_function('n=>nativeState.metrics?.completed_sequence_frame===n-1',arg=frames,timeout=10000)
    info=page.evaluate('({samples:nativeState.ack.samples,underruns:nativeState.ack.underruns,hdr:nativeState.hdr,native:nativeState.metrics,selected:nativeSelected()})')
    assert info['selected'] and info['samples']==expected and info['underruns']==0 and not errors
+   window_condition=visibility.finish();assert window_condition['condition_held'],'Private playback lost its controlled visible condition'
    metric=info['native'];rows.append({'alias':alias,'timeline_seconds':expected/48000,'samples':info['samples'],'expected_samples':expected,
     'underruns':info['underruns'],'first_ready_seconds':first,'native_complete':True,'HDR_linear':info['hdr'],
     'completed_last_frame':metric['completed_sequence_frame'],'skips':metric['skipped_sequence_frames'],
     'playback_interval':metric.get('timings',{}).get('playback_present_interval'),
     'pool_frames':[d.get('hardware_pool_frames') for d in metric.get('decoder_statistics',[])],
-    'hdr10plus_retained_at_decode':any(r.get('hdr10plus_retained') for r in metric.get('selected',[]))})
+    'hdr10plus_retained_at_decode':any(r.get('hdr10plus_retained') for r in metric.get('selected',[])),
+    'window_condition':window_condition})
    (a.results/'playback-safe.json').write_text(json.dumps(rows,indent=2),encoding='utf8')
    print(json.dumps({'alias':alias,'complete':True,'samples':expected,'underruns':0}),flush=True)
 if __name__=='__main__':

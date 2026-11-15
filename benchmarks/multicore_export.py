@@ -19,7 +19,7 @@ def main(a):
  a.results.mkdir(parents=True,exist_ok=True);rows=[]
  paths=[a.media/f'h264-4k60-{n}.mp4' for n in range(3)]
  s=scene(paths,3,3840,a.layers,a.effects)
- configs=[(1,1,4),(1,1,8),(2,1,4),(1,2,4)]
+ configs=[(1,1,4),(1,1,8)] if a.encode_only else [(1,1,4),(1,1,8),(2,1,4),(1,2,4)]
  baseline=None;baseline_source_quality=None
  for repeat in range(3):
   for config in (configs if repeat%2==0 else configs[::-1]):
@@ -44,4 +44,4 @@ def main(a):
    rows.append(row);(a.results/'workers.json').write_text(json.dumps({'layers':a.layers,'effects':a.effects,'quality_options_unchanged':True,'rows':rows},indent=2),encoding='utf8')
    print(json.dumps(row),flush=True)
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('media',type=Path);p.add_argument('results',type=Path);p.add_argument('--layers',type=int,default=1);p.add_argument('--effects',action='store_true');main(p.parse_args())
+ p=argparse.ArgumentParser();p.add_argument('media',type=Path);p.add_argument('results',type=Path);p.add_argument('--layers',type=int,default=1);p.add_argument('--effects',action='store_true');p.add_argument('--encode-only',action='store_true',help='Compare the preserved four/eight encoder-worker policies; keep decode/filter workers identical.');main(p.parse_args())

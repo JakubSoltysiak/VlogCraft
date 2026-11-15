@@ -7,7 +7,7 @@ class Controller:
  def __init__(self,window,cache,bundle):
   self.window=window;self.cache=Path(cache)/'native-preview';self.cache.mkdir(exist_ok=True)
   self.bundle=Path(bundle);self.guard=threading.RLock();self.process=None;self.panel=None;self.latest={};self.generation=0;self.snapshot=None
-  self.audio_processes=set();self.closed=False
+  self.audio_processes=set();self.closed=False;self.reader_thread=None;self.clock_position=0
  def runtime(self):
   override=os.environ.get('VLOGCRAFT_NATIVE_BINARY')
   if override:
@@ -67,12 +67,13 @@ class Controller:
    env=dict(os.environ,PATH=str(dll)+os.pathsep+os.environ['PATH'])
    process=subprocess.Popen([str(exe),'--plan',str(target),'--parent',str(parent)],env=env,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=log,text=True,encoding='utf8',creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
    log.close();self.process=process;self.latest={'event':'starting'}
-   threading.Thread(target=self._read,args=(process,),daemon=True).start()
+   self.reader_thread=threading.Thread(target=self._read,args=(process,),daemon=True);self.reader_thread.start()
   self.clock(data.get('microseconds',0),False,generation)
   return {k:v for k,v in plan.items() if k!='text'}|{'generation':generation}
  def clock(self,microseconds,playing,generation):
   with self.guard:
    if generation!=self.generation:return {'stale':True}
+   self.clock_position=int(microseconds)
    if self.process and self.process.poll() is None:
     try:self.process.stdin.write(f'CLOCK {int(microseconds)} {int(bool(playing))} {generation}\n');self.process.stdin.flush()
     except (BrokenPipeError,OSError):self.latest={'event':'error','reason':'Native renderer stopped; reference fallback is available'}
@@ -94,7 +95,7 @@ class Controller:
    except subprocess.TimeoutExpired:process.kill();process.wait(timeout=2)
  def stop(self):
   with self.guard:
-   process=self.process;self.process=None;self.generation+=1
+   process=self.process;self.process=None;self.snapshot=None;self.generation+=1;reader=self.reader_thread;self.reader_thread=None
    audio=list(self.audio_processes)
    if process and process.poll() is None:
     try:process.stdin.write('CLOSE\n');process.stdin.flush()
@@ -104,6 +105,7 @@ class Controller:
   if process:
    try:process.wait(timeout=3)
    except subprocess.TimeoutExpired:self._terminate(process)
+   if reader is not None and reader is not threading.current_thread():reader.join(timeout=2)
    for pipe in (process.stdin,process.stdout):
     if pipe:pipe.close()
  def close(self):

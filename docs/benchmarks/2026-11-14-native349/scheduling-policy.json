@@ -1,0 +1,152 @@
+{
+  "phase": "final-baseline-endurance600",
+  "process_policies": [
+    {
+      "role": "driver",
+      "priority_class": 32,
+      "power_information_available": true,
+      "power_control_mask": 0,
+      "power_state_mask": 0
+    },
+    {
+      "role": "host",
+      "priority_class": 32,
+      "power_information_available": true,
+      "power_control_mask": 0,
+      "power_state_mask": 0
+    },
+    {
+      "role": "driver",
+      "priority_class": 32,
+      "power_information_available": true,
+      "power_control_mask": 0,
+      "power_state_mask": 0
+    },
+    {
+      "role": "driver",
+      "priority_class": 32,
+      "power_information_available": true,
+      "power_control_mask": 0,
+      "power_state_mask": 0
+    },
+    {
+      "role": "webview_other",
+      "priority_class": 32,
+      "power_information_available": true,
+      "power_control_mask": 0,
+      "power_state_mask": 0
+    },
+    {
+      "role": "native",
+      "priority_class": 32,
+      "power_information_available": true,
+      "power_control_mask": 0,
+      "power_state_mask": 0
+    },
+    {
+      "role": "driver",
+      "priority_class": 32,
+      "power_information_available": true,
+      "power_control_mask": 0,
+      "power_state_mask": 0
+    },
+    {
+      "role": "driver",
+      "priority_class": 32,
+      "power_information_available": true,
+      "power_control_mask": 0,
+      "power_state_mask": 0
+    },
+    {
+      "role": "driver",
+      "priority_class": 32,
+      "power_information_available": true,
+      "power_control_mask": 0,
+      "power_state_mask": 0
+    },
+    {
+      "role": "webview_other",
+      "priority_class": 32,
+      "power_information_available": true,
+      "power_control_mask": 0,
+      "power_state_mask": 0
+    },
+    {
+      "role": "webview_other",
+      "priority_class": 32768,
+      "power_information_available": true,
+      "power_control_mask": 4,
+      "power_state_mask": 0
+    },
+    {
+      "role": "webview_other",
+      "priority_class": 32,
+      "power_information_available": true,
+      "power_control_mask": 0,
+      "power_state_mask": 0
+    },
+    {
+      "role": "webview_other",
+      "priority_class": 32,
+      "power_information_available": true,
+      "power_control_mask": 0,
+      "power_state_mask": 0
+    },
+    {
+      "role": "renderer",
+      "priority_class": 32,
+      "power_information_available": true,
+      "power_control_mask": 4,
+      "power_state_mask": 0
+    },
+    {
+      "role": "webview_other",
+      "priority_class": 32,
+      "power_information_available": true,
+      "power_control_mask": 4,
+      "power_state_mask": 0
+    },
+    {
+      "role": "driver",
+      "priority_class": 32,
+      "power_information_available": true,
+      "power_control_mask": 0,
+      "power_state_mask": 0
+    },
+    {
+      "role": "driver",
+      "priority_class": 32,
+      "power_information_available": true,
+      "power_control_mask": 0,
+      "power_state_mask": 0
+    }
+  ],
+  "OS_CPU_frequency_status": 0,
+  "OS_reported_current_MHz": [
+    2000,
+    2000,
+    2000,
+    2000,
+    2000,
+    2000,
+    2000,
+    2000,
+    2000,
+    2000,
+    2000,
+    2000,
+    2000,
+    2000,
+    2000,
+    2000,
+    2000,
+    2000,
+    2000,
+    2000,
+    2000,
+    2000,
+    2000,
+    2000
+  ],
+  "frequency_scope": "Windows-reported instantaneous values, not calibrated effective boost clocks."
+}

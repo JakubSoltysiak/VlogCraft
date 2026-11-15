@@ -1,0 +1,185 @@
+{
+  "version": "3.4.9",
+  "qualification": "WORK IN PROGRESS \u2014 QUALIFICATION INCOMPLETE",
+  "baseline": "3.4.8 / PR5 / 6a5532e6efa091d31e1baf633af03864316e63d3",
+  "MSI_sha256": "05bcdbd1abaa0e68f1ac2ad6df73511f5acdfcf60b8dfc07f369f667a7eb9fe4",
+  "scope": "Durable safety checkpoint, not hardware acceptance. Includes every numeric final workload attempt, including failed focus checks. GPU caches and production native binary retained.",
+  "candidate": {
+    "count": 10,
+    "failed_exit_codes": 3,
+    "fps_worst": 59.73429992117747,
+    "fps_all": [
+      59.853317446983034,
+      59.80498825244866,
+      59.7596063009073,
+      59.89382929739242,
+      59.73457868941917,
+      59.88904816307527,
+      59.73429992117747,
+      59.791209606816494,
+      59.88224996102977,
+      59.77392153296881
+    ],
+    "skips_all": [
+      4,
+      18,
+      3,
+      3,
+      22,
+      5,
+      4,
+      7,
+      8,
+      5
+    ],
+    "scope": "All numeric measured attempts, including failed audio/focus/application checks; incomplete attempts without FPS are not assigned an invented score."
+  },
+  "baseline_current": {
+    "count": 10,
+    "failed_exit_codes": 1,
+    "fps_worst": 59.700944633179375,
+    "fps_all": [
+      59.7225375506351,
+      59.83338629500842,
+      59.828057180204965,
+      59.835440561785646,
+      59.764005121034494,
+      59.813997145785066,
+      59.84298007177607,
+      59.700944633179375,
+      59.857116816915195,
+      59.80972029714073
+    ],
+    "skips_all": [
+      2,
+      5,
+      2,
+      5,
+      2,
+      5,
+      7,
+      18,
+      11,
+      8
+    ],
+    "scope": "All numeric measured attempts, including failed audio/focus/application checks; incomplete attempts without FPS are not assigned an invented score."
+  },
+  "candidate_guardrails": {
+    "all_ten_at_least59_5": false,
+    "zero_audio_underruns": false,
+    "exact_samples": false,
+    "median_skips_at_most3_5": false,
+    "maximum_skips_at_most16": false,
+    "continuous_window_condition": false
+  },
+  "remaining": [
+    "Long-playback/audio and visibility acceptance",
+    "Active WebView memory plateau unproven",
+    "Historical target losses unassigned",
+    "Exact final GitHub Actions receipt"
+  ],
+  "source_fingerprint": "daaa81cab9dfaaadaf64b38f0ff3589c840ba7d43bd44242c02d4d9e7ca8f112",
+  "fingerprint_method": "SHA256 sorted relevant relative path + NUL + LF-normalized source + NUL",
+  "benchmark_protocol_fingerprint": "bae46c7e71792239be4c8598796da9772bed9f02b2697fce5383b7f119726826",
+  "benchmark_protocol_fingerprint_method": "SHA256 sorted benchmark driver/observer relative path + NUL + LF-normalized source + NUL",
+  "before_tracker_protocol_fingerprint": "d0fd54608b8902f4f55e7b0e17826feda6a256eca1f730c673540fe1f4dc8dc1",
+  "protocol_scope": "The final ten workload attempts predate the QA heartbeat integration. Application/native code is unchanged. Current protocol binding includes the new two-second supervisor tracker; it does not relabel older measurements as a new full cohort. Tracker overhead and impacted short smoke are qualified separately.",
+  "final_descriptive_comparison": {
+    "baseline": {
+      "attempts_with_metrics": 10,
+      "successful_exit": 9,
+      "fps_best": 59.857116816915195,
+      "fps_median": 59.821027162995016,
+      "fps_worst": 59.700944633179375,
+      "fps_SD": 0.05065494312549266,
+      "at_least59_5": 10,
+      "skip_min": 2,
+      "skip_median": 5,
+      "skip_max": 18,
+      "all_zero_underruns": true,
+      "all_exact_samples": true,
+      "all_window_conditions_held": false,
+      "median_peak_summed_RSS_MiB": 3445.3999999999996,
+      "median_CPU_machine_percent": 6.34,
+      "mean_interval_across_run_variance_ms2": 0.0001114965000000115,
+      "p50_median_ms": 16.7,
+      "p95_median_ms": 17.95,
+      "p99_median_ms": 35.95,
+      "longest_active_interval_ms": 64.9182,
+      "bootstrap_failures": 7,
+      "guardrails": {
+        "all_ten_at_least59_5": false,
+        "zero_audio_underruns": false,
+        "exact_samples": false,
+        "median_skips_at_most3_5": false,
+        "maximum_skips_at_most16": false,
+        "continuous_window_condition": false
+      }
+    },
+    "candidate": {
+      "attempts_with_metrics": 10,
+      "successful_exit": 7,
+      "fps_best": 59.89382929739242,
+      "fps_median": 59.79809892963257,
+      "fps_worst": 59.73429992117747,
+      "fps_SD": 0.05998467058009329,
+      "at_least59_5": 10,
+      "skip_min": 3,
+      "skip_median": 5,
+      "skip_max": 22,
+      "all_zero_underruns": true,
+      "all_exact_samples": true,
+      "all_window_conditions_held": false,
+      "median_peak_summed_RSS_MiB": 3467,
+      "median_CPU_machine_percent": 6.77,
+      "mean_interval_across_run_variance_ms2": 0.00021727049999999482,
+      "p50_median_ms": 16.7,
+      "p95_median_ms": 18.200000000000003,
+      "p99_median_ms": 36.55,
+      "longest_active_interval_ms": 76.9794,
+      "bootstrap_failures": 10,
+      "guardrails": {
+        "all_ten_at_least59_5": false,
+        "zero_audio_underruns": false,
+        "exact_samples": false,
+        "median_skips_at_most3_5": false,
+        "maximum_skips_at_most16": false,
+        "continuous_window_condition": false
+      }
+    }
+  },
+  "essential_verification": {
+    "offline_Python": {
+      "passed": 113,
+      "seconds": 33.699
+    },
+    "JavaScript": {
+      "passed": 19
+    },
+    "large_workflow": "passed after actual host close/reopen fixture correction; old ERR_ABORTED retained",
+    "installed_bundle": "all checks passed; QA modules excluded",
+    "tracker_tests": 15,
+    "tracker_viewer": "passed refresh/close; no console survivors"
+  },
+  "confirmed_qualification_failures": {
+    "candidate_endurance600": {
+      "fps": 57.980403703307424,
+      "skips": 1203,
+      "underruns": 0,
+      "maximum_active_interval_ms": 4629.36,
+      "window_condition_held": false
+    },
+    "candidate_memory600": {
+      "audio_underruns": 657,
+      "window_condition_held": true
+    },
+    "candidate_editing1800": {
+      "batches": 180,
+      "undo": 80,
+      "underruns": 0,
+      "window_condition_held": false,
+      "one_covered_sample_seconds": 130.3278177000011,
+      "late_WebView_slope_MiB_per_minute": 10.97603674221359
+    }
+  }
+}

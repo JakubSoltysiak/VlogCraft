@@ -20,8 +20,8 @@ let renderPoll=null,proposalToken=null,proposalSnapshot=null;
 async function request(path,method='GET',body=null){const o={method,cache:'no-store'};if(body!==null){o.headers={'Content-Type':'application/json'};o.body=JSON.stringify(body);}const r=await fetch('/api/'+path,o);let data=await r.json().catch(()=>({error:'Unexpected response from local editor'}));if(!r.ok)throw Error(data.error||`HTTP ${r.status}`);return data;}
 function toast(message,warning=false){const box=$('toast');box.textContent=message;box.className='toast visible'+(warning?' warn':'');clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>box.className='toast',4200);}
 function setSaveStatus(txt){$('saveStatus').textContent=txt;}
-function save(){modified++;setSaveStatus('UNSAVED CHANGES');clearTimeout(saveTimer);saveTimer=setTimeout(()=>void flushSave(),600);}
-async function flushSave(){clearTimeout(saveTimer);saveTimer=null;let s=structuredClone(state);if(s){delete s.luts;delete s.assets;}let rev=modified;
+function save(){modified++;recoveryCheckpoint(true);setSaveStatus('UNSAVED CHANGES');clearTimeout(saveTimer);saveTimer=setTimeout(()=>void flushSave(),600);}
+async function flushSave(){clearTimeout(saveTimer);saveTimer=null;let s=structuredClone(state);if(s){delete s.luts;delete s.assets;}let rev=modified;if(s){s._desktopEpoch=recoveryEpoch;s._editRevision=rev;}
  const next=saveInFlight.catch(()=>{}).then(async()=>{if(!state)return;const saved=await request('state','POST',s);persisted=Math.max(rev,persisted);if(persisted>=modified)setSaveStatus('ALL CHANGES SAVED');return saved;});
  saveInFlight=next;try{await next;}catch(e){setSaveStatus('SAVE ERROR');toast('Could not save: '+e.message,true);}return next;}
 function snapshot(){invalidateRendered();undoStack.push(structuredClone({tracks:state.tracks,name:state.name,output:state.output}));if(undoStack.length>80)undoStack.shift();redoStack=[];}
@@ -135,7 +135,7 @@ function positionPlayhead(){
  const head=$('playheadTime'),total=$('totalTime'),value=timecode(playhead),end=timecode(duration());
  if(head.textContent!==value)head.textContent=value;if(total.textContent!==end)total.textContent=end;
 }
-function seek(t){playhead=clamp(frameTime(t),0,Math.max(0,duration()));if(isPlaying){playAt=playhead;playStart=transportNow();}positionPlayhead();syncPreview(true);}
+function seek(t){playhead=clamp(frameTime(t),0,Math.max(0,duration()));if(isPlaying){playAt=playhead;playStart=transportNow();}positionPlayhead();syncPreview(true);recoveryCheckpoint(false);}
 function snapTo(value,ignore=null){value=Math.max(0,value);if(!snap)return frameTime(value);const others=[0,playhead];for(const t of state.tracks)for(const c of t.clips)if(c.id!==ignore)others.push(c.position,endOf(c));const nearest=others.reduce((best,v)=>Math.abs(v-value)<Math.abs(best-value)?v:best,Infinity);return frameTime(Math.abs(nearest-value)<=Math.max(.08,9/zoom)?nearest:value);}
 function startClipGesture(e){if(e.button!==0)return;const el=e.currentTarget,cid=el.dataset.clip,t=trackById(el.dataset.parent),c=t.clips.find(c=>c.id===cid);if(!c||t.locked||c.locked)return;
  e.stopPropagation();
@@ -237,7 +237,7 @@ function syncAudio(force=false){const active=[];
   if(isPlaying&&m.paused)m.play().catch(()=>{});else if(!isPlaying&&!m.paused)m.pause();
  }
 }
-function stopPlayback(){isPlaying=false;updateMeter.peak=0;updateMeter.lastPaint=undefined;nativePause();pauseRendered();$('masterMeter').value=-60;referenceChanged();$('playBtn').innerHTML=svg('play');for(const p of activePlayers.values())p.media?.pause?.();for(const p of audioPlayers.values())p.pause();}
+function stopPlayback(){isPlaying=false;recoveryCheckpoint(false);updateMeter.peak=0;updateMeter.lastPaint=undefined;nativePause();pauseRendered();$('masterMeter').value=-60;referenceChanged();$('playBtn').innerHTML=svg('play');for(const p of activePlayers.values())p.media?.pause?.();for(const p of audioPlayers.values())p.pause();}
 async function playPause(){if(nativeSelected())return nativePlayPause();if(isPlaying){stopPlayback();return;}if(duration()<=0)return toast('Add footage first',true);if(playhead>=duration()-.001)playhead=0;try{await initializeMixer();transportClock=mixer.state==='running'?mixer:null;}catch{transportClock=null;}
  isPlaying=true;playAt=playhead;playStart=transportNow();$('playBtn').innerHTML=svg('pause');syncPreview(true);requestAnimationFrame(animate);}
 function animate(){if(!isPlaying)return;updateMeter();playhead=nativeSelected()?nativeClock():renderedEnabled()?renderedClock():playAt+(transportNow()-playStart)/1000;if(nativeSelected()&&playhead>=nativeDuration()){playhead=nativeDuration();positionPlayhead();stopPlayback();return;}if(!nativeSelected()&&playhead>=duration()){seek(duration());stopPlayback();return;}positionPlayhead();syncPreview(false);const p=$('timelinePlayhead');if(p){const scroller=$('timelineScroller');const edge=151+playhead*zoom;if(edge>scroller.scrollLeft+scroller.clientWidth-50)scroller.scrollLeft=edge-200;}requestAnimationFrame(animate);}
@@ -347,4 +347,4 @@ function setup(){
  window.addEventListener('dragleave',e=>{if(e.dataTransfer?.types.includes('Files')){dragCount=Math.max(0,dragCount-1);if(!dragCount)$('dropOverlay').hidden=true;}});
  window.addEventListener('drop',e=>{if(e.dataTransfer?.types.includes('Files')){e.preventDefault();e.stopPropagation();dragCount=0;$('dropOverlay').hidden=true;const lane=e.target.closest('[data-lane]');let id=lane?.dataset?.lane,p=lane?clamp((e.clientX-lane.getBoundingClientRect().left)/zoom,0,1e12):null;if(!state?.desktop)void importDropped(e.dataTransfer.files,id,p);}});
 }
-(async()=>{setup();try{state=await request('state');redraw();setupStudio();await setupNative();}catch(e){toast('Editor failed to initialize: '+e.message,true);}})();
+(async()=>{setup();try{state=await request('state');redraw();setupStudio();await setupNative();await recoveryInitialize();}catch(e){toast('Editor failed to initialize: '+e.message,true);}})();

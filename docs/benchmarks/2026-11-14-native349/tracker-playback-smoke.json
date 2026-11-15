@@ -1,0 +1,154 @@
+{
+  "seconds": 30.0,
+  "measured_seconds": 30.282300000000745,
+  "samples": 1440000,
+  "expected_samples": 1440000,
+  "underruns": 0,
+  "reached_end": true,
+  "distinct_sequence_fps": 59.407640767047276,
+  "present_calls_per_second": 59.407640767047276,
+  "program_resolution": [
+    960,
+    540
+  ],
+  "native_rect": {
+    "x": 621.0982666015625,
+    "y": 220.35714721679688,
+    "width": 203.42857360839844,
+    "height": 114.28572082519531,
+    "dpr": 1.75
+  },
+  "first_ready_seconds": 1.9922549000002618,
+  "application_ready_seconds": 1.9778226999987965,
+  "window_condition": {
+    "mode": "visible",
+    "condition_held": true,
+    "scope": "Physical center hit-test and window state, not physical scanout. Owned QA topmost/cover windows only; no global Windows settings.",
+    "sample_count": 32,
+    "violations": [],
+    "boundary_samples": [
+      {
+        "seconds": 3.4000004234258085e-06,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 31.365305499999522,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      }
+    ],
+    "selection_scope": "Every detected condition violation and first/last samples retained; full generated raw trace remains local. Scores and failed attempts are never excluded."
+  },
+  "browser_focus_changes": [
+    {
+      "seconds": 0.003100000001490116,
+      "focused": true
+    }
+  ],
+  "focus_emulation": "disabled via connect_over_cdp(no_defaults=True)",
+  "skips": 0,
+  "timings": {
+    "context_wait": {
+      "count": 12751,
+      "mean_ms": 0.10175,
+      "p50_upper_ms": 0.1,
+      "p95_upper_ms": 0.5,
+      "p99_upper_ms": 0.8,
+      "max_ms": 397.063,
+      "overflow_100ms": 1
+    },
+    "submit_cpu": {
+      "count": 1800,
+      "mean_ms": 0.445931,
+      "p50_upper_ms": 0.5,
+      "p95_upper_ms": 0.8,
+      "p99_upper_ms": 1,
+      "max_ms": 4.0428,
+      "overflow_100ms": 0
+    },
+    "completion_observation": {
+      "count": 1800,
+      "mean_ms": 8.88307,
+      "p50_upper_ms": 5.9,
+      "p95_upper_ms": 41.9,
+      "p99_upper_ms": 61.6,
+      "max_ms": 81.1938,
+      "overflow_100ms": 0
+    },
+    "composition_gpu": {
+      "count": 1800,
+      "mean_ms": 0.678573,
+      "p50_upper_ms": 0.7,
+      "p95_upper_ms": 0.8,
+      "p99_upper_ms": 1,
+      "max_ms": 2.774,
+      "overflow_100ms": 0
+    },
+    "present_call": {
+      "count": 1800,
+      "mean_ms": 0.601185,
+      "p50_upper_ms": 0.2,
+      "p95_upper_ms": 0.6,
+      "p99_upper_ms": 13.8,
+      "max_ms": 38.1117,
+      "overflow_100ms": 0
+    },
+    "present_call_interval": {
+      "count": 1799,
+      "mean_ms": 17.5611,
+      "p50_upper_ms": 16.7,
+      "p95_upper_ms": 18,
+      "p99_upper_ms": 27.5,
+      "max_ms": 1632.26,
+      "overflow_100ms": 1
+    },
+    "playback_present_interval": {
+      "count": 1798,
+      "mean_ms": 16.663,
+      "p50_upper_ms": 16.7,
+      "p95_upper_ms": 18,
+      "p99_upper_ms": 27.2,
+      "max_ms": 48.7475,
+      "overflow_100ms": 0
+    },
+    "source_selection": {
+      "count": 1905,
+      "mean_ms": 0.0711978,
+      "p50_upper_ms": 0.1,
+      "p95_upper_ms": 0.1,
+      "p99_upper_ms": 0.1,
+      "max_ms": 60.8645,
+      "overflow_100ms": 0
+    },
+    "wake_overshoot": {
+      "count": 5137,
+      "mean_ms": 0.330286,
+      "p50_upper_ms": 0.4,
+      "p95_upper_ms": 0.6,
+      "p99_upper_ms": 0.8,
+      "max_ms": 1.9482,
+      "overflow_100ms": 0
+    }
+  },
+  "queues": {
+    "peak_source_queue_frames": 4,
+    "peak_inflight_gpu_frames": 4,
+    "gpu_slot_budget": 6,
+    "retained_surface_views": 48,
+    "retained_texture_pools": 3,
+    "retained_texture_estimated_MiB": 1317.04
+  },
+  "peak_summed_RSS_MiB": 2614.1,
+  "all_on_AC": true
+}

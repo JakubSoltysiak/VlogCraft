@@ -1,0 +1,27 @@
+{
+  "source_bytes": 5972550422,
+  "first_edited_packet_offset": 4578951204,
+  "decoded_rgb_mean_absolute_error": 0.051,
+  "video_frames": 84,
+  "resolution": [
+    3840,
+    2160
+  ],
+  "rate": "60/1",
+  "audio_seconds": "1.400000",
+  "multiple_large_native_paths": true,
+  "batch_independent_source": true,
+  "proxy_cancel_retry": true,
+  "offline_network": {
+    "browser_external_fetch_blocked": true,
+    "loopback_allowed": true,
+    "python_socket_guard": false,
+    "media_process_proxy": "closed loopback port",
+    "os_firewall_test": false
+  },
+  "installed_motion_apply_undo": true,
+  "offline_proposal_approve_undo": true,
+  "source_monitor": true,
+  "project_reload": true,
+  "reload_kind": "normal owned host close/reopen; no navigation-guard bypass"
+}

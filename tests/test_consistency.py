@@ -1,8 +1,7 @@
 import sys,unittest
 from pathlib import Path
-sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'benchmarks'))
-from consistency import summary,percentile
-from runtime_trace import windows,active_windows
+from benchmarks.consistency import summary,percentile
+from benchmarks.runtime_trace import windows,active_windows
 class ConsistencyTests(unittest.TestCase):
  def test_failed_and_poor_trials_remain_visible(self):
   result=summary([{'exit_code':0,'fps':60,'skips':0,'underruns':0},{'exit_code':0,'fps':55,'skips':600,'underruns':0},{'exit_code':1}])

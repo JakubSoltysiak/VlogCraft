@@ -1,0 +1,35 @@
+[
+  {
+    "injected": "renderer",
+    "recovered": true,
+    "seconds": 2.1200628000005963,
+    "draft": true,
+    "undo_redo": true,
+    "paused": true,
+    "epoch": 1
+  },
+  {
+    "injected": "renderer",
+    "recovered": true,
+    "seconds": 1.9733320000013919,
+    "draft": true,
+    "undo_redo": true,
+    "paused": true,
+    "epoch": 2
+  },
+  {
+    "injected": "browser",
+    "recovered": true,
+    "seconds": 2.80441890000111,
+    "draft": true,
+    "undo_redo": true,
+    "paused": true,
+    "epoch": 3
+  },
+  {
+    "observer_detach_no_recovery": true,
+    "navigation_blocked": true,
+    "stale_save_rejected": true,
+    "budget_and_manual_retry": true
+  }
+]

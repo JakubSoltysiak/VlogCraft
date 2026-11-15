@@ -1,0 +1,2545 @@
+[
+  {
+    "name": "control-0-baseline",
+    "exit_code": 0,
+    "seconds": 137.19718229999125
+  },
+  {
+    "name": "control-0-candidate",
+    "exit_code": 0,
+    "seconds": 140.95851909999328
+  },
+  {
+    "name": "control-1-candidate",
+    "exit_code": 0,
+    "seconds": 138.8154654999962
+  },
+  {
+    "name": "control-1-baseline",
+    "exit_code": 0,
+    "seconds": 138.7633283000032
+  },
+  {
+    "name": "control-2-baseline",
+    "exit_code": 0,
+    "seconds": 138.38791220000712
+  },
+  {
+    "name": "control-2-candidate",
+    "exit_code": 0,
+    "seconds": 139.13438610000594
+  },
+  {
+    "name": "native-functional",
+    "exit_code": 0,
+    "seconds": 14.114089700000477
+  },
+  {
+    "name": "recovery-final",
+    "exit_code": 0,
+    "seconds": 24.392003899993142
+  },
+  {
+    "name": "background-recovery",
+    "exit_code": 1,
+    "seconds": 24.641775099997176
+  },
+  {
+    "name": "native-final-close",
+    "exit_code": 1,
+    "seconds": 17.371860500003095
+  },
+  {
+    "name": "native-startup-final",
+    "exit_code": 0,
+    "seconds": 15.434414099989226
+  },
+  {
+    "name": "recovery-startup-final",
+    "exit_code": 0,
+    "seconds": 24.184930399991572
+  },
+  {
+    "name": "background-recovery-final",
+    "exit_code": 0,
+    "seconds": 46.208660899996175
+  },
+  {
+    "name": "startup-close",
+    "exit_code": 0,
+    "seconds": 14.577057499991497
+  },
+  {
+    "name": "seeking-final",
+    "exit_code": 0,
+    "seconds": 13.934189100007643
+  },
+  {
+    "name": "audio-ownership-final",
+    "exit_code": 0,
+    "seconds": 13.399230200011516
+  },
+  {
+    "name": "project-lifecycle",
+    "exit_code": 0,
+    "seconds": 39.599682300002314
+  },
+  {
+    "name": "pressure-cancel",
+    "exit_code": 1,
+    "seconds": 144.21132989999023
+  },
+  {
+    "name": "pressure-cancel-2",
+    "exit_code": 0,
+    "seconds": 24.694607299999916
+  },
+  {
+    "name": "export-preservation",
+    "exit_code": 0,
+    "seconds": 100.4498164000106
+  },
+  {
+    "name": "observer-attached",
+    "exit_code": 0,
+    "seconds": 188.75152320000052
+  },
+  {
+    "name": "observer-detached",
+    "exit_code": 0,
+    "seconds": 183.09393750000163
+  },
+  {
+    "name": "memory600",
+    "exit_code": 1,
+    "seconds": 635.7334271
+  },
+  {
+    "name": "native-full-clock",
+    "exit_code": 0,
+    "seconds": 18.579211299977032
+  },
+  {
+    "name": "recovery-full-clock",
+    "exit_code": 0,
+    "seconds": 27.69063960001222
+  },
+  {
+    "name": "memory600-full-clock",
+    "exit_code": 0,
+    "seconds": 626.4326081000036
+  },
+  {
+    "name": "reference-full-before",
+    "exit_code": 0,
+    "seconds": 140.61135490000015
+  },
+  {
+    "name": "consistency-full-clock",
+    "exit_code": 0,
+    "seconds": 1397.15147479999
+  },
+  {
+    "name": "reference-full-after",
+    "exit_code": 0,
+    "seconds": 139.34534570001415
+  },
+  {
+    "name": "endurance600-full-clock",
+    "exit_code": 0,
+    "seconds": 628.8203375999874
+  },
+  {
+    "name": "editing1800-full-clock",
+    "exit_code": 1,
+    "seconds": 0.06946749999769963
+  },
+  {
+    "name": "editing1800-full-clock-retry",
+    "exit_code": 0,
+    "seconds": 1836.8663847999997
+  },
+  {
+    "name": "quality-960",
+    "exit_code": 0,
+    "seconds": 43.466416900017066
+  },
+  {
+    "name": "quality-1920",
+    "exit_code": 0,
+    "seconds": 40.59489209999447
+  },
+  {
+    "name": "quality-3840",
+    "exit_code": 0,
+    "seconds": 40.434633400000166
+  },
+  {
+    "name": "camera-native",
+    "exit_code": 0,
+    "seconds": 10.297541000007186
+  },
+  {
+    "name": "camera-playback",
+    "exit_code": 1,
+    "seconds": 53.445865099987714
+  },
+  {
+    "name": "compressed-source-offline",
+    "exit_code": 1,
+    "seconds": 27.86717110002064
+  },
+  {
+    "name": "compressed-source-offline-2",
+    "exit_code": 0,
+    "seconds": 25.26375299997744
+  },
+  {
+    "name": "compressed-source-JS",
+    "exit_code": 0,
+    "seconds": 0.1879256000102032
+  },
+  {
+    "name": "compressed-source-native",
+    "exit_code": 0,
+    "seconds": 14.013422399992123
+  },
+  {
+    "name": "compressed-source-startup",
+    "exit_code": 0,
+    "seconds": 10.468624400004046
+  },
+  {
+    "name": "final-native",
+    "exit_code": 0,
+    "seconds": 21.03018879998126
+  },
+  {
+    "name": "final-large-recovery",
+    "exit_code": 0,
+    "seconds": 33.44271420000587
+  },
+  {
+    "name": "final-recovery",
+    "exit_code": 0,
+    "seconds": 24.6392495999753
+  },
+  {
+    "name": "final-startup-close",
+    "exit_code": 0,
+    "seconds": 12.51590159998159
+  },
+  {
+    "name": "final-checkpoint-profile",
+    "exit_code": 0,
+    "seconds": 47.660663500020746
+  },
+  {
+    "name": "final-geometry",
+    "exit_code": 0,
+    "seconds": 8.597085000015795
+  },
+  {
+    "name": "final-reference-before",
+    "exit_code": 0,
+    "seconds": 138.96142169999075
+  },
+  {
+    "name": "final-consistency",
+    "exit_code": 0,
+    "seconds": 1388.5562076568604
+  },
+  {
+    "name": "window-smoke-visible",
+    "exit_code": 0,
+    "seconds": 15.39536669998779
+  },
+  {
+    "name": "window-smoke-preview-covered",
+    "exit_code": 0,
+    "seconds": 15.03894160001073
+  },
+  {
+    "name": "window-smoke-editor-covered",
+    "exit_code": 0,
+    "seconds": 14.397574500006158
+  },
+  {
+    "name": "window-control-0-visible-baseline",
+    "exit_code": 0,
+    "seconds": 139.46263180000824
+  },
+  {
+    "name": "window-control-0-visible-candidate",
+    "exit_code": 0,
+    "seconds": 138.2976198999968
+  },
+  {
+    "name": "window-control-0-editor-covered-baseline",
+    "exit_code": 0,
+    "seconds": 138.38560319997487
+  },
+  {
+    "name": "window-control-0-editor-covered-candidate",
+    "exit_code": 0,
+    "seconds": 140.6706957000133
+  },
+  {
+    "name": "window-control-1-editor-covered-candidate",
+    "exit_code": 0,
+    "seconds": 139.00541439998779
+  },
+  {
+    "name": "window-control-1-editor-covered-baseline",
+    "exit_code": 0,
+    "seconds": 138.7432620000036
+  },
+  {
+    "name": "window-control-1-visible-candidate",
+    "exit_code": 0,
+    "seconds": 138.29568169999402
+  },
+  {
+    "name": "window-control-1-visible-baseline",
+    "exit_code": 0,
+    "seconds": 140.72513140001683
+  },
+  {
+    "name": "window-control-preview-covered-candidate",
+    "exit_code": 0,
+    "seconds": 138.0360102999839
+  },
+  {
+    "name": "window-control-preview-covered-baseline",
+    "exit_code": 0,
+    "seconds": 138.98665770000662
+  },
+  {
+    "name": "final-exact-large-recovery",
+    "exit_code": 0,
+    "seconds": 32.29380799998762
+  },
+  {
+    "name": "window-smoke-visible-unfocused",
+    "exit_code": 1,
+    "seconds": 16.75526790000731
+  },
+  {
+    "name": "window-smoke-visible-unfocused-2",
+    "exit_code": 1,
+    "seconds": 14.140919500001473
+  },
+  {
+    "name": "window-smoke-visible-unfocused-3",
+    "exit_code": 0,
+    "seconds": 15.087506100011524
+  },
+  {
+    "name": "focus-control-baseline",
+    "exit_code": 0,
+    "seconds": 136.82053040000028
+  },
+  {
+    "name": "focus-control-candidate",
+    "exit_code": 0,
+    "seconds": 140.09762670000782
+  },
+  {
+    "name": "legacy-dpi-control-candidate",
+    "exit_code": 1,
+    "seconds": 137.93115067481995
+  },
+  {
+    "name": "natural-native",
+    "exit_code": 0,
+    "seconds": 13.849303099996177
+  },
+  {
+    "name": "natural-recovery",
+    "exit_code": 0,
+    "seconds": 22.519836199993733
+  },
+  {
+    "name": "natural-exact-large-recovery",
+    "exit_code": 0,
+    "seconds": 37.72024140000576
+  },
+  {
+    "name": "natural-visible-smoke",
+    "exit_code": 1,
+    "seconds": 15.769664799998282
+  },
+  {
+    "name": "natural-visible-smoke-2",
+    "exit_code": 0,
+    "seconds": 14.697785299998941
+  },
+  {
+    "name": "natural-browser-unfocused-smoke",
+    "exit_code": 0,
+    "seconds": 13.824720900011016
+  },
+  {
+    "name": "natural-browser-focus-control-candidate",
+    "exit_code": 0,
+    "seconds": 137.89360960002523
+  },
+  {
+    "name": "natural-browser-focus-control-baseline",
+    "exit_code": 0,
+    "seconds": 138.63805400001002
+  },
+  {
+    "name": "natural-visible-pair-00-candidate",
+    "exit_code": 0,
+    "seconds": 138.99076950000017
+  },
+  {
+    "name": "natural-visible-pair-00-baseline",
+    "exit_code": 0,
+    "seconds": 138.40045980000286
+  },
+  {
+    "name": "natural-visible-pair-01-baseline",
+    "exit_code": 0,
+    "seconds": 138.7579371999891
+  },
+  {
+    "name": "natural-visible-pair-01-candidate",
+    "exit_code": 0,
+    "seconds": 140.37464409999666
+  },
+  {
+    "name": "natural-visible-pair-02-candidate",
+    "exit_code": 0,
+    "seconds": 142.06676660000812
+  },
+  {
+    "name": "natural-visible-pair-02-baseline",
+    "exit_code": 0,
+    "seconds": 139.60182699997677
+  },
+  {
+    "name": "natural-visible-pair-03-baseline",
+    "exit_code": 0,
+    "seconds": 142.16403270000592
+  },
+  {
+    "name": "natural-visible-pair-03-candidate",
+    "exit_code": 0,
+    "seconds": 141.7766580999887
+  },
+  {
+    "name": "natural-visible-pair-04-candidate",
+    "exit_code": 0,
+    "seconds": 140.21441129999585
+  },
+  {
+    "name": "natural-visible-pair-04-baseline",
+    "exit_code": 0,
+    "seconds": 139.93358020001324
+  },
+  {
+    "name": "natural-visible-pair-05-baseline",
+    "exit_code": 0,
+    "seconds": 139.41744499999913
+  },
+  {
+    "name": "natural-visible-pair-05-candidate",
+    "exit_code": 0,
+    "seconds": 141.9569621999981
+  },
+  {
+    "name": "natural-visible-pair-06-candidate",
+    "exit_code": 0,
+    "seconds": 139.7994332999806
+  },
+  {
+    "name": "natural-visible-pair-06-baseline",
+    "exit_code": 0,
+    "seconds": 141.63861769999494
+  },
+  {
+    "name": "natural-visible-pair-07-baseline",
+    "exit_code": 0,
+    "seconds": 139.61608909998904
+  },
+  {
+    "name": "natural-visible-pair-07-candidate",
+    "exit_code": 0,
+    "seconds": 139.7237024999922
+  },
+  {
+    "name": "natural-visible-pair-08-candidate",
+    "exit_code": 0,
+    "seconds": 139.76698310000938
+  },
+  {
+    "name": "natural-visible-pair-08-baseline",
+    "exit_code": 0,
+    "seconds": 140.0622453999822
+  },
+  {
+    "name": "natural-visible-pair-09-baseline",
+    "exit_code": 0,
+    "seconds": 140.23878149999655
+  },
+  {
+    "name": "natural-visible-pair-09-candidate",
+    "exit_code": 0,
+    "seconds": 141.9286227999837
+  },
+  {
+    "name": "aggregate-visible",
+    "exit_code": 0,
+    "seconds": 0.40287600000738166
+  },
+  {
+    "name": "final-baseline-memory600",
+    "exit_code": 0,
+    "seconds": 631.4718276000058
+  },
+  {
+    "name": "final-memory600",
+    "exit_code": 0,
+    "seconds": 628.4277702000109
+  },
+  {
+    "name": "final-endurance600",
+    "exit_code": 0,
+    "seconds": 633.5461876999761
+  },
+  {
+    "name": "final-editing1800",
+    "exit_code": 1,
+    "seconds": 1820.582755600015
+  },
+  {
+    "name": "guarded-native",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 18.74556759999996,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0
+    }
+  },
+  {
+    "name": "guarded-detached-editing-smoke",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 72.60540739999999,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0
+    }
+  },
+  {
+    "name": "detached-editing1800",
+    "exit_code": 1,
+    "child_returncode": 1,
+    "seconds": 1941.8509999999999,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0
+    }
+  },
+  {
+    "name": "detached-editing-analysis",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 0.4001157000002422,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "guarded-detached-deadline-smoke",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 69.86120740000024,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "final-quality-960",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 41.49049110000033,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "final-quality-1920",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 45.18974430000026,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "final-quality-3840",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 47.31041159999995,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "final-editing-analysis",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 0.9105522999998357,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "natural-visible-control-baseline",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 154.6422421000002,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "natural-visible-control-candidate",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 154.0388210000001,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "natural-editor-covered-control-baseline",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 151.70148050000034,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "natural-editor-covered-control-candidate",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 150.45953109999982,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "natural-editor-covered-unfocused-control-baseline",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 150.41445290000001,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "natural-editor-covered-unfocused-control-candidate",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 147.60359659999995,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "final-baseline-endurance600",
+    "exit_code": 1,
+    "child_returncode": 1,
+    "seconds": 662.5245290000003,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "job-policy-nested-baseline",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 42.41532170000028,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "job-policy-ancestor-baseline",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 40.47861760000069,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "job-policy-ancestor-candidate",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 43.63207560000046,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "job-policy-nested-candidate",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 44.561260700000275,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "pdh-instrumented-baseline",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 137.26471680000031,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "pdh-disabled-baseline",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 137.38737570000012,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "hot-profile-baseline-125",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 24.863215200000013,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "hot-profile-baseline-600",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 36.78832240000065,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "hot-profile-candidate-600",
+    "exit_code": 1,
+    "child_returncode": 1,
+    "seconds": 41.220601399999396,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 3,
+      "new_visible_terminal_windows_after": 3,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "close-profile-repro",
+    "exit_code": 1,
+    "child_returncode": 1,
+    "seconds": 39.15710619999936,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 3,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 9,
+      "new_visible_terminal_windows_after": 6,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-source-offline",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 38.01354269999956,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 9,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 9,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "source-console-workflow",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 17.65137810000033,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 9,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 9,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-package",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 110.23843159999979,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 9,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 9,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-bundle-source",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 1.0121847000000344,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 9,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 9,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-installed-lifecycle",
+    "exit_code": 1,
+    "child_returncode": 1,
+    "seconds": 30.17778670000007,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "qa-process-final-unit",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 2.7144527999989805,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-final-package",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 87.53141490000053,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-final-source-bundle",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 0.9682430000011664,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-final-lifecycle",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 33.93847470000037,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-final-installed-bundle",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 2.116008099999817,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-final-native",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 16.911864599998808,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-final-recovery",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 23.789045299999998,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-final-history",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 33.599727599999824,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-final-startup",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 13.251502600000094,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-pair-00-candidate",
+    "exit_code": 1,
+    "child_returncode": 1,
+    "seconds": 4.740026299999954,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-pair-00-baseline",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 140.04889849999927,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-pair-01-baseline",
+    "exit_code": 1,
+    "child_returncode": 1,
+    "seconds": 5.2051477000004525,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-pair-01-candidate",
+    "exit_code": 1,
+    "child_returncode": 1,
+    "seconds": 5.085416500000065,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-pair-02-candidate",
+    "exit_code": 1,
+    "child_returncode": 1,
+    "seconds": 5.05154980000043,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-pair-02-baseline",
+    "exit_code": 1,
+    "child_returncode": 1,
+    "seconds": 4.936389500000587,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-pair-03-baseline",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 138.8704198000014,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-pair-03-candidate",
+    "exit_code": 1,
+    "child_returncode": 1,
+    "seconds": 5.19689389999985,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-pair-04-candidate",
+    "exit_code": 1,
+    "child_returncode": 1,
+    "seconds": 5.13508499999989,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-pair-04-baseline",
+    "exit_code": 1,
+    "child_returncode": 1,
+    "seconds": 4.867287699998997,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-pair-05-baseline",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 139.49431940000068,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-pair-05-candidate",
+    "exit_code": 1,
+    "child_returncode": 1,
+    "seconds": 5.1789281999990635,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-pair-06-candidate",
+    "exit_code": 1,
+    "child_returncode": 1,
+    "seconds": 5.338405899999998,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-pair-06-baseline",
+    "exit_code": 1,
+    "child_returncode": 1,
+    "seconds": 5.393508799999836,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-pair-07-baseline",
+    "exit_code": 1,
+    "child_returncode": 1,
+    "seconds": 4.904101699999956,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-pair-07-candidate",
+    "exit_code": 1,
+    "child_returncode": 1,
+    "seconds": 5.072501099999499,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-pair-08-candidate",
+    "exit_code": 1,
+    "child_returncode": 1,
+    "seconds": 5.091363800000181,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-pair-08-baseline",
+    "exit_code": 1,
+    "child_returncode": 1,
+    "seconds": 5.048767200001748,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-pair-09-baseline",
+    "exit_code": 1,
+    "child_returncode": 1,
+    "seconds": 4.946626599999945,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-pair-09-candidate",
+    "exit_code": 1,
+    "child_returncode": 1,
+    "seconds": 5.169210899999598,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "aggregate-console-final",
+    "exit_code": 1,
+    "child_returncode": 1,
+    "seconds": 0.40239069999915955,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-pair-10-candidate",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 136.3822162000015,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-pair-10-baseline",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 139.54664950000006,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-pair-11-baseline",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 139.11854199999834,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-pair-11-candidate",
+    "exit_code": 1,
+    "child_returncode": 1,
+    "seconds": 138.08251459999883,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-pair-12-candidate",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 138.4669718999994,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-pair-12-baseline",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 141.14080830000057,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-pair-13-baseline",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 140.6697310999989,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-pair-13-candidate",
+    "exit_code": 1,
+    "child_returncode": 1,
+    "seconds": 137.67060289999972,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-pair-14-candidate",
+    "exit_code": 1,
+    "child_returncode": 1,
+    "seconds": 137.31792289999976,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-pair-14-baseline",
+    "exit_code": 1,
+    "child_returncode": 1,
+    "seconds": 141.5158102000005,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-pair-15-baseline",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 141.84356690000095,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-pair-15-candidate",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 141.03159360000063,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-pair-16-candidate",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 141.09750469999926,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-pair-16-baseline",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 142.15666070000043,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-pair-17-candidate",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 140.70927590000065,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-pair-18-candidate",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 140.25864779999938,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-pair-19-candidate",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 140.81320359999881,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "aggregate-console-completed",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 0.3871015000004263,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-endurance600-baseline",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 643.6250992000005,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-endurance600-candidate",
+    "exit_code": 1,
+    "child_returncode": 1,
+    "seconds": 637.309891500001,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-memory600",
+    "exit_code": 1,
+    "child_returncode": 1,
+    "seconds": 626.4973548999988,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-memory-analysis",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 0.447947299999214,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-quality-960",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 41.08284529999946,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-quality-1920",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 41.639498399999866,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-quality-3840",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 41.05288329999894,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "final-audio-ownership",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 11.742130099999486,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "final-observer-attached",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 290.51860880000095,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "final-observer-detached",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 186.7043494999998,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "final-project-lifecycle",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 36.369490099999894,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "final-pressure-cancel",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 24.630013699999836,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "final-background-recovery",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 47.88456319999932,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "final-camera-playback",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 170.26150469999993,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "final-camera-recovery",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 76.34204820000014,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "final-camera-export",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 34.161950000001525,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "final-installed-large",
+    "exit_code": 1,
+    "child_returncode": 1,
+    "seconds": 20.502681699999812,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "final-settings",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 17.78581260000101,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "final-icons",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 6.6962459000005765,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "final-export-repeat",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 76.70861580000019,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "final-direct-export",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 18.646135900000445,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "final-encoder-workers",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 57.26212690000102,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "final-encoders",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 5.548086700000567,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "final-drain",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 7.353277000000162,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "final-offline-python",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 36.80212019999999,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "final-JS",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 0.34347619999971357,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "final-privacy",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 6.639039100000446,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "final-bundle",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 2.1301891000002797,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-detached-editing1800",
+    "exit_code": 1,
+    "child_returncode": 1,
+    "seconds": 1851.937692899999,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  },
+  {
+    "name": "console-detached-editing-analysis",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "seconds": 0.4657937999982096,
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    }
+  }
+]

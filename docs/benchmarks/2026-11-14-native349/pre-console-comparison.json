@@ -1,0 +1,107 @@
+{
+  "compatible": true,
+  "metrics": {
+    "present_fps": {
+      "baseline_median": 59.70501492378479,
+      "candidate_median": 59.73487139652114,
+      "change_percent": 0.05000664144288075,
+      "baseline_range": [
+        58.974127813964984,
+        59.912492757676866
+      ],
+      "candidate_range": [
+        59.66722029099797,
+        59.929973780136855
+      ],
+      "baseline_worst": 58.974127813964984,
+      "candidate_worst": 59.66722029099797,
+      "worst_change_percent": 1.175248371996882,
+      "median_investigate": false,
+      "worst_investigate": false,
+      "investigate": false,
+      "repeated": true
+    },
+    "first_frame_ms": {
+      "baseline_median": 1057.2829000011552,
+      "candidate_median": 1104.0553500060923,
+      "change_percent": 4.423834907845953,
+      "baseline_range": [
+        976.8665000156034,
+        1154.42659999826
+      ],
+      "candidate_range": [
+        928.1479000055697,
+        1233.4813999768812
+      ],
+      "baseline_worst": 1154.42659999826,
+      "candidate_worst": 1233.4813999768812,
+      "worst_change_percent": 6.847971103467337,
+      "median_investigate": false,
+      "worst_investigate": false,
+      "investigate": false,
+      "repeated": true
+    },
+    "startup_ms": {
+      "baseline_median": 2069.8626499943202,
+      "candidate_median": 2244.5172000007005,
+      "change_percent": 8.437977756971438,
+      "baseline_range": [
+        2013.625099993078,
+        2395.8081000018865
+      ],
+      "candidate_range": [
+        2016.0462999774609,
+        2834.138200007146
+      ],
+      "baseline_worst": 2395.8081000018865,
+      "candidate_worst": 2834.138200007146,
+      "worst_change_percent": 18.295709911195082,
+      "median_investigate": false,
+      "worst_investigate": true,
+      "investigate": true,
+      "repeated": true
+    },
+    "frame_p95_ms": {
+      "baseline_median": 18.1,
+      "candidate_median": 18.0,
+      "change_percent": -0.5524861878453117,
+      "baseline_range": [
+        17.9,
+        18.4
+      ],
+      "candidate_range": [
+        17.9,
+        18.3
+      ],
+      "baseline_worst": 18.4,
+      "candidate_worst": 18.3,
+      "worst_change_percent": -0.5434782608695536,
+      "median_investigate": false,
+      "worst_investigate": false,
+      "investigate": false,
+      "repeated": true
+    },
+    "frame_p99_ms": {
+      "baseline_median": 38.6,
+      "candidate_median": 38.95,
+      "change_percent": 0.9067357512953403,
+      "baseline_range": [
+        35.9,
+        40.2
+      ],
+      "candidate_range": [
+        33.3,
+        40.6
+      ],
+      "baseline_worst": 40.2,
+      "candidate_worst": 40.6,
+      "worst_change_percent": 0.9950248756218869,
+      "median_investigate": false,
+      "worst_investigate": false,
+      "investigate": false,
+      "repeated": true
+    }
+  },
+  "investigate": true,
+  "interpretation": "Investigation trigger, not automatic failure; inspect variation, quality and completeness"
+}

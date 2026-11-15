@@ -1,0 +1,7 @@
+{
+  "confirmed_initial_windows": 3,
+  "controlled_reproduction_windows": 6,
+  "close_requests": 9,
+  "processes_terminated": 0,
+  "unrelated_windows_targeted": 0
+}

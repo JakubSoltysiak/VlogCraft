@@ -1,0 +1,3471 @@
+[
+  {
+    "source_case": "window-control-0-editor-covered-baseline",
+    "native_binary_sha256": "ac206038cea559f87d784e0ec4fc8485bdebd1421b7c4a78853e7ea037e3f72a",
+    "seconds": 125.0,
+    "width": 960,
+    "layers": 3,
+    "audio_tracks": 3,
+    "window_mode": "editor-covered",
+    "cache_policy": "Fresh application each trial; repeated original-source offsets; OS filesystem caches unmanaged",
+    "proxy": false,
+    "rows": [
+      {
+        "trial": 1,
+        "exit_code": 0,
+        "wall_seconds": 138.156,
+        "fps": 59.867414176853025,
+        "skips": 7,
+        "samples": 6000000,
+        "expected_samples": 6000000,
+        "underruns": 0,
+        "first_ready_seconds": 1.1818111999891698,
+        "startup_seconds": 2.0214846000017133,
+        "peak_working_set_MiB": 3420.9,
+        "CPU_percent": 6.1,
+        "present_intervals": {
+          "count": 7490,
+          "mean_ms": 16.6857,
+          "p50_upper_ms": 16.7,
+          "p95_upper_ms": 17.8,
+          "p99_upper_ms": 25,
+          "max_ms": 59.2468,
+          "overflow_100ms": 0
+        },
+        "throughput_windows": [
+          {
+            "window_seconds": 1,
+            "count": 243,
+            "minimum_fps": 57.72876098569694,
+            "p05_fps": 59.294871794871575,
+            "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+          },
+          {
+            "window_seconds": 10,
+            "count": 209,
+            "minimum_fps": 59.73762683174063,
+            "p05_fps": 59.770894867087094,
+            "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+          }
+        ],
+        "source_skips": 0,
+        "gpu_skips": 0,
+        "other_skips": 7,
+        "mixed_power": false,
+        "window_condition": {
+          "mode": "editor-covered",
+          "condition_held": true,
+          "scope": "Physical center hit-test and window state, not physical scanout. Owned QA topmost/cover windows only; no global Windows settings.",
+          "sample_count": 94,
+          "violations": [],
+          "boundary_samples": [
+            {
+              "seconds": 3.300025127828121e-06,
+              "visible": true,
+              "minimized": false,
+              "preview_center_unobscured": false,
+              "foreground_owned": true
+            },
+            {
+              "seconds": 126.1798368000018,
+              "visible": true,
+              "minimized": false,
+              "preview_center_unobscured": false,
+              "foreground_owned": true
+            }
+          ],
+          "selection_scope": "Every detected condition violation and first/last samples retained; full generated raw trace remains local. Scores and failed attempts are never excluded."
+        },
+        "physical_alignment": {
+          "window_dpi": 168,
+          "browser_dpr": 1.75,
+          "expected_client_pixels": [
+            1087,
+            386,
+            356,
+            200
+          ],
+          "actual_client_pixels": [
+            1087,
+            386,
+            356,
+            200
+          ],
+          "absolute_error_pixels": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "scope": "Default browser zoom; physical HWND/client coordinates, independent of the reported emulated DPR."
+        },
+        "all_on_AC": true
+      }
+    ],
+    "summary": {
+      "completed": 1,
+      "valid": 1,
+      "fps_all": [
+        59.867414176853025
+      ],
+      "skips_all": [
+        7
+      ],
+      "fps_best": 59.867414176853025,
+      "fps_median": 59.867414176853025,
+      "fps_worst": 59.867414176853025,
+      "fps_p05_across_trials": 59.867414176853025,
+      "fps_population_stdev": 0.0,
+      "at_least_59_5": 1,
+      "under_30_skips": 1,
+      "zero_underruns": true,
+      "failed_trials": 0
+    }
+  },
+  {
+    "source_case": "window-control-0-editor-covered-candidate",
+    "native_binary_sha256": "ac206038cea559f87d784e0ec4fc8485bdebd1421b7c4a78853e7ea037e3f72a",
+    "seconds": 125.0,
+    "width": 960,
+    "layers": 3,
+    "audio_tracks": 3,
+    "window_mode": "editor-covered",
+    "cache_policy": "Fresh application each trial; repeated original-source offsets; OS filesystem caches unmanaged",
+    "proxy": false,
+    "rows": [
+      {
+        "trial": 1,
+        "exit_code": 0,
+        "wall_seconds": 140.39,
+        "fps": 59.76830204704095,
+        "skips": 11,
+        "samples": 6000000,
+        "expected_samples": 6000000,
+        "underruns": 0,
+        "first_ready_seconds": 1.1060833999945316,
+        "startup_seconds": 2.071200800011866,
+        "peak_working_set_MiB": 3507.2,
+        "CPU_percent": 5.79,
+        "present_intervals": {
+          "count": 7487,
+          "mean_ms": 16.6954,
+          "p50_upper_ms": 16.7,
+          "p95_upper_ms": 17.7,
+          "p99_upper_ms": 25.4,
+          "max_ms": 58.0238,
+          "overflow_100ms": 0
+        },
+        "throughput_windows": [
+          {
+            "window_seconds": 1,
+            "count": 215,
+            "minimum_fps": 54.294975688816464,
+            "p05_fps": 58.661452315349756,
+            "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+          },
+          {
+            "window_seconds": 10,
+            "count": 202,
+            "minimum_fps": 59.090470213382254,
+            "p05_fps": 59.702965411753084,
+            "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+          }
+        ],
+        "source_skips": 0,
+        "gpu_skips": 0,
+        "other_skips": 11,
+        "mixed_power": false,
+        "window_condition": {
+          "mode": "editor-covered",
+          "condition_held": true,
+          "scope": "Physical center hit-test and window state, not physical scanout. Owned QA topmost/cover windows only; no global Windows settings.",
+          "sample_count": 88,
+          "violations": [],
+          "boundary_samples": [
+            {
+              "seconds": 2.6999914553016424e-06,
+              "visible": true,
+              "minimized": false,
+              "preview_center_unobscured": false,
+              "foreground_owned": true
+            },
+            {
+              "seconds": 126.42849329998717,
+              "visible": true,
+              "minimized": false,
+              "preview_center_unobscured": false,
+              "foreground_owned": true
+            }
+          ],
+          "selection_scope": "Every detected condition violation and first/last samples retained; full generated raw trace remains local. Scores and failed attempts are never excluded."
+        },
+        "physical_alignment": {
+          "window_dpi": 168,
+          "browser_dpr": 1.75,
+          "expected_client_pixels": [
+            1087,
+            386,
+            356,
+            200
+          ],
+          "actual_client_pixels": [
+            1087,
+            386,
+            356,
+            200
+          ],
+          "absolute_error_pixels": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "scope": "Default browser zoom; physical HWND/client coordinates, independent of the reported emulated DPR."
+        },
+        "all_on_AC": true
+      }
+    ],
+    "summary": {
+      "completed": 1,
+      "valid": 1,
+      "fps_all": [
+        59.76830204704095
+      ],
+      "skips_all": [
+        11
+      ],
+      "fps_best": 59.76830204704095,
+      "fps_median": 59.76830204704095,
+      "fps_worst": 59.76830204704095,
+      "fps_p05_across_trials": 59.76830204704095,
+      "fps_population_stdev": 0.0,
+      "at_least_59_5": 1,
+      "under_30_skips": 1,
+      "zero_underruns": true,
+      "failed_trials": 0
+    }
+  },
+  {
+    "source_case": "window-control-0-visible-baseline",
+    "native_binary_sha256": "ac206038cea559f87d784e0ec4fc8485bdebd1421b7c4a78853e7ea037e3f72a",
+    "seconds": 125.0,
+    "width": 960,
+    "layers": 3,
+    "audio_tracks": 3,
+    "window_mode": "visible",
+    "cache_policy": "Fresh application each trial; repeated original-source offsets; OS filesystem caches unmanaged",
+    "proxy": false,
+    "rows": [
+      {
+        "trial": 1,
+        "exit_code": 0,
+        "wall_seconds": 139.219,
+        "fps": 59.67649227054546,
+        "skips": 3,
+        "samples": 6000000,
+        "expected_samples": 6000000,
+        "underruns": 0,
+        "first_ready_seconds": 1.2508841000089888,
+        "startup_seconds": 1.757180899992818,
+        "peak_working_set_MiB": 3066.9,
+        "CPU_percent": 5.41,
+        "present_intervals": {
+          "count": 7495,
+          "mean_ms": 16.6734,
+          "p50_upper_ms": 16.7,
+          "p95_upper_ms": 17.7,
+          "p99_upper_ms": 21.6,
+          "max_ms": 51.3667,
+          "overflow_100ms": 0
+        },
+        "throughput_windows": [
+          {
+            "window_seconds": 1,
+            "count": 235,
+            "minimum_fps": 35.492457852706444,
+            "p05_fps": 59.22905136421024,
+            "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+          },
+          {
+            "window_seconds": 10,
+            "count": 221,
+            "minimum_fps": 57.17665615141961,
+            "p05_fps": 59.866520569777855,
+            "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+          }
+        ],
+        "source_skips": 0,
+        "gpu_skips": 0,
+        "other_skips": 3,
+        "mixed_power": false,
+        "window_condition": {
+          "mode": "visible",
+          "condition_held": true,
+          "scope": "Physical center hit-test and window state, not physical scanout. Owned QA topmost/cover windows only; no global Windows settings.",
+          "sample_count": 89,
+          "violations": [],
+          "boundary_samples": [
+            {
+              "seconds": 3.00002284348011e-06,
+              "visible": true,
+              "minimized": false,
+              "preview_center_unobscured": true,
+              "foreground_owned": true
+            },
+            {
+              "seconds": 126.34870160001446,
+              "visible": true,
+              "minimized": false,
+              "preview_center_unobscured": true,
+              "foreground_owned": true
+            }
+          ],
+          "selection_scope": "Every detected condition violation and first/last samples retained; full generated raw trace remains local. Scores and failed attempts are never excluded."
+        },
+        "physical_alignment": {
+          "window_dpi": 168,
+          "browser_dpr": 1.75,
+          "expected_client_pixels": [
+            1087,
+            386,
+            356,
+            200
+          ],
+          "actual_client_pixels": [
+            1087,
+            386,
+            356,
+            200
+          ],
+          "absolute_error_pixels": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "scope": "Default browser zoom; physical HWND/client coordinates, independent of the reported emulated DPR."
+        },
+        "all_on_AC": true
+      }
+    ],
+    "summary": {
+      "completed": 1,
+      "valid": 1,
+      "fps_all": [
+        59.67649227054546
+      ],
+      "skips_all": [
+        3
+      ],
+      "fps_best": 59.67649227054546,
+      "fps_median": 59.67649227054546,
+      "fps_worst": 59.67649227054546,
+      "fps_p05_across_trials": 59.67649227054546,
+      "fps_population_stdev": 0.0,
+      "at_least_59_5": 1,
+      "under_30_skips": 1,
+      "zero_underruns": true,
+      "failed_trials": 0
+    }
+  },
+  {
+    "source_case": "window-control-0-visible-candidate",
+    "native_binary_sha256": "ac206038cea559f87d784e0ec4fc8485bdebd1421b7c4a78853e7ea037e3f72a",
+    "seconds": 125.0,
+    "width": 960,
+    "layers": 3,
+    "audio_tracks": 3,
+    "window_mode": "visible",
+    "cache_policy": "Fresh application each trial; repeated original-source offsets; OS filesystem caches unmanaged",
+    "proxy": false,
+    "rows": [
+      {
+        "trial": 1,
+        "exit_code": 0,
+        "wall_seconds": 137.906,
+        "fps": 59.653499299797645,
+        "skips": 19,
+        "samples": 6000000,
+        "expected_samples": 6000000,
+        "underruns": 0,
+        "first_ready_seconds": 1.1270162000146229,
+        "startup_seconds": 2.027117999998154,
+        "peak_working_set_MiB": 3466.9,
+        "CPU_percent": 6.28,
+        "present_intervals": {
+          "count": 7479,
+          "mean_ms": 16.7126,
+          "p50_upper_ms": 16.7,
+          "p95_upper_ms": 18,
+          "p99_upper_ms": 37.2,
+          "max_ms": 56.1926,
+          "overflow_100ms": 0
+        },
+        "throughput_windows": [
+          {
+            "window_seconds": 1,
+            "count": 261,
+            "minimum_fps": 49.5988329686357,
+            "p05_fps": 58.734537687995044,
+            "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+          },
+          {
+            "window_seconds": 10,
+            "count": 221,
+            "minimum_fps": 58.65244789142027,
+            "p05_fps": 59.56645044797507,
+            "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+          }
+        ],
+        "source_skips": 0,
+        "gpu_skips": 0,
+        "other_skips": 19,
+        "mixed_power": false,
+        "window_condition": {
+          "mode": "visible",
+          "condition_held": true,
+          "scope": "Physical center hit-test and window state, not physical scanout. Owned QA topmost/cover windows only; no global Windows settings.",
+          "sample_count": 95,
+          "violations": [],
+          "boundary_samples": [
+            {
+              "seconds": 2.3999891709536314e-06,
+              "visible": true,
+              "minimized": false,
+              "preview_center_unobscured": true,
+              "foreground_owned": true
+            },
+            {
+              "seconds": 126.56722549998085,
+              "visible": true,
+              "minimized": false,
+              "preview_center_unobscured": true,
+              "foreground_owned": true
+            }
+          ],
+          "selection_scope": "Every detected condition violation and first/last samples retained; full generated raw trace remains local. Scores and failed attempts are never excluded."
+        },
+        "physical_alignment": {
+          "window_dpi": 168,
+          "browser_dpr": 1.75,
+          "expected_client_pixels": [
+            1087,
+            386,
+            356,
+            200
+          ],
+          "actual_client_pixels": [
+            1087,
+            386,
+            356,
+            200
+          ],
+          "absolute_error_pixels": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "scope": "Default browser zoom; physical HWND/client coordinates, independent of the reported emulated DPR."
+        },
+        "all_on_AC": true
+      }
+    ],
+    "summary": {
+      "completed": 1,
+      "valid": 1,
+      "fps_all": [
+        59.653499299797645
+      ],
+      "skips_all": [
+        19
+      ],
+      "fps_best": 59.653499299797645,
+      "fps_median": 59.653499299797645,
+      "fps_worst": 59.653499299797645,
+      "fps_p05_across_trials": 59.653499299797645,
+      "fps_population_stdev": 0.0,
+      "at_least_59_5": 1,
+      "under_30_skips": 1,
+      "zero_underruns": true,
+      "failed_trials": 0
+    }
+  },
+  {
+    "source_case": "window-control-1-editor-covered-baseline",
+    "native_binary_sha256": "ac206038cea559f87d784e0ec4fc8485bdebd1421b7c4a78853e7ea037e3f72a",
+    "seconds": 125.0,
+    "width": 960,
+    "layers": 3,
+    "audio_tracks": 3,
+    "window_mode": "editor-covered",
+    "cache_policy": "Fresh application each trial; repeated original-source offsets; OS filesystem caches unmanaged",
+    "proxy": false,
+    "legacy_viewport": false,
+    "rows": [
+      {
+        "trial": 1,
+        "exit_code": 0,
+        "wall_seconds": 138.484,
+        "fps": 59.68140183193947,
+        "skips": 6,
+        "samples": 6000000,
+        "expected_samples": 6000000,
+        "underruns": 0,
+        "first_ready_seconds": 1.149033999972744,
+        "startup_seconds": 2.012369600008242,
+        "peak_working_set_MiB": 3433.1,
+        "CPU_percent": 6.34,
+        "present_intervals": {
+          "count": 7492,
+          "mean_ms": 16.68,
+          "p50_upper_ms": 16.7,
+          "p95_upper_ms": 17.8,
+          "p99_upper_ms": 32.7,
+          "max_ms": 50.8102,
+          "overflow_100ms": 0
+        },
+        "throughput_windows": [
+          {
+            "window_seconds": 1,
+            "count": 233,
+            "minimum_fps": 37.126715092817086,
+            "p05_fps": 59.26581158779238,
+            "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+          },
+          {
+            "window_seconds": 10,
+            "count": 205,
+            "minimum_fps": 57.15975165073426,
+            "p05_fps": 59.82073077776599,
+            "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+          }
+        ],
+        "source_skips": 0,
+        "gpu_skips": 0,
+        "other_skips": 6,
+        "mixed_power": false,
+        "window_condition": {
+          "mode": "editor-covered",
+          "condition_held": true,
+          "scope": "Physical center hit-test and window state, not physical scanout. Owned QA topmost/cover windows only; no global Windows settings.",
+          "sample_count": 93,
+          "violations": [],
+          "boundary_samples": [
+            {
+              "seconds": 3.9000005926936865e-06,
+              "visible": true,
+              "minimized": false,
+              "preview_center_unobscured": false,
+              "foreground_owned": true
+            },
+            {
+              "seconds": 126.56168529999559,
+              "visible": true,
+              "minimized": false,
+              "preview_center_unobscured": false,
+              "foreground_owned": true
+            }
+          ],
+          "selection_scope": "Every detected condition violation and first/last samples retained; full generated raw trace remains local. Scores and failed attempts are never excluded."
+        },
+        "physical_alignment": {
+          "window_dpi": 168,
+          "browser_dpr": 1.75,
+          "expected_client_pixels": [
+            1087,
+            386,
+            356,
+            200
+          ],
+          "actual_client_pixels": [
+            1087,
+            386,
+            356,
+            200
+          ],
+          "absolute_error_pixels": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "scope": "Default browser zoom; physical HWND/client coordinates, independent of the reported emulated DPR."
+        },
+        "all_on_AC": true
+      }
+    ],
+    "summary": {
+      "completed": 1,
+      "valid": 1,
+      "fps_all": [
+        59.68140183193947
+      ],
+      "skips_all": [
+        6
+      ],
+      "fps_best": 59.68140183193947,
+      "fps_median": 59.68140183193947,
+      "fps_worst": 59.68140183193947,
+      "fps_p05_across_trials": 59.68140183193947,
+      "fps_population_stdev": 0.0,
+      "at_least_59_5": 1,
+      "under_30_skips": 1,
+      "zero_underruns": true,
+      "failed_trials": 0
+    }
+  },
+  {
+    "source_case": "window-control-1-editor-covered-candidate",
+    "native_binary_sha256": "ac206038cea559f87d784e0ec4fc8485bdebd1421b7c4a78853e7ea037e3f72a",
+    "seconds": 125.0,
+    "width": 960,
+    "layers": 3,
+    "audio_tracks": 3,
+    "window_mode": "editor-covered",
+    "cache_policy": "Fresh application each trial; repeated original-source offsets; OS filesystem caches unmanaged",
+    "proxy": false,
+    "legacy_viewport": false,
+    "rows": [
+      {
+        "trial": 1,
+        "exit_code": 0,
+        "wall_seconds": 138.75,
+        "fps": 59.81653602001815,
+        "skips": 4,
+        "samples": 6000000,
+        "expected_samples": 6000000,
+        "underruns": 0,
+        "first_ready_seconds": 1.1880893999768887,
+        "startup_seconds": 1.9965534999791998,
+        "peak_working_set_MiB": 3582.0,
+        "CPU_percent": 6.41,
+        "present_intervals": {
+          "count": 7494,
+          "mean_ms": 16.6756,
+          "p50_upper_ms": 16.7,
+          "p95_upper_ms": 17.7,
+          "p99_upper_ms": 21.5,
+          "max_ms": 54.4687,
+          "overflow_100ms": 0
+        },
+        "throughput_windows": [
+          {
+            "window_seconds": 1,
+            "count": 261,
+            "minimum_fps": 51.47058823529456,
+            "p05_fps": 59.28705440900565,
+            "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+          },
+          {
+            "window_seconds": 10,
+            "count": 239,
+            "minimum_fps": 59.732540861812744,
+            "p05_fps": 59.849385652001594,
+            "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+          }
+        ],
+        "source_skips": 0,
+        "gpu_skips": 0,
+        "other_skips": 4,
+        "mixed_power": false,
+        "window_condition": {
+          "mode": "editor-covered",
+          "condition_held": true,
+          "scope": "Physical center hit-test and window state, not physical scanout. Owned QA topmost/cover windows only; no global Windows settings.",
+          "sample_count": 98,
+          "violations": [],
+          "boundary_samples": [
+            {
+              "seconds": 4.1000021155923605e-06,
+              "visible": true,
+              "minimized": false,
+              "preview_center_unobscured": false,
+              "foreground_owned": true
+            },
+            {
+              "seconds": 126.38597289999598,
+              "visible": true,
+              "minimized": false,
+              "preview_center_unobscured": false,
+              "foreground_owned": true
+            }
+          ],
+          "selection_scope": "Every detected condition violation and first/last samples retained; full generated raw trace remains local. Scores and failed attempts are never excluded."
+        },
+        "physical_alignment": {
+          "window_dpi": 168,
+          "browser_dpr": 1.75,
+          "expected_client_pixels": [
+            1087,
+            386,
+            356,
+            200
+          ],
+          "actual_client_pixels": [
+            1087,
+            386,
+            356,
+            200
+          ],
+          "absolute_error_pixels": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "scope": "Default browser zoom; physical HWND/client coordinates, independent of the reported emulated DPR."
+        },
+        "all_on_AC": true
+      }
+    ],
+    "summary": {
+      "completed": 1,
+      "valid": 1,
+      "fps_all": [
+        59.81653602001815
+      ],
+      "skips_all": [
+        4
+      ],
+      "fps_best": 59.81653602001815,
+      "fps_median": 59.81653602001815,
+      "fps_worst": 59.81653602001815,
+      "fps_p05_across_trials": 59.81653602001815,
+      "fps_population_stdev": 0.0,
+      "at_least_59_5": 1,
+      "under_30_skips": 1,
+      "zero_underruns": true,
+      "failed_trials": 0
+    }
+  },
+  {
+    "source_case": "window-control-1-visible-baseline",
+    "native_binary_sha256": "ac206038cea559f87d784e0ec4fc8485bdebd1421b7c4a78853e7ea037e3f72a",
+    "seconds": 125.0,
+    "width": 960,
+    "layers": 3,
+    "audio_tracks": 3,
+    "window_mode": "visible",
+    "cache_policy": "Fresh application each trial; repeated original-source offsets; OS filesystem caches unmanaged",
+    "proxy": false,
+    "legacy_viewport": false,
+    "rows": [
+      {
+        "trial": 1,
+        "exit_code": 0,
+        "wall_seconds": 140.5,
+        "fps": 59.42068991776377,
+        "skips": 8,
+        "samples": 6000000,
+        "expected_samples": 6000000,
+        "underruns": 0,
+        "first_ready_seconds": 1.1369396999944001,
+        "startup_seconds": 2.186831600003643,
+        "peak_working_set_MiB": 3360.1,
+        "CPU_percent": 6.23,
+        "present_intervals": {
+          "count": 7490,
+          "mean_ms": 16.6846,
+          "p50_upper_ms": 16.7,
+          "p95_upper_ms": 17.9,
+          "p99_upper_ms": 33.1,
+          "max_ms": 62.377,
+          "overflow_100ms": 0
+        },
+        "throughput_windows": [
+          {
+            "window_seconds": 1,
+            "count": 171,
+            "minimum_fps": 3.8131553860820104,
+            "p05_fps": 59.17639429312602,
+            "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+          },
+          {
+            "window_seconds": 10,
+            "count": 165,
+            "minimum_fps": 59.51609526562923,
+            "p05_fps": 59.61546053930278,
+            "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+          }
+        ],
+        "source_skips": 0,
+        "gpu_skips": 0,
+        "other_skips": 8,
+        "mixed_power": false,
+        "window_condition": {
+          "mode": "visible",
+          "condition_held": true,
+          "scope": "Physical center hit-test and window state, not physical scanout. Owned QA topmost/cover windows only; no global Windows settings.",
+          "sample_count": 78,
+          "violations": [],
+          "boundary_samples": [
+            {
+              "seconds": 3.400025889277458e-06,
+              "visible": true,
+              "minimized": false,
+              "preview_center_unobscured": true,
+              "foreground_owned": true
+            },
+            {
+              "seconds": 127.76878579999902,
+              "visible": true,
+              "minimized": false,
+              "preview_center_unobscured": true,
+              "foreground_owned": true
+            }
+          ],
+          "selection_scope": "Every detected condition violation and first/last samples retained; full generated raw trace remains local. Scores and failed attempts are never excluded."
+        },
+        "physical_alignment": {
+          "window_dpi": 168,
+          "browser_dpr": 1.75,
+          "expected_client_pixels": [
+            1087,
+            386,
+            356,
+            200
+          ],
+          "actual_client_pixels": [
+            1087,
+            386,
+            356,
+            200
+          ],
+          "absolute_error_pixels": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "scope": "Default browser zoom; physical HWND/client coordinates, independent of the reported emulated DPR."
+        },
+        "all_on_AC": true
+      }
+    ],
+    "summary": {
+      "completed": 1,
+      "valid": 1,
+      "fps_all": [
+        59.42068991776377
+      ],
+      "skips_all": [
+        8
+      ],
+      "fps_best": 59.42068991776377,
+      "fps_median": 59.42068991776377,
+      "fps_worst": 59.42068991776377,
+      "fps_p05_across_trials": 59.42068991776377,
+      "fps_population_stdev": 0.0,
+      "at_least_59_5": 0,
+      "under_30_skips": 1,
+      "zero_underruns": true,
+      "failed_trials": 0
+    }
+  },
+  {
+    "source_case": "window-control-1-visible-candidate",
+    "native_binary_sha256": "ac206038cea559f87d784e0ec4fc8485bdebd1421b7c4a78853e7ea037e3f72a",
+    "seconds": 125.0,
+    "width": 960,
+    "layers": 3,
+    "audio_tracks": 3,
+    "window_mode": "visible",
+    "cache_policy": "Fresh application each trial; repeated original-source offsets; OS filesystem caches unmanaged",
+    "proxy": false,
+    "legacy_viewport": false,
+    "rows": [
+      {
+        "trial": 1,
+        "exit_code": 0,
+        "wall_seconds": 138.078,
+        "fps": 59.911016752708704,
+        "skips": 3,
+        "samples": 6000000,
+        "expected_samples": 6000000,
+        "underruns": 0,
+        "first_ready_seconds": 1.0447004000016022,
+        "startup_seconds": 1.9809907000162639,
+        "peak_working_set_MiB": 3269.3,
+        "CPU_percent": 6.26,
+        "present_intervals": {
+          "count": 7494,
+          "mean_ms": 16.6732,
+          "p50_upper_ms": 16.7,
+          "p95_upper_ms": 17.9,
+          "p99_upper_ms": 35.8,
+          "max_ms": 55.3494,
+          "overflow_100ms": 0
+        },
+        "throughput_windows": [
+          {
+            "window_seconds": 1,
+            "count": 252,
+            "minimum_fps": 58.56255545696564,
+            "p05_fps": 59.29879178711734,
+            "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+          },
+          {
+            "window_seconds": 10,
+            "count": 219,
+            "minimum_fps": 59.806701545588844,
+            "p05_fps": 59.852037912831904,
+            "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+          }
+        ],
+        "source_skips": 0,
+        "gpu_skips": 0,
+        "other_skips": 3,
+        "mixed_power": false,
+        "window_condition": {
+          "mode": "visible",
+          "condition_held": true,
+          "scope": "Physical center hit-test and window state, not physical scanout. Owned QA topmost/cover windows only; no global Windows settings.",
+          "sample_count": 92,
+          "violations": [],
+          "boundary_samples": [
+            {
+              "seconds": 5.1000097300857306e-06,
+              "visible": true,
+              "minimized": false,
+              "preview_center_unobscured": true,
+              "foreground_owned": true
+            },
+            {
+              "seconds": 125.27971120001166,
+              "visible": true,
+              "minimized": false,
+              "preview_center_unobscured": true,
+              "foreground_owned": true
+            }
+          ],
+          "selection_scope": "Every detected condition violation and first/last samples retained; full generated raw trace remains local. Scores and failed attempts are never excluded."
+        },
+        "physical_alignment": {
+          "window_dpi": 168,
+          "browser_dpr": 1.75,
+          "expected_client_pixels": [
+            1087,
+            386,
+            356,
+            200
+          ],
+          "actual_client_pixels": [
+            1087,
+            386,
+            356,
+            200
+          ],
+          "absolute_error_pixels": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "scope": "Default browser zoom; physical HWND/client coordinates, independent of the reported emulated DPR."
+        },
+        "all_on_AC": true
+      }
+    ],
+    "summary": {
+      "completed": 1,
+      "valid": 1,
+      "fps_all": [
+        59.911016752708704
+      ],
+      "skips_all": [
+        3
+      ],
+      "fps_best": 59.911016752708704,
+      "fps_median": 59.911016752708704,
+      "fps_worst": 59.911016752708704,
+      "fps_p05_across_trials": 59.911016752708704,
+      "fps_population_stdev": 0.0,
+      "at_least_59_5": 1,
+      "under_30_skips": 1,
+      "zero_underruns": true,
+      "failed_trials": 0
+    }
+  },
+  {
+    "source_case": "window-control-preview-covered-baseline",
+    "native_binary_sha256": "ac206038cea559f87d784e0ec4fc8485bdebd1421b7c4a78853e7ea037e3f72a",
+    "seconds": 125.0,
+    "width": 960,
+    "layers": 3,
+    "audio_tracks": 3,
+    "window_mode": "preview-covered",
+    "cache_policy": "Fresh application each trial; repeated original-source offsets; OS filesystem caches unmanaged",
+    "proxy": false,
+    "legacy_viewport": false,
+    "rows": [
+      {
+        "trial": 1,
+        "exit_code": 0,
+        "wall_seconds": 138.75,
+        "fps": 59.64540626916821,
+        "skips": 4,
+        "samples": 6000000,
+        "expected_samples": 6000000,
+        "underruns": 0,
+        "first_ready_seconds": 1.1408812000008766,
+        "startup_seconds": 2.0460935999872163,
+        "peak_working_set_MiB": 3461.1,
+        "CPU_percent": 6.59,
+        "present_intervals": {
+          "count": 7494,
+          "mean_ms": 16.6755,
+          "p50_upper_ms": 16.7,
+          "p95_upper_ms": 17.9,
+          "p99_upper_ms": 33.8,
+          "max_ms": 51.6852,
+          "overflow_100ms": 0
+        },
+        "throughput_windows": [
+          {
+            "window_seconds": 1,
+            "count": 241,
+            "minimum_fps": 33.480176211454015,
+            "p05_fps": 59.246309246309124,
+            "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+          },
+          {
+            "window_seconds": 10,
+            "count": 208,
+            "minimum_fps": 57.05323007548283,
+            "p05_fps": 59.83560118876047,
+            "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+          }
+        ],
+        "source_skips": 0,
+        "gpu_skips": 0,
+        "other_skips": 4,
+        "mixed_power": false,
+        "window_condition": {
+          "mode": "preview-covered",
+          "condition_held": true,
+          "scope": "Physical center hit-test and window state, not physical scanout. Owned QA topmost/cover windows only; no global Windows settings.",
+          "sample_count": 91,
+          "violations": [],
+          "boundary_samples": [
+            {
+              "seconds": 3.9000005926936865e-06,
+              "visible": true,
+              "minimized": false,
+              "preview_center_unobscured": false,
+              "foreground_owned": true
+            },
+            {
+              "seconds": 127.04429029999301,
+              "visible": true,
+              "minimized": false,
+              "preview_center_unobscured": false,
+              "foreground_owned": true
+            }
+          ],
+          "selection_scope": "Every detected condition violation and first/last samples retained; full generated raw trace remains local. Scores and failed attempts are never excluded."
+        },
+        "physical_alignment": {
+          "window_dpi": 168,
+          "browser_dpr": 1.75,
+          "expected_client_pixels": [
+            1087,
+            386,
+            356,
+            200
+          ],
+          "actual_client_pixels": [
+            1087,
+            386,
+            356,
+            200
+          ],
+          "absolute_error_pixels": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "scope": "Default browser zoom; physical HWND/client coordinates, independent of the reported emulated DPR."
+        },
+        "all_on_AC": true
+      }
+    ],
+    "summary": {
+      "completed": 1,
+      "valid": 1,
+      "fps_all": [
+        59.64540626916821
+      ],
+      "skips_all": [
+        4
+      ],
+      "fps_best": 59.64540626916821,
+      "fps_median": 59.64540626916821,
+      "fps_worst": 59.64540626916821,
+      "fps_p05_across_trials": 59.64540626916821,
+      "fps_population_stdev": 0.0,
+      "at_least_59_5": 1,
+      "under_30_skips": 1,
+      "zero_underruns": true,
+      "failed_trials": 0
+    }
+  },
+  {
+    "source_case": "window-control-preview-covered-candidate",
+    "native_binary_sha256": "ac206038cea559f87d784e0ec4fc8485bdebd1421b7c4a78853e7ea037e3f72a",
+    "seconds": 125.0,
+    "width": 960,
+    "layers": 3,
+    "audio_tracks": 3,
+    "window_mode": "preview-covered",
+    "cache_policy": "Fresh application each trial; repeated original-source offsets; OS filesystem caches unmanaged",
+    "proxy": false,
+    "legacy_viewport": false,
+    "rows": [
+      {
+        "trial": 1,
+        "exit_code": 0,
+        "wall_seconds": 137.796,
+        "fps": 59.87444906635978,
+        "skips": 6,
+        "samples": 6000000,
+        "expected_samples": 6000000,
+        "underruns": 0,
+        "first_ready_seconds": 1.084100900014164,
+        "startup_seconds": 2.0290440000244416,
+        "peak_working_set_MiB": 3433.6,
+        "CPU_percent": 6.56,
+        "present_intervals": {
+          "count": 7491,
+          "mean_ms": 16.68,
+          "p50_upper_ms": 16.7,
+          "p95_upper_ms": 18,
+          "p99_upper_ms": 35.9,
+          "max_ms": 68.6467,
+          "overflow_100ms": 0
+        },
+        "throughput_windows": [
+          {
+            "window_seconds": 1,
+            "count": 223,
+            "minimum_fps": 58.188643829188166,
+            "p05_fps": 59.171597633135946,
+            "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+          },
+          {
+            "window_seconds": 10,
+            "count": 195,
+            "minimum_fps": 59.717160513389324,
+            "p05_fps": 59.79805901382217,
+            "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+          }
+        ],
+        "source_skips": 0,
+        "gpu_skips": 0,
+        "other_skips": 6,
+        "mixed_power": false,
+        "window_condition": {
+          "mode": "preview-covered",
+          "condition_held": true,
+          "scope": "Physical center hit-test and window state, not physical scanout. Owned QA topmost/cover windows only; no global Windows settings.",
+          "sample_count": 90,
+          "violations": [],
+          "boundary_samples": [
+            {
+              "seconds": 3.9000005926936865e-06,
+              "visible": true,
+              "minimized": false,
+              "preview_center_unobscured": false,
+              "foreground_owned": true
+            },
+            {
+              "seconds": 125.45472849998623,
+              "visible": true,
+              "minimized": false,
+              "preview_center_unobscured": false,
+              "foreground_owned": true
+            }
+          ],
+          "selection_scope": "Every detected condition violation and first/last samples retained; full generated raw trace remains local. Scores and failed attempts are never excluded."
+        },
+        "physical_alignment": {
+          "window_dpi": 168,
+          "browser_dpr": 1.75,
+          "expected_client_pixels": [
+            1087,
+            386,
+            356,
+            200
+          ],
+          "actual_client_pixels": [
+            1087,
+            386,
+            356,
+            200
+          ],
+          "absolute_error_pixels": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "scope": "Default browser zoom; physical HWND/client coordinates, independent of the reported emulated DPR."
+        },
+        "all_on_AC": true
+      }
+    ],
+    "summary": {
+      "completed": 1,
+      "valid": 1,
+      "fps_all": [
+        59.87444906635978
+      ],
+      "skips_all": [
+        6
+      ],
+      "fps_best": 59.87444906635978,
+      "fps_median": 59.87444906635978,
+      "fps_worst": 59.87444906635978,
+      "fps_p05_across_trials": 59.87444906635978,
+      "fps_population_stdev": 0.0,
+      "at_least_59_5": 1,
+      "under_30_skips": 1,
+      "zero_underruns": true,
+      "failed_trials": 0
+    }
+  },
+  {
+    "source_case": "focus-control-baseline",
+    "native_binary_sha256": "ac206038cea559f87d784e0ec4fc8485bdebd1421b7c4a78853e7ea037e3f72a",
+    "seconds": 125.0,
+    "width": 960,
+    "layers": 3,
+    "audio_tracks": 3,
+    "window_mode": "visible-unfocused",
+    "cache_policy": "Fresh application each trial; repeated original-source offsets; OS filesystem caches unmanaged",
+    "proxy": false,
+    "legacy_viewport": false,
+    "rows": [
+      {
+        "trial": 1,
+        "exit_code": 0,
+        "wall_seconds": 136.609,
+        "fps": 59.86626217569776,
+        "skips": 10,
+        "samples": 6000000,
+        "expected_samples": 6000000,
+        "underruns": 0,
+        "first_ready_seconds": 1.0496670000138693,
+        "startup_seconds": 1.980467299988959,
+        "peak_working_set_MiB": 3050.4,
+        "CPU_percent": 6.4,
+        "present_intervals": {
+          "count": 7488,
+          "mean_ms": 16.6932,
+          "p50_upper_ms": 16.7,
+          "p95_upper_ms": 18,
+          "p99_upper_ms": 40.2,
+          "max_ms": 55.1225,
+          "overflow_100ms": 0
+        },
+        "throughput_windows": [
+          {
+            "window_seconds": 1,
+            "count": 244,
+            "minimum_fps": 58.50015915484484,
+            "p05_fps": 58.90753302391984,
+            "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+          },
+          {
+            "window_seconds": 10,
+            "count": 205,
+            "minimum_fps": 59.7059113786638,
+            "p05_fps": 59.758169281503,
+            "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+          }
+        ],
+        "source_skips": 0,
+        "gpu_skips": 0,
+        "other_skips": 10,
+        "mixed_power": false,
+        "window_condition": {
+          "mode": "visible-unfocused",
+          "condition_held": true,
+          "scope": "Physical center hit-test and window state, not physical scanout. Owned QA topmost/cover windows only; no global Windows settings.",
+          "sample_count": 92,
+          "violations": [],
+          "boundary_samples": [
+            {
+              "seconds": 1.8999853637069464e-06,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": true,
+              "foreground_owned": false,
+              "qa_cover_bounds": [
+                0,
+                0,
+                1,
+                1
+              ]
+            },
+            {
+              "seconds": 125.43234189998475,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": true,
+              "foreground_owned": false,
+              "qa_cover_bounds": [
+                0,
+                0,
+                1,
+                1
+              ]
+            }
+          ],
+          "selection_scope": "Every detected condition violation and first/last samples retained; full generated raw trace remains local. Scores and failed attempts are never excluded."
+        },
+        "physical_alignment": {
+          "window_dpi": 168,
+          "browser_dpr": 1.75,
+          "expected_client_pixels": [
+            1087,
+            386,
+            356,
+            200
+          ],
+          "actual_client_pixels": [
+            1087,
+            386,
+            356,
+            200
+          ],
+          "absolute_error_pixels": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "scope": "Default browser zoom; physical HWND/client coordinates, independent of the reported emulated DPR."
+        },
+        "all_on_AC": true
+      }
+    ],
+    "summary": {
+      "completed": 1,
+      "valid": 1,
+      "fps_all": [
+        59.86626217569776
+      ],
+      "skips_all": [
+        10
+      ],
+      "fps_best": 59.86626217569776,
+      "fps_median": 59.86626217569776,
+      "fps_worst": 59.86626217569776,
+      "fps_p05_across_trials": 59.86626217569776,
+      "fps_population_stdev": 0.0,
+      "at_least_59_5": 1,
+      "under_30_skips": 1,
+      "zero_underruns": true,
+      "failed_trials": 0
+    }
+  },
+  {
+    "source_case": "focus-control-candidate",
+    "native_binary_sha256": "ac206038cea559f87d784e0ec4fc8485bdebd1421b7c4a78853e7ea037e3f72a",
+    "seconds": 125.0,
+    "width": 960,
+    "layers": 3,
+    "audio_tracks": 3,
+    "window_mode": "visible-unfocused",
+    "cache_policy": "Fresh application each trial; repeated original-source offsets; OS filesystem caches unmanaged",
+    "proxy": false,
+    "legacy_viewport": false,
+    "rows": [
+      {
+        "trial": 1,
+        "exit_code": 0,
+        "wall_seconds": 139.891,
+        "fps": 59.54245570293383,
+        "skips": 10,
+        "samples": 6000000,
+        "expected_samples": 6000000,
+        "underruns": 0,
+        "first_ready_seconds": 1.0185191000055056,
+        "startup_seconds": 2.057322100008605,
+        "peak_working_set_MiB": 3439.2,
+        "CPU_percent": 6.43,
+        "present_intervals": {
+          "count": 7488,
+          "mean_ms": 16.689,
+          "p50_upper_ms": 16.7,
+          "p95_upper_ms": 18,
+          "p99_upper_ms": 36,
+          "max_ms": 60.7304,
+          "overflow_100ms": 0
+        },
+        "throughput_windows": [
+          {
+            "window_seconds": 1,
+            "count": 223,
+            "minimum_fps": 28.127313101406383,
+            "p05_fps": 59.11015256809654,
+            "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+          },
+          {
+            "window_seconds": 10,
+            "count": 200,
+            "minimum_fps": 59.66916108704219,
+            "p05_fps": 59.794425775845056,
+            "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+          }
+        ],
+        "source_skips": 0,
+        "gpu_skips": 0,
+        "other_skips": 10,
+        "mixed_power": false,
+        "window_condition": {
+          "mode": "visible-unfocused",
+          "condition_held": true,
+          "scope": "Physical center hit-test and window state, not physical scanout. Owned QA topmost/cover windows only; no global Windows settings.",
+          "sample_count": 89,
+          "violations": [],
+          "boundary_samples": [
+            {
+              "seconds": 4.2000028770416975e-06,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": true,
+              "foreground_owned": false,
+              "qa_cover_bounds": [
+                0,
+                0,
+                1,
+                1
+              ]
+            },
+            {
+              "seconds": 126.3528669999796,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": true,
+              "foreground_owned": false,
+              "qa_cover_bounds": [
+                0,
+                0,
+                1,
+                1
+              ]
+            }
+          ],
+          "selection_scope": "Every detected condition violation and first/last samples retained; full generated raw trace remains local. Scores and failed attempts are never excluded."
+        },
+        "physical_alignment": {
+          "window_dpi": 168,
+          "browser_dpr": 1.75,
+          "expected_client_pixels": [
+            1087,
+            386,
+            356,
+            200
+          ],
+          "actual_client_pixels": [
+            1087,
+            386,
+            356,
+            200
+          ],
+          "absolute_error_pixels": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "scope": "Default browser zoom; physical HWND/client coordinates, independent of the reported emulated DPR."
+        },
+        "all_on_AC": true
+      }
+    ],
+    "summary": {
+      "completed": 1,
+      "valid": 1,
+      "fps_all": [
+        59.54245570293383
+      ],
+      "skips_all": [
+        10
+      ],
+      "fps_best": 59.54245570293383,
+      "fps_median": 59.54245570293383,
+      "fps_worst": 59.54245570293383,
+      "fps_p05_across_trials": 59.54245570293383,
+      "fps_population_stdev": 0.0,
+      "at_least_59_5": 1,
+      "under_30_skips": 1,
+      "zero_underruns": true,
+      "failed_trials": 0
+    }
+  },
+  {
+    "source_case": "legacy-dpi-control-candidate",
+    "native_binary_sha256": "ac206038cea559f87d784e0ec4fc8485bdebd1421b7c4a78853e7ea037e3f72a",
+    "seconds": 125.0,
+    "width": 960,
+    "layers": 3,
+    "audio_tracks": 3,
+    "window_mode": "visible",
+    "cache_policy": "Fresh application each trial; repeated original-source offsets; OS filesystem caches unmanaged",
+    "proxy": false,
+    "legacy_viewport": true,
+    "rows": [
+      {
+        "trial": 1,
+        "exit_code": 1,
+        "wall_seconds": 137.656,
+        "fps": 59.86841579330248,
+        "skips": 9,
+        "samples": 6000000,
+        "expected_samples": 6000000,
+        "underruns": 0,
+        "first_ready_seconds": 1.069264599995222,
+        "startup_seconds": 2.0403759000182617,
+        "peak_working_set_MiB": 2925.3,
+        "CPU_percent": 7.33,
+        "present_intervals": {
+          "count": 7488,
+          "mean_ms": 16.6868,
+          "p50_upper_ms": 16.7,
+          "p95_upper_ms": 18.5,
+          "p99_upper_ms": 41.6,
+          "max_ms": 61.5775,
+          "overflow_100ms": 0
+        },
+        "throughput_windows": [
+          {
+            "window_seconds": 1,
+            "count": 191,
+            "minimum_fps": 58.53182668075765,
+            "p05_fps": 58.948589099343444,
+            "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+          },
+          {
+            "window_seconds": 10,
+            "count": 178,
+            "minimum_fps": 59.659283507501,
+            "p05_fps": 59.7545377322567,
+            "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+          }
+        ],
+        "source_skips": 0,
+        "gpu_skips": 0,
+        "other_skips": 9,
+        "mixed_power": false,
+        "window_condition": {
+          "mode": "visible",
+          "condition_held": false,
+          "scope": "Physical center hit-test and window state, not physical scanout. Owned QA topmost/cover windows only; no global Windows settings.",
+          "sample_count": 81,
+          "violations": [
+            {
+              "seconds": 2.7999922167509794e-06,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 1.2030145000026096,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 2.8258763999911025,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 4.1467837000091095,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 5.747984199988423,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 7.48766740001156,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 9.234272300003795,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 10.79924399999436,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 12.435576699994272,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 13.948048199992627,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 15.472911199991358,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 17.347813200001838,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 19.333990099985385,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 21.112182599987136,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 22.571913099993253,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 24.142938500008313,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 25.55645450000884,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 27.13560549999238,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 28.6010985999892,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 30.279856899986044,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 31.81704009999521,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 33.53704729999299,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 35.23107670000172,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 37.0785193000047,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 38.83739920001244,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 40.19807079999009,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 41.84593280000263,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 43.19469730000128,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 44.787738499988336,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 46.428824300004635,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 47.73091280000517,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 49.36157189999358,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 51.04316679999465,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 52.65539689999423,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 54.09081409999635,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 55.53076699998928,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 57.19736120000016,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 59.00125199998729,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 60.671738200006075,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 62.15543859999161,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 63.58336910000071,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 65.49673250000342,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 67.34441369998967,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 69.27989010000601,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 70.68349560000934,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 72.34150809998391,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 73.70317359999171,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 75.28967209998518,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 76.80355199999758,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 78.35720379999839,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 79.64699370000744,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 81.20992620001198,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 82.77002940000966,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 84.41727939998964,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 85.98024100001203,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 87.61281230000895,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 89.33217079998576,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 90.86688290000893,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 92.39349009998841,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 93.76501400000416,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 95.1984669000085,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 96.75918759999331,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 98.316706099984,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 99.75131829999737,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 101.32718550000573,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 102.85858780000126,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 104.45628340000985,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 105.82501709999633,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 107.32243450000533,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 108.7337889999908,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 110.11544689998846,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 111.5147711999889,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 113.02541490001022,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 114.45484429999487,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 116.09993309999118,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 117.78879630001029,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 119.2712090999994,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 120.87964659999125,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 122.2976389999967,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 123.85266400000546,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 125.2762545000005,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            }
+          ],
+          "boundary_samples": [
+            {
+              "seconds": 2.7999922167509794e-06,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            },
+            {
+              "seconds": 125.2762545000005,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false
+            }
+          ],
+          "selection_scope": "Every detected condition violation and first/last samples retained; full generated raw trace remains local. Scores and failed attempts are never excluded."
+        },
+        "physical_alignment": null,
+        "all_on_AC": true
+      }
+    ],
+    "summary": {
+      "completed": 1,
+      "valid": 0,
+      "fps_all": [],
+      "skips_all": [],
+      "fps_best": null,
+      "fps_median": null,
+      "fps_worst": null,
+      "fps_p05_across_trials": null,
+      "fps_population_stdev": null,
+      "at_least_59_5": 0,
+      "under_30_skips": 0,
+      "zero_underruns": false,
+      "failed_trials": 1
+    }
+  },
+  {
+    "source_case": "natural-browser-focus-control-baseline",
+    "native_binary_sha256": "ac206038cea559f87d784e0ec4fc8485bdebd1421b7c4a78853e7ea037e3f72a",
+    "seconds": 125.0,
+    "width": 960,
+    "layers": 3,
+    "audio_tracks": 3,
+    "window_mode": "visible-browser-unfocused",
+    "cache_policy": "Fresh application each trial; repeated original-source offsets; OS filesystem caches unmanaged",
+    "proxy": false,
+    "legacy_viewport": false,
+    "legacy_focus_emulation": false,
+    "rows": [
+      {
+        "trial": 1,
+        "exit_code": 0,
+        "wall_seconds": 138.406,
+        "fps": 59.86105396044153,
+        "skips": 7,
+        "samples": 6000000,
+        "expected_samples": 6000000,
+        "underruns": 0,
+        "first_ready_seconds": 0.8787585999816656,
+        "startup_seconds": 2.0792376000026707,
+        "peak_working_set_MiB": 3410.6,
+        "CPU_percent": 6.62,
+        "present_intervals": {
+          "count": 7491,
+          "mean_ms": 16.6851,
+          "p50_upper_ms": 16.7,
+          "p95_upper_ms": 18,
+          "p99_upper_ms": 39.8,
+          "max_ms": 63.1655,
+          "overflow_100ms": 0
+        },
+        "throughput_windows": [
+          {
+            "window_seconds": 1,
+            "count": 277,
+            "minimum_fps": 57.16406829992601,
+            "p05_fps": 58.98324126954399,
+            "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+          },
+          {
+            "window_seconds": 10,
+            "count": 251,
+            "minimum_fps": 59.63608650090502,
+            "p05_fps": 59.76520811099252,
+            "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+          }
+        ],
+        "source_skips": 0,
+        "gpu_skips": 0,
+        "other_skips": 7,
+        "mixed_power": false,
+        "window_condition": {
+          "mode": "visible-browser-unfocused",
+          "condition_held": true,
+          "scope": "Physical center hit-test and window state, not physical scanout. Owned QA topmost/cover windows only; no global Windows settings.",
+          "sample_count": 98,
+          "violations": [],
+          "boundary_samples": [
+            {
+              "seconds": 2.3999891709536314e-06,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": true,
+              "foreground_owned": false,
+              "qa_cover_bounds": [
+                0,
+                0,
+                1,
+                1
+              ]
+            },
+            {
+              "seconds": 125.9281692999939,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": true,
+              "foreground_owned": false,
+              "qa_cover_bounds": [
+                0,
+                0,
+                1,
+                1
+              ]
+            }
+          ],
+          "selection_scope": "Every detected condition violation and first/last samples retained; full generated raw trace remains local. Scores and failed attempts are never excluded."
+        },
+        "physical_alignment": {
+          "window_dpi": 168,
+          "browser_dpr": 1.75,
+          "expected_client_pixels": [
+            1087,
+            386,
+            356,
+            200
+          ],
+          "actual_client_pixels": [
+            1087,
+            386,
+            356,
+            200
+          ],
+          "absolute_error_pixels": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "scope": "Default browser zoom; physical HWND/client coordinates, independent of the reported emulated DPR."
+        },
+        "focus_emulation": "disabled via connect_over_cdp(no_defaults=True)",
+        "browser_visibility_state": {
+          "state": "visible",
+          "focused": false,
+          "dpr": 1.75
+        },
+        "browser_focus_changes": [
+          {
+            "seconds": 0.14040000000596045,
+            "focused": false
+          }
+        ],
+        "all_on_AC": true
+      }
+    ],
+    "summary": {
+      "completed": 1,
+      "valid": 1,
+      "fps_all": [
+        59.86105396044153
+      ],
+      "skips_all": [
+        7
+      ],
+      "fps_best": 59.86105396044153,
+      "fps_median": 59.86105396044153,
+      "fps_worst": 59.86105396044153,
+      "fps_p05_across_trials": 59.86105396044153,
+      "fps_population_stdev": 0.0,
+      "at_least_59_5": 1,
+      "under_30_skips": 1,
+      "zero_underruns": true,
+      "failed_trials": 0
+    }
+  },
+  {
+    "source_case": "natural-browser-focus-control-candidate",
+    "native_binary_sha256": "ac206038cea559f87d784e0ec4fc8485bdebd1421b7c4a78853e7ea037e3f72a",
+    "seconds": 125.0,
+    "width": 960,
+    "layers": 3,
+    "audio_tracks": 3,
+    "window_mode": "visible-browser-unfocused",
+    "cache_policy": "Fresh application each trial; repeated original-source offsets; OS filesystem caches unmanaged",
+    "proxy": false,
+    "legacy_viewport": false,
+    "legacy_focus_emulation": false,
+    "rows": [
+      {
+        "trial": 1,
+        "exit_code": 0,
+        "wall_seconds": 137.657,
+        "fps": 59.940794675200976,
+        "skips": 1,
+        "samples": 6000000,
+        "expected_samples": 6000000,
+        "underruns": 0,
+        "first_ready_seconds": 1.013970200001495,
+        "startup_seconds": 1.954159000015352,
+        "peak_working_set_MiB": 3016.1,
+        "CPU_percent": 6.21,
+        "present_intervals": {
+          "count": 7497,
+          "mean_ms": 16.6726,
+          "p50_upper_ms": 16.7,
+          "p95_upper_ms": 18,
+          "p99_upper_ms": 35,
+          "max_ms": 47.4422,
+          "overflow_100ms": 0
+        },
+        "throughput_windows": [
+          {
+            "window_seconds": 1,
+            "count": 278,
+            "minimum_fps": 58.611802012338536,
+            "p05_fps": 59.246309246309124,
+            "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+          },
+          {
+            "window_seconds": 10,
+            "count": 248,
+            "minimum_fps": 59.81330404769372,
+            "p05_fps": 59.90756563616592,
+            "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+          }
+        ],
+        "source_skips": 0,
+        "gpu_skips": 0,
+        "other_skips": 1,
+        "mixed_power": false,
+        "window_condition": {
+          "mode": "visible-browser-unfocused",
+          "condition_held": true,
+          "scope": "Physical center hit-test and window state, not physical scanout. Owned QA topmost/cover windows only; no global Windows settings.",
+          "sample_count": 99,
+          "violations": [],
+          "boundary_samples": [
+            {
+              "seconds": 1.600012183189392e-06,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": true,
+              "foreground_owned": false,
+              "qa_cover_bounds": [
+                0,
+                0,
+                1,
+                1
+              ]
+            },
+            {
+              "seconds": 126.09937079998781,
+              "visible": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": true,
+              "foreground_owned": false,
+              "qa_cover_bounds": [
+                0,
+                0,
+                1,
+                1
+              ]
+            }
+          ],
+          "selection_scope": "Every detected condition violation and first/last samples retained; full generated raw trace remains local. Scores and failed attempts are never excluded."
+        },
+        "physical_alignment": {
+          "window_dpi": 168,
+          "browser_dpr": 1.75,
+          "expected_client_pixels": [
+            1087,
+            386,
+            356,
+            200
+          ],
+          "actual_client_pixels": [
+            1087,
+            386,
+            356,
+            200
+          ],
+          "absolute_error_pixels": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "scope": "Default browser zoom; physical HWND/client coordinates, independent of the reported emulated DPR."
+        },
+        "focus_emulation": "disabled via connect_over_cdp(no_defaults=True)",
+        "browser_visibility_state": {
+          "state": "visible",
+          "focused": false,
+          "dpr": 1.75
+        },
+        "browser_focus_changes": [
+          {
+            "seconds": 0.1405,
+            "focused": false
+          }
+        ],
+        "all_on_AC": true
+      }
+    ],
+    "summary": {
+      "completed": 1,
+      "valid": 1,
+      "fps_all": [
+        59.940794675200976
+      ],
+      "skips_all": [
+        1
+      ],
+      "fps_best": 59.940794675200976,
+      "fps_median": 59.940794675200976,
+      "fps_worst": 59.940794675200976,
+      "fps_p05_across_trials": 59.940794675200976,
+      "fps_population_stdev": 0.0,
+      "at_least_59_5": 1,
+      "under_30_skips": 1,
+      "zero_underruns": true,
+      "failed_trials": 0
+    }
+  },
+  {
+    "source_case": "natural-visible-control-baseline",
+    "native_binary_sha256": "ac206038cea559f87d784e0ec4fc8485bdebd1421b7c4a78853e7ea037e3f72a",
+    "seconds": 125.0,
+    "width": 960,
+    "layers": 3,
+    "audio_tracks": 3,
+    "window_mode": "visible",
+    "cache_policy": "Fresh application each trial; repeated original-source offsets; OS filesystem caches unmanaged",
+    "proxy": false,
+    "legacy_viewport": false,
+    "legacy_focus_emulation": false,
+    "rows": [
+      {
+        "trial": 1,
+        "exit_code": 0,
+        "wall_seconds": 153.5,
+        "fps": 58.56403349021077,
+        "skips": 151,
+        "samples": 6000000,
+        "expected_samples": 6000000,
+        "underruns": 0,
+        "first_ready_seconds": 2.195434100000057,
+        "startup_seconds": 5.294997099999819,
+        "peak_working_set_MiB": 3457.4,
+        "CPU_percent": 11.67,
+        "present_intervals": {
+          "count": 7347,
+          "mean_ms": 17.0101,
+          "p50_upper_ms": 16.7,
+          "p95_upper_ms": 24.6,
+          "p99_upper_ms": 42,
+          "max_ms": 611.043,
+          "overflow_100ms": 2
+        },
+        "throughput_windows": [
+          {
+            "window_seconds": 1,
+            "count": 85,
+            "minimum_fps": 43.7636761487962,
+            "p05_fps": 54.93464671339243,
+            "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+          },
+          {
+            "window_seconds": 10,
+            "count": 88,
+            "minimum_fps": 57.496275133554924,
+            "p05_fps": 58.39914204933221,
+            "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+          }
+        ],
+        "source_skips": 75,
+        "gpu_skips": 0,
+        "other_skips": 76,
+        "mixed_power": false,
+        "window_condition": {
+          "mode": "visible",
+          "condition_held": true,
+          "scope": "Physical center hit-test and window state, not physical scanout. Owned QA topmost/cover windows only; no global Windows settings.",
+          "sample_count": 59,
+          "violations": [],
+          "boundary_samples": [
+            {
+              "seconds": 2.7999999474559445e-06,
+              "visible": true,
+              "surface_replaced_during_sample": false,
+              "sampled_native_surface": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": true,
+              "foreground_owned": true
+            },
+            {
+              "seconds": 126.6281541999997,
+              "visible": true,
+              "surface_replaced_during_sample": false,
+              "sampled_native_surface": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": true,
+              "foreground_owned": true
+            }
+          ],
+          "selection_scope": "Every detected condition violation and first/last samples retained; full generated raw trace remains local. Scores and failed attempts are never excluded."
+        },
+        "physical_alignment": {
+          "window_dpi": 168,
+          "browser_dpr": 1.75,
+          "expected_client_pixels": [
+            1087,
+            386,
+            356,
+            200
+          ],
+          "actual_client_pixels": [
+            1087,
+            386,
+            356,
+            200
+          ],
+          "absolute_error_pixels": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "scope": "Default browser zoom; physical HWND/client coordinates, independent of the reported emulated DPR."
+        },
+        "focus_emulation": "disabled via connect_over_cdp(no_defaults=True)",
+        "browser_visibility_state": {
+          "state": "visible",
+          "focused": true,
+          "dpr": 1.75
+        },
+        "browser_focus_changes": [
+          {
+            "seconds": 0.0845,
+            "focused": true
+          }
+        ],
+        "all_on_AC": true
+      }
+    ],
+    "summary": {
+      "completed": 1,
+      "valid": 1,
+      "fps_all": [
+        58.56403349021077
+      ],
+      "skips_all": [
+        151
+      ],
+      "fps_best": 58.56403349021077,
+      "fps_median": 58.56403349021077,
+      "fps_worst": 58.56403349021077,
+      "fps_p05_across_trials": 58.56403349021077,
+      "fps_population_stdev": 0.0,
+      "at_least_59_5": 0,
+      "under_30_skips": 0,
+      "zero_underruns": true,
+      "failed_trials": 0
+    }
+  },
+  {
+    "source_case": "natural-visible-control-candidate",
+    "native_binary_sha256": "ac206038cea559f87d784e0ec4fc8485bdebd1421b7c4a78853e7ea037e3f72a",
+    "seconds": 125.0,
+    "width": 960,
+    "layers": 3,
+    "audio_tracks": 3,
+    "window_mode": "visible",
+    "cache_policy": "Fresh application each trial; repeated original-source offsets; OS filesystem caches unmanaged",
+    "proxy": false,
+    "legacy_viewport": false,
+    "legacy_focus_emulation": false,
+    "rows": [
+      {
+        "trial": 1,
+        "exit_code": 0,
+        "wall_seconds": 153.031,
+        "fps": 58.375399951559565,
+        "skips": 172,
+        "samples": 6000000,
+        "expected_samples": 6000000,
+        "underruns": 0,
+        "first_ready_seconds": 2.504678099999637,
+        "startup_seconds": 4.835550999999668,
+        "peak_working_set_MiB": 2964.9,
+        "CPU_percent": 11.8,
+        "present_intervals": {
+          "count": 7326,
+          "mean_ms": 17.0582,
+          "p50_upper_ms": 16.7,
+          "p95_upper_ms": 24.8,
+          "p99_upper_ms": 42.5,
+          "max_ms": 177.098,
+          "overflow_100ms": 5
+        },
+        "throughput_windows": [
+          {
+            "window_seconds": 1,
+            "count": 88,
+            "minimum_fps": 41.80945853324185,
+            "p05_fps": 53.39615233608173,
+            "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+          },
+          {
+            "window_seconds": 10,
+            "count": 97,
+            "minimum_fps": 56.02379771938518,
+            "p05_fps": 56.95177889989591,
+            "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+          }
+        ],
+        "source_skips": 68,
+        "gpu_skips": 0,
+        "other_skips": 104,
+        "mixed_power": false,
+        "window_condition": {
+          "mode": "visible",
+          "condition_held": true,
+          "scope": "Physical center hit-test and window state, not physical scanout. Owned QA topmost/cover windows only; no global Windows settings.",
+          "sample_count": 62,
+          "violations": [],
+          "boundary_samples": [
+            {
+              "seconds": 9.399999726156238e-06,
+              "visible": true,
+              "surface_replaced_during_sample": false,
+              "sampled_native_surface": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": true,
+              "foreground_owned": true
+            },
+            {
+              "seconds": 126.70923439999979,
+              "visible": true,
+              "surface_replaced_during_sample": false,
+              "sampled_native_surface": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": true,
+              "foreground_owned": true
+            }
+          ],
+          "selection_scope": "Every detected condition violation and first/last samples retained; full generated raw trace remains local. Scores and failed attempts are never excluded."
+        },
+        "physical_alignment": {
+          "window_dpi": 168,
+          "browser_dpr": 1.75,
+          "expected_client_pixels": [
+            1087,
+            386,
+            356,
+            200
+          ],
+          "actual_client_pixels": [
+            1087,
+            386,
+            356,
+            200
+          ],
+          "absolute_error_pixels": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "scope": "Default browser zoom; physical HWND/client coordinates, independent of the reported emulated DPR."
+        },
+        "focus_emulation": "disabled via connect_over_cdp(no_defaults=True)",
+        "browser_visibility_state": {
+          "state": "visible",
+          "focused": true,
+          "dpr": 1.75
+        },
+        "browser_focus_changes": [
+          {
+            "seconds": 0.27929999999981375,
+            "focused": true
+          }
+        ],
+        "all_on_AC": true
+      }
+    ],
+    "summary": {
+      "completed": 1,
+      "valid": 1,
+      "fps_all": [
+        58.375399951559565
+      ],
+      "skips_all": [
+        172
+      ],
+      "fps_best": 58.375399951559565,
+      "fps_median": 58.375399951559565,
+      "fps_worst": 58.375399951559565,
+      "fps_p05_across_trials": 58.375399951559565,
+      "fps_population_stdev": 0.0,
+      "at_least_59_5": 0,
+      "under_30_skips": 0,
+      "zero_underruns": true,
+      "failed_trials": 0
+    }
+  },
+  {
+    "source_case": "natural-editor-covered-control-baseline",
+    "native_binary_sha256": "ac206038cea559f87d784e0ec4fc8485bdebd1421b7c4a78853e7ea037e3f72a",
+    "seconds": 125.0,
+    "width": 960,
+    "layers": 3,
+    "audio_tracks": 3,
+    "window_mode": "editor-covered",
+    "cache_policy": "Fresh application each trial; repeated original-source offsets; OS filesystem caches unmanaged",
+    "proxy": false,
+    "legacy_viewport": false,
+    "legacy_focus_emulation": false,
+    "rows": [
+      {
+        "trial": 1,
+        "exit_code": 0,
+        "wall_seconds": 150.969,
+        "fps": 59.15892004591998,
+        "skips": 99,
+        "samples": 6000000,
+        "expected_samples": 6000000,
+        "underruns": 0,
+        "first_ready_seconds": 2.656910499999867,
+        "startup_seconds": 4.06399300000021,
+        "peak_working_set_MiB": 3422.8,
+        "CPU_percent": 9.7,
+        "present_intervals": {
+          "count": 7399,
+          "mean_ms": 16.8896,
+          "p50_upper_ms": 16.7,
+          "p95_upper_ms": 23.3,
+          "p99_upper_ms": 40.9,
+          "max_ms": 425.596,
+          "overflow_100ms": 2
+        },
+        "throughput_windows": [
+          {
+            "window_seconds": 1,
+            "count": 164,
+            "minimum_fps": 31.820215780838243,
+            "p05_fps": 57.38560143091373,
+            "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+          },
+          {
+            "window_seconds": 10,
+            "count": 158,
+            "minimum_fps": 56.57722307383569,
+            "p05_fps": 58.68320610687021,
+            "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+          }
+        ],
+        "source_skips": 35,
+        "gpu_skips": 0,
+        "other_skips": 64,
+        "mixed_power": false,
+        "window_condition": {
+          "mode": "editor-covered",
+          "condition_held": true,
+          "scope": "Physical center hit-test and window state, not physical scanout. Owned QA topmost/cover windows only; no global Windows settings.",
+          "sample_count": 78,
+          "violations": [],
+          "boundary_samples": [
+            {
+              "seconds": 3.7999998312443495e-06,
+              "visible": true,
+              "surface_replaced_during_sample": false,
+              "sampled_native_surface": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": true,
+              "qa_cover_bounds": [
+                75,
+                75,
+                1480,
+                900
+              ]
+            },
+            {
+              "seconds": 127.7425076999998,
+              "visible": true,
+              "surface_replaced_during_sample": false,
+              "sampled_native_surface": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": true,
+              "qa_cover_bounds": [
+                75,
+                75,
+                1480,
+                900
+              ]
+            }
+          ],
+          "selection_scope": "Every detected condition violation and first/last samples retained; full generated raw trace remains local. Scores and failed attempts are never excluded."
+        },
+        "physical_alignment": {
+          "window_dpi": 168,
+          "browser_dpr": 1.75,
+          "expected_client_pixels": [
+            1087,
+            386,
+            356,
+            200
+          ],
+          "actual_client_pixels": [
+            1087,
+            386,
+            356,
+            200
+          ],
+          "absolute_error_pixels": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "scope": "Default browser zoom; physical HWND/client coordinates, independent of the reported emulated DPR."
+        },
+        "focus_emulation": "disabled via connect_over_cdp(no_defaults=True)",
+        "browser_visibility_state": {
+          "state": "visible",
+          "focused": true,
+          "dpr": 1.75
+        },
+        "browser_focus_changes": [
+          {
+            "seconds": 0.30270000000018626,
+            "focused": true
+          }
+        ],
+        "all_on_AC": true
+      }
+    ],
+    "summary": {
+      "completed": 1,
+      "valid": 1,
+      "fps_all": [
+        59.15892004591998
+      ],
+      "skips_all": [
+        99
+      ],
+      "fps_best": 59.15892004591998,
+      "fps_median": 59.15892004591998,
+      "fps_worst": 59.15892004591998,
+      "fps_p05_across_trials": 59.15892004591998,
+      "fps_population_stdev": 0.0,
+      "at_least_59_5": 0,
+      "under_30_skips": 0,
+      "zero_underruns": true,
+      "failed_trials": 0
+    }
+  },
+  {
+    "source_case": "natural-editor-covered-control-candidate",
+    "native_binary_sha256": "ac206038cea559f87d784e0ec4fc8485bdebd1421b7c4a78853e7ea037e3f72a",
+    "seconds": 125.0,
+    "width": 960,
+    "layers": 3,
+    "audio_tracks": 3,
+    "window_mode": "editor-covered",
+    "cache_policy": "Fresh application each trial; repeated original-source offsets; OS filesystem caches unmanaged",
+    "proxy": false,
+    "legacy_viewport": false,
+    "legacy_focus_emulation": false,
+    "rows": [
+      {
+        "trial": 1,
+        "exit_code": 0,
+        "wall_seconds": 149.828,
+        "fps": 59.30117463626578,
+        "skips": 52,
+        "samples": 6000000,
+        "expected_samples": 6000000,
+        "underruns": 0,
+        "first_ready_seconds": 2.1279309000001376,
+        "startup_seconds": 3.6372412000000622,
+        "peak_working_set_MiB": 3409.1,
+        "CPU_percent": 10.32,
+        "present_intervals": {
+          "count": 7446,
+          "mean_ms": 16.7836,
+          "p50_upper_ms": 16.7,
+          "p95_upper_ms": 20.5,
+          "p99_upper_ms": 41.2,
+          "max_ms": 89.9891,
+          "overflow_100ms": 0
+        },
+        "throughput_windows": [
+          {
+            "window_seconds": 1,
+            "count": 158,
+            "minimum_fps": 38.51851851851868,
+            "p05_fps": 57.93487826342013,
+            "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+          },
+          {
+            "window_seconds": 10,
+            "count": 150,
+            "minimum_fps": 56.94266258758514,
+            "p05_fps": 58.88240038088942,
+            "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+          }
+        ],
+        "source_skips": 7,
+        "gpu_skips": 0,
+        "other_skips": 45,
+        "mixed_power": false,
+        "window_condition": {
+          "mode": "editor-covered",
+          "condition_held": true,
+          "scope": "Physical center hit-test and window state, not physical scanout. Owned QA topmost/cover windows only; no global Windows settings.",
+          "sample_count": 74,
+          "violations": [],
+          "boundary_samples": [
+            {
+              "seconds": 4.999999873689376e-06,
+              "visible": true,
+              "surface_replaced_during_sample": false,
+              "sampled_native_surface": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": true,
+              "qa_cover_bounds": [
+                101,
+                101,
+                1480,
+                900
+              ]
+            },
+            {
+              "seconds": 126.67623689999982,
+              "visible": true,
+              "surface_replaced_during_sample": false,
+              "sampled_native_surface": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": true,
+              "qa_cover_bounds": [
+                101,
+                101,
+                1480,
+                900
+              ]
+            }
+          ],
+          "selection_scope": "Every detected condition violation and first/last samples retained; full generated raw trace remains local. Scores and failed attempts are never excluded."
+        },
+        "physical_alignment": {
+          "window_dpi": 168,
+          "browser_dpr": 1.75,
+          "expected_client_pixels": [
+            1087,
+            386,
+            356,
+            200
+          ],
+          "actual_client_pixels": [
+            1087,
+            386,
+            356,
+            200
+          ],
+          "absolute_error_pixels": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "scope": "Default browser zoom; physical HWND/client coordinates, independent of the reported emulated DPR."
+        },
+        "focus_emulation": "disabled via connect_over_cdp(no_defaults=True)",
+        "browser_visibility_state": {
+          "state": "visible",
+          "focused": true,
+          "dpr": 1.75
+        },
+        "browser_focus_changes": [
+          {
+            "seconds": 0.319,
+            "focused": true
+          }
+        ],
+        "all_on_AC": true
+      }
+    ],
+    "summary": {
+      "completed": 1,
+      "valid": 1,
+      "fps_all": [
+        59.30117463626578
+      ],
+      "skips_all": [
+        52
+      ],
+      "fps_best": 59.30117463626578,
+      "fps_median": 59.30117463626578,
+      "fps_worst": 59.30117463626578,
+      "fps_p05_across_trials": 59.30117463626578,
+      "fps_population_stdev": 0.0,
+      "at_least_59_5": 0,
+      "under_30_skips": 0,
+      "zero_underruns": true,
+      "failed_trials": 0
+    }
+  },
+  {
+    "source_case": "natural-editor-covered-unfocused-control-baseline",
+    "native_binary_sha256": "ac206038cea559f87d784e0ec4fc8485bdebd1421b7c4a78853e7ea037e3f72a",
+    "seconds": 125.0,
+    "width": 960,
+    "layers": 3,
+    "audio_tracks": 3,
+    "window_mode": "editor-covered-unfocused",
+    "cache_policy": "Fresh application each trial; repeated original-source offsets; OS filesystem caches unmanaged",
+    "proxy": false,
+    "legacy_viewport": false,
+    "legacy_focus_emulation": false,
+    "rows": [
+      {
+        "trial": 1,
+        "exit_code": 0,
+        "wall_seconds": 149.781,
+        "fps": 58.488185418367095,
+        "skips": 147,
+        "samples": 6000000,
+        "expected_samples": 6000000,
+        "underruns": 0,
+        "first_ready_seconds": 1.9716542999999547,
+        "startup_seconds": 3.7865176000000247,
+        "peak_working_set_MiB": 3194.1,
+        "CPU_percent": 10.16,
+        "present_intervals": {
+          "count": 7351,
+          "mean_ms": 17.0006,
+          "p50_upper_ms": 16.7,
+          "p95_upper_ms": 20.6,
+          "p99_upper_ms": 41.4,
+          "max_ms": 913.795,
+          "overflow_100ms": 2
+        },
+        "throughput_windows": [
+          {
+            "window_seconds": 1,
+            "count": 57,
+            "minimum_fps": 15.925702407295644,
+            "p05_fps": 32.49630723781424,
+            "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+          },
+          {
+            "window_seconds": 10,
+            "count": 52,
+            "minimum_fps": 58.67980068107046,
+            "p05_fps": 58.708607964636705,
+            "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+          }
+        ],
+        "source_skips": 75,
+        "gpu_skips": 0,
+        "other_skips": 72,
+        "mixed_power": false,
+        "window_condition": {
+          "mode": "editor-covered-unfocused",
+          "condition_held": true,
+          "scope": "Physical center hit-test and window state, not physical scanout. Owned QA topmost/cover windows only; no global Windows settings.",
+          "sample_count": 53,
+          "violations": [],
+          "boundary_samples": [
+            {
+              "seconds": 3.3000001167238224e-06,
+              "visible": true,
+              "surface_replaced_during_sample": false,
+              "sampled_native_surface": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false,
+              "qa_cover_bounds": [
+                151,
+                151,
+                1480,
+                900
+              ]
+            },
+            {
+              "seconds": 127.57308250000006,
+              "visible": true,
+              "surface_replaced_during_sample": false,
+              "sampled_native_surface": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false,
+              "qa_cover_bounds": [
+                151,
+                151,
+                1480,
+                900
+              ]
+            }
+          ],
+          "selection_scope": "Every detected condition violation and first/last samples retained; full generated raw trace remains local. Scores and failed attempts are never excluded."
+        },
+        "physical_alignment": {
+          "window_dpi": 168,
+          "browser_dpr": 1.75,
+          "expected_client_pixels": [
+            1087,
+            386,
+            356,
+            200
+          ],
+          "actual_client_pixels": [
+            1087,
+            386,
+            356,
+            200
+          ],
+          "absolute_error_pixels": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "scope": "Default browser zoom; physical HWND/client coordinates, independent of the reported emulated DPR."
+        },
+        "focus_emulation": "disabled via connect_over_cdp(no_defaults=True)",
+        "browser_visibility_state": {
+          "state": "visible",
+          "focused": false,
+          "dpr": 1.75
+        },
+        "browser_focus_changes": [
+          {
+            "seconds": 0.41389999999990684,
+            "focused": false
+          }
+        ],
+        "all_on_AC": true
+      }
+    ],
+    "summary": {
+      "completed": 1,
+      "valid": 1,
+      "fps_all": [
+        58.488185418367095
+      ],
+      "skips_all": [
+        147
+      ],
+      "fps_best": 58.488185418367095,
+      "fps_median": 58.488185418367095,
+      "fps_worst": 58.488185418367095,
+      "fps_p05_across_trials": 58.488185418367095,
+      "fps_population_stdev": 0.0,
+      "at_least_59_5": 0,
+      "under_30_skips": 0,
+      "zero_underruns": true,
+      "failed_trials": 0
+    }
+  },
+  {
+    "source_case": "natural-editor-covered-unfocused-control-candidate",
+    "native_binary_sha256": "ac206038cea559f87d784e0ec4fc8485bdebd1421b7c4a78853e7ea037e3f72a",
+    "seconds": 125.0,
+    "width": 960,
+    "layers": 3,
+    "audio_tracks": 3,
+    "window_mode": "editor-covered-unfocused",
+    "cache_policy": "Fresh application each trial; repeated original-source offsets; OS filesystem caches unmanaged",
+    "proxy": false,
+    "legacy_viewport": false,
+    "legacy_focus_emulation": false,
+    "rows": [
+      {
+        "trial": 1,
+        "exit_code": 0,
+        "wall_seconds": 147.031,
+        "fps": 59.23656855926105,
+        "skips": 81,
+        "samples": 6000000,
+        "expected_samples": 6000000,
+        "underruns": 0,
+        "first_ready_seconds": 1.785221999999976,
+        "startup_seconds": 3.553602800000135,
+        "peak_working_set_MiB": 3246.1,
+        "CPU_percent": 10.42,
+        "present_intervals": {
+          "count": 7417,
+          "mean_ms": 16.8485,
+          "p50_upper_ms": 16.7,
+          "p95_upper_ms": 20.2,
+          "p99_upper_ms": 41.5,
+          "max_ms": 106.521,
+          "overflow_100ms": 1
+        },
+        "throughput_windows": [
+          {
+            "window_seconds": 1,
+            "count": 72,
+            "minimum_fps": 55.66218809980817,
+            "p05_fps": 56.13022211530737,
+            "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+          },
+          {
+            "window_seconds": 10,
+            "count": 60,
+            "minimum_fps": 58.79203869758905,
+            "p05_fps": 58.909134404529354,
+            "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+          }
+        ],
+        "source_skips": 25,
+        "gpu_skips": 0,
+        "other_skips": 56,
+        "mixed_power": false,
+        "window_condition": {
+          "mode": "editor-covered-unfocused",
+          "condition_held": true,
+          "scope": "Physical center hit-test and window state, not physical scanout. Owned QA topmost/cover windows only; no global Windows settings.",
+          "sample_count": 50,
+          "violations": [],
+          "boundary_samples": [
+            {
+              "seconds": 2.7000000955013093e-06,
+              "visible": true,
+              "surface_replaced_during_sample": false,
+              "sampled_native_surface": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false,
+              "qa_cover_bounds": [
+                176,
+                176,
+                1480,
+                900
+              ]
+            },
+            {
+              "seconds": 125.32121609999967,
+              "visible": true,
+              "surface_replaced_during_sample": false,
+              "sampled_native_surface": true,
+              "minimized": false,
+              "editor_topmost": true,
+              "preview_center_unobscured": false,
+              "foreground_owned": false,
+              "qa_cover_bounds": [
+                176,
+                176,
+                1480,
+                900
+              ]
+            }
+          ],
+          "selection_scope": "Every detected condition violation and first/last samples retained; full generated raw trace remains local. Scores and failed attempts are never excluded."
+        },
+        "physical_alignment": {
+          "window_dpi": 168,
+          "browser_dpr": 1.75,
+          "expected_client_pixels": [
+            1087,
+            386,
+            356,
+            200
+          ],
+          "actual_client_pixels": [
+            1087,
+            386,
+            356,
+            200
+          ],
+          "absolute_error_pixels": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "scope": "Default browser zoom; physical HWND/client coordinates, independent of the reported emulated DPR."
+        },
+        "focus_emulation": "disabled via connect_over_cdp(no_defaults=True)",
+        "browser_visibility_state": {
+          "state": "visible",
+          "focused": false,
+          "dpr": 1.75
+        },
+        "browser_focus_changes": [
+          {
+            "seconds": 0.7651999999997205,
+            "focused": false
+          }
+        ],
+        "all_on_AC": true
+      }
+    ],
+    "summary": {
+      "completed": 1,
+      "valid": 1,
+      "fps_all": [
+        59.23656855926105
+      ],
+      "skips_all": [
+        81
+      ],
+      "fps_best": 59.23656855926105,
+      "fps_median": 59.23656855926105,
+      "fps_worst": 59.23656855926105,
+      "fps_p05_across_trials": 59.23656855926105,
+      "fps_population_stdev": 0.0,
+      "at_least_59_5": 0,
+      "under_30_skips": 0,
+      "zero_underruns": true,
+      "failed_trials": 0
+    }
+  }
+]

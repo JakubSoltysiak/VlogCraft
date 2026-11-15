@@ -1,0 +1,13 @@
+{
+  "extra_pressure_MiB": 512.0,
+  "available_before_MiB": 16302.546875,
+  "playback_audio": {
+    "samples": 576000,
+    "underruns": 0
+  },
+  "destination_preserved": true,
+  "cancelled": true,
+  "temporary_export_directories_remaining": 0,
+  "browser_errors": [],
+  "scope": "Bounded extra allocation with at least4GiB pre-allocation headroom; not Windows low-memory exhaustion or physical-sync qualification"
+}

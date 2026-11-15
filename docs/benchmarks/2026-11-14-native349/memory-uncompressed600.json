@@ -1,0 +1,2353 @@
+{
+  "mode": "continuous",
+  "seconds": 600,
+  "groups": {
+    "ffmpeg": {
+      "rss_MiB": {
+        "first30_median": 0.0,
+        "last30_median": 0,
+        "peak": 62.85546875,
+        "after_warmup_slope": {
+          "available": true,
+          "samples": 18,
+          "MiB_per_minute": 0.0,
+          "approximate_95_percent_interval": [
+            0.0,
+            0.0
+          ],
+          "method": "OLS on30s medians, Newey-West2-lag covariance with finite-sample correction and normal1.96 interval. Single session, approximate serial-correlation treatment; not a population reliability guarantee."
+        },
+        "late_slope": {
+          "available": true,
+          "samples": 18,
+          "MiB_per_minute": 0.0,
+          "approximate_95_percent_interval": [
+            0.0,
+            0.0
+          ],
+          "method": "OLS on30s medians, Newey-West2-lag covariance with finite-sample correction and normal1.96 interval. Single session, approximate serial-correlation treatment; not a population reliability guarantee."
+        },
+        "30s_medians": [
+          [
+            15,
+            0.0
+          ],
+          [
+            45,
+            0
+          ],
+          [
+            75,
+            0
+          ],
+          [
+            105,
+            0.0
+          ],
+          [
+            135,
+            0.0
+          ],
+          [
+            165,
+            0
+          ],
+          [
+            195,
+            0.0
+          ],
+          [
+            225,
+            0
+          ],
+          [
+            255,
+            0.0
+          ],
+          [
+            285,
+            0.0
+          ],
+          [
+            315,
+            0.0
+          ],
+          [
+            345,
+            0.0
+          ],
+          [
+            375,
+            0.0
+          ],
+          [
+            405,
+            0.0
+          ],
+          [
+            435,
+            0.0
+          ],
+          [
+            465,
+            0.0
+          ],
+          [
+            495,
+            0.0
+          ],
+          [
+            525,
+            0
+          ],
+          [
+            555,
+            0.0
+          ],
+          [
+            585,
+            0
+          ]
+        ]
+      },
+      "private_commit_MiB": {
+        "first30_median": 0.0,
+        "last30_median": 0,
+        "peak": 62.27734375,
+        "after_warmup_slope": {
+          "available": true,
+          "samples": 18,
+          "MiB_per_minute": 0.0,
+          "approximate_95_percent_interval": [
+            0.0,
+            0.0
+          ],
+          "method": "OLS on30s medians, Newey-West2-lag covariance with finite-sample correction and normal1.96 interval. Single session, approximate serial-correlation treatment; not a population reliability guarantee."
+        },
+        "late_slope": {
+          "available": true,
+          "samples": 18,
+          "MiB_per_minute": 0.0,
+          "approximate_95_percent_interval": [
+            0.0,
+            0.0
+          ],
+          "method": "OLS on30s medians, Newey-West2-lag covariance with finite-sample correction and normal1.96 interval. Single session, approximate serial-correlation treatment; not a population reliability guarantee."
+        },
+        "30s_medians": [
+          [
+            15,
+            0.0
+          ],
+          [
+            45,
+            0
+          ],
+          [
+            75,
+            0
+          ],
+          [
+            105,
+            0.0
+          ],
+          [
+            135,
+            0.0
+          ],
+          [
+            165,
+            0
+          ],
+          [
+            195,
+            0.0
+          ],
+          [
+            225,
+            0
+          ],
+          [
+            255,
+            0.0
+          ],
+          [
+            285,
+            0.0
+          ],
+          [
+            315,
+            0.0
+          ],
+          [
+            345,
+            0.0
+          ],
+          [
+            375,
+            0.0
+          ],
+          [
+            405,
+            0.0
+          ],
+          [
+            435,
+            0.0
+          ],
+          [
+            465,
+            0.0
+          ],
+          [
+            495,
+            0.0
+          ],
+          [
+            525,
+            0
+          ],
+          [
+            555,
+            0.0
+          ],
+          [
+            585,
+            0
+          ]
+        ]
+      }
+    },
+    "host": {
+      "rss_MiB": {
+        "first30_median": 189.845703125,
+        "last30_median": 189.7890625,
+        "peak": 203.0078125,
+        "after_warmup_slope": {
+          "available": true,
+          "samples": 18,
+          "MiB_per_minute": 0.04523429437564097,
+          "approximate_95_percent_interval": [
+            -0.017144354247147796,
+            0.10761294299842974
+          ],
+          "method": "OLS on30s medians, Newey-West2-lag covariance with finite-sample correction and normal1.96 interval. Single session, approximate serial-correlation treatment; not a population reliability guarantee."
+        },
+        "late_slope": {
+          "available": true,
+          "samples": 18,
+          "MiB_per_minute": 0.04523429437564097,
+          "approximate_95_percent_interval": [
+            -0.017144354247147796,
+            0.10761294299842974
+          ],
+          "method": "OLS on30s medians, Newey-West2-lag covariance with finite-sample correction and normal1.96 interval. Single session, approximate serial-correlation treatment; not a population reliability guarantee."
+        },
+        "30s_medians": [
+          [
+            15,
+            189.845703125
+          ],
+          [
+            45,
+            189.85546875
+          ],
+          [
+            75,
+            189.62890625
+          ],
+          [
+            105,
+            189.69921875
+          ],
+          [
+            135,
+            189.275390625
+          ],
+          [
+            165,
+            189.8046875
+          ],
+          [
+            195,
+            189.76171875
+          ],
+          [
+            225,
+            191.39453125
+          ],
+          [
+            255,
+            189.6171875
+          ],
+          [
+            285,
+            189.66796875
+          ],
+          [
+            315,
+            189.728515625
+          ],
+          [
+            345,
+            189.9375
+          ],
+          [
+            375,
+            189.71875
+          ],
+          [
+            405,
+            189.58984375
+          ],
+          [
+            435,
+            189.658203125
+          ],
+          [
+            465,
+            190.595703125
+          ],
+          [
+            495,
+            189.63671875
+          ],
+          [
+            525,
+            189.78515625
+          ],
+          [
+            555,
+            190.955078125
+          ],
+          [
+            585,
+            189.7890625
+          ]
+        ]
+      },
+      "private_commit_MiB": {
+        "first30_median": 885.47265625,
+        "last30_median": 885.015625,
+        "peak": 899.83984375,
+        "after_warmup_slope": {
+          "available": true,
+          "samples": 18,
+          "MiB_per_minute": -0.034257288441708056,
+          "approximate_95_percent_interval": [
+            -0.12103116911747586,
+            0.052516592234059745
+          ],
+          "method": "OLS on30s medians, Newey-West2-lag covariance with finite-sample correction and normal1.96 interval. Single session, approximate serial-correlation treatment; not a population reliability guarantee."
+        },
+        "late_slope": {
+          "available": true,
+          "samples": 18,
+          "MiB_per_minute": -0.034257288441708056,
+          "approximate_95_percent_interval": [
+            -0.12103116911747586,
+            0.052516592234059745
+          ],
+          "method": "OLS on30s medians, Newey-West2-lag covariance with finite-sample correction and normal1.96 interval. Single session, approximate serial-correlation treatment; not a population reliability guarantee."
+        },
+        "30s_medians": [
+          [
+            15,
+            885.47265625
+          ],
+          [
+            45,
+            885.5078125
+          ],
+          [
+            75,
+            885.234375
+          ],
+          [
+            105,
+            885.26171875
+          ],
+          [
+            135,
+            884.78515625
+          ],
+          [
+            165,
+            885.31640625
+          ],
+          [
+            195,
+            885.68359375
+          ],
+          [
+            225,
+            887.2421875
+          ],
+          [
+            255,
+            885.0078125
+          ],
+          [
+            285,
+            885.19921875
+          ],
+          [
+            315,
+            885.310546875
+          ],
+          [
+            345,
+            885.13671875
+          ],
+          [
+            375,
+            885.044921875
+          ],
+          [
+            405,
+            884.888671875
+          ],
+          [
+            435,
+            884.640625
+          ],
+          [
+            465,
+            885.619140625
+          ],
+          [
+            495,
+            884.90234375
+          ],
+          [
+            525,
+            884.82421875
+          ],
+          [
+            555,
+            886.0078125
+          ],
+          [
+            585,
+            885.015625
+          ]
+        ]
+      }
+    },
+    "native": {
+      "rss_MiB": {
+        "first30_median": 1546.560546875,
+        "last30_median": 1586.30078125,
+        "peak": 1677.30859375,
+        "after_warmup_slope": {
+          "available": true,
+          "samples": 18,
+          "MiB_per_minute": 4.512166215170282,
+          "approximate_95_percent_interval": [
+            2.3057767685755177,
+            6.718555661765047
+          ],
+          "method": "OLS on30s medians, Newey-West2-lag covariance with finite-sample correction and normal1.96 interval. Single session, approximate serial-correlation treatment; not a population reliability guarantee."
+        },
+        "late_slope": {
+          "available": true,
+          "samples": 18,
+          "MiB_per_minute": 4.512166215170282,
+          "approximate_95_percent_interval": [
+            2.3057767685755177,
+            6.718555661765047
+          ],
+          "method": "OLS on30s medians, Newey-West2-lag covariance with finite-sample correction and normal1.96 interval. Single session, approximate serial-correlation treatment; not a population reliability guarantee."
+        },
+        "30s_medians": [
+          [
+            15,
+            1546.560546875
+          ],
+          [
+            45,
+            1552.3125
+          ],
+          [
+            75,
+            1553.00390625
+          ],
+          [
+            105,
+            1553.095703125
+          ],
+          [
+            135,
+            1552.673828125
+          ],
+          [
+            165,
+            1552.64453125
+          ],
+          [
+            195,
+            1552.70703125
+          ],
+          [
+            225,
+            1585.69921875
+          ],
+          [
+            255,
+            1585.9453125
+          ],
+          [
+            285,
+            1585.931640625
+          ],
+          [
+            315,
+            1586.134765625
+          ],
+          [
+            345,
+            1586.171875
+          ],
+          [
+            375,
+            1586.41015625
+          ],
+          [
+            405,
+            1586.482421875
+          ],
+          [
+            435,
+            1586.30078125
+          ],
+          [
+            465,
+            1586.453125
+          ],
+          [
+            495,
+            1586.322265625
+          ],
+          [
+            525,
+            1586.3359375
+          ],
+          [
+            555,
+            1586.42578125
+          ],
+          [
+            585,
+            1586.30078125
+          ]
+        ]
+      },
+      "private_commit_MiB": {
+        "first30_median": 2287.751953125,
+        "last30_median": 2327.8515625,
+        "peak": 2559.12890625,
+        "after_warmup_slope": {
+          "available": true,
+          "samples": 18,
+          "MiB_per_minute": 4.817248774509807,
+          "approximate_95_percent_interval": [
+            2.4382790185365515,
+            7.196218530483062
+          ],
+          "method": "OLS on30s medians, Newey-West2-lag covariance with finite-sample correction and normal1.96 interval. Single session, approximate serial-correlation treatment; not a population reliability guarantee."
+        },
+        "late_slope": {
+          "available": true,
+          "samples": 18,
+          "MiB_per_minute": 4.817248774509807,
+          "approximate_95_percent_interval": [
+            2.4382790185365515,
+            7.196218530483062
+          ],
+          "method": "OLS on30s medians, Newey-West2-lag covariance with finite-sample correction and normal1.96 interval. Single session, approximate serial-correlation treatment; not a population reliability guarantee."
+        },
+        "30s_medians": [
+          [
+            15,
+            2287.751953125
+          ],
+          [
+            45,
+            2291.09375
+          ],
+          [
+            75,
+            2291.8671875
+          ],
+          [
+            105,
+            2291.875
+          ],
+          [
+            135,
+            2291.75390625
+          ],
+          [
+            165,
+            2291.8046875
+          ],
+          [
+            195,
+            2291.998046875
+          ],
+          [
+            225,
+            2327.24609375
+          ],
+          [
+            255,
+            2327.556640625
+          ],
+          [
+            285,
+            2327.646484375
+          ],
+          [
+            315,
+            2327.69140625
+          ],
+          [
+            345,
+            2327.69140625
+          ],
+          [
+            375,
+            2327.6875
+          ],
+          [
+            405,
+            2327.65625
+          ],
+          [
+            435,
+            2327.646484375
+          ],
+          [
+            465,
+            2327.65625
+          ],
+          [
+            495,
+            2327.65625
+          ],
+          [
+            525,
+            2327.65625
+          ],
+          [
+            555,
+            2327.66015625
+          ],
+          [
+            585,
+            2327.8515625
+          ]
+        ]
+      }
+    },
+    "webview": {
+      "rss_MiB": {
+        "first30_median": 1110.27734375,
+        "last30_median": 1986.23828125,
+        "peak": 2020.19921875,
+        "after_warmup_slope": {
+          "available": true,
+          "samples": 18,
+          "MiB_per_minute": 80.92630530830746,
+          "approximate_95_percent_interval": [
+            64.0270723033513,
+            97.82553831326362
+          ],
+          "method": "OLS on30s medians, Newey-West2-lag covariance with finite-sample correction and normal1.96 interval. Single session, approximate serial-correlation treatment; not a population reliability guarantee."
+        },
+        "late_slope": {
+          "available": true,
+          "samples": 18,
+          "MiB_per_minute": 80.92630530830746,
+          "approximate_95_percent_interval": [
+            64.0270723033513,
+            97.82553831326362
+          ],
+          "method": "OLS on30s medians, Newey-West2-lag covariance with finite-sample correction and normal1.96 interval. Single session, approximate serial-correlation treatment; not a population reliability guarantee."
+        },
+        "30s_medians": [
+          [
+            15,
+            1110.27734375
+          ],
+          [
+            45,
+            1212.88671875
+          ],
+          [
+            75,
+            1266.01171875
+          ],
+          [
+            105,
+            1347.98828125
+          ],
+          [
+            135,
+            1412.009765625
+          ],
+          [
+            165,
+            1489.20703125
+          ],
+          [
+            195,
+            1584.138671875
+          ],
+          [
+            225,
+            1627.92578125
+          ],
+          [
+            255,
+            1677.45703125
+          ],
+          [
+            285,
+            1736.05859375
+          ],
+          [
+            315,
+            1765.16796875
+          ],
+          [
+            345,
+            1765.181640625
+          ],
+          [
+            375,
+            1830.09375
+          ],
+          [
+            405,
+            1837.3359375
+          ],
+          [
+            435,
+            1893.53125
+          ],
+          [
+            465,
+            1906.697265625
+          ],
+          [
+            495,
+            1933.548828125
+          ],
+          [
+            525,
+            1943.7890625
+          ],
+          [
+            555,
+            1969.33984375
+          ],
+          [
+            585,
+            1986.23828125
+          ]
+        ]
+      },
+      "private_commit_MiB": {
+        "first30_median": 952.00390625,
+        "last30_median": 1805.9765625,
+        "peak": 1839.66015625,
+        "after_warmup_slope": {
+          "available": true,
+          "samples": 18,
+          "MiB_per_minute": 79.5200391834365,
+          "approximate_95_percent_interval": [
+            62.82044736623685,
+            96.21963100063614
+          ],
+          "method": "OLS on30s medians, Newey-West2-lag covariance with finite-sample correction and normal1.96 interval. Single session, approximate serial-correlation treatment; not a population reliability guarantee."
+        },
+        "late_slope": {
+          "available": true,
+          "samples": 18,
+          "MiB_per_minute": 79.5200391834365,
+          "approximate_95_percent_interval": [
+            62.82044736623685,
+            96.21963100063614
+          ],
+          "method": "OLS on30s medians, Newey-West2-lag covariance with finite-sample correction and normal1.96 interval. Single session, approximate serial-correlation treatment; not a population reliability guarantee."
+        },
+        "30s_medians": [
+          [
+            15,
+            952.00390625
+          ],
+          [
+            45,
+            1047.8828125
+          ],
+          [
+            75,
+            1096.1171875
+          ],
+          [
+            105,
+            1179.15234375
+          ],
+          [
+            135,
+            1241.609375
+          ],
+          [
+            165,
+            1318.3359375
+          ],
+          [
+            195,
+            1413.19140625
+          ],
+          [
+            225,
+            1454.0078125
+          ],
+          [
+            255,
+            1502.96875
+          ],
+          [
+            285,
+            1560.998046875
+          ],
+          [
+            315,
+            1588.93359375
+          ],
+          [
+            345,
+            1587.89453125
+          ],
+          [
+            375,
+            1651.193359375
+          ],
+          [
+            405,
+            1658.654296875
+          ],
+          [
+            435,
+            1714.99609375
+          ],
+          [
+            465,
+            1727.650390625
+          ],
+          [
+            495,
+            1754.33984375
+          ],
+          [
+            525,
+            1765.26953125
+          ],
+          [
+            555,
+            1789.232421875
+          ],
+          [
+            585,
+            1805.9765625
+          ]
+        ]
+      }
+    },
+    "total": {
+      "rss_MiB": {
+        "first30_median": 2870.01953125,
+        "last30_median": 3762.40234375,
+        "peak": 3796.5390625,
+        "after_warmup_slope": {
+          "available": true,
+          "samples": 18,
+          "MiB_per_minute": 85.56499129256966,
+          "approximate_95_percent_interval": [
+            66.81433418976512,
+            104.3156483953742
+          ],
+          "method": "OLS on30s medians, Newey-West2-lag covariance with finite-sample correction and normal1.96 interval. Single session, approximate serial-correlation treatment; not a population reliability guarantee."
+        },
+        "late_slope": {
+          "available": true,
+          "samples": 18,
+          "MiB_per_minute": 85.56499129256966,
+          "approximate_95_percent_interval": [
+            66.81433418976512,
+            104.3156483953742
+          ],
+          "method": "OLS on30s medians, Newey-West2-lag covariance with finite-sample correction and normal1.96 interval. Single session, approximate serial-correlation treatment; not a population reliability guarantee."
+        },
+        "30s_medians": [
+          [
+            15,
+            2870.01953125
+          ],
+          [
+            45,
+            2954.92578125
+          ],
+          [
+            75,
+            3008.83203125
+          ],
+          [
+            105,
+            3090.568359375
+          ],
+          [
+            135,
+            3154.515625
+          ],
+          [
+            165,
+            3231.4453125
+          ],
+          [
+            195,
+            3326.384765625
+          ],
+          [
+            225,
+            3397.03125
+          ],
+          [
+            255,
+            3453.10546875
+          ],
+          [
+            285,
+            3523.64453125
+          ],
+          [
+            315,
+            3540.841796875
+          ],
+          [
+            345,
+            3543.27734375
+          ],
+          [
+            375,
+            3605.580078125
+          ],
+          [
+            405,
+            3613.130859375
+          ],
+          [
+            435,
+            3669.146484375
+          ],
+          [
+            465,
+            3684.990234375
+          ],
+          [
+            495,
+            3709.12109375
+          ],
+          [
+            525,
+            3721.1875
+          ],
+          [
+            555,
+            3746.818359375
+          ],
+          [
+            585,
+            3762.40234375
+          ]
+        ]
+      },
+      "private_commit_MiB": {
+        "first30_median": 4141.466796875,
+        "last30_median": 5019.70703125,
+        "peak": 5052.70703125,
+        "after_warmup_slope": {
+          "available": true,
+          "samples": 18,
+          "MiB_per_minute": 84.47808226909183,
+          "approximate_95_percent_interval": [
+            65.78850814295596,
+            103.1676563952277
+          ],
+          "method": "OLS on30s medians, Newey-West2-lag covariance with finite-sample correction and normal1.96 interval. Single session, approximate serial-correlation treatment; not a population reliability guarantee."
+        },
+        "late_slope": {
+          "available": true,
+          "samples": 18,
+          "MiB_per_minute": 84.47808226909183,
+          "approximate_95_percent_interval": [
+            65.78850814295596,
+            103.1676563952277
+          ],
+          "method": "OLS on30s medians, Newey-West2-lag covariance with finite-sample correction and normal1.96 interval. Single session, approximate serial-correlation treatment; not a population reliability guarantee."
+        },
+        "30s_medians": [
+          [
+            15,
+            4141.466796875
+          ],
+          [
+            45,
+            4224.48828125
+          ],
+          [
+            75,
+            4273.20703125
+          ],
+          [
+            105,
+            4355.546875
+          ],
+          [
+            135,
+            4418.685546875
+          ],
+          [
+            165,
+            4495.08984375
+          ],
+          [
+            195,
+            4590.748046875
+          ],
+          [
+            225,
+            4659.234375
+          ],
+          [
+            255,
+            4715.546875
+          ],
+          [
+            285,
+            4786.0703125
+          ],
+          [
+            315,
+            4801.357421875
+          ],
+          [
+            345,
+            4803.0234375
+          ],
+          [
+            375,
+            4863.294921875
+          ],
+          [
+            405,
+            4870.974609375
+          ],
+          [
+            435,
+            4926.759765625
+          ],
+          [
+            465,
+            4942.5859375
+          ],
+          [
+            495,
+            4966.44921875
+          ],
+          [
+            525,
+            4980.078125
+          ],
+          [
+            555,
+            5002.638671875
+          ],
+          [
+            585,
+            5019.70703125
+          ]
+        ]
+      }
+    }
+  },
+  "heap_samples": [
+    {
+      "seconds": 1.3734533000097144,
+      "stage": "prepared",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 519,
+        "Nodes": 4993,
+        "JSHeapUsedSize": 19280960,
+        "JSHeapTotalSize": 46809088
+      },
+      "state": {
+        "frame": 0,
+        "playing": false,
+        "underruns": 0,
+        "samples": 0,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 85,
+        "encoded_bytes": 340307
+      },
+      "WebView_roles": {
+        "browser": {
+          "rss_MiB": 122.453125,
+          "private_commit_MiB": 42.08984375,
+          "processes": 1
+        },
+        "other": {
+          "rss_MiB": 10.14453125,
+          "private_commit_MiB": 2.6484375,
+          "processes": 1
+        },
+        "gpu-process": {
+          "rss_MiB": 275.1015625,
+          "private_commit_MiB": 288.95703125,
+          "processes": 1
+        },
+        "utility": {
+          "rss_MiB": 87.8828125,
+          "private_commit_MiB": 30.9296875,
+          "processes": 3
+        },
+        "renderer": {
+          "rss_MiB": 520.91015625,
+          "private_commit_MiB": 497.15234375,
+          "processes": 1
+        }
+      }
+    },
+    {
+      "seconds": 30.805421700002626,
+      "stage": "active",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 621,
+        "Nodes": 5473,
+        "JSHeapUsedSize": 22289420,
+        "JSHeapTotalSize": 54276096
+      },
+      "state": {
+        "frame": 1755,
+        "playing": true,
+        "underruns": 0,
+        "samples": 1409920,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 1944,
+        "encoded_bytes": 8095653
+      },
+      "WebView_roles": {
+        "browser": {
+          "rss_MiB": 124.453125,
+          "private_commit_MiB": 43.50390625,
+          "processes": 1
+        },
+        "other": {
+          "rss_MiB": 18.6640625,
+          "private_commit_MiB": 3.57421875,
+          "processes": 1
+        },
+        "gpu-process": {
+          "rss_MiB": 268.76171875,
+          "private_commit_MiB": 283.7421875,
+          "processes": 1
+        },
+        "utility": {
+          "rss_MiB": 89.08203125,
+          "private_commit_MiB": 31.65234375,
+          "processes": 3
+        },
+        "renderer": {
+          "rss_MiB": 633.62890625,
+          "private_commit_MiB": 601.77734375,
+          "processes": 1
+        }
+      }
+    },
+    {
+      "seconds": 61.08367600000929,
+      "stage": "active",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 627,
+        "Nodes": 5092,
+        "JSHeapUsedSize": 12130784,
+        "JSHeapTotalSize": 57159680
+      },
+      "state": {
+        "frame": 3571,
+        "playing": true,
+        "underruns": 0,
+        "samples": 2864000,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 3803,
+        "encoded_bytes": 15874597
+      },
+      "WebView_roles": {
+        "browser": {
+          "rss_MiB": 128.28515625,
+          "private_commit_MiB": 42.75,
+          "processes": 1
+        },
+        "other": {
+          "rss_MiB": 12.9453125,
+          "private_commit_MiB": 3.25,
+          "processes": 1
+        },
+        "gpu-process": {
+          "rss_MiB": 280.08203125,
+          "private_commit_MiB": 296.51953125,
+          "processes": 1
+        },
+        "utility": {
+          "rss_MiB": 90.1953125,
+          "private_commit_MiB": 31.6015625,
+          "processes": 3
+        },
+        "renderer": {
+          "rss_MiB": 722.0703125,
+          "private_commit_MiB": 689.6796875,
+          "processes": 1
+        }
+      }
+    },
+    {
+      "seconds": 90.25874940000358,
+      "stage": "active",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 627,
+        "Nodes": 5259,
+        "JSHeapUsedSize": 16017024,
+        "JSHeapTotalSize": 58994688
+      },
+      "state": {
+        "frame": 5325,
+        "playing": true,
+        "underruns": 0,
+        "samples": 4263808,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 5594,
+        "encoded_bytes": 23382518
+      },
+      "WebView_roles": {
+        "browser": {
+          "rss_MiB": 129.5,
+          "private_commit_MiB": 43.90625,
+          "processes": 1
+        },
+        "other": {
+          "rss_MiB": 12.9453125,
+          "private_commit_MiB": 3.25,
+          "processes": 1
+        },
+        "gpu-process": {
+          "rss_MiB": 279.65234375,
+          "private_commit_MiB": 296.69140625,
+          "processes": 1
+        },
+        "utility": {
+          "rss_MiB": 91.4375,
+          "private_commit_MiB": 32.82421875,
+          "processes": 3
+        },
+        "renderer": {
+          "rss_MiB": 783.16796875,
+          "private_commit_MiB": 750.74609375,
+          "processes": 1
+        }
+      }
+    },
+    {
+      "seconds": 120.4960671000008,
+      "stage": "active",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 1135,
+        "Nodes": 9080,
+        "JSHeapUsedSize": 16096720,
+        "JSHeapTotalSize": 60829696
+      },
+      "state": {
+        "frame": 7138,
+        "playing": true,
+        "underruns": 0,
+        "samples": 5715840,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 7448,
+        "encoded_bytes": 31157177
+      },
+      "WebView_roles": {
+        "browser": {
+          "rss_MiB": 130.984375,
+          "private_commit_MiB": 44.21875,
+          "processes": 1
+        },
+        "other": {
+          "rss_MiB": 12.94921875,
+          "private_commit_MiB": 3.25,
+          "processes": 1
+        },
+        "gpu-process": {
+          "rss_MiB": 280.44921875,
+          "private_commit_MiB": 298.1015625,
+          "processes": 1
+        },
+        "utility": {
+          "rss_MiB": 91.4375,
+          "private_commit_MiB": 32.734375,
+          "processes": 3
+        },
+        "renderer": {
+          "rss_MiB": 860.5546875,
+          "private_commit_MiB": 827.734375,
+          "processes": 1
+        }
+      }
+    },
+    {
+      "seconds": 150.86074070000905,
+      "stage": "active",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 621,
+        "Nodes": 5146,
+        "JSHeapUsedSize": 14619664,
+        "JSHeapTotalSize": 62140416
+      },
+      "state": {
+        "frame": 8959,
+        "playing": true,
+        "underruns": 0,
+        "samples": 7172992,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 9350,
+        "encoded_bytes": 39133377
+      },
+      "WebView_roles": {
+        "browser": {
+          "rss_MiB": 130.921875,
+          "private_commit_MiB": 44.12109375,
+          "processes": 1
+        },
+        "other": {
+          "rss_MiB": 12.87109375,
+          "private_commit_MiB": 3.09765625,
+          "processes": 1
+        },
+        "gpu-process": {
+          "rss_MiB": 279.0078125,
+          "private_commit_MiB": 296.16015625,
+          "processes": 1
+        },
+        "utility": {
+          "rss_MiB": 91.4140625,
+          "private_commit_MiB": 32.53515625,
+          "processes": 3
+        },
+        "renderer": {
+          "rss_MiB": 925.93359375,
+          "private_commit_MiB": 892.58984375,
+          "processes": 1
+        }
+      }
+    },
+    {
+      "seconds": 180.27558640000643,
+      "stage": "active",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 1135,
+        "Nodes": 9776,
+        "JSHeapUsedSize": 31247524,
+        "JSHeapTotalSize": 62402560
+      },
+      "state": {
+        "frame": 10726,
+        "playing": true,
+        "underruns": 0,
+        "samples": 8585088,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 10968,
+        "encoded_bytes": 45937974
+      },
+      "WebView_roles": {
+        "browser": {
+          "rss_MiB": 133.65625,
+          "private_commit_MiB": 46.70703125,
+          "processes": 1
+        },
+        "other": {
+          "rss_MiB": 12.87109375,
+          "private_commit_MiB": 3.09765625,
+          "processes": 1
+        },
+        "gpu-process": {
+          "rss_MiB": 314.95703125,
+          "private_commit_MiB": 332.65234375,
+          "processes": 1
+        },
+        "utility": {
+          "rss_MiB": 93.70703125,
+          "private_commit_MiB": 34.78515625,
+          "processes": 3
+        },
+        "renderer": {
+          "rss_MiB": 1011.5859375,
+          "private_commit_MiB": 976.359375,
+          "processes": 1
+        }
+      }
+    },
+    {
+      "seconds": 210.54774320000433,
+      "stage": "active",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 1129,
+        "Nodes": 9497,
+        "JSHeapUsedSize": 26747720,
+        "JSHeapTotalSize": 62402560
+      },
+      "state": {
+        "frame": 12540,
+        "playing": true,
+        "underruns": 0,
+        "samples": 10038144,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 12819,
+        "encoded_bytes": 53737036
+      },
+      "WebView_roles": {
+        "browser": {
+          "rss_MiB": 133.83203125,
+          "private_commit_MiB": 46.8671875,
+          "processes": 1
+        },
+        "other": {
+          "rss_MiB": 12.83984375,
+          "private_commit_MiB": 3.0390625,
+          "processes": 1
+        },
+        "gpu-process": {
+          "rss_MiB": 309.70703125,
+          "private_commit_MiB": 327.265625,
+          "processes": 1
+        },
+        "utility": {
+          "rss_MiB": 93.71875,
+          "private_commit_MiB": 34.78515625,
+          "processes": 3
+        },
+        "renderer": {
+          "rss_MiB": 1062.640625,
+          "private_commit_MiB": 1029.1484375,
+          "processes": 1
+        }
+      }
+    },
+    {
+      "seconds": 241.21587820001878,
+      "stage": "active",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 627,
+        "Nodes": 5194,
+        "JSHeapUsedSize": 14348700,
+        "JSHeapTotalSize": 64237568
+      },
+      "state": {
+        "frame": 14378,
+        "playing": true,
+        "underruns": 0,
+        "samples": 11510656,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 14596,
+        "encoded_bytes": 61181982
+      },
+      "WebView_roles": {
+        "browser": {
+          "rss_MiB": 134.57421875,
+          "private_commit_MiB": 47.52734375,
+          "processes": 1
+        },
+        "other": {
+          "rss_MiB": 12.88671875,
+          "private_commit_MiB": 3.08203125,
+          "processes": 1
+        },
+        "gpu-process": {
+          "rss_MiB": 311.00390625,
+          "private_commit_MiB": 325.9375,
+          "processes": 1
+        },
+        "utility": {
+          "rss_MiB": 93.84765625,
+          "private_commit_MiB": 34.97265625,
+          "processes": 3
+        },
+        "renderer": {
+          "rss_MiB": 1093.3046875,
+          "private_commit_MiB": 1059.59375,
+          "processes": 1
+        }
+      }
+    },
+    {
+      "seconds": 271.72225350001827,
+      "stage": "active",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 1129,
+        "Nodes": 9640,
+        "JSHeapUsedSize": 30620136,
+        "JSHeapTotalSize": 63975424
+      },
+      "state": {
+        "frame": 16211,
+        "playing": true,
+        "underruns": 0,
+        "samples": 12973952,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 16555,
+        "encoded_bytes": 69452366
+      },
+      "WebView_roles": {
+        "browser": {
+          "rss_MiB": 133.95703125,
+          "private_commit_MiB": 46.8671875,
+          "processes": 1
+        },
+        "other": {
+          "rss_MiB": 12.88671875,
+          "private_commit_MiB": 3.08203125,
+          "processes": 1
+        },
+        "gpu-process": {
+          "rss_MiB": 311.03515625,
+          "private_commit_MiB": 326.44921875,
+          "processes": 1
+        },
+        "utility": {
+          "rss_MiB": 93.859375,
+          "private_commit_MiB": 34.98046875,
+          "processes": 3
+        },
+        "renderer": {
+          "rss_MiB": 1155.18359375,
+          "private_commit_MiB": 1122.25,
+          "processes": 1
+        }
+      }
+    },
+    {
+      "seconds": 300.7172245999973,
+      "stage": "active",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 627,
+        "Nodes": 5258,
+        "JSHeapUsedSize": 16029180,
+        "JSHeapTotalSize": 67383296
+      },
+      "state": {
+        "frame": 17954,
+        "playing": true,
+        "underruns": 0,
+        "samples": 14366592,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 18423,
+        "encoded_bytes": 77343575
+      },
+      "WebView_roles": {
+        "browser": {
+          "rss_MiB": 135.25390625,
+          "private_commit_MiB": 47.796875,
+          "processes": 1
+        },
+        "other": {
+          "rss_MiB": 13.0234375,
+          "private_commit_MiB": 3.1328125,
+          "processes": 1
+        },
+        "gpu-process": {
+          "rss_MiB": 311.296875,
+          "private_commit_MiB": 326.0,
+          "processes": 1
+        },
+        "utility": {
+          "rss_MiB": 94.87890625,
+          "private_commit_MiB": 35.78125,
+          "processes": 3
+        },
+        "renderer": {
+          "rss_MiB": 1210.75390625,
+          "private_commit_MiB": 1175.4765625,
+          "processes": 1
+        }
+      }
+    },
+    {
+      "seconds": 331.3222397000063,
+      "stage": "active",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 1129,
+        "Nodes": 9629,
+        "JSHeapUsedSize": 30177020,
+        "JSHeapTotalSize": 67645440
+      },
+      "state": {
+        "frame": 19790,
+        "playing": true,
+        "underruns": 0,
+        "samples": 15835008,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 20382,
+        "encoded_bytes": 85619711
+      },
+      "WebView_roles": {
+        "browser": {
+          "rss_MiB": 136.9609375,
+          "private_commit_MiB": 49.53515625,
+          "processes": 1
+        },
+        "other": {
+          "rss_MiB": 13.0234375,
+          "private_commit_MiB": 3.1328125,
+          "processes": 1
+        },
+        "gpu-process": {
+          "rss_MiB": 310.515625,
+          "private_commit_MiB": 325.64453125,
+          "processes": 1
+        },
+        "utility": {
+          "rss_MiB": 96.6484375,
+          "private_commit_MiB": 37.55078125,
+          "processes": 3
+        },
+        "renderer": {
+          "rss_MiB": 1196.52734375,
+          "private_commit_MiB": 1161.76953125,
+          "processes": 1
+        }
+      }
+    },
+    {
+      "seconds": 361.37605059999623,
+      "stage": "active",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 621,
+        "Nodes": 5066,
+        "JSHeapUsedSize": 12445180,
+        "JSHeapTotalSize": 67121152
+      },
+      "state": {
+        "frame": 21585,
+        "playing": true,
+        "underruns": 0,
+        "samples": 17275776,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 22306,
+        "encoded_bytes": 93750337
+      },
+      "WebView_roles": {
+        "browser": {
+          "rss_MiB": 135.77734375,
+          "private_commit_MiB": 48.2734375,
+          "processes": 1
+        },
+        "other": {
+          "rss_MiB": 13.02734375,
+          "private_commit_MiB": 3.13671875,
+          "processes": 1
+        },
+        "gpu-process": {
+          "rss_MiB": 311.02734375,
+          "private_commit_MiB": 326.1015625,
+          "processes": 1
+        },
+        "utility": {
+          "rss_MiB": 95.5078125,
+          "private_commit_MiB": 36.29296875,
+          "processes": 3
+        },
+        "renderer": {
+          "rss_MiB": 1262.29296875,
+          "private_commit_MiB": 1225.13671875,
+          "processes": 1
+        }
+      }
+    },
+    {
+      "seconds": 391.15038200002164,
+      "stage": "active",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 1135,
+        "Nodes": 9354,
+        "JSHeapUsedSize": 22683640,
+        "JSHeapTotalSize": 67383296
+      },
+      "state": {
+        "frame": 23376,
+        "playing": true,
+        "underruns": 0,
+        "samples": 18705280,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 24236,
+        "encoded_bytes": 101918377
+      },
+      "WebView_roles": {
+        "browser": {
+          "rss_MiB": 137.484375,
+          "private_commit_MiB": 50.03125,
+          "processes": 1
+        },
+        "other": {
+          "rss_MiB": 13.02734375,
+          "private_commit_MiB": 3.13671875,
+          "processes": 1
+        },
+        "gpu-process": {
+          "rss_MiB": 310.91015625,
+          "private_commit_MiB": 326.03125,
+          "processes": 1
+        },
+        "utility": {
+          "rss_MiB": 96.625,
+          "private_commit_MiB": 37.4140625,
+          "processes": 3
+        },
+        "renderer": {
+          "rss_MiB": 1251.5625,
+          "private_commit_MiB": 1214.578125,
+          "processes": 1
+        }
+      }
+    },
+    {
+      "seconds": 421.0486194000114,
+      "stage": "active",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 1129,
+        "Nodes": 9781,
+        "JSHeapUsedSize": 33655264,
+        "JSHeapTotalSize": 67645440
+      },
+      "state": {
+        "frame": 25170,
+        "playing": true,
+        "underruns": 0,
+        "samples": 20139904,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 26153,
+        "encoded_bytes": 110030843
+      },
+      "WebView_roles": {
+        "browser": {
+          "rss_MiB": 137.1796875,
+          "private_commit_MiB": 49.671875,
+          "processes": 1
+        },
+        "other": {
+          "rss_MiB": 12.98046875,
+          "private_commit_MiB": 3.04296875,
+          "processes": 1
+        },
+        "gpu-process": {
+          "rss_MiB": 310.8828125,
+          "private_commit_MiB": 326.4296875,
+          "processes": 1
+        },
+        "utility": {
+          "rss_MiB": 96.53515625,
+          "private_commit_MiB": 37.1640625,
+          "processes": 3
+        },
+        "renderer": {
+          "rss_MiB": 1296.7265625,
+          "private_commit_MiB": 1259.3515625,
+          "processes": 1
+        }
+      }
+    },
+    {
+      "seconds": 450.72352800000226,
+      "stage": "active",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 1129,
+        "Nodes": 10064,
+        "JSHeapUsedSize": 16750264,
+        "JSHeapTotalSize": 67907584
+      },
+      "state": {
+        "frame": 26950,
+        "playing": true,
+        "underruns": 0,
+        "samples": 21566336,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 28067,
+        "encoded_bytes": 118131236
+      },
+      "WebView_roles": {
+        "browser": {
+          "rss_MiB": 139.42578125,
+          "private_commit_MiB": 51.921875,
+          "processes": 1
+        },
+        "other": {
+          "rss_MiB": 12.98046875,
+          "private_commit_MiB": 3.04296875,
+          "processes": 1
+        },
+        "gpu-process": {
+          "rss_MiB": 310.4375,
+          "private_commit_MiB": 325.359375,
+          "processes": 1
+        },
+        "utility": {
+          "rss_MiB": 98.80859375,
+          "private_commit_MiB": 39.375,
+          "processes": 3
+        },
+        "renderer": {
+          "rss_MiB": 1348.39453125,
+          "private_commit_MiB": 1312.12109375,
+          "processes": 1
+        }
+      }
+    },
+    {
+      "seconds": 480.1450643000135,
+      "stage": "active",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 621,
+        "Nodes": 4974,
+        "JSHeapUsedSize": 10406732,
+        "JSHeapTotalSize": 67907584
+      },
+      "state": {
+        "frame": 28717,
+        "playing": true,
+        "underruns": 0,
+        "samples": 22978432,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 29954,
+        "encoded_bytes": 126114707
+      },
+      "WebView_roles": {
+        "browser": {
+          "rss_MiB": 140.51953125,
+          "private_commit_MiB": 52.96484375,
+          "processes": 1
+        },
+        "other": {
+          "rss_MiB": 12.98046875,
+          "private_commit_MiB": 3.04296875,
+          "processes": 1
+        },
+        "gpu-process": {
+          "rss_MiB": 310.4609375,
+          "private_commit_MiB": 326.0078125,
+          "processes": 1
+        },
+        "utility": {
+          "rss_MiB": 98.796875,
+          "private_commit_MiB": 39.328125,
+          "processes": 3
+        },
+        "renderer": {
+          "rss_MiB": 1367.8359375,
+          "private_commit_MiB": 1330.1171875,
+          "processes": 1
+        }
+      }
+    },
+    {
+      "seconds": 510.60688520001713,
+      "stage": "active",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 627,
+        "Nodes": 5370,
+        "JSHeapUsedSize": 18736676,
+        "JSHeapTotalSize": 67645440
+      },
+      "state": {
+        "frame": 30547,
+        "playing": true,
+        "underruns": 0,
+        "samples": 24440704,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 31927,
+        "encoded_bytes": 134467841
+      },
+      "WebView_roles": {
+        "browser": {
+          "rss_MiB": 140.5234375,
+          "private_commit_MiB": 52.96875,
+          "processes": 1
+        },
+        "other": {
+          "rss_MiB": 12.9765625,
+          "private_commit_MiB": 3.0390625,
+          "processes": 1
+        },
+        "gpu-process": {
+          "rss_MiB": 309.6015625,
+          "private_commit_MiB": 325.89453125,
+          "processes": 1
+        },
+        "utility": {
+          "rss_MiB": 98.8046875,
+          "private_commit_MiB": 39.328125,
+          "processes": 3
+        },
+        "renderer": {
+          "rss_MiB": 1350.890625,
+          "private_commit_MiB": 1311.32421875,
+          "processes": 1
+        }
+      }
+    },
+    {
+      "seconds": 540.1884974999994,
+      "stage": "active",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 1129,
+        "Nodes": 9296,
+        "JSHeapUsedSize": 22275592,
+        "JSHeapTotalSize": 67907584
+      },
+      "state": {
+        "frame": 32321,
+        "playing": true,
+        "underruns": 0,
+        "samples": 25860992,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 33831,
+        "encoded_bytes": 142524444
+      },
+      "WebView_roles": {
+        "browser": {
+          "rss_MiB": 139.9609375,
+          "private_commit_MiB": 52.375,
+          "processes": 1
+        },
+        "other": {
+          "rss_MiB": 12.9765625,
+          "private_commit_MiB": 3.0390625,
+          "processes": 1
+        },
+        "gpu-process": {
+          "rss_MiB": 309.6875,
+          "private_commit_MiB": 325.96484375,
+          "processes": 1
+        },
+        "utility": {
+          "rss_MiB": 98.8515625,
+          "private_commit_MiB": 39.34765625,
+          "processes": 3
+        },
+        "renderer": {
+          "rss_MiB": 1391.98828125,
+          "private_commit_MiB": 1352.36328125,
+          "processes": 1
+        }
+      }
+    },
+    {
+      "seconds": 571.263328400004,
+      "stage": "active",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 1135,
+        "Nodes": 9461,
+        "JSHeapUsedSize": 25206488,
+        "JSHeapTotalSize": 68169728
+      },
+      "state": {
+        "frame": 34183,
+        "playing": true,
+        "underruns": 0,
+        "samples": 27351936,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 35835,
+        "encoded_bytes": 150998246
+      },
+      "WebView_roles": {
+        "browser": {
+          "rss_MiB": 139.8984375,
+          "private_commit_MiB": 52.3359375,
+          "processes": 1
+        },
+        "other": {
+          "rss_MiB": 12.9765625,
+          "private_commit_MiB": 3.0390625,
+          "processes": 1
+        },
+        "gpu-process": {
+          "rss_MiB": 309.2734375,
+          "private_commit_MiB": 325.87890625,
+          "processes": 1
+        },
+        "utility": {
+          "rss_MiB": 98.8515625,
+          "private_commit_MiB": 39.375,
+          "processes": 3
+        },
+        "renderer": {
+          "rss_MiB": 1411.34765625,
+          "private_commit_MiB": 1370.890625,
+          "processes": 1
+        }
+      }
+    },
+    {
+      "seconds": 600.8945944000152,
+      "stage": "active",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 483,
+        "Nodes": 4409,
+        "JSHeapUsedSize": 23140248,
+        "JSHeapTotalSize": 68431872
+      },
+      "state": {
+        "frame": 35962,
+        "playing": true,
+        "underruns": 0,
+        "samples": 28774272,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 37768,
+        "encoded_bytes": 159187156
+      },
+      "WebView_roles": {
+        "browser": {
+          "rss_MiB": 135.1953125,
+          "private_commit_MiB": 47.62890625,
+          "processes": 1
+        },
+        "other": {
+          "rss_MiB": 13.03125,
+          "private_commit_MiB": 3.1328125,
+          "processes": 1
+        },
+        "gpu-process": {
+          "rss_MiB": 309.453125,
+          "private_commit_MiB": 325.71875,
+          "processes": 1
+        },
+        "utility": {
+          "rss_MiB": 95.078125,
+          "private_commit_MiB": 35.67578125,
+          "processes": 3
+        },
+        "renderer": {
+          "rss_MiB": 1434.15234375,
+          "private_commit_MiB": 1395.26171875,
+          "processes": 1
+        }
+      }
+    },
+    {
+      "seconds": 600.9302977000189,
+      "stage": "end",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 483,
+        "Nodes": 4418,
+        "JSHeapUsedSize": 23369092,
+        "JSHeapTotalSize": 68431872
+      },
+      "state": {
+        "frame": 35962,
+        "playing": true,
+        "underruns": 0,
+        "samples": 28776320,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 37771,
+        "encoded_bytes": 159199873
+      },
+      "WebView_roles": {
+        "browser": {
+          "rss_MiB": 135.1953125,
+          "private_commit_MiB": 47.62890625,
+          "processes": 1
+        },
+        "other": {
+          "rss_MiB": 13.03125,
+          "private_commit_MiB": 3.1328125,
+          "processes": 1
+        },
+        "gpu-process": {
+          "rss_MiB": 309.453125,
+          "private_commit_MiB": 325.71875,
+          "processes": 1
+        },
+        "utility": {
+          "rss_MiB": 95.078125,
+          "private_commit_MiB": 35.67578125,
+          "processes": 3
+        },
+        "renderer": {
+          "rss_MiB": 1434.18359375,
+          "private_commit_MiB": 1395.29296875,
+          "processes": 1
+        }
+      }
+    },
+    {
+      "seconds": 602.8462697000068,
+      "stage": "stopped",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 483,
+        "Nodes": 4428,
+        "JSHeapUsedSize": 24319532,
+        "JSHeapTotalSize": 68431872
+      },
+      "state": {
+        "frame": 35972,
+        "playing": false,
+        "underruns": 0,
+        "samples": 28778368,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 37899,
+        "encoded_bytes": 159742437
+      },
+      "WebView_roles": {
+        "browser": {
+          "rss_MiB": 135.19921875,
+          "private_commit_MiB": 47.62890625,
+          "processes": 1
+        },
+        "other": {
+          "rss_MiB": 13.03125,
+          "private_commit_MiB": 3.1328125,
+          "processes": 1
+        },
+        "gpu-process": {
+          "rss_MiB": 308.9921875,
+          "private_commit_MiB": 325.07421875,
+          "processes": 1
+        },
+        "utility": {
+          "rss_MiB": 95.078125,
+          "private_commit_MiB": 35.67578125,
+          "processes": 3
+        },
+        "renderer": {
+          "rss_MiB": 1434.82421875,
+          "private_commit_MiB": 1395.76171875,
+          "processes": 1
+        }
+      }
+    },
+    {
+      "seconds": 604.6806564000144,
+      "stage": "diagnostic_GC",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 483,
+        "Nodes": 3845,
+        "JSHeapUsedSize": 10522552,
+        "JSHeapTotalSize": 11284480
+      },
+      "state": {
+        "frame": 35972,
+        "playing": false,
+        "underruns": 0,
+        "samples": 28778368,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 38009,
+        "encoded_bytes": 160208690
+      },
+      "WebView_roles": {
+        "browser": {
+          "rss_MiB": 146.265625,
+          "private_commit_MiB": 50.91015625,
+          "processes": 1
+        },
+        "other": {
+          "rss_MiB": 13.03125,
+          "private_commit_MiB": 3.1328125,
+          "processes": 1
+        },
+        "gpu-process": {
+          "rss_MiB": 306.84375,
+          "private_commit_MiB": 325.63671875,
+          "processes": 1
+        },
+        "utility": {
+          "rss_MiB": 95.078125,
+          "private_commit_MiB": 35.67578125,
+          "processes": 3
+        },
+        "renderer": {
+          "rss_MiB": 1075.8828125,
+          "private_commit_MiB": 1038.0703125,
+          "processes": 1
+        }
+      }
+    },
+    {
+      "seconds": 605.9220874000166,
+      "stage": "native_released",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 483,
+        "Nodes": 3846,
+        "JSHeapUsedSize": 10620944,
+        "JSHeapTotalSize": 11284480
+      },
+      "state": {
+        "frame": null,
+        "playing": false,
+        "underruns": null,
+        "samples": null,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 38011,
+        "encoded_bytes": 160217168
+      },
+      "WebView_roles": {
+        "browser": {
+          "rss_MiB": 146.1484375,
+          "private_commit_MiB": 50.45703125,
+          "processes": 1
+        },
+        "other": {
+          "rss_MiB": 13.03125,
+          "private_commit_MiB": 3.1328125,
+          "processes": 1
+        },
+        "gpu-process": {
+          "rss_MiB": 307.08984375,
+          "private_commit_MiB": 325.671875,
+          "processes": 1
+        },
+        "utility": {
+          "rss_MiB": 95.078125,
+          "private_commit_MiB": 35.67578125,
+          "processes": 3
+        },
+        "renderer": {
+          "rss_MiB": 1075.37109375,
+          "private_commit_MiB": 1037.2578125,
+          "processes": 1
+        }
+      }
+    }
+  ],
+  "clock_wire": {
+    "requests": 38011,
+    "encoded_bytes": 160217168
+  },
+  "failure_type": null,
+  "scope": "RSS sums may duplicate shared UMA pages. Private commit, heap, GPU estimates are separate. No forced GC during active measurement.",
+  "browser_error_count": 0,
+  "observed_underruns": 0,
+  "editing_batch_count": 0,
+  "audio_gate_passed": true,
+  "window_condition_held": null,
+  "active_observer": "attached Performance/Network observer",
+  "qualification_exit_code": 0,
+  "heap_sample_count_original": 25,
+  "heap_sample_selection": "All actual heap observations plus first/last process-only snapshots. Full generated raw trace retained locally; all30s medians/slopes remain in groups."
+}

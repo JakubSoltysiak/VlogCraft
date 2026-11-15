@@ -363,6 +363,6 @@ def render(state, output, work, *, review=False, on_progress=None, cancelled=lam
     return str(target)
 
 def _run(cmd,cwd):
-    r=subprocess.run(cmd,cwd=cwd,capture_output=True,text=True,timeout=120*60)
+    r=subprocess.run(cmd,cwd=cwd,capture_output=True,text=True,timeout=120*60,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
     if r.returncode:
         raise RuntimeError(r.stderr[-1500:])

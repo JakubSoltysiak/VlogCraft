@@ -1,0 +1,4 @@
+{
+  "rows": [],
+  "scope": "No additional long covered controls were launched during finalization. Earlier same-native-runtime covered/unfocused controls are retained in guarded-controls.json and controls-final.json; they are not relabelled as tests of the later installer."
+}

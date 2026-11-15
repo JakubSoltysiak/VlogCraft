@@ -1,0 +1,174 @@
+{
+  "uncompressed": [
+    {
+      "arm": "baseline",
+      "iteration": 0,
+      "fill_history_ms": 1402.302599977702,
+      "edit_save_JS_ms": 1197.2000000178814,
+      "edit_save_wall_ms": 1200.7338000112213,
+      "resume_prebuffer_wall_ms": 731.1286999902222,
+      "batch_wall_ms": 1931.8625000014435,
+      "health": {
+        "undo": 80,
+        "ack": null,
+        "sequence": null
+      }
+    },
+    {
+      "arm": "baseline",
+      "iteration": 1,
+      "fill_history_ms": 1402.302599977702,
+      "edit_save_JS_ms": 959.9000000059605,
+      "edit_save_wall_ms": 964.3441999796778,
+      "resume_prebuffer_wall_ms": 698.6897000169847,
+      "batch_wall_ms": 1663.0338999966625,
+      "health": {
+        "undo": 80,
+        "ack": null,
+        "sequence": null
+      }
+    },
+    {
+      "arm": "baseline",
+      "iteration": 2,
+      "fill_history_ms": 1402.302599977702,
+      "edit_save_JS_ms": 917.5,
+      "edit_save_wall_ms": 920.9680999920238,
+      "resume_prebuffer_wall_ms": 1003.6444999859668,
+      "batch_wall_ms": 1924.6125999779906,
+      "health": {
+        "undo": 80,
+        "ack": null,
+        "sequence": null
+      }
+    },
+    {
+      "arm": "candidate",
+      "iteration": 0,
+      "fill_history_ms": 7237.379500002135,
+      "edit_save_JS_ms": 9723.399999976158,
+      "edit_save_wall_ms": 9726.733299990883,
+      "resume_prebuffer_wall_ms": 6.144899991340935,
+      "batch_wall_ms": 9732.878199982224,
+      "health": {
+        "undo": 80,
+        "ack": 9,
+        "sequence": 9
+      }
+    },
+    {
+      "arm": "candidate",
+      "iteration": 1,
+      "fill_history_ms": 7237.379500002135,
+      "edit_save_JS_ms": 9707.09999999404,
+      "edit_save_wall_ms": 9710.221400018781,
+      "resume_prebuffer_wall_ms": 1499.4608999986667,
+      "batch_wall_ms": 11209.682300017448,
+      "health": {
+        "undo": 80,
+        "ack": 13,
+        "sequence": 13
+      }
+    },
+    {
+      "arm": "candidate",
+      "iteration": 2,
+      "fill_history_ms": 7237.379500002135,
+      "edit_save_JS_ms": 11263.300000011921,
+      "edit_save_wall_ms": 11266.482800012454,
+      "resume_prebuffer_wall_ms": 1182.1506000123918,
+      "batch_wall_ms": 12448.633400024846,
+      "health": {
+        "undo": 80,
+        "ack": 17,
+        "sequence": 17
+      }
+    }
+  ],
+  "final": [
+    {
+      "arm": "baseline",
+      "iteration": 0,
+      "fill_history_ms": 1409.8564000159968,
+      "edit_save_JS_ms": 1250.199999988079,
+      "edit_save_wall_ms": 1254.5666999940295,
+      "resume_prebuffer_wall_ms": 635.2869999827817,
+      "batch_wall_ms": 1889.8536999768112,
+      "health": {
+        "undo": 80,
+        "ack": null,
+        "sequence": null
+      }
+    },
+    {
+      "arm": "baseline",
+      "iteration": 1,
+      "fill_history_ms": 1409.8564000159968,
+      "edit_save_JS_ms": 1162,
+      "edit_save_wall_ms": 1164.8514000116847,
+      "resume_prebuffer_wall_ms": 909.3928000074811,
+      "batch_wall_ms": 2074.244200019166,
+      "health": {
+        "undo": 80,
+        "ack": null,
+        "sequence": null
+      }
+    },
+    {
+      "arm": "baseline",
+      "iteration": 2,
+      "fill_history_ms": 1409.8564000159968,
+      "edit_save_JS_ms": 1198.4000000059605,
+      "edit_save_wall_ms": 1201.9582000211813,
+      "resume_prebuffer_wall_ms": 1315.445299987914,
+      "batch_wall_ms": 2517.4035000090953,
+      "health": {
+        "undo": 80,
+        "ack": null,
+        "sequence": null
+      }
+    },
+    {
+      "arm": "candidate",
+      "iteration": 0,
+      "fill_history_ms": 1623.6162999994121,
+      "edit_save_JS_ms": 1317.199999988079,
+      "edit_save_wall_ms": 1320.8289000031073,
+      "resume_prebuffer_wall_ms": 844.7760000126436,
+      "batch_wall_ms": 2165.604900015751,
+      "health": {
+        "undo": 80,
+        "ack": 9,
+        "sequence": 9
+      }
+    },
+    {
+      "arm": "candidate",
+      "iteration": 1,
+      "fill_history_ms": 1623.6162999994121,
+      "edit_save_JS_ms": 1445.0999999940395,
+      "edit_save_wall_ms": 1448.3312999946065,
+      "resume_prebuffer_wall_ms": 854.4121999875642,
+      "batch_wall_ms": 2302.7434999821708,
+      "health": {
+        "undo": 80,
+        "ack": 13,
+        "sequence": 13
+      }
+    },
+    {
+      "arm": "candidate",
+      "iteration": 2,
+      "fill_history_ms": 1623.6162999994121,
+      "edit_save_JS_ms": 1174,
+      "edit_save_wall_ms": 1177.3236000153702,
+      "resume_prebuffer_wall_ms": 1332.2401999903377,
+      "batch_wall_ms": 2509.563800005708,
+      "health": {
+        "undo": 80,
+        "ack": 17,
+        "sequence": 17
+      }
+    }
+  ]
+}

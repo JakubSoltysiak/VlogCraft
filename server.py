@@ -59,6 +59,7 @@ MAX_CHUNK=16*1024*1024  # keep resident uploads small; NOT a file size limit
 UPLOADS={}
 JOBS={'export':{'status':'idle','percent':0,'message':'','path':None,'error':None},'proxy':{'status':'idle','percent':0,'message':'','assetId':None,'error':None}}
 DESKTOP_ACTION=None
+DESKTOP_RECOVERY=None
 PROXY_QUEUE=collections.deque()
 CURRENT_PROCESS={'export':None,'proxy':None}
 CANCEL={'export':threading.Event(),'proxy':threading.Event()}
@@ -140,7 +141,8 @@ def save_state(candidate=None):
 def probe(path):
     p=subprocess.run(['ffprobe','-v','error','-show_entries',
                       'format=format_name,duration,start_time:stream=time_base,start_pts,duration_ts,avg_frame_rate,codec_type,codec_name,width,height,r_frame_rate,channels,channel_layout,sample_rate,sample_aspect_ratio,bits_per_raw_sample,color_transfer,color_primaries,color_space,color_range,pix_fmt:stream_side_data=rotation',
-                      '-of','json',str(path)],capture_output=True,text=True,timeout=75)
+                      '-of','json',str(path)],capture_output=True,text=True,timeout=75,
+                     creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
     if p.returncode:raise ValueError(f'FFprobe could not read {Path(path).name}: {p.stderr[-500:]}')
     info=json.loads(p.stdout);streams=info.get('streams',[])
     v=next((x for x in streams if x.get('codec_type')=='video'),None)
@@ -240,7 +242,7 @@ def create_thumbnail(asset):
     args+=['-i',asset['path'],'-frames:v','1','-vf',
            'scale=480:270:force_original_aspect_ratio=decrease,pad=480:270:(ow-iw)/2:(oh-ih)/2:black',
            '-q:v','5',str(out)]
-    try:subprocess.run(args,capture_output=True,timeout=55)
+    try:subprocess.run(args,capture_output=True,timeout=55,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
     except (OSError,subprocess.TimeoutExpired):pass
 
 def _number(value,what,lo,hi):
@@ -370,6 +372,7 @@ def client_state():
     for asset in snapshot['assets']:asset['missing']=not Path(asset['path']).is_file()
     snapshot['desktop']=DESKTOP_ACTION is not None
     snapshot['recovered']=RECOVERED
+    snapshot['desktopEpoch']=DESKTOP_RECOVERY.model.epoch if DESKTOP_RECOVERY else 0
     return snapshot
 
 
@@ -686,6 +689,7 @@ class Handler(BaseHTTPRequestHandler):
                 return self.json_response(client_state())
             if path=='/api/performance/status':return self.json_response(PERFORMANCE_DIAGNOSTICS.status() if PERFORMANCE_DIAGNOSTICS else {'status':'unavailable'})
             if path=='/api/native/capabilities':return self.json_response(NATIVE_PLAYBACK.capabilities() if NATIVE_PLAYBACK else {'available':False,'experimental':True})
+            if path=='/api/desktop/recovery':return self.json_response(DESKTOP_RECOVERY.model.status() if DESKTOP_RECOVERY else {'epoch':0,'phase':'browser','restore':None})
             if path=='/api/native/status':return self.json_response(NATIVE_PLAYBACK.status() if NATIVE_PLAYBACK else {'running':False})
             if path=='/api/native/audio':
                 if not self.check_origin() or self.headers.get('Sec-Fetch-Site')=='cross-site':return self.json_response({'error':'Forbidden origin'},403)
@@ -758,7 +762,7 @@ class Handler(BaseHTTPRequestHandler):
             if path=='/' or path=='/index.html':return self.file_response(WEB/'index.html','text/html; charset=utf-8')
             if path in ('/branding/vlogcraft-approved.ico',*(f'/branding/vlogcraft-{n}.png' for n in (16,24,32,48,64,128,256))):
                 return self.file_response(WEB/path.lstrip('/'))
-            if path in ('/app.js','/studio.js','/animation.js','/motion.js','/timeline.js','/timebase.js','/edit_ops.js','/edit_commands.js','/monitor.js','/rendered_preview.js','/native_preview.js','/native_audio_worklet.js','/performance.js','/playback_cache.js','/effects.js','/grade.js','/audio.js','/nesting.js','/source_frames.js','/style.css'):
+            if path in ('/app.js','/studio.js','/animation.js','/motion.js','/timeline.js','/timebase.js','/edit_ops.js','/edit_commands.js','/monitor.js','/rendered_preview.js','/native_preview.js','/native_audio_worklet.js','/recovery.js','/performance.js','/playback_cache.js','/effects.js','/grade.js','/audio.js','/nesting.js','/source_frames.js','/style.css'):
                 return self.file_response(WEB/path.lstrip('/'))
             return self.json_response({'error':'Not found'},404)
         except (BrokenPipeError,ConnectionAbortedError,ConnectionResetError):return
@@ -906,6 +910,9 @@ class Handler(BaseHTTPRequestHandler):
                 finally:
                     job_status('motion',status='idle')
                 return self.json_response(analysis)
+            if path=='/api/desktop/recovery/ready':
+                if DESKTOP_RECOVERY:DESKTOP_RECOVERY.ready(int(data['epoch']))
+                return self.json_response({'ready':True})
             if path=='/api/desktop':
                 if DESKTOP_ACTION is None:raise ValueError('Open the desktop application')
                 return self.json_response(DESKTOP_ACTION(data.get('action')))
@@ -928,8 +935,10 @@ class Handler(BaseHTTPRequestHandler):
                 return self.json_response({'assets':assets,'errors':errs})
             if path=='/api/state':
                 with LOCK:
+                    if DESKTOP_RECOVERY:DESKTOP_RECOVERY.model.check_epoch(data.get('_desktopEpoch',0))
                     s=validate_state(data)
                     save_state(s)
+                    if DESKTOP_RECOVERY:DESKTOP_RECOVERY.model.note_saved(int(data.get('_desktopEpoch',0)),int(data.get('_editRevision',0)))
                     return self.json_response(client_state())
             if path=='/api/title':return self.json_response({'clip':default_title()})
             if path=='/api/proxy':

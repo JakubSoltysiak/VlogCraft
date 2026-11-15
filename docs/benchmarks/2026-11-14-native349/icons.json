@@ -1,0 +1,34 @@
+{
+  "approved_source_preserved": true,
+  "sizes": [
+    16,
+    24,
+    32,
+    48,
+    64,
+    128,
+    256
+  ],
+  "msi_icon_exact": true,
+  "exe_seven_resources_exact": true,
+  "shortcut_icon_bytes_exact": true,
+  "shortcut_app_id": true,
+  "shell_icon_mean_errors_255": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "live_icon_mean_errors_255": {
+    "taskbar_big": {
+      "native_size": 48,
+      "mean_error_255": 0.0
+    },
+    "window_small": {
+      "native_size": 24,
+      "mean_error_255": 0.0
+    }
+  },
+  "web_branding": true,
+  "old_installed_icon_files": 0
+}

@@ -1,0 +1,488 @@
+{
+  "native_binary_sha256": "ac206038cea559f87d784e0ec4fc8485bdebd1421b7c4a78853e7ea037e3f72a",
+  "seconds": 125.0,
+  "width": 960,
+  "layers": 3,
+  "audio_tracks": 3,
+  "cache_policy": "Fresh application each trial; repeated original-source offsets; OS filesystem caches unmanaged",
+  "proxy": false,
+  "rows": [
+    {
+      "trial": 1,
+      "exit_code": 0,
+      "wall_seconds": 141.047,
+      "fps": 59.81808658772256,
+      "skips": 7,
+      "samples": 6000000,
+      "expected_samples": 6000000,
+      "underruns": 0,
+      "first_ready_seconds": 1.0770363000046927,
+      "startup_seconds": 1.9815233999979682,
+      "peak_working_set_MiB": 3249.6,
+      "CPU_percent": 6.37,
+      "present_intervals": {
+        "count": 7491,
+        "mean_ms": 16.6821,
+        "p50_upper_ms": 16.7,
+        "p95_upper_ms": 18,
+        "p99_upper_ms": 33.7,
+        "max_ms": 50.46,
+        "overflow_100ms": 0
+      },
+      "throughput_windows": [
+        {
+          "window_seconds": 1,
+          "count": 215,
+          "minimum_fps": 50.95541401273884,
+          "p05_fps": 59.22038980509794,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+        },
+        {
+          "window_seconds": 10,
+          "count": 192,
+          "minimum_fps": 58.85209284257552,
+          "p05_fps": 59.79028926640772,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+        }
+      ],
+      "source_skips": 0,
+      "gpu_skips": 0,
+      "other_skips": 7,
+      "mixed_power": false,
+      "all_on_AC": true
+    },
+    {
+      "trial": 2,
+      "exit_code": 0,
+      "wall_seconds": 139.625,
+      "fps": 59.7964843818594,
+      "skips": 9,
+      "samples": 6000000,
+      "expected_samples": 6000000,
+      "underruns": 0,
+      "first_ready_seconds": 1.082064399990486,
+      "startup_seconds": 2.090055599997868,
+      "peak_working_set_MiB": 3474.8,
+      "CPU_percent": 6.51,
+      "present_intervals": {
+        "count": 7489,
+        "mean_ms": 16.6867,
+        "p50_upper_ms": 16.7,
+        "p95_upper_ms": 17.8,
+        "p99_upper_ms": 25.1,
+        "max_ms": 64.3982,
+        "overflow_100ms": 0
+      },
+      "throughput_windows": [
+        {
+          "window_seconds": 1,
+          "count": 247,
+          "minimum_fps": 58.190282222869065,
+          "p05_fps": 59.171597633135946,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+        },
+        {
+          "window_seconds": 10,
+          "count": 229,
+          "minimum_fps": 59.10712563880045,
+          "p05_fps": 59.770894867087094,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+        }
+      ],
+      "source_skips": 0,
+      "gpu_skips": 0,
+      "other_skips": 9,
+      "mixed_power": false,
+      "all_on_AC": true
+    },
+    {
+      "trial": 3,
+      "exit_code": 0,
+      "wall_seconds": 138.203,
+      "fps": 59.89656192295702,
+      "skips": 3,
+      "samples": 6000000,
+      "expected_samples": 6000000,
+      "underruns": 0,
+      "first_ready_seconds": 1.0200318000133848,
+      "startup_seconds": 2.0671263999975054,
+      "peak_working_set_MiB": 3366.7,
+      "CPU_percent": 6.36,
+      "present_intervals": {
+        "count": 7492,
+        "mean_ms": 16.6759,
+        "p50_upper_ms": 16.7,
+        "p95_upper_ms": 17.8,
+        "p99_upper_ms": 23.7,
+        "max_ms": 51.2918,
+        "overflow_100ms": 0
+      },
+      "throughput_windows": [
+        {
+          "window_seconds": 1,
+          "count": 241,
+          "minimum_fps": 58.70841487279893,
+          "p05_fps": 59.355067328136165,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+        },
+        {
+          "window_seconds": 10,
+          "count": 217,
+          "minimum_fps": 59.799043995707706,
+          "p05_fps": 59.857620223739644,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+        }
+      ],
+      "source_skips": 0,
+      "gpu_skips": 0,
+      "other_skips": 3,
+      "mixed_power": false,
+      "all_on_AC": true
+    },
+    {
+      "trial": 4,
+      "exit_code": 0,
+      "wall_seconds": 138.937,
+      "fps": 59.65281615117142,
+      "skips": 7,
+      "samples": 6000000,
+      "expected_samples": 6000000,
+      "underruns": 0,
+      "first_ready_seconds": 1.057265900002676,
+      "startup_seconds": 2.0511235000012675,
+      "peak_working_set_MiB": 3354.9,
+      "CPU_percent": 6.23,
+      "present_intervals": {
+        "count": 7491,
+        "mean_ms": 16.6821,
+        "p50_upper_ms": 16.7,
+        "p95_upper_ms": 18,
+        "p99_upper_ms": 37.6,
+        "max_ms": 57.8344,
+        "overflow_100ms": 0
+      },
+      "throughput_windows": [
+        {
+          "window_seconds": 1,
+          "count": 239,
+          "minimum_fps": 35.440613026820024,
+          "p05_fps": 58.918482647296,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+        },
+        {
+          "window_seconds": 10,
+          "count": 215,
+          "minimum_fps": 57.27399720614645,
+          "p05_fps": 59.81956703883395,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+        }
+      ],
+      "source_skips": 0,
+      "gpu_skips": 0,
+      "other_skips": 7,
+      "mixed_power": false,
+      "all_on_AC": true
+    },
+    {
+      "trial": 5,
+      "exit_code": 0,
+      "wall_seconds": 138.516,
+      "fps": 59.818667926956586,
+      "skips": 6,
+      "samples": 6000000,
+      "expected_samples": 6000000,
+      "underruns": 0,
+      "first_ready_seconds": 1.0102864000073168,
+      "startup_seconds": 2.0462415000074543,
+      "peak_working_set_MiB": 3427.3,
+      "CPU_percent": 6.77,
+      "present_intervals": {
+        "count": 7492,
+        "mean_ms": 16.68,
+        "p50_upper_ms": 16.7,
+        "p95_upper_ms": 18,
+        "p99_upper_ms": 41.1,
+        "max_ms": 50.1161,
+        "overflow_100ms": 0
+      },
+      "throughput_windows": [
+        {
+          "window_seconds": 1,
+          "count": 274,
+          "minimum_fps": 51.13636363636376,
+          "p05_fps": 58.925476603119044,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+        },
+        {
+          "window_seconds": 10,
+          "count": 239,
+          "minimum_fps": 59.72654460814297,
+          "p05_fps": 59.77245380107805,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+        }
+      ],
+      "source_skips": 0,
+      "gpu_skips": 0,
+      "other_skips": 6,
+      "mixed_power": false,
+      "all_on_AC": true
+    },
+    {
+      "trial": 6,
+      "exit_code": 0,
+      "wall_seconds": 138.469,
+      "fps": 59.813997145782395,
+      "skips": 5,
+      "samples": 6000000,
+      "expected_samples": 6000000,
+      "underruns": 0,
+      "first_ready_seconds": 0.9657894999982091,
+      "startup_seconds": 2.064796499995282,
+      "peak_working_set_MiB": 3461.5,
+      "CPU_percent": 6.34,
+      "present_intervals": {
+        "count": 7493,
+        "mean_ms": 16.6778,
+        "p50_upper_ms": 16.7,
+        "p95_upper_ms": 18,
+        "p99_upper_ms": 38.3,
+        "max_ms": 55.5291,
+        "overflow_100ms": 0
+      },
+      "throughput_windows": [
+        {
+          "window_seconds": 1,
+          "count": 194,
+          "minimum_fps": 53.04518664047148,
+          "p05_fps": 58.932364832453956,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+        },
+        {
+          "window_seconds": 10,
+          "count": 175,
+          "minimum_fps": 59.744969235799424,
+          "p05_fps": 59.8265924724011,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+        }
+      ],
+      "source_skips": 0,
+      "gpu_skips": 0,
+      "other_skips": 5,
+      "mixed_power": false,
+      "all_on_AC": true
+    },
+    {
+      "trial": 7,
+      "exit_code": 0,
+      "wall_seconds": 138.547,
+      "fps": 59.69521673759447,
+      "skips": 3,
+      "samples": 6000000,
+      "expected_samples": 6000000,
+      "underruns": 0,
+      "first_ready_seconds": 1.011312700007693,
+      "startup_seconds": 2.0883992000017315,
+      "peak_working_set_MiB": 3278.2,
+      "CPU_percent": 6.48,
+      "present_intervals": {
+        "count": 7495,
+        "mean_ms": 16.6735,
+        "p50_upper_ms": 16.7,
+        "p95_upper_ms": 18,
+        "p99_upper_ms": 38.6,
+        "max_ms": 58.4402,
+        "overflow_100ms": 0
+      },
+      "throughput_windows": [
+        {
+          "window_seconds": 1,
+          "count": 205,
+          "minimum_fps": 36.713286713287,
+          "p05_fps": 59.18307946056102,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+        },
+        {
+          "window_seconds": 10,
+          "count": 189,
+          "minimum_fps": 57.428459427675456,
+          "p05_fps": 59.845804458220016,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+        }
+      ],
+      "source_skips": 0,
+      "gpu_skips": 0,
+      "other_skips": 3,
+      "mixed_power": false,
+      "all_on_AC": true
+    },
+    {
+      "trial": 8,
+      "exit_code": 0,
+      "wall_seconds": 138.812,
+      "fps": 59.85107105068774,
+      "skips": 4,
+      "samples": 6000000,
+      "expected_samples": 6000000,
+      "underruns": 0,
+      "first_ready_seconds": 0.9636120999930426,
+      "startup_seconds": 2.140003799999249,
+      "peak_working_set_MiB": 3473.5,
+      "CPU_percent": 6.2,
+      "present_intervals": {
+        "count": 7494,
+        "mean_ms": 16.6755,
+        "p50_upper_ms": 16.7,
+        "p95_upper_ms": 17.9,
+        "p99_upper_ms": 33.6,
+        "max_ms": 62.7602,
+        "overflow_100ms": 0
+      },
+      "throughput_windows": [
+        {
+          "window_seconds": 1,
+          "count": 164,
+          "minimum_fps": 52.12014134275595,
+          "p05_fps": 59.33994472443505,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+        },
+        {
+          "window_seconds": 10,
+          "count": 174,
+          "minimum_fps": 59.81152415064159,
+          "p05_fps": 59.84958853407883,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+        }
+      ],
+      "source_skips": 0,
+      "gpu_skips": 0,
+      "other_skips": 4,
+      "mixed_power": false,
+      "all_on_AC": true
+    },
+    {
+      "trial": 9,
+      "exit_code": 0,
+      "wall_seconds": 138.391,
+      "fps": 59.81591542293209,
+      "skips": 4,
+      "samples": 6000000,
+      "expected_samples": 6000000,
+      "underruns": 0,
+      "first_ready_seconds": 1.0045242000051076,
+      "startup_seconds": 2.0968537000007927,
+      "peak_working_set_MiB": 3457.5,
+      "CPU_percent": 6.3,
+      "present_intervals": {
+        "count": 7494,
+        "mean_ms": 16.6756,
+        "p50_upper_ms": 16.7,
+        "p95_upper_ms": 17.9,
+        "p99_upper_ms": 33.6,
+        "max_ms": 51.0312,
+        "overflow_100ms": 0
+      },
+      "throughput_windows": [
+        {
+          "window_seconds": 1,
+          "count": 233,
+          "minimum_fps": 58.445913576698416,
+          "p05_fps": 59.263577188380495,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+        },
+        {
+          "window_seconds": 10,
+          "count": 214,
+          "minimum_fps": 59.077951440086494,
+          "p05_fps": 59.832735961768186,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+        }
+      ],
+      "source_skips": 0,
+      "gpu_skips": 0,
+      "other_skips": 4,
+      "mixed_power": false,
+      "all_on_AC": true
+    },
+    {
+      "trial": 10,
+      "exit_code": 0,
+      "wall_seconds": 138.047,
+      "fps": 59.723055704496154,
+      "skips": 25,
+      "samples": 6000000,
+      "expected_samples": 6000000,
+      "underruns": 0,
+      "first_ready_seconds": 0.9487155000097118,
+      "startup_seconds": 2.1003216999961296,
+      "peak_working_set_MiB": 3493.8,
+      "CPU_percent": 6.25,
+      "present_intervals": {
+        "count": 7473,
+        "mean_ms": 16.7224,
+        "p50_upper_ms": 16.7,
+        "p95_upper_ms": 17.9,
+        "p99_upper_ms": 33.7,
+        "max_ms": 153.601,
+        "overflow_100ms": 1
+      },
+      "throughput_windows": [
+        {
+          "window_seconds": 1,
+          "count": 230,
+          "minimum_fps": 50.170220390611,
+          "p05_fps": 59.30370473731951,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+        },
+        {
+          "window_seconds": 10,
+          "count": 197,
+          "minimum_fps": 58.60496268418703,
+          "p05_fps": 59.73019434165672,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+        }
+      ],
+      "source_skips": 16,
+      "gpu_skips": 0,
+      "other_skips": 9,
+      "mixed_power": false,
+      "all_on_AC": true
+    }
+  ],
+  "summary": {
+    "completed": 10,
+    "valid": 10,
+    "fps_all": [
+      59.81808658772256,
+      59.7964843818594,
+      59.89656192295702,
+      59.65281615117142,
+      59.818667926956586,
+      59.813997145782395,
+      59.69521673759447,
+      59.85107105068774,
+      59.81591542293209,
+      59.723055704496154
+    ],
+    "skips_all": [
+      7,
+      9,
+      3,
+      7,
+      6,
+      5,
+      3,
+      4,
+      4,
+      25
+    ],
+    "fps_best": 59.89656192295702,
+    "fps_median": 59.814956284357244,
+    "fps_worst": 59.65281615117142,
+    "fps_p05_across_trials": 59.671896415061795,
+    "fps_population_stdev": 0.0708782743001642,
+    "at_least_59_5": 10,
+    "under_30_skips": 10,
+    "zero_underruns": true,
+    "failed_trials": 0
+  }
+}

@@ -2,10 +2,13 @@
 import argparse,json,sys,time
 from pathlib import Path
 from fractions import Fraction
+from contextlib import ExitStack
 from windows_session import session
 from resource_history import History
 from conditions import Conditions
 from runtime_trace import RuntimeTrace,windows,active_windows
+from window_geometry import alignment
+from window_visibility import WindowVisibility
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'tests'))
 from performance import Resources
 SETUP="""({assets,seconds,cut})=>{
@@ -21,12 +24,14 @@ SETUP="""({assets,seconds,cut})=>{
  });playhead=0;redraw();save();return flushSave();
 }"""
 def main(a):
- with session(a.executable,a.results,offline=True) as (page,proc,project,errors):
+ with session(a.executable,a.results,offline=True,legacy_viewport=a.legacy_viewport,legacy_focus_emulation=a.legacy_focus_emulation) as (page,proc,project,errors),ExitStack() as owned_windows:
   result=page.evaluate("paths=>request('import','POST',{paths,autoProxy:false})",[str((a.media/f'h264-4k60-{n}.mp4').resolve()) for n in range(a.layers)])
   assert not result['errors']
   page.evaluate(SETUP,{'assets':result['assets'],'seconds':a.seconds,'cut':a.cut})
   page.evaluate("""({width,rate})=>{state.output.fps=rate;const select=$('programResolution');if(![...select.options].some(o=>o.value===String(width)))select.add(new Option('Benchmark',width));select.value=width;save();return flushSave();}""",{'width':a.width,'rate':a.rate})
   page.wait_for_function("Array.from(document.querySelector('#playbackEngine').options).some(o=>o.value==='native'&&!o.disabled)")
+  if not a.legacy_viewport and not a.actual_display and not a.large_surface:
+   page.evaluate("()=>{const stage=$('previewStage'),d=devicePixelRatio;stage.style.width=(356/d)+'px';stage.style.height=(200/d)+'px';stage.style.maxWidth='none';stage.style.maxHeight='none';stage.style.flex='0 0 auto';}")
   ui_patch=None
   if a.ui_source:
    from ui_patch import inject
@@ -39,9 +44,15 @@ def main(a):
    page.evaluate("""()=>{const w=Math.min(innerWidth-24,(innerHeight-140)*16/9),css=document.createElement('style');css.textContent='#previewStage{position:fixed!important;left:12px!important;top:90px!important;width:'+w+'px!important;height:'+w*9/16+'px!important;max-height:none!important;max-width:none!important;z-index:400}';document.head.append(css);}""")
   begin=time.perf_counter();page.select_option('#playbackEngine','native')
   page.wait_for_function('nativeState.metrics?.completed_frames>0',timeout=30000);ready=time.perf_counter()-begin
-  meter=Resources(proc.pid,gpu=True);history=History(proc.pid,5);conditions=Conditions()
+  physical_alignment=None
+  if not a.legacy_viewport:
+   page.wait_for_timeout(200);physical_alignment=alignment(page,proc)
+   assert max(physical_alignment['absolute_error_pixels'])<=3,physical_alignment
+  visibility=owned_windows.enter_context(WindowVisibility(proc,a.window_mode))
+  if a.window_mode in ('visible-browser-unfocused','editor-covered-unfocused'):page.wait_for_function('!document.hasFocus()',timeout=5000)
+  meter=Resources(proc.pid,gpu=not a.diagnostic_no_gpu_counters);history=History(proc.pid,5);conditions=Conditions()
   trace=RuntimeTrace(proc.pid) if a.trace else None;status_rows=[];last_status=-1
-  failure=None;data={}
+  failure=None;data={};focus_changes=[]
   expected_samples=page.evaluate('Math.round(nativeDuration()*48000)')
   try:
    page.evaluate("""async()=>{
@@ -52,7 +63,8 @@ def main(a):
    while True:
     data=page.evaluate("""()=>({measured_seconds:(performance.now()-nativeBench.start)/1000,base:nativeBench.base,last:nativeState.metrics,
      samples:nativeState.ack?.samples,underruns:nativeState.ack?.underruns,playing:isPlaying,
-     reached_end:playhead>=nativeDuration()-.001,peak_meter_db:nativeBench.peak})""")
+     reached_end:playhead>=nativeDuration()-.001,peak_meter_db:nativeBench.peak,browser_focused:document.hasFocus()})""")
+    if not focus_changes or focus_changes[-1]['focused']!=data['browser_focused']:focus_changes.append({'seconds':data['measured_seconds'],'focused':data['browser_focused']})
     if a.trace and data['last'].get('wall_seconds',-1)>last_status:
      row=data['last'];last_status=row['wall_seconds'];status_rows.append({k:row[k] for k in ('wall_seconds','sequence_frame','present_calls','completed_frames','skipped_sequence_frames','source_wait_iterations','gpu_wait_iterations','skipped_without_queue_wait','clock_rewind_hold_iterations') if k in row})
     if data['measured_seconds']>=checkpoint:
@@ -63,6 +75,10 @@ def main(a):
   except Exception as exc:
    failure=exc
   data['working_set_history']=history.finish();data['resources']=meter.finish();data['conditions']=conditions.finish()
+  data['window_condition']=visibility.finish()
+  data['browser_focus_changes']=focus_changes
+  data['focus_emulation']='Playwright default override' if a.legacy_focus_emulation else 'disabled via connect_over_cdp(no_defaults=True)'
+  data['browser_visibility_state']=page.evaluate('({state:document.visibilityState,focused:document.hasFocus(),dpr:devicePixelRatio})') if failure is None else None
   if trace:
    data['runtime_trace']=trace.finish();data['status_trace']=status_rows
    active_rows=[r for r in status_rows if r.get('sequence_frame',0)>0]
@@ -74,11 +90,12 @@ def main(a):
    data.update(failed=True,failure_type=type(failure).__name__,expected_samples=expected_samples,reached_end=False)
    (a.results/'native-playback.json').write_text(json.dumps(data,indent=2),encoding='utf8')
    raise failure
-  data['actual_display_layout']=display;data['native_rect']=page.evaluate('nativeRect()')
+  data['layout_contract']='legacy DPR1 emulation' if a.legacy_viewport else 'native DPI; fixed356x200 physical monitor unless actual-display/large-surface';data['physical_alignment']=physical_alignment;data['actual_display_layout']=display;data['native_rect']=page.evaluate('nativeRect()')
   if a.large_surface:assert abs(data['native_rect']['width']/data['native_rect']['height']-16/9)<.005,'Benchmark monitor aspect changed unexpectedly'
   data.update(ui_source_patch_sha256=ui_patch,application_ready_seconds=getattr(page,'_vlogcraft_launch_seconds',None),first_ready_seconds=ready,seconds=a.seconds,cut_seconds=a.cut,video_tracks=a.layers,audio_tracks=a.layers,original_resolution=[3840,2160],
               program_resolution=[a.width,a.width*9//16],rate=a.rate,browser_errors=errors,proxies=False)
   data['expected_samples']=page.evaluate('Math.round(nativeDuration()*48000)')
+  data['gpu_counter_observer']='disabled for attribution diagnostic; not protected acceptance' if a.diagnostic_no_gpu_counters else 'legacy high-frequency PDH GPU observer; cost recorded separately'
   elapsed=data['measured_seconds']
   for key in ('completed_frames','present_calls','dxgi_present_count'):
    data[key+'_per_second']=((data['last'][key]-data['base'][key])/elapsed if key in data['last'] and key in data['base'] else None)
@@ -92,7 +109,12 @@ def main(a):
   assert data['underruns']==0,'Audio underruns occurred; trial is not qualified'
   assert data['last']['peak_source_queue_frames']<=4 and data['last']['peak_inflight_gpu_frames']<=data['last'].get('gpu_slot_budget',3)<=6,data
   assert data['intermediate_encoded_video_files']==0,data
+  if a.window_mode!='uncontrolled':assert data['window_condition']['condition_held'],'Requested visible/covered condition was not maintained; retain trial as unqualified'
+  if a.window_mode in ('visible-browser-unfocused','editor-covered-unfocused'):assert focus_changes and all(not r['focused'] for r in focus_changes),'Actual browser focus changed during the background-focus arm'
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('executable',type=Path);p.add_argument('media',type=Path);p.add_argument('results',type=Path)
  p.add_argument('--seconds',type=float,default=60);p.add_argument('--cut',type=float,default=.5)
- p.add_argument('--trace',action='store_true');p.add_argument('--ui-source',action='store_true');p.add_argument('--actual-display',action='store_true');p.add_argument('--large-surface',action='store_true');p.add_argument('--width',type=int,default=960);p.add_argument('--layers',type=int,choices=(1,3),default=3);p.add_argument('--rate',default='60/1');main(p.parse_args())
+ p.add_argument('--window-mode',choices=('uncontrolled','visible','visible-unfocused','visible-browser-unfocused','preview-covered','editor-covered','editor-covered-unfocused'),default='visible')
+ p.add_argument('--legacy-focus-emulation',action='store_true',help='Diagnostic reproduction only; keep Playwright artificial page focus')
+ p.add_argument('--diagnostic-no-gpu-counters',action='store_true',help='Attribution control only; retain all original/default-observer acceptance scores')
+ p.add_argument('--legacy-viewport',action='store_true',help='Replay historical DPR1 measurement geometry; not visual-placement qualification');p.add_argument('--trace',action='store_true');p.add_argument('--ui-source',action='store_true');p.add_argument('--actual-display',action='store_true');p.add_argument('--large-surface',action='store_true');p.add_argument('--width',type=int,default=960);p.add_argument('--layers',type=int,choices=(1,3),default=3);p.add_argument('--rate',default='60/1');main(p.parse_args())

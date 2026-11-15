@@ -1,0 +1,167 @@
+[
+  {
+    "alias": "CameraA",
+    "timeline_seconds": 81.68333333333334,
+    "samples": 3920800,
+    "expected_samples": 3920800,
+    "underruns": 0,
+    "first_ready_seconds": 0.6488718999989942,
+    "native_complete": true,
+    "HDR_linear": true,
+    "completed_last_frame": 4900,
+    "skips": 0,
+    "playback_interval": {
+      "count": 4899,
+      "mean_ms": 16.6666,
+      "p50_upper_ms": 16.7,
+      "p95_upper_ms": 17.7,
+      "p99_upper_ms": 18.2,
+      "max_ms": 26.646,
+      "overflow_100ms": 0
+    },
+    "pool_frames": [
+      37
+    ],
+    "hdr10plus_retained_at_decode": true,
+    "window_condition": {
+      "mode": "visible",
+      "condition_held": true,
+      "scope": "Physical center hit-test and window state, not physical scanout. Owned QA topmost/cover windows only; no global Windows settings.",
+      "sample_count": 83,
+      "violations": [],
+      "boundary_samples": [
+        {
+          "seconds": 2.5000008463393897e-06,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": false,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 82.61128149999968,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        }
+      ],
+      "selection_scope": "Every detected condition violation and first/last samples retained; full generated raw trace remains local. Scores and failed attempts are never excluded."
+    }
+  },
+  {
+    "alias": "CameraB",
+    "timeline_seconds": 49.266666666666666,
+    "samples": 2364800,
+    "expected_samples": 2364800,
+    "underruns": 0,
+    "first_ready_seconds": 0.7609019999999873,
+    "native_complete": true,
+    "HDR_linear": true,
+    "completed_last_frame": 2955,
+    "skips": 0,
+    "playback_interval": {
+      "count": 2954,
+      "mean_ms": 16.6664,
+      "p50_upper_ms": 16.7,
+      "p95_upper_ms": 17.7,
+      "p99_upper_ms": 18.1,
+      "max_ms": 26.2591,
+      "overflow_100ms": 0
+    },
+    "pool_frames": [
+      37
+    ],
+    "hdr10plus_retained_at_decode": true,
+    "window_condition": {
+      "mode": "visible",
+      "condition_held": true,
+      "scope": "Physical center hit-test and window state, not physical scanout. Owned QA topmost/cover windows only; no global Windows settings.",
+      "sample_count": 51,
+      "violations": [],
+      "boundary_samples": [
+        {
+          "seconds": 2.3000011424301192e-06,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": false,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 50.39014769999994,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        }
+      ],
+      "selection_scope": "Every detected condition violation and first/last samples retained; full generated raw trace remains local. Scores and failed attempts are never excluded."
+    }
+  },
+  {
+    "alias": "CameraC",
+    "timeline_seconds": 18.016666666666666,
+    "samples": 864800,
+    "expected_samples": 864800,
+    "underruns": 0,
+    "first_ready_seconds": 0.6799123999990115,
+    "native_complete": true,
+    "HDR_linear": false,
+    "completed_last_frame": 1080,
+    "skips": 0,
+    "playback_interval": {
+      "count": 1079,
+      "mean_ms": 16.6662,
+      "p50_upper_ms": 16.7,
+      "p95_upper_ms": 17.7,
+      "p99_upper_ms": 18.2,
+      "max_ms": 20.9904,
+      "overflow_100ms": 0
+    },
+    "pool_frames": [
+      37
+    ],
+    "hdr10plus_retained_at_decode": false,
+    "window_condition": {
+      "mode": "visible",
+      "condition_held": true,
+      "scope": "Physical center hit-test and window state, not physical scanout. Owned QA topmost/cover windows only; no global Windows settings.",
+      "sample_count": 20,
+      "violations": [],
+      "boundary_samples": [
+        {
+          "seconds": 2.4000000848900527e-06,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": false,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 19.174492399999508,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        }
+      ],
+      "selection_scope": "Every detected condition violation and first/last samples retained; full generated raw trace remains local. Scores and failed attempts are never excluded."
+    }
+  }
+]

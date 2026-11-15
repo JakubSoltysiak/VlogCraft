@@ -1,0 +1,7 @@
+{
+  "compatible": false,
+  "mismatches": [
+    "observer"
+  ],
+  "investigate": true
+}

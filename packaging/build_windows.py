@@ -15,7 +15,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 BUILD = ROOT / 'build'
 RELEASE = ROOT / 'release'
-VERSION = '3.4.8'
+VERSION = '3.4.9'
 WIX_NS = 'http://schemas.microsoft.com/wix/2006/wi'
 UPGRADE_CODE = '09FA364C-4D7B-4B43-A1CF-7D82A0B62F02'
 ET.register_namespace('', WIX_NS)
@@ -58,6 +58,7 @@ def build(wix,experimental_native=False):
                     '--add-data', str(engine / 'ffprobe.exe') + ';engine',
                     '--add-data', str(engine.parent / 'LICENSE') + ';engine',
                     '--collect-data', 'webview', '--exclude-module', 'playwright',
+                    '--exclude-module', 'sitecustomize', '--exclude-module', 'benchmarks',
                     '--exclude-module', 'tkinter', 'desktop.py'], check=True)
     bundle = ROOT / 'dist' / 'VlogCraftStudio'
     if experimental_native:
