@@ -1,0 +1,20 @@
+{
+  "version": "3.4.10",
+  "qualification": "partial: confirmed PCM lock correction and meter churn reduction; long-session stabilization blocked",
+  "baseline_commit": "b2df1cf9060b55fd52135c4e892366850c277a6e",
+  "report": "docs/ROOT_CAUSE_3_4_10.md",
+  "evidence_scope": "Two matched 60s detached pairs and separate 90s allocation profiles at 960x540 composition / 356x200 surface; old-host 420s accumulation diagnostic. Not a new protected ten-run or physical 4K60 qualification.",
+  "source_fingerprint": "da0bc59a3067204149e46e629bc39d7b859222a9638c4e024482b6f85aed4d4e",
+  "fingerprint_method": "SHA256 sorted relevant relative path + NUL + LF-normalized source + NUL",
+  "benchmark_protocol_fingerprint": "041ba6bccb41523980ca48a0e3ceb9affb5f9102c590cdceee1d1a9e654093d1",
+  "benchmark_protocol_fingerprint_method": "SHA256 sorted benchmark driver/observer relative path + NUL + LF-normalized source + NUL",
+  "production_checkpoint": "7767d09ac0486528a563cff226708c416ee33239",
+  "evidence": "docs/benchmarks/native3410/root-cause-results.json",
+  "installer_sha256": "8d8cd097de5d2dfd67bb14c0c2c6a16f5750a6a9c004da8ee0371acf844821d2",
+  "open_blockers": [
+    "Historical 4.629s stall and 657 underruns not attributed",
+    "Active memory plateau unproven; candidate allocation profile has higher aggregate WebView commit",
+    "Protected consistency/full physical-size playback and long synchronization not requalified",
+    "Clean-machine/multiple-driver, signing and binary-redistribution review remain open"
+  ]
+}

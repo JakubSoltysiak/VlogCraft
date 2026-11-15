@@ -1,5 +1,19 @@
 # VlogCraft Studio development qualification
 
+## 3.4.10 root-cause continuation — current candidate
+
+Confirmed and corrected PCM graph preparation blocking clock/status delivery. Four deterministic tests pass for clock independence, concurrent Stop/seek fencing and the two-process budget. Full offline regression passed 124/124 in 33.506s before adding the last two race tests; all four race tests then passed. Two meter tests, three bounded-recorder tests and two allocation-summary privacy tests pass. Final exact-head normal/offline CI receipts are recorded in draft PR #7; hosted checks do not qualify GPU timing.
+
+Installed 3.4.10 passes native PCM/seek/renderer-failure fallback, modal/resize alignment, renderer/browser recovery, exact content of all 80 undo states, unsaved draft and paused-position restoration. Both UHD60 exports decode all 180 frames, SSIM 0.997805, zero A/V endpoint difference; baseline 7.148s and candidate 7.354s are one pair, not evidence of a throughput change. Upgrade/uninstall/reinstall exit 0 and preserve protected settings/project data. Source/installed modules, native runtime and approved icons match. MSI SHA256 `8d8cd097de5d2dfd67bb14c0c2c6a16f5750a6a9c004da8ee0371acf844821d2`.
+
+Detached generated-media diagnostics at 960×540 composition / 356×200 physical surface: old-host 420.104s has 64 skips, 0 underruns and 140.562ms maximum active interval. Two matched 60s pairs retain baseline 202/32 skips and candidate 35/27, all 0 underruns; variation and reverse-pair p99 prevent full consistency acceptance. Allocation sampling attributes 62,655,300 bytes to old meter iteration and no samples to the candidate, but candidate WebView private commit after natural idle is 1353.508MiB versus 993.449MiB baseline. Memory stabilization is not established. Profiling outcomes 3 versus 25 skips are retained separately, not substituted for acceptance scores. [Methods, failures and next experiment](docs/ROOT_CAUSE_3_4_10.md).
+
+Historical 4.629s stall, 657 underruns, positive long-session slopes, original protected 3.4.8/3.4.9 cohorts and every failure remain preserved. Qualification and HDR production adoption remain blocked. New diagnostics use generated media; no fresh private-camera, full physical-size, ten-run or long-editing acceptance is claimed.
+
+## Earlier 3.4.10 diagnostic-only checkpoint
+
+At checkpoint 1ab1e62, seven focused tests passed normally and offline. Attached/detached45s controls and one150s memory-workload probe passed audio/visibility/resource-release checks. Natural idle released194.4/149.1MiB before explicit GC. Production sources/MSI were unchanged at that checkpoint. Current production changes and limitations are above. [Historical findings](docs/STABILIZATION_3_4_10.md), [draft PR #7](https://github.com/JakubSoltysiak/VlogCraft/pull/7).
+
 ## 3.4.9 finalization — 15 November 2026
 
 **Development delivery; qualification incomplete.** [Draft PR #6](https://github.com/JakubSoltysiak/VlogCraft/pull/6) is stacked on PR #5. Main, PRs #1–#5 and historical tags are preserved/unmerged. [Full report and ten-row comparison](docs/RELIABILITY_MEMORY_3_4_9.md), [sanitized evidence](docs/benchmarks/2026-11-14-native349), [offline QA viewer](docs/QA_PROGRESS.md).
@@ -391,3 +405,5 @@ A single installed run measured 1.047 s from drop to clip insertion, 4.344 s thr
 The encoder smoke matrix exported and decoded H.264, HEVC and AV1 on both CPU and AMD AMF at 640×360/60. NVENC and Quick Sync could not be qualified on this hardware. No paid endpoint was invoked and no camera footage was supplied.
 
 3.4.9 checkpoint B: persistent QA infrastructure passes 15 focused tests; the pythonw GUI refreshes status and closes normally with zero owned survivors/new terminals. Legacy Windows output encoding and atomic-reader sharing failures were reproduced and corrected; failed tracker attempts remain recorded. Profile integration now gives descendants the same bounded three-second normal-shutdown grace as the supervisor; forced cleanup still fails. See [QA progress](docs/QA_PROGRESS.md).
+
+Historical 1ab1e62 diagnostic checkpoint (superseded by the current continuation above): diagnostic wall deadlines and natural idle separation tested; short controls show194/149MiB natural WebView reclamation,0underruns. Old1,061-frame burst predates recorded late occlusion. No production root cause/fix or full acceptance claimed. [Report](docs/STABILIZATION_3_4_10.md).

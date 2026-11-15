@@ -2,6 +2,8 @@
 
 > **[MASTER TO-DO LIST & PRODUCT ROADMAP](TODO.md)** — shared living backlog for the owner, Codex and ChatGPT. Check priorities and update it with each feature PR.
 
+The **3.4.10 stabilization investigation** continues on [draft PR #7](https://github.com/JakubSoltysiak/VlogCraft/pull/7). The local 3.4.10 development installer includes a verified PCM preparation lock correction and reduced meter allocation churn. Recovery, exact 80-state history, fallback, offline regression and installer checks pass within their documented scope. Historical long stalls, intermittent underruns and active memory growth remain acceptance blockers. [Measured findings and limits](docs/ROOT_CAUSE_3_4_10.md). This is not a stable release.
+
 The **3.4.9 development candidate** provides bounded WebView recovery, exact80-state draft/undo restoration, compressed checkpoints, explicit audio-worklet disposal and Windows process cleanup. It is [draft PR #6](https://github.com/JakubSoltysiak/VlogCraft/pull/6), stacked on PR #5. **Qualification remains incomplete:** long playback tails, a diagnostic audio failure and continuing WebView growth block production HDR adoption. [Actual results and every retained failure](docs/RELIABILITY_MEMORY_3_4_9.md), [verification](VERIFICATION.md), [feature matrix](FEATURES.md).
 
 An offline development **QA progress viewer** reads persistent build/qa/status.json without opening another terminal. Double-click tools/qa_status.pyw or run it with the local pythonw interpreter. [Exact commands, counting and heartbeat semantics](docs/QA_PROGRESS.md). It is separate from the production editor.
