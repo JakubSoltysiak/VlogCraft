@@ -17,6 +17,7 @@ PROTOCOL_FILES=(
  'benchmarks/camera_playback.py','benchmarks/camera_recovery.py','benchmarks/checkpoint_profile.py',
  'benchmarks/owned_process.py','benchmarks/run_qa.py','benchmarks/qa_progress.py','tests/qa_guard/sitecustomize.py',
  'benchmarks/detached_editing.py','benchmarks/graphics_diagnostics.py','benchmarks/observation_window.py',
+ 'benchmarks/root_cause_probe.py','benchmarks/flight_recorder.js',
  'tests/performance.py','tests/gpu_metrics.py')
 
 def fingerprint(files=None):

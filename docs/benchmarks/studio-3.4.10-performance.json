@@ -6,6 +6,6 @@
   "evidence_scope": "New observer deadline/natural-idle protocol. Historical 3.4.9 scores are not relabelled as new measurements.",
   "source_fingerprint": "daaa81cab9dfaaadaf64b38f0ff3589c840ba7d43bd44242c02d4d9e7ca8f112",
   "fingerprint_method": "SHA256 sorted relevant relative path + NUL + LF-normalized source + NUL",
-  "benchmark_protocol_fingerprint": "ce18bd21e9f6b21fdfd2f3cdde662ddfe64baaf0377c3c23f1a2752074119ded",
+  "benchmark_protocol_fingerprint": "54b6a4d6f1d201a7e9ade93791d5fd5fb8ad807ce62b08f7c519ca16f6b51360",
   "benchmark_protocol_fingerprint_method": "SHA256 sorted benchmark driver/observer relative path + NUL + LF-normalized source + NUL"
 }
