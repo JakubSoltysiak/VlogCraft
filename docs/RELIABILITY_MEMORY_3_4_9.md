@@ -1,6 +1,6 @@
 # WebView reliability and memory ownership — 3.4.9
 
-**WORK IN PROGRESS — QUALIFICATION INCOMPLETE.** Finalization checkpoint preserves the existing 3.4.9 work before further qualification. Final installed MSI: `05bcdbd1abaa0e68f1ac2ad6df73511f5acdfcf60b8dfc07f369f667a7eb9fe4`. The final ten workload attempts per arm are retained, including focus failures; long memory stability is unproven. The persistent QA tracker and final delivery summary are not yet complete. No stable release or HDR readiness is claimed.
+**WORK IN PROGRESS — QUALIFICATION INCOMPLETE.** Finalization checkpoint preserves the existing 3.4.9 work before further qualification. Final installed MSI: `05bcdbd1abaa0e68f1ac2ad6df73511f5acdfcf60b8dfc07f369f667a7eb9fe4`. The final ten workload attempts per arm are retained, including focus failures; long memory stability is unproven. The persistent offline QA tracker is implemented and has focused automated/GUI checks; final delivery qualification remains incomplete. See [QA progress instructions](QA_PROGRESS.md). No stable release or HDR readiness is claimed.
 
 Development continues verified PR #5 / `6a5532e6efa091d31e1baf633af03864316e63d3` on `codex/studio-3.4.9-reliability`. PRs #1–#5 stay unmerged. Original media, the approved artwork, project format, FFmpeg renderer and 3.4.8 scheduling/cache/encoder policies are preserved. This milestone adds no HDR or AI features.
 

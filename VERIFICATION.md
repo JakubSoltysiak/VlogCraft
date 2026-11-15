@@ -1,6 +1,6 @@
 # VlogCraft Studio 3.4 development qualification
 
-**WORK IN PROGRESS — QUALIFICATION INCOMPLETE.** Finalization checkpoint preserves the existing 3.4.9 work before further qualification. Final installed MSI: `05bcdbd1abaa0e68f1ac2ad6df73511f5acdfcf60b8dfc07f369f667a7eb9fe4`. The final ten workload attempts per arm are retained, including focus failures; long memory stability is unproven. The persistent QA tracker and final delivery summary are not yet complete. No stable release or HDR readiness is claimed.
+**WORK IN PROGRESS — QUALIFICATION INCOMPLETE.** Finalization checkpoint preserves the existing 3.4.9 work before further qualification. Final installed MSI: `05bcdbd1abaa0e68f1ac2ad6df73511f5acdfcf60b8dfc07f369f667a7eb9fe4`. The final ten workload attempts per arm are retained, including focus failures; long memory stability is unproven. The persistent offline QA tracker is implemented and has focused automated/GUI checks; final delivery qualification remains incomplete. See [QA progress instructions](docs/QA_PROGRESS.md). No stable release or HDR readiness is claimed.
 
 ## 3.4.9 reliability qualification — 14–15 November 2026
 
@@ -391,3 +391,5 @@ The installed desktop test supplied a native WebView2 drop payload for a fully a
 A single installed run measured 1.047 s from drop to clip insertion, 4.344 s through proxy readiness, 0.781 s for a seek check including automation polling and 1.719 s for the 24-frame export. The process tree's peak summed working set was 2,075.5 MiB, sampled CPU time 21.48 s and process I/O 5,045.9 MiB read / 12.2 MiB written. These are whole-workflow measurements on a short synthetic source. GPU utilization, physical disk I/O and sustained real-time playback were unmeasured. Three control-image comparisons matched the reference, with the inspector visible at two viewport widths.
 
 The encoder smoke matrix exported and decoded H.264, HEVC and AV1 on both CPU and AMD AMF at 640×360/60. NVENC and Quick Sync could not be qualified on this hardware. No paid endpoint was invoked and no camera footage was supplied.
+
+3.4.9 checkpoint B: persistent QA infrastructure passes 15 focused tests; the pythonw GUI refreshes status and closes normally with zero owned survivors/new terminals. Legacy Windows output encoding and atomic-reader sharing failures were reproduced and corrected; failed tracker attempts remain recorded. Profile integration now gives descendants the same bounded three-second normal-shutdown grace as the supervisor; forced cleanup still fails. See [QA progress](docs/QA_PROGRESS.md).

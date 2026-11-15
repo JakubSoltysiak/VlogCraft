@@ -15,7 +15,7 @@ PROTOCOL_FILES=(
  'benchmarks/session_memory.py','benchmarks/observer_memory.py','benchmarks/memory_metrics.py',
  'benchmarks/export_preservation.py','benchmarks/engine_profile.py','benchmarks/multicore_export.py',
  'benchmarks/camera_playback.py','benchmarks/camera_recovery.py','benchmarks/checkpoint_profile.py',
- 'benchmarks/owned_process.py','benchmarks/run_qa.py','tests/qa_guard/sitecustomize.py',
+ 'benchmarks/owned_process.py','benchmarks/run_qa.py','benchmarks/qa_progress.py','tests/qa_guard/sitecustomize.py',
  'benchmarks/detached_editing.py','benchmarks/graphics_diagnostics.py',
  'tests/performance.py','tests/gpu_metrics.py')
 

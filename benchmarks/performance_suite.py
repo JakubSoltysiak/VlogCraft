@@ -1,7 +1,12 @@
 """Repeatable local QUICK/STANDARD/FULL profiles. Generated workloads; no uploads."""
 import argparse,json,subprocess,sys,time,os
 from pathlib import Path
-from owned_process import ProcessScope
+if __package__:
+ from .owned_process import ProcessScope
+ from .qa_progress import Tracker,DEFAULT,Activity,duration
+else:
+ from owned_process import ProcessScope
+ from qa_progress import Tracker,DEFAULT,Activity,duration
 ROOT=Path(__file__).resolve().parents[1]
 def commands(level,executable,media,results):
  py=sys.executable
@@ -36,12 +41,33 @@ def commands(level,executable,media,results):
  return steps
 def main(a):
  a.results.mkdir(parents=True,exist_ok=True);report={'level':a.level,'steps':[]}
- for name,cmd in commands(a.level,a.executable.resolve(),a.media.resolve(),a.results.resolve()):
+ if (a.results/'suite.json').exists():raise FileExistsError('Preserve previous suite results; use a new results directory')
+ steps=commands(a.level,a.executable.resolve(),a.media.resolve(),a.results.resolve())
+ tracker=Tracker(os.environ.get('VLOGCRAFT_QA_STATUS',DEFAULT),os.environ.get('VLOGCRAFT_QA_RUN_ID'),a.level+' QA profile')
+ tracker.plan([name for name,cmd in steps],complete=True)
+ for name,cmd in steps:
   began=time.perf_counter()
+  token=tracker.start(name,phase=a.level,expected_seconds=duration(cmd),pid=os.getpid())
+  progress_error=None
   env=dict(os.environ,VLOGCRAFT_QA_HIDDEN_CHILDREN='1');env['PYTHONPATH']=str(ROOT/'tests/qa_guard')+os.pathsep+env.get('PYTHONPATH','')
   with (a.results/(name+'.log')).open('wb') as log,ProcessScope() as owner:
-   r=owner.launch(cmd,cwd=ROOT,env=env,stdout=log,stderr=log);code=r.wait()
-  report['steps'].append({'name':name,'exit_code':code,'seconds':time.perf_counter()-began,'process_ownership':owner.report})
+   r=owner.launch(cmd,cwd=ROOT,env=env,stdout=log,stderr=log);activity=Activity(r.pid)
+   try:
+    while True:
+     try:code=r.wait(timeout=2);break
+     except subprocess.TimeoutExpired:
+      try:tracker.heartbeat(name,token,time.perf_counter()-began,activity.sample())
+      except Exception as error:progress_error=type(error).__name__
+   except BaseException as error:
+    try:tracker.finish(name,token,'cancelled' if isinstance(error,KeyboardInterrupt) else 'failed',reason=type(error).__name__)
+    except Exception:pass  # Preserve the original exception and owned-process cleanup.
+    raise
+   deadline=time.monotonic()+3
+   while owner.members() and time.monotonic()<deadline:time.sleep(.05)
+  if owner.report['job_members_at_cleanup'] and code==0:code=1
+  try:tracker.finish(name,token,'passed' if code==0 else 'failed',code)
+  except Exception as error:progress_error=type(error).__name__
+  report['steps'].append({'name':name,'exit_code':code,'seconds':time.perf_counter()-began,'process_ownership':owner.report,'progress_error':progress_error})
   (a.results/'suite.json').write_text(json.dumps(report,indent=2),encoding='utf8')
   print(json.dumps(report['steps'][-1]),flush=True)
   if code:raise SystemExit(code)

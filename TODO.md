@@ -23,6 +23,8 @@
 
 Both 30-minute editing attempts completed 180 batches, retained 80 undo entries and reported zero underruns, but failed strict focus qualification. Attached: two foreground-loss samples/seven surface-observer failures; detached: 21 unfocused samples over approximately 33 seconds with the preview unobscured. Late WebView growth remains 12.905 and 10.937 MiB/min, with later natural reclamation. Active-session plateau acceptance under VC-REL349-004 remains open. Both failures are retained.
 
+- [x] **VC-REL349-009 — Persistent offline development QA tracker, scoped verification.** Atomic build/qa/status.json, retained attempts/failures, stable retry IDs, dynamic and unknown totals, two-second supervisor heartbeat/activity and controller status. Fifteen focused tests and the no-console GUI refresh/close smoke pass. QUICK/STANDARD/FULL register leaf cases. [Viewer and commands](docs/QA_PROGRESS.md). No playback-thread callbacks or online dependency.
+
 ## How to use and maintain this file
 
 - This is the **shared product backlog**, not a declaration that every item is implemented.

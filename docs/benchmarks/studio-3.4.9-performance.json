@@ -73,7 +73,6 @@
     "continuous_window_condition": false
   },
   "remaining": [
-    "Persistent QA tracker",
     "Final failure classification and documentation",
     "Large-file final workflow failure",
     "Long WebView private-commit plateau unproven",
@@ -81,6 +80,8 @@
   ],
   "source_fingerprint": "daaa81cab9dfaaadaf64b38f0ff3589c840ba7d43bd44242c02d4d9e7ca8f112",
   "fingerprint_method": "SHA256 sorted relevant relative path + NUL + LF-normalized source + NUL",
-  "benchmark_protocol_fingerprint": "d0fd54608b8902f4f55e7b0e17826feda6a256eca1f730c673540fe1f4dc8dc1",
-  "benchmark_protocol_fingerprint_method": "SHA256 sorted benchmark driver/observer relative path + NUL + LF-normalized source + NUL"
+  "benchmark_protocol_fingerprint": "5b6294e30166781727e0e5479c3c97ba2694feee1b74923c8294deb464ab6ebc",
+  "benchmark_protocol_fingerprint_method": "SHA256 sorted benchmark driver/observer relative path + NUL + LF-normalized source + NUL",
+  "before_tracker_protocol_fingerprint": "d0fd54608b8902f4f55e7b0e17826feda6a256eca1f730c673540fe1f4dc8dc1",
+  "protocol_scope": "The final ten workload attempts predate the QA heartbeat integration. Application/native code is unchanged. Current protocol binding includes the new two-second supervisor tracker; it does not relabel older measurements as a new full cohort. Tracker overhead and impacted short smoke are qualified separately."
 }
