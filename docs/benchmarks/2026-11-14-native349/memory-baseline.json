@@ -1672,5 +1672,7 @@
   "audio_gate_passed": true,
   "window_condition_held": null,
   "active_observer": "attached Performance/Network observer",
-  "qualification_exit_code": null
+  "qualification_exit_code": null,
+  "heap_sample_count_original": 25,
+  "heap_sample_selection": "All actual heap observations plus first/last process-only snapshots. Full generated raw trace retained locally; all30s medians/slopes remain in groups."
 }

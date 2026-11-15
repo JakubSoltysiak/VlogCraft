@@ -1,10 +1,76 @@
 # WebView reliability and memory ownership — 3.4.9
 
-**WORK IN PROGRESS — QUALIFICATION INCOMPLETE.** Finalization checkpoint preserves the existing 3.4.9 work before further qualification. Final installed MSI: `05bcdbd1abaa0e68f1ac2ad6df73511f5acdfcf60b8dfc07f369f667a7eb9fe4`. The final ten workload attempts per arm are retained, including focus failures; long memory stability is unproven. The persistent offline QA tracker is implemented and has focused automated/GUI checks; final delivery qualification remains incomplete. See [QA progress instructions](QA_PROGRESS.md). No stable release or HDR readiness is claimed.
+## Final development delivery — 15 November 2026
 
-Development continues verified PR #5 / `6a5532e6efa091d31e1baf633af03864316e63d3` on `codex/studio-3.4.9-reliability`. PRs #1–#5 stay unmerged. Original media, the approved artwork, project format, FFmpeg renderer and 3.4.8 scheduling/cache/encoder policies are preserved. This milestone adds no HDR or AI features.
+**WORK IN PROGRESS — QUALIFICATION INCOMPLETE.** Recovery/resource fixes and the development installer are verified for the scopes below. Long-playback/audio and active-memory acceptance fail or remain unproven. This is [draft PR #6](https://github.com/JakubSoltysiak/VlogCraft/pull/6), stacked on PR #5; no PR is merged and no stable release is created.
 
-**Current acceptance is incomplete.** The earlier ten-pair cohort passed its FPS/audio gates, but subsequent guarded controls and frozen-baseline endurance failed. Those results remain separate and included. Both completed 30-minute editing attempts also fail strict focus qualification and retain positive late WebView memory slopes. Investigation continues; neither a complete milestone nor readiness for HDR development is claimed.
+Final MSI SHA256: `05bcdbd1abaa0e68f1ac2ad6df73511f5acdfcf60b8dfc07f369f667a7eb9fe4`. Native runtime remains byte-identical `ac206038cea559f87d784e0ec4fc8485bdebd1421b7c4a78853e7ea037e3f72a`. Full clock replies are restored; the rejected compact-response path is absent. Frame caches, GPU slots, PTS selection, preview quality, encoder policy, approved artwork, originals and FFmpeg fallback are preserved. QA-only additions are excluded from the installed application.
+
+### Final ten workload attempts per arm
+
+Three original generated 4K60 sources, three video/three audio tracks, 1,500 clips,125 seconds,960×540 composition,356×200 physical preview; no proxies/intermediate encode. Actual175% Windows DPI, real Windows/browser focus, separate physical coverage, AC and default GPU counters. These are reduced-resolution composition results from 4K originals, not full-size UHD60 scanout.
+
+All **twenty measured attempts** are included, including failed window conditions. Candidate ordinals2,4,5 and baseline ordinal8 failed foreground qualification; they are not replaced. Seven baseline and ten candidate earlier observer-ReferenceError attempts failed before playback and remain in the ledger, separately from these ten workload attempts. Extra numbered cases were used only for those proven before-playback fixture failures. Ordinal rows are not simultaneous temporal pairs.
+
+| Measured ordinal | Frozen 3.4.8 FPS | Skips | Final 3.4.9 FPS | Skips | 3.4.9 result |
+|---:|---:|---:|---:|---:|---|
+| 1 | 59.722538 | 2 | 59.853317 | 4 | passed fixture |
+| 2 | 59.833386 | 5 | 59.804988 | 18 | FAILED fixture |
+| 3 | 59.828057 | 2 | 59.759606 | 3 | passed fixture |
+| 4 | 59.835441 | 5 | 59.893829 | 3 | FAILED fixture |
+| 5 | 59.764005 | 2 | 59.734579 | 22 | FAILED fixture |
+| 6 | 59.813997 | 5 | 59.889048 | 5 | passed fixture |
+| 7 | 59.842980 | 7 | 59.734300 | 4 | passed fixture |
+| 8 | 59.700945 | 18 | 59.791210 | 7 | passed fixture |
+| 9 | 59.857117 | 11 | 59.882250 | 8 | passed fixture |
+| 10 | 59.809720 | 8 | 59.773922 | 5 | passed fixture |
+
+
+| Descriptive metric, all ten measured attempts | Frozen 3.4.8 | Final 3.4.9 |
+|---|---:|---:|
+| Best / median / worst FPS | 59.857117 / 59.821027 / 59.700945 | 59.893829 / 59.798099 / 59.734300 |
+| FPS population SD | 0.050655 | 0.059985 |
+| Skips min / median / max | 2 / 5 / 18 | 3 / 5 / 22 |
+| Maintained window condition | 9/10 | 7/10 |
+| Exact6,000,000 audio samples / zero underruns | 10/10 | 10/10 |
+| Median sampled peak summed RSS MiB | 3445.4 | 3467.0 |
+| Median machine CPU percent | 6.34 | 6.77 |
+| Active interval p50/p95/p99 median upper ms | 16.7 / 17.95 / 35.95 | 16.7 / 18.20 / 36.55 |
+| Longest active interval ms | 64.9182 | 76.9794 |
+| Across-run mean-interval variance ms² | 0.000111497 | 0.000217270 |
+
+The numeric FPS/audio results are encouraging, but **strict ten-run qualification does not pass**. All twenty exceed59.5FPS; four have invalid focus conditions, and both arms miss the archived median-skip3.5 target. Candidate maximum22 also exceeds the archived16. Histogram percentiles are upper bounds; the variance above concerns trial means, not exact per-frame variance. Summed RSS can double-count UMA mappings. The historical348 archive and earlier passing349 cohort remain separate, never substituted for final-build measurements.
+
+### Endurance and memory blockers
+
+Final matched600-second playback: frozen348 **59.678450FPS /95 skips /0 underruns**, exact28.8M samples and held window condition; candidate **57.980404FPS /1,203 skips /0 underruns**, exact28.8M samples but failed focus/coverage. Candidate's longest active presentation interval is **4,629.36ms**, longest individual Present call **1,408.37ms**;1,137 skips are source-wait-associated,0 GPU-queue-associated. Neither source-wait association nor recorded occlusion establishes the ultimate cause. No unexpected host exit, renderer/browser failure or forced cleanup was established in that run. These failures remain alongside the earlier frozen34846.095FPS/11,227-underrun failure and earlier candidate59.876FPS/zero-underrun run.
+
+The final600-second **memory diagnostic fails with657 audio underruns despite its sampled window condition holding**. Its count rises between the90- and120-second samples. Minimum sampled available RAM is11,417MiB; peak sampled machine CPU55.7%, so sampled data do not establish RAM exhaustion. WebView first/last30-second private-commit medians are1,074.01/1,939.91MiB; warmed slope81.201MiB/min (approximate95% interval67.946–94.456). Total private commit4,254.54→5,155.79MiB. Earlier matched600-second slopes81.044/80.956MiB/min with zero underruns are retained, not a substitute passing result. This diagnostic failure is an unresolved acceptance blocker, not dismissed as observer overhead.
+
+The corrected final-build detached1800-second editing attempt completes **180 batches,80 undo entries and0 audio underruns**, with no browser error and normal resource release. It nevertheless **fails strict visibility**: one sampled preview occlusion at130.328s, with foreground retained. Late WebView growth is **10.976MiB/min**, approximate95% interval10.208–11.744; private commit862.72→1,573.20MiB. Post-stop live JS is47.69MiB before diagnostic GC and48.05MiB after the later idle/GC observation. This does not establish an active plateau or identify all growth as a leak. The earlier attached/detached failures and12.905/10.937MiB/min slopes remain. No further30-minute test was launched in finalization; no periodic GC or cache reduction ships.
+
+### Essential checks and confirmed fixes
+
+- **113/113 offline Python tests** pass in33.699s; **19/19 JavaScript tests** pass. Twenty decoded drain repetitions and six CPU/AMD encoder smoke exports passed in the completed final package qualification. The source/native compilation and Windows CI receipts are recorded against the exact final commit in draft PR #6.
+- Final installed renderer/browser recovery preserves unsaved acknowledged draft, exact canonical content of all80 undo snapshots, project tracks/output, undo/redo and paused point. Zero-pixel native preview alignment; three early-close cycles; storage-failure cleanup; five project reopen cycles with zero surviving owned children. Active export survives renderer recovery and fully decodes720 UHD60 frames. Original unexplained target losses remain unassigned.
+- Twenty seeks create/destroy21 AudioWorklets: one wrapper active, zero after Stop; processor PCM/handlers/ports release, backend snapshot/reader release. Pause semantics and effective frame caches remain unchanged. This fixes a confirmed ownership leak without claiming all WebView growth is resolved.
+- Checkpoint40.47→4.27MiB; corrected **installed** edit/save median1.321s versus frozen3481.202s and rejected uncompressed9.727s. The earlier~1.19s source result is not relabelled as installed latency. All80 states and Unicode survive native gzip/JSON fallback and fault restoration.
+- All three complete private originals pass final native playback and recovery/reopening, with exact audio budgets and zero underruns; unchanged native precision/PTS checks are reused. Explicit SDR reference exports decode60 UHD60 frames each. This is not calibrated HDR or HDR10+ mastering. Original hashes/mtimes remain unchanged; no footage, frames, thumbnails, names, GPS or private paths are published.
+- Two independent **5,972,550,422-byte** generated sources pass installed linked native-drop/no-copy, greater-than4GiB seek, proxy cancel/retry, editing/undo/consent-bound offline AI/reopen and84 decoded3840×2160/60 frames with1.4s audio. The first fixture's CDP reload was rejected by the intended navigation guard; the corrected fixture verifies a real normal host close/reopen, with no production bypass. Its earlier ERR_ABORTED failure remains. Physical Explorer gestures and an OS-firewall test are outside this automated scope.
+- Three alternating export pairs: median5.971→4.990s; worst6.347→5.147s. All180 frames decode, equal SSIM.997805, unchanged UHD60 libx264/preset/quality/audio settings. No export regression reproduced in this fixture; no new encoder optimization was introduced to chase this result. Other direct/worker/encoder controls remain in the evidence.
+- The final MSI's baseline install, upgrade, uninstall and reinstall return0 and preserve protected project/settings bytes. Bundled/installed Python, desktop/web/native and approved EXE/MSI/shortcut/window/taskbar resources pass, including QA-module exclusion. WebView2 was already installed; clean-machine deployment, signing and binary redistribution obligations remain open.
+
+### Persistent QA and terminal ownership
+
+The offline tracker is **build/qa/status.json**. [Open the no-console viewer or read status](QA_PROGRESS.md). Fifteen focused tests cover atomic/concurrent access, unknown/dynamic totals, immutable retries/history, controller exit, heartbeat/activity, legacy encoding, result preservation and profile leaf accounting. The GUI refresh/close check passes. Supervisor updates cost median23.257ms wall/mean17.188ms CPU with~100KB retained status, every two seconds, outside playback threads. A30-second tracker integration smoke records59.407641 wall-time FPS,0 skips,exact1.44M samples,0 underruns and held visibility; it is not a replacement125-second acceptance score.
+
+Hidden suspended-child Job assignment, bounded normal shutdown and failure/timeout cleanup retain logs and never terminate unrelated applications. GUI FFprobe/thumbnail/default-render subprocesses use no-console flags. All completed final-package steps and new finalization checks leave zero owned survivors/new visible terminals. Nine confirmed empty test windows were gracefully closed with0 process terminations/0 unrelated windows targeted. The older dozens of windows lack full attribution. Viewer/Codex disconnection does not cancel a running benchmark. Historical failures remain accessible in the tracker's run selector;100% completed is not a qualification pass.
+
+**Recommendation:** the recovery, audio ownership, checkpoint and QA improvements are ready for draft review and scoped development use. Full reliability/memory acceptance remains incomplete. Keep native opt-in and the FFmpeg fallback. **Hold production HDR/3.5 engine adoption** until the diagnostic audio failure, long presentation tails and memory/visibility gates are addressed. No additional architectural investigation or unrelated feature is part of this delivery.
+
+## Earlier investigation records
+
+The records below describe earlier variants and diagnostic attempts. Their references to a final/current candidate apply to that stage; the final05bcdbd results above govern this delivery.
 
 ## Historical incidents and classification
 
@@ -139,7 +205,7 @@ Run 2's longest active presentation interval was 1,300.36 ms; 87 of its 115 skip
 
 Controlled follow-up tests keep only the owned QA window above other windows, or create a local opaque test cover over the preview/whole editor. Win32 hit tests, foreground state, native DPI and browser visibility are recorded throughout. The controlled experiments use the same package, native binary, sources, tracks, duration, composition, physical surface and quality. Covered results remain separate and public; visible measurements cannot erase the failure above. The test-only topmost/cover state is removed on cleanup and no global Windows settings are changed. Qualification is still in progress.
 
-## Natural Windows ten-pair comparison
+## Earlier pre-console natural Windows ten-pair comparison
 
 The earlier compressed-history MSI was `3d13547f0e9d4fee453f84b7bed176fdf3c891146a6469500a6ac288d2978d30`. No application or native C++ change was made during that measurement-isolation cohort. The frozen 3.4.8 host and installed 3.4.9 host ran ten alternating pairs with identical generated originals, three video/three audio tracks, 1,500 clips, 125 seconds, 960 × 540 composition and a 356 × 200 physical monitor. No proxies, encoded program intermediate, generated frames or quality reductions were used. Every decoder retained its six-frame prefix budget/37-frame pool and every renderer retained six GPU slots.
 
@@ -223,6 +289,6 @@ The corrected final MSI is `05bcdbd1abaa0e68f1ac2ad6df73511f5acdfcf60b8dfc07f369
 | View | DOM, JS DTOs, timeline, capped80-entry undo/redo, one coalesced checkpoint in flight plus latest pending | Live heap/DOM/listeners and browser/renderer/GPU/utility process roles sampled separately; checkpoint/history data are intentional editing retention. Full allocation-stack attribution and every detached-DOM path remain unqualified. |
 | Browser allocator | V8/DOM/media/GPU and process pools; DevTools overhead | Post-stop diagnostic GC/release comparisons and attached/detached controls distinguish some reclaimable objects from process commit. A lower live heap alone does not prove a stable total-memory plateau. |
 
-## Qualification still running
+## Historical qualification scheduling record
 
-The protected ten-run packaged comparison, matched memory measurements, extended editing, repeated project lifecycle, bounded pressure/cancellation, export preservation, private originals and final Windows/CI checks will be recorded here before publication. No pending check is represented as passed.
+The final delivery section above supersedes scheduling notes in these chronological investigation records. Earlier variants and failed attempts remain preserved; hosted receipts live in draft PR #6.

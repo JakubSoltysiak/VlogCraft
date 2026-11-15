@@ -2,7 +2,9 @@
 
 > **[MASTER TO-DO LIST & PRODUCT ROADMAP](TODO.md)** — shared living backlog for the owner, Codex and ChatGPT. Check priorities and update it with each feature PR.
 
-The **3.4.9 reliability development candidate** adds bounded WebView recovery, durable local draft checkpoints, explicit native-audio worklet disposal and safer startup/shutdown. It preserves the 3.4.8 pacing, effective caches, preview quality, encoder policy and approved icon. [Reliability and memory evidence](docs/RELIABILITY_MEMORY_3_4_9.md) distinguishes tested recovery from the still-unexplained historical target losses. Native playback remains experimental; this is not a stable release or HDR qualification.
+The **3.4.9 development candidate** provides bounded WebView recovery, exact80-state draft/undo restoration, compressed checkpoints, explicit audio-worklet disposal and Windows process cleanup. It is [draft PR #6](https://github.com/JakubSoltysiak/VlogCraft/pull/6), stacked on PR #5. **Qualification remains incomplete:** long playback tails, a diagnostic audio failure and continuing WebView growth block production HDR adoption. [Actual results and every retained failure](docs/RELIABILITY_MEMORY_3_4_9.md), [verification](VERIFICATION.md), [feature matrix](FEATURES.md).
+
+An offline development **QA progress viewer** reads persistent build/qa/status.json without opening another terminal. Double-click tools/qa_status.pyw or run it with the local pythonw interpreter. [Exact commands, counting and heartbeat semantics](docs/QA_PROGRESS.md). It is separate from the production editor.
 
 The earlier 3.4.8 development candidate improves repeated playback consistency while preserving the approved icon in a separate asset commit. [Measured results and remaining gates](docs/PERFORMANCE_CONSISTENCY_3_4_8.md) include every failed attempt. Native preview remains experimental.
 

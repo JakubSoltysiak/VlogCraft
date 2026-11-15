@@ -2366,5 +2366,7 @@
   },
   "failure_type": null,
   "scope": "RSS sums may duplicate shared UMA pages. Private commit, heap, GPU estimates are separate. No forced GC during active measurement.",
-  "browser_error_count": 0
+  "browser_error_count": 0,
+  "heap_sample_count_original": 25,
+  "heap_sample_selection": "All actual heap observations plus first/last process-only snapshots. Full generated raw trace retained locally; all30s medians/slopes remain in groups."
 }
