@@ -1,0 +1,343 @@
+{
+  "layers": 1,
+  "effects": false,
+  "quality_options_unchanged": true,
+  "rows": [
+    {
+      "SSIM_vs_source": 0.997753,
+      "repeat": 0,
+      "workers": [
+        1,
+        1,
+        4
+      ],
+      "seconds": 8.622998000000734,
+      "frames": 180,
+      "fps": 20.87441050084723,
+      "decoded": true,
+      "SSIM_vs_first_baseline": 1.0,
+      "stages": [
+        {
+          "output": "segment_00000_video.mov",
+          "seconds": 8.208554,
+          "exit": 0,
+          "ffmpeg_user_s": 21.844,
+          "ffmpeg_system_s": 0.391,
+          "ffmpeg_runtime_s": 8.085,
+          "ffmpeg_peak_rss_MiB": 1273.2,
+          "bytes": 13377462
+        },
+        {
+          "output": "segment_00000_audio.wav",
+          "seconds": 0.086511,
+          "exit": 0,
+          "ffmpeg_user_s": 0.0,
+          "ffmpeg_system_s": 0.0,
+          "ffmpeg_runtime_s": 0.007,
+          "ffmpeg_peak_rss_MiB": 42.62,
+          "bytes": 576078
+        },
+        {
+          "output": "segment_00000.mov",
+          "seconds": 0.111308,
+          "exit": 0,
+          "ffmpeg_user_s": 0.0,
+          "ffmpeg_system_s": 0.0,
+          "ffmpeg_runtime_s": 0.023,
+          "ffmpeg_peak_rss_MiB": 40.72,
+          "bytes": 13954203
+        },
+        {
+          "output": "delivery.partial.mp4",
+          "seconds": 0.20627,
+          "exit": 0,
+          "ffmpeg_user_s": 0.156,
+          "ffmpeg_system_s": 0.062,
+          "ffmpeg_runtime_s": 0.111,
+          "ffmpeg_peak_rss_MiB": 41.25,
+          "bytes": 13453180
+        }
+      ]
+    },
+    {
+      "SSIM_vs_source": 0.997805,
+      "repeat": 0,
+      "workers": [
+        1,
+        1,
+        8
+      ],
+      "seconds": 4.688499199999569,
+      "frames": 180,
+      "fps": 38.391816298063254,
+      "decoded": true,
+      "SSIM_vs_first_baseline": 0.997713,
+      "stages": [
+        {
+          "output": "segment_00000_video.mov",
+          "seconds": 4.281547,
+          "exit": 0,
+          "ffmpeg_user_s": 18.219,
+          "ffmpeg_system_s": 0.672,
+          "ffmpeg_runtime_s": 4.109,
+          "ffmpeg_peak_rss_MiB": 1694.5,
+          "bytes": 13577117
+        },
+        {
+          "output": "segment_00000_audio.wav",
+          "seconds": 0.093597,
+          "exit": 0,
+          "ffmpeg_user_s": 0.0,
+          "ffmpeg_system_s": 0.047,
+          "ffmpeg_runtime_s": 0.008,
+          "ffmpeg_peak_rss_MiB": 42.64,
+          "bytes": 576078
+        },
+        {
+          "output": "segment_00000.mov",
+          "seconds": 0.110753,
+          "exit": 0,
+          "ffmpeg_user_s": 0.0,
+          "ffmpeg_system_s": 0.0,
+          "ffmpeg_runtime_s": 0.021,
+          "ffmpeg_peak_rss_MiB": 40.71,
+          "bytes": 14153870
+        },
+        {
+          "output": "delivery.partial.mp4",
+          "seconds": 0.191527,
+          "exit": 0,
+          "ffmpeg_user_s": 0.078,
+          "ffmpeg_system_s": 0.031,
+          "ffmpeg_runtime_s": 0.098,
+          "ffmpeg_peak_rss_MiB": 41.35,
+          "bytes": 13652847
+        }
+      ]
+    },
+    {
+      "SSIM_vs_source": 0.997805,
+      "repeat": 1,
+      "workers": [
+        1,
+        1,
+        8
+      ],
+      "seconds": 5.553042100000312,
+      "frames": 180,
+      "fps": 32.4146651076155,
+      "decoded": true,
+      "SSIM_vs_first_baseline": 0.997713,
+      "stages": [
+        {
+          "output": "segment_00000_video.mov",
+          "seconds": 5.116988,
+          "exit": 0,
+          "ffmpeg_user_s": 21.0,
+          "ffmpeg_system_s": 0.328,
+          "ffmpeg_runtime_s": 4.966,
+          "ffmpeg_peak_rss_MiB": 1694.94,
+          "bytes": 13577117
+        },
+        {
+          "output": "segment_00000_audio.wav",
+          "seconds": 0.101559,
+          "exit": 0,
+          "ffmpeg_user_s": 0.0,
+          "ffmpeg_system_s": 0.0,
+          "ffmpeg_runtime_s": 0.008,
+          "ffmpeg_peak_rss_MiB": 42.62,
+          "bytes": 576078
+        },
+        {
+          "output": "segment_00000.mov",
+          "seconds": 0.1147,
+          "exit": 0,
+          "ffmpeg_user_s": 0.016,
+          "ffmpeg_system_s": 0.016,
+          "ffmpeg_runtime_s": 0.025,
+          "ffmpeg_peak_rss_MiB": 40.72,
+          "bytes": 14153870
+        },
+        {
+          "output": "delivery.partial.mp4",
+          "seconds": 0.208478,
+          "exit": 0,
+          "ffmpeg_user_s": 0.094,
+          "ffmpeg_system_s": 0.031,
+          "ffmpeg_runtime_s": 0.103,
+          "ffmpeg_peak_rss_MiB": 41.36,
+          "bytes": 13652847
+        }
+      ]
+    },
+    {
+      "SSIM_vs_source": 0.997753,
+      "repeat": 1,
+      "workers": [
+        1,
+        1,
+        4
+      ],
+      "seconds": 7.5434604000001855,
+      "frames": 180,
+      "fps": 23.861727967710358,
+      "decoded": true,
+      "SSIM_vs_first_baseline": 1.0,
+      "stages": [
+        {
+          "output": "segment_00000_video.mov",
+          "seconds": 7.130982,
+          "exit": 0,
+          "ffmpeg_user_s": 19.406,
+          "ffmpeg_system_s": 0.469,
+          "ffmpeg_runtime_s": 7.003,
+          "ffmpeg_peak_rss_MiB": 1273.05,
+          "bytes": 13377462
+        },
+        {
+          "output": "segment_00000_audio.wav",
+          "seconds": 0.083405,
+          "exit": 0,
+          "ffmpeg_user_s": 0.0,
+          "ffmpeg_system_s": 0.0,
+          "ffmpeg_runtime_s": 0.008,
+          "ffmpeg_peak_rss_MiB": 42.64,
+          "bytes": 576078
+        },
+        {
+          "output": "segment_00000.mov",
+          "seconds": 0.112399,
+          "exit": 0,
+          "ffmpeg_user_s": 0.047,
+          "ffmpeg_system_s": 0.0,
+          "ffmpeg_runtime_s": 0.023,
+          "ffmpeg_peak_rss_MiB": 40.73,
+          "bytes": 13954203
+        },
+        {
+          "output": "delivery.partial.mp4",
+          "seconds": 0.205199,
+          "exit": 0,
+          "ffmpeg_user_s": 0.094,
+          "ffmpeg_system_s": 0.016,
+          "ffmpeg_runtime_s": 0.108,
+          "ffmpeg_peak_rss_MiB": 41.36,
+          "bytes": 13453180
+        }
+      ]
+    },
+    {
+      "SSIM_vs_source": 0.997753,
+      "repeat": 2,
+      "workers": [
+        1,
+        1,
+        4
+      ],
+      "seconds": 8.630433100001028,
+      "frames": 180,
+      "fps": 20.856427240016327,
+      "decoded": true,
+      "SSIM_vs_first_baseline": 1.0,
+      "stages": [
+        {
+          "output": "segment_00000_video.mov",
+          "seconds": 8.234399,
+          "exit": 0,
+          "ffmpeg_user_s": 21.797,
+          "ffmpeg_system_s": 0.312,
+          "ffmpeg_runtime_s": 8.099,
+          "ffmpeg_peak_rss_MiB": 1273.4,
+          "bytes": 13377462
+        },
+        {
+          "output": "segment_00000_audio.wav",
+          "seconds": 0.086704,
+          "exit": 0,
+          "ffmpeg_user_s": 0.0,
+          "ffmpeg_system_s": 0.0,
+          "ffmpeg_runtime_s": 0.008,
+          "ffmpeg_peak_rss_MiB": 42.64,
+          "bytes": 576078
+        },
+        {
+          "output": "segment_00000.mov",
+          "seconds": 0.110935,
+          "exit": 0,
+          "ffmpeg_user_s": 0.016,
+          "ffmpeg_system_s": 0.0,
+          "ffmpeg_runtime_s": 0.024,
+          "ffmpeg_peak_rss_MiB": 40.7,
+          "bytes": 13954203
+        },
+        {
+          "output": "delivery.partial.mp4",
+          "seconds": 0.185657,
+          "exit": 0,
+          "ffmpeg_user_s": 0.078,
+          "ffmpeg_system_s": 0.078,
+          "ffmpeg_runtime_s": 0.095,
+          "ffmpeg_peak_rss_MiB": 41.36,
+          "bytes": 13453180
+        }
+      ]
+    },
+    {
+      "SSIM_vs_source": 0.997805,
+      "repeat": 2,
+      "workers": [
+        1,
+        1,
+        8
+      ],
+      "seconds": 4.594260099998792,
+      "frames": 180,
+      "fps": 39.17932291209358,
+      "decoded": true,
+      "SSIM_vs_first_baseline": 0.997713,
+      "stages": [
+        {
+          "output": "segment_00000_video.mov",
+          "seconds": 4.165431,
+          "exit": 0,
+          "ffmpeg_user_s": 17.672,
+          "ffmpeg_system_s": 0.516,
+          "ffmpeg_runtime_s": 4.018,
+          "ffmpeg_peak_rss_MiB": 1694.53,
+          "bytes": 13577117
+        },
+        {
+          "output": "segment_00000_audio.wav",
+          "seconds": 0.097853,
+          "exit": 0,
+          "ffmpeg_user_s": 0.0,
+          "ffmpeg_system_s": 0.0,
+          "ffmpeg_runtime_s": 0.009,
+          "ffmpeg_peak_rss_MiB": 42.62,
+          "bytes": 576078
+        },
+        {
+          "output": "segment_00000.mov",
+          "seconds": 0.116642,
+          "exit": 0,
+          "ffmpeg_user_s": 0.016,
+          "ffmpeg_system_s": 0.016,
+          "ffmpeg_runtime_s": 0.025,
+          "ffmpeg_peak_rss_MiB": 40.71,
+          "bytes": 14153870
+        },
+        {
+          "output": "delivery.partial.mp4",
+          "seconds": 0.202515,
+          "exit": 0,
+          "ffmpeg_user_s": 0.125,
+          "ffmpeg_system_s": 0.016,
+          "ffmpeg_runtime_s": 0.103,
+          "ffmpeg_peak_rss_MiB": 41.35,
+          "bytes": 13652847
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+[
+  {
+    "injected": "renderer",
+    "seconds": 7.688714700001583,
+    "restored_undo_entries": 80,
+    "exact_all_history_content": true,
+    "project_tracks_output_exact": true,
+    "unsaved_draft": true,
+    "undo_redo_exact": true,
+    "paused_position": true,
+    "physical_alignment_error_pixels": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "injected": "browser",
+    "seconds": 7.874920099999144,
+    "restored_undo_entries": 80,
+    "exact_all_history_content": true,
+    "project_tracks_output_exact": true,
+    "unsaved_draft": true,
+    "undo_redo_exact": true,
+    "paused_position": true,
+    "physical_alignment_error_pixels": [
+      0,
+      0,
+      0,
+      0
+    ]
+  }
+]

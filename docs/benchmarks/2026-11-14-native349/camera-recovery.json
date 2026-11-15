@@ -1,0 +1,557 @@
+[
+  {
+    "alias": "CameraA",
+    "renderer_recovered": true,
+    "draft_and_position_preserved": true,
+    "color_contract_preserved": true,
+    "HDR_linear": true,
+    "post_recovery_samples": 288000,
+    "underruns": 0,
+    "native_released": true,
+    "window_condition": {
+      "mode": "visible",
+      "samples": [
+        {
+          "seconds": 2.899998435168527e-06,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": false,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 1.0088570999996591,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": false,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 2.0149123999999574,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": false,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 3.041527399998813,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 4.047182799999064,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 5.053855999998632,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 6.068724099999599,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 7.081707099998312,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 8.096403099998497,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        }
+      ],
+      "condition_held": true,
+      "scope": "Physical center hit-test and window state, not physical scanout. Owned QA topmost/cover windows only; no global Windows settings."
+    },
+    "reopen_window_condition": {
+      "mode": "visible",
+      "samples": [
+        {
+          "seconds": 3.6999990697950125e-06,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 1.0028241999989405,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 2.017631099999562,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 3.0208049999982904,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 4.023395399999572,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 5.035191599999962,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 6.048701399999118,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        }
+      ],
+      "condition_held": true,
+      "scope": "Physical center hit-test and window state, not physical scanout. Owned QA topmost/cover windows only; no global Windows settings."
+    },
+    "new_host_reopen_and_playback": true
+  },
+  {
+    "alias": "CameraB",
+    "renderer_recovered": true,
+    "draft_and_position_preserved": true,
+    "color_contract_preserved": true,
+    "HDR_linear": true,
+    "post_recovery_samples": 288000,
+    "underruns": 0,
+    "native_released": true,
+    "window_condition": {
+      "mode": "visible",
+      "samples": [
+        {
+          "seconds": 3.700000888784416e-06,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": false,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 1.0101956000016798,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": false,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 2.0199024000012287,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": false,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 3.0259798000006413,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 4.02733950000038,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 5.027921100001549,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 6.0332132000003185,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 7.048901400001341,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 8.0606553000016,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        }
+      ],
+      "condition_held": true,
+      "scope": "Physical center hit-test and window state, not physical scanout. Owned QA topmost/cover windows only; no global Windows settings."
+    },
+    "reopen_window_condition": {
+      "mode": "visible",
+      "samples": [
+        {
+          "seconds": 3.600000127335079e-06,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": false,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 1.0020268999996915,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 2.01608429999942,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 3.0219385999989754,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 4.035474799999065,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 5.0493723999989015,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 6.054958099999567,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        }
+      ],
+      "condition_held": true,
+      "scope": "Physical center hit-test and window state, not physical scanout. Owned QA topmost/cover windows only; no global Windows settings."
+    },
+    "new_host_reopen_and_playback": true
+  },
+  {
+    "alias": "CameraC",
+    "renderer_recovered": true,
+    "draft_and_position_preserved": true,
+    "color_contract_preserved": true,
+    "HDR_linear": false,
+    "post_recovery_samples": 288000,
+    "underruns": 0,
+    "native_released": true,
+    "window_condition": {
+      "mode": "visible",
+      "samples": [
+        {
+          "seconds": 2.9000002541579306e-06,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": false,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 1.0012496999988798,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 2.0369500999986485,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": false,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 3.076605999998719,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 4.092671799999152,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 5.107731500000227,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 6.1166899999989255,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 7.1177380999997695,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 8.118474900000365,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        }
+      ],
+      "condition_held": true,
+      "scope": "Physical center hit-test and window state, not physical scanout. Owned QA topmost/cover windows only; no global Windows settings."
+    },
+    "reopen_window_condition": {
+      "mode": "visible",
+      "samples": [
+        {
+          "seconds": 3.700000888784416e-06,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 1.012633400001505,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 2.0140411000011227,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 3.0241084000008414,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 4.037398899999971,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 5.051598300000478,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 6.065021700000216,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        }
+      ],
+      "condition_held": true,
+      "scope": "Physical center hit-test and window state, not physical scanout. Owned QA topmost/cover windows only; no global Windows settings."
+    },
+    "new_host_reopen_and_playback": true
+  }
+]

@@ -136,7 +136,7 @@ def snapshot(path=DEFAULT,run_id=None,now=None):
         activity_age=max(0,now-r['last_activity_epoch'])
         current.append({'id':key,'name':case['name'],**r,'controller_alive':alive,'heartbeat_age_seconds':heartbeat_age,
                         'activity_age_seconds':activity_age,'observation_status':'controller exited without a result' if alive is False else ('heartbeat stale' if heartbeat_age>10 else ('no recent CPU/I/O activity; idle or stalled' if activity_age>30 else 'heartbeat and process activity observed'))})
-    return {'run_id':run_id,'title':run['title'],'phase':run['phase'],'last_update':run['updated'],'counts':counts,'completed':completed,
+    return {'run_id':run_id,'title':run['title'],'phase':run['phase'],'qualification':run.get('qualification','Not assessed; inspect failures and the verification report'),'last_update':run['updated'],'counts':counts,'completed':completed,
             'total':discovered if run['plan_complete'] else None,'discovered':discovered,
             'completion_percent':100*completed/discovered if run['plan_complete'] and discovered else None,
             'discovered_completion_percent':100*completed/discovered if discovered else 0,

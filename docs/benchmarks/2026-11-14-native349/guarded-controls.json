@@ -1,0 +1,137 @@
+{
+  "scope": "Post-supervision visible/covered controls. Keep all scores separate from the earlier ten-pair cohort; all six miss59.5FPS, both visible arms have higherCPU/lowerclockcadence. Root cause remains under investigation. Covered counters do not qualify physical scanout.",
+  "rows": [
+    {
+      "case": "natural-visible-control-baseline",
+      "mode": "visible",
+      "arm": "baseline",
+      "FPS": 58.56403349021077,
+      "skips": 151,
+      "underruns": 0,
+      "samples": 6000000,
+      "window_condition_held": true,
+      "CPU_machine_percent": 11.67,
+      "clock_updates": 3726,
+      "playback_interval": {
+        "count": 7347,
+        "mean_ms": 17.0101,
+        "p50_upper_ms": 16.7,
+        "p95_upper_ms": 24.6,
+        "p99_upper_ms": 42,
+        "max_ms": 611.043,
+        "overflow_100ms": 2
+      },
+      "at_least_59_5_FPS": false
+    },
+    {
+      "case": "natural-visible-control-candidate",
+      "mode": "visible",
+      "arm": "candidate",
+      "FPS": 58.375399951559565,
+      "skips": 172,
+      "underruns": 0,
+      "samples": 6000000,
+      "window_condition_held": true,
+      "CPU_machine_percent": 11.8,
+      "clock_updates": 2611,
+      "playback_interval": {
+        "count": 7326,
+        "mean_ms": 17.0582,
+        "p50_upper_ms": 16.7,
+        "p95_upper_ms": 24.8,
+        "p99_upper_ms": 42.5,
+        "max_ms": 177.098,
+        "overflow_100ms": 5
+      },
+      "at_least_59_5_FPS": false
+    },
+    {
+      "case": "natural-editor-covered-control-baseline",
+      "mode": "editor-covered",
+      "arm": "baseline",
+      "FPS": 59.15892004591998,
+      "skips": 99,
+      "underruns": 0,
+      "samples": 6000000,
+      "window_condition_held": true,
+      "CPU_machine_percent": 9.7,
+      "clock_updates": 6309,
+      "playback_interval": {
+        "count": 7399,
+        "mean_ms": 16.8896,
+        "p50_upper_ms": 16.7,
+        "p95_upper_ms": 23.3,
+        "p99_upper_ms": 40.9,
+        "max_ms": 425.596,
+        "overflow_100ms": 2
+      },
+      "at_least_59_5_FPS": false
+    },
+    {
+      "case": "natural-editor-covered-control-candidate",
+      "mode": "editor-covered",
+      "arm": "candidate",
+      "FPS": 59.30117463626578,
+      "skips": 52,
+      "underruns": 0,
+      "samples": 6000000,
+      "window_condition_held": true,
+      "CPU_machine_percent": 10.32,
+      "clock_updates": 5570,
+      "playback_interval": {
+        "count": 7446,
+        "mean_ms": 16.7836,
+        "p50_upper_ms": 16.7,
+        "p95_upper_ms": 20.5,
+        "p99_upper_ms": 41.2,
+        "max_ms": 89.9891,
+        "overflow_100ms": 0
+      },
+      "at_least_59_5_FPS": false
+    },
+    {
+      "case": "natural-editor-covered-unfocused-control-baseline",
+      "mode": "editor-covered-unfocused",
+      "arm": "baseline",
+      "FPS": 58.488185418367095,
+      "skips": 147,
+      "underruns": 0,
+      "samples": 6000000,
+      "window_condition_held": true,
+      "CPU_machine_percent": 10.16,
+      "clock_updates": 3770,
+      "playback_interval": {
+        "count": 7351,
+        "mean_ms": 17.0006,
+        "p50_upper_ms": 16.7,
+        "p95_upper_ms": 20.6,
+        "p99_upper_ms": 41.4,
+        "max_ms": 913.795,
+        "overflow_100ms": 2
+      },
+      "at_least_59_5_FPS": false
+    },
+    {
+      "case": "natural-editor-covered-unfocused-control-candidate",
+      "mode": "editor-covered-unfocused",
+      "arm": "candidate",
+      "FPS": 59.23656855926105,
+      "skips": 81,
+      "underruns": 0,
+      "samples": 6000000,
+      "window_condition_held": true,
+      "CPU_machine_percent": 10.42,
+      "clock_updates": 3869,
+      "playback_interval": {
+        "count": 7417,
+        "mean_ms": 16.8485,
+        "p50_upper_ms": 16.7,
+        "p95_upper_ms": 20.2,
+        "p99_upper_ms": 41.5,
+        "max_ms": 106.521,
+        "overflow_100ms": 1
+      },
+      "at_least_59_5_FPS": false
+    }
+  ]
+}

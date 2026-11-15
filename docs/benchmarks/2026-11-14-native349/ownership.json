@@ -1,0 +1,32 @@
+{
+  "baseline": {
+    "diagnostic_only": true,
+    "seek_cycles": 20,
+    "JS_worklet_wrappers": {
+      "before": 1,
+      "after_seeks": 21,
+      "after_stop": 21
+    },
+    "native_audio_events": {
+      "created": 21,
+      "destroyed": 0
+    },
+    "graph_worklets_remaining": 21,
+    "browser_errors": []
+  },
+  "candidate": {
+    "diagnostic_only": true,
+    "seek_cycles": 20,
+    "JS_worklet_wrappers": {
+      "before": 1,
+      "after_seeks": 1,
+      "after_stop": 0
+    },
+    "native_audio_events": {
+      "created": 21,
+      "destroyed": 21
+    },
+    "graph_worklets_remaining": 0,
+    "browser_errors": []
+  }
+}

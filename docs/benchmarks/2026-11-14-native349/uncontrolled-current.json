@@ -485,7 +485,6 @@
     "zero_underruns": true,
     "failed_trials": 0
   },
-  "variant": "Final compressed-history package, actual DPI, uncontrolled window visibility",
   "acceptance_passed": false,
-  "visibility_scope": "A spot check observed preview occlusion and loss of foreground; no continuous visibility trace was recorded. Do not retroactively classify every trial as occluded."
+  "visibility_scope": "Spot check found covered/unfocused preview; no continuous visibility trace, so individual trials cannot retroactively be classified as occluded."
 }

@@ -1,0 +1,1345 @@
+[
+  {
+    "seconds": 30.0,
+    "measured_seconds": 30.208799999999815,
+    "samples": 1440000,
+    "expected_samples": 1440000,
+    "underruns": 0,
+    "reached_end": true,
+    "distinct_sequence_fps": 59.485977595932674,
+    "present_calls_per_second": 59.485977595932674,
+    "program_resolution": [
+      960,
+      540
+    ],
+    "native_rect": {
+      "x": 621.0982666015625,
+      "y": 220.35714721679688,
+      "width": 203.42857360839844,
+      "height": 114.28572082519531,
+      "dpr": 1.75
+    },
+    "first_ready_seconds": 1.2991653999997652,
+    "application_ready_seconds": 2.259382900000219,
+    "window_condition": {
+      "mode": "visible",
+      "samples": [
+        {
+          "seconds": 3.8000002859917004e-06,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 1.0095350999999937,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 2.0245230000000447,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 3.038957400000072,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 4.051893700000164,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 5.054642399999921,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 6.066966400000183,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 7.078707800000302,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 8.094122599999992,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 9.0954713000001,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 10.109910500000296,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 11.125164699999914,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 12.126130699999976,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 13.128574899999876,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 14.143919800000276,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 15.15645540000014,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 16.169306700000107,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 17.182201800000257,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 18.183390600000166,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 19.214193400000113,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 20.228575300000102,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 21.27442770000016,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 22.303749600000174,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 23.30776999999989,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 24.32109500000024,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 25.333368000000064,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 26.345101500000055,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 27.359982599999967,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 28.368963500000064,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 29.38176730000032,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 30.395341500000086,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 31.410345600000255,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        }
+      ],
+      "condition_held": true,
+      "scope": "Physical center hit-test and window state, not physical scanout. Owned QA topmost/cover windows only; no global Windows settings."
+    },
+    "browser_focus_changes": [
+      {
+        "seconds": 0.023,
+        "focused": true
+      }
+    ],
+    "focus_emulation": "disabled via connect_over_cdp(no_defaults=True)",
+    "skips": 2,
+    "timings": {
+      "context_wait": {
+        "count": 12436,
+        "mean_ms": 0.0973296,
+        "p50_upper_ms": 0.1,
+        "p95_upper_ms": 0.6,
+        "p99_upper_ms": 0.9,
+        "max_ms": 90.2384,
+        "overflow_100ms": 0
+      },
+      "submit_cpu": {
+        "count": 1798,
+        "mean_ms": 0.528385,
+        "p50_upper_ms": 0.5,
+        "p95_upper_ms": 0.9,
+        "p99_upper_ms": 1.2,
+        "max_ms": 7.4317,
+        "overflow_100ms": 0
+      },
+      "completion_observation": {
+        "count": 1798,
+        "mean_ms": 9.31427,
+        "p50_upper_ms": 5.7,
+        "p95_upper_ms": 48.6,
+        "p99_upper_ms": 66.7,
+        "max_ms": 87.0223,
+        "overflow_100ms": 0
+      },
+      "composition_gpu": {
+        "count": 1798,
+        "mean_ms": 0.648456,
+        "p50_upper_ms": 0.7,
+        "p95_upper_ms": 0.8,
+        "p99_upper_ms": 0.9,
+        "max_ms": 2.86504,
+        "overflow_100ms": 0
+      },
+      "present_call": {
+        "count": 1798,
+        "mean_ms": 0.846134,
+        "p50_upper_ms": 0.3,
+        "p95_upper_ms": 4.2,
+        "p99_upper_ms": 17.6,
+        "max_ms": 34.637,
+        "overflow_100ms": 0
+      },
+      "present_call_interval": {
+        "count": 1797,
+        "mean_ms": 17.8369,
+        "p50_upper_ms": 16.7,
+        "p95_upper_ms": 18.1,
+        "p99_upper_ms": 33.1,
+        "max_ms": 2085.16,
+        "overflow_100ms": 1
+      },
+      "playback_present_interval": {
+        "count": 1796,
+        "mean_ms": 16.6859,
+        "p50_upper_ms": 16.7,
+        "p95_upper_ms": 18.1,
+        "p99_upper_ms": 33,
+        "max_ms": 50.572,
+        "overflow_100ms": 0
+      },
+      "source_selection": {
+        "count": 1828,
+        "mean_ms": 0.0932396,
+        "p50_upper_ms": 0.1,
+        "p95_upper_ms": 0.1,
+        "p99_upper_ms": 0.2,
+        "max_ms": 85.0855,
+        "overflow_100ms": 0
+      },
+      "wake_overshoot": {
+        "count": 4914,
+        "mean_ms": 0.339801,
+        "p50_upper_ms": 0.4,
+        "p95_upper_ms": 0.7,
+        "p99_upper_ms": 0.9,
+        "max_ms": 2.5642,
+        "overflow_100ms": 0
+      }
+    },
+    "queues": {
+      "peak_source_queue_frames": 4,
+      "peak_inflight_gpu_frames": 4,
+      "gpu_slot_budget": 6,
+      "retained_surface_views": 48,
+      "retained_texture_pools": 3,
+      "retained_texture_estimated_MiB": 1317.04
+    },
+    "peak_summed_RSS_MiB": 2692.4,
+    "all_on_AC": true
+  },
+  {
+    "seconds": 30.0,
+    "measured_seconds": 30.060100000000094,
+    "samples": 1440000,
+    "expected_samples": 1440000,
+    "underruns": 0,
+    "reached_end": true,
+    "distinct_sequence_fps": 59.58064011763083,
+    "present_calls_per_second": 59.58064011763083,
+    "program_resolution": [
+      1920,
+      1080
+    ],
+    "native_rect": {
+      "x": 621.0982666015625,
+      "y": 220.35714721679688,
+      "width": 203.42857360839844,
+      "height": 114.28572082519531,
+      "dpr": 1.75
+    },
+    "first_ready_seconds": 2.218558799999755,
+    "application_ready_seconds": 2.912929200000235,
+    "window_condition": {
+      "mode": "visible",
+      "samples": [
+        {
+          "seconds": 3.5000002753804438e-06,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 1.0056647999999768,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 2.0197448000003533,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 3.0207212000000254,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 4.021913600000062,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 5.025154800000109,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 6.035432300000139,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 7.04141030000028,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 8.05453660000012,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 9.06016720000025,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 10.073296000000028,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 11.083484700000099,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 12.08534920000011,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 13.097675299999992,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 14.102910500000235,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 15.111456699999962,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 16.113089599999967,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 17.124198700000306,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 18.12489390000019,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 19.14930990000039,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 20.15534200000002,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 21.167524500000127,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 22.181991599999947,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 23.20787560000008,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 24.213777800000116,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 25.229687800000193,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 26.2427517000001,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 27.25808330000018,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 28.272975400000178,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 29.308926900000188,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 30.321023800000148,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 31.327081300000373,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        }
+      ],
+      "condition_held": true,
+      "scope": "Physical center hit-test and window state, not physical scanout. Owned QA topmost/cover windows only; no global Windows settings."
+    },
+    "browser_focus_changes": [
+      {
+        "seconds": 0.029300000000279398,
+        "focused": true
+      }
+    ],
+    "focus_emulation": "disabled via connect_over_cdp(no_defaults=True)",
+    "skips": 2,
+    "timings": {
+      "context_wait": {
+        "count": 12151,
+        "mean_ms": 0.121874,
+        "p50_upper_ms": 0.1,
+        "p95_upper_ms": 0.8,
+        "p99_upper_ms": 1.1,
+        "max_ms": 112.459,
+        "overflow_100ms": 1
+      },
+      "submit_cpu": {
+        "count": 1792,
+        "mean_ms": 0.577649,
+        "p50_upper_ms": 0.6,
+        "p95_upper_ms": 0.9,
+        "p99_upper_ms": 1.4,
+        "max_ms": 7.8817,
+        "overflow_100ms": 0
+      },
+      "completion_observation": {
+        "count": 1792,
+        "mean_ms": 11.9437,
+        "p50_upper_ms": 6.1,
+        "p95_upper_ms": 57.3,
+        "p99_upper_ms": 70.3,
+        "max_ms": 89.5373,
+        "overflow_100ms": 0
+      },
+      "composition_gpu": {
+        "count": 1792,
+        "mean_ms": 1.00129,
+        "p50_upper_ms": 1,
+        "p95_upper_ms": 1.2,
+        "p99_upper_ms": 1.4,
+        "max_ms": 3.67744,
+        "overflow_100ms": 0
+      },
+      "present_call": {
+        "count": 1792,
+        "mean_ms": 1.42277,
+        "p50_upper_ms": 0.4,
+        "p95_upper_ms": 7.5,
+        "p99_upper_ms": 24.1,
+        "max_ms": 39.9321,
+        "overflow_100ms": 0
+      },
+      "present_call_interval": {
+        "count": 1791,
+        "mean_ms": 17.6047,
+        "p50_upper_ms": 16.7,
+        "p95_upper_ms": 18.7,
+        "p99_upper_ms": 39.7,
+        "max_ms": 1662.62,
+        "overflow_100ms": 1
+      },
+      "playback_present_interval": {
+        "count": 1790,
+        "mean_ms": 16.6857,
+        "p50_upper_ms": 16.7,
+        "p95_upper_ms": 18.7,
+        "p99_upper_ms": 39.6,
+        "max_ms": 55.8457,
+        "overflow_100ms": 0
+      },
+      "source_selection": {
+        "count": 1836,
+        "mean_ms": 0.112677,
+        "p50_upper_ms": 0.1,
+        "p95_upper_ms": 0.1,
+        "p99_upper_ms": 0.2,
+        "max_ms": 112.013,
+        "overflow_100ms": 1
+      },
+      "wake_overshoot": {
+        "count": 4761,
+        "mean_ms": 0.356869,
+        "p50_upper_ms": 0.4,
+        "p95_upper_ms": 0.7,
+        "p99_upper_ms": 0.9,
+        "max_ms": 4.3011,
+        "overflow_100ms": 0
+      }
+    },
+    "queues": {
+      "peak_source_queue_frames": 4,
+      "peak_inflight_gpu_frames": 4,
+      "gpu_slot_budget": 6,
+      "retained_surface_views": 48,
+      "retained_texture_pools": 3,
+      "retained_texture_estimated_MiB": 1317.04
+    },
+    "peak_summed_RSS_MiB": 2839.8,
+    "all_on_AC": true
+  },
+  {
+    "seconds": 30.0,
+    "measured_seconds": 30.084299999999814,
+    "samples": 1440000,
+    "expected_samples": 1440000,
+    "underruns": 0,
+    "reached_end": true,
+    "distinct_sequence_fps": 59.49947314712362,
+    "present_calls_per_second": 59.49947314712362,
+    "program_resolution": [
+      3840,
+      2160
+    ],
+    "native_rect": {
+      "x": 621.0982666015625,
+      "y": 220.35714721679688,
+      "width": 203.42857360839844,
+      "height": 114.28572082519531,
+      "dpr": 1.75
+    },
+    "first_ready_seconds": 2.1567323999997825,
+    "application_ready_seconds": 3.63668830000006,
+    "window_condition": {
+      "mode": "visible",
+      "samples": [
+        {
+          "seconds": 5.200000032345997e-06,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 1.0072767999999996,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 2.0093779999997423,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 3.0124410999997053,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 4.0279325999999855,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 5.042942099999891,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 6.053020699999706,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 7.056862699999783,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 8.063742699999693,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 9.092021699999805,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 10.11844689999998,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 11.14347859999998,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 12.170374400000128,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 13.18149510000012,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 14.194366199999877,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 15.207518700000037,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 16.23011099999985,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 17.232286699999804,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 18.236219899999924,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 19.243040299999848,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 20.25613539999995,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 21.273329300000114,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 22.275037599999905,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 23.29545229999985,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 24.323020599999836,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 25.326224399999774,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 26.35648289999972,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 27.3718187999998,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 28.381322499999897,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 29.39750640000011,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        },
+        {
+          "seconds": 30.429612200000065,
+          "visible": true,
+          "surface_replaced_during_sample": false,
+          "sampled_native_surface": true,
+          "minimized": false,
+          "editor_topmost": true,
+          "preview_center_unobscured": true,
+          "foreground_owned": true
+        }
+      ],
+      "condition_held": true,
+      "scope": "Physical center hit-test and window state, not physical scanout. Owned QA topmost/cover windows only; no global Windows settings."
+    },
+    "browser_focus_changes": [
+      {
+        "seconds": 0.0195,
+        "focused": true
+      }
+    ],
+    "focus_emulation": "disabled via connect_over_cdp(no_defaults=True)",
+    "skips": 6,
+    "timings": {
+      "context_wait": {
+        "count": 12026,
+        "mean_ms": 0.17859,
+        "p50_upper_ms": 0.1,
+        "p95_upper_ms": 1,
+        "p99_upper_ms": 1.5,
+        "max_ms": 234.223,
+        "overflow_100ms": 3
+      },
+      "submit_cpu": {
+        "count": 1791,
+        "mean_ms": 0.775298,
+        "p50_upper_ms": 0.7,
+        "p95_upper_ms": 1.4,
+        "p99_upper_ms": 1.8,
+        "max_ms": 26.8985,
+        "overflow_100ms": 0
+      },
+      "completion_observation": {
+        "count": 1790,
+        "mean_ms": 12.0641,
+        "p50_upper_ms": 6.8,
+        "p95_upper_ms": 55.7,
+        "p99_upper_ms": 72.4,
+        "max_ms": 93.236,
+        "overflow_100ms": 0
+      },
+      "composition_gpu": {
+        "count": 1790,
+        "mean_ms": 2.14348,
+        "p50_upper_ms": 2.2,
+        "p95_upper_ms": 2.6,
+        "p99_upper_ms": 2.9,
+        "max_ms": 5.92596,
+        "overflow_100ms": 0
+      },
+      "present_call": {
+        "count": 1791,
+        "mean_ms": 1.30357,
+        "p50_upper_ms": 0.5,
+        "p95_upper_ms": 6.6,
+        "p99_upper_ms": 23.6,
+        "max_ms": 42.692,
+        "overflow_100ms": 0
+      },
+      "present_call_interval": {
+        "count": 1790,
+        "mean_ms": 17.5388,
+        "p50_upper_ms": 16.7,
+        "p95_upper_ms": 19.3,
+        "p99_upper_ms": 37.6,
+        "max_ms": 1472.09,
+        "overflow_100ms": 1
+      },
+      "playback_present_interval": {
+        "count": 1789,
+        "mean_ms": 16.7258,
+        "p50_upper_ms": 16.7,
+        "p95_upper_ms": 19.3,
+        "p99_upper_ms": 37.5,
+        "max_ms": 53.2164,
+        "overflow_100ms": 0
+      },
+      "source_selection": {
+        "count": 1943,
+        "mean_ms": 0.159185,
+        "p50_upper_ms": 0.1,
+        "p95_upper_ms": 0.2,
+        "p99_upper_ms": 0.2,
+        "max_ms": 192.142,
+        "overflow_100ms": 1
+      },
+      "wake_overshoot": {
+        "count": 4816,
+        "mean_ms": 0.390351,
+        "p50_upper_ms": 0.4,
+        "p95_upper_ms": 0.8,
+        "p99_upper_ms": 1,
+        "max_ms": 1.7575,
+        "overflow_100ms": 0
+      }
+    },
+    "queues": {
+      "peak_source_queue_frames": 4,
+      "peak_inflight_gpu_frames": 4,
+      "gpu_slot_budget": 4,
+      "retained_surface_views": 48,
+      "retained_texture_pools": 3,
+      "retained_texture_estimated_MiB": 1245.85
+    },
+    "peak_summed_RSS_MiB": 2881.2,
+    "all_on_AC": true
+  }
+]

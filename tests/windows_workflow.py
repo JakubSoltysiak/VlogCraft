@@ -23,6 +23,15 @@ def probe(path, *args):
     return json.loads(subprocess.check_output(['ffprobe','-v','error',*args,'-of','json',str(path)]))
 
 
+def close_owned_window(process):
+    def close(hwnd,_):
+        pid=ctypes.c_ulong();ctypes.windll.user32.GetWindowThreadProcessId(hwnd,ctypes.byref(pid))
+        if pid.value==process.pid and ctypes.windll.user32.IsWindowVisible(hwnd):ctypes.windll.user32.PostMessageW(hwnd,0x10,0,0)
+        return True
+    callback=ctypes.WINFUNCTYPE(ctypes.c_bool,ctypes.c_void_p,ctypes.c_void_p)(close)
+    ctypes.windll.user32.EnumWindows(callback,0)
+
+
 def test(executable, source, results, record_visual=False, second_source=None, offline=False):
     results.mkdir(parents=True,exist_ok=True)
     with tempfile.TemporaryDirectory(prefix='workflow-', dir=results, ignore_cleanup_errors=True) as testdir:
@@ -55,7 +64,7 @@ def test(executable, source, results, record_visual=False, second_source=None, o
                 page.set_default_timeout(30000)
                 errors=[]
                 page.on('pageerror',lambda err:errors.append(str(err)))
-                page.wait_for_function("document.documentElement.classList.contains('native-ready') && state?.desktop")
+                page.wait_for_function("typeof state !== 'undefined' && document.documentElement.classList.contains('native-ready') && state?.desktop")
                 if offline:
                     from urllib.parse import urlsplit
                     context.route('**/*',lambda route:route.continue_() if urlsplit(route.request.url).hostname in ('127.0.0.1','localhost',None) else route.abort())
@@ -231,8 +240,36 @@ def test(executable, source, results, record_visual=False, second_source=None, o
                 page.wait_for_function("state.tracks.flatMap(t=>t.clips)[0].grade==='warm'")
                 page.locator('#undoBtn').click()
                 page.evaluate('flushSave()')
-                page.reload()
-                page.wait_for_function("state?.assets.length===1 && state.tracks.flatMap(t=>t.clips).length===1")
+                if page.evaluate("typeof recoverySettled==='function'"):page.evaluate('recoverySettled()')
+                # CDP reload is now intentionally rejected by the navigation
+                # guard. Verify the actual saved-project workflow by a normal
+                # host close/reopen, without granting an automation bypass.
+                assert not errors,errors
+                close_owned_window(p);p.wait(timeout=15);assert p.returncode==0
+                browser.close()
+                previous_port=port
+                with socket.socket() as sock:sock.bind(('127.0.0.1',0));port=sock.getsockname()[1]
+                env['WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS']=env['WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS'].replace(f'--remote-debugging-port={previous_port}',f'--remote-debugging-port={port}')
+                p=subprocess.Popen([*cmd,'--project',str(project)],env=env)
+                deadline=time.monotonic()+50
+                while time.monotonic()<deadline:
+                    try:
+                        with urllib.request.urlopen(f'http://127.0.0.1:{port}/json/list',timeout=1) as res:
+                            if any(t['url'].startswith('http://127.0.0.1:') for t in json.load(res)):break
+                    except OSError:pass
+                    assert p.poll() is None,'Reopened host exited during startup';time.sleep(.1)
+                browser=pw.chromium.connect_over_cdp(f'http://127.0.0.1:{port}');context=browser.contexts[0]
+                deadline=time.monotonic()+30
+                while not any(tab.url.startswith('http://127.0.0.1:') for tab in context.pages):
+                    assert time.monotonic()<deadline,'Reopened page was not enumerated';time.sleep(.05)
+                page=next(tab for tab in context.pages if tab.url.startswith('http://127.0.0.1:'))
+                page.set_default_timeout(30000);page.on('pageerror',lambda err:errors.append(str(err)))
+                if offline:context.route('**/*',lambda route:route.continue_() if urlsplit(route.request.url).hostname in ('127.0.0.1','localhost',None) else route.abort())
+                page.wait_for_function("typeof state !== 'undefined' && state?.desktop && document.documentElement.classList.contains('native-ready')")
+                page.set_viewport_size({'width':1440,'height':850});dev=context.new_cdp_session(page)
+                dev.send('Emulation.setDeviceMetricsOverride',{'width':1440,'height':850,'deviceScaleFactor':1,'mobile':False})
+                page.wait_for_function("state.assets.length===1 && state.tracks.flatMap(t=>t.clips).length===1")
+                summary['reload_kind']='normal owned host close/reopen; no navigation-guard bypass'
                 assert page.evaluate("Math.abs(state.tracks.flatMap(t=>t.clips)[0].start-4.6)<1e-6")
                 assert not errors,errors
                 page.locator('#playbackEngine').select_option('rendered')

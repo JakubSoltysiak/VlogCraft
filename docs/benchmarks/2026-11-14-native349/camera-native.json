@@ -1,0 +1,86 @@
+[
+  {
+    "alias": "CameraA",
+    "frames": 180,
+    "seeks": [
+      {
+        "target_seconds": 0,
+        "process_seconds": 0.24173720000544563,
+        "pts_matches_reference": true
+      },
+      {
+        "target_seconds": 1.1,
+        "process_seconds": 0.3081693999993149,
+        "pts_matches_reference": true
+      },
+      {
+        "target_seconds": 3.217,
+        "process_seconds": 0.44198259999393485,
+        "pts_matches_reference": true
+      }
+    ],
+    "float_readback": {
+      "finite": true,
+      "rgb_max": 17.953125,
+      "rgb_min": 0.0,
+      "hdr_linear_output": true
+    },
+    "hdr10plus_retained_at_decode": true
+  },
+  {
+    "alias": "CameraB",
+    "frames": 180,
+    "seeks": [
+      {
+        "target_seconds": 0,
+        "process_seconds": 0.2566969000035897,
+        "pts_matches_reference": true
+      },
+      {
+        "target_seconds": 1.1,
+        "process_seconds": 0.3402594999934081,
+        "pts_matches_reference": true
+      },
+      {
+        "target_seconds": 3.217,
+        "process_seconds": 0.43246050001471303,
+        "pts_matches_reference": true
+      }
+    ],
+    "float_readback": {
+      "finite": true,
+      "rgb_max": 14.3515625,
+      "rgb_min": -0.00024318695068359375,
+      "hdr_linear_output": true
+    },
+    "hdr10plus_retained_at_decode": true
+  },
+  {
+    "alias": "CameraC",
+    "frames": 180,
+    "seeks": [
+      {
+        "target_seconds": 0,
+        "process_seconds": 0.3214225999836344,
+        "pts_matches_reference": true
+      },
+      {
+        "target_seconds": 1.1,
+        "process_seconds": 0.5362635999917984,
+        "pts_matches_reference": true
+      },
+      {
+        "target_seconds": 3.217,
+        "process_seconds": 0.9170527000096627,
+        "pts_matches_reference": true
+      }
+    ],
+    "float_readback": {
+      "finite": true,
+      "rgb_max": 1.0,
+      "rgb_min": 0.0,
+      "hdr_linear_output": false
+    },
+    "hdr10plus_retained_at_decode": false
+  }
+]

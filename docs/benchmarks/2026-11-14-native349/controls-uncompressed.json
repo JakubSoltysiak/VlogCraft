@@ -1,0 +1,150 @@
+[
+  {
+    "native_binary_sha256": "ac206038cea559f87d784e0ec4fc8485bdebd1421b7c4a78853e7ea037e3f72a",
+    "seconds": 125.0,
+    "width": 960,
+    "layers": 3,
+    "audio_tracks": 3,
+    "cache_policy": "Fresh application each trial; repeated original-source offsets; OS filesystem caches unmanaged",
+    "proxy": false,
+    "rows": [
+      {
+        "trial": 1,
+        "exit_code": 0,
+        "wall_seconds": 140.344,
+        "fps": 59.7625595812599,
+        "skips": 0,
+        "samples": 6000000,
+        "expected_samples": 6000000,
+        "underruns": 0,
+        "first_ready_seconds": 0.9167298000247683,
+        "startup_seconds": 2.725492099998519,
+        "peak_working_set_MiB": 3457.8,
+        "CPU_percent": 6.5,
+        "present_intervals": {
+          "count": 7498,
+          "mean_ms": 16.6667,
+          "p50_upper_ms": 16.7,
+          "p95_upper_ms": 18.1,
+          "p99_upper_ms": 39.7,
+          "max_ms": 48.8543,
+          "overflow_100ms": 0
+        },
+        "throughput_windows": [
+          {
+            "window_seconds": 1,
+            "count": 192,
+            "minimum_fps": 39.347408829174604,
+            "p05_fps": 59.22330097087372,
+            "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+          },
+          {
+            "window_seconds": 10,
+            "count": 188,
+            "minimum_fps": 59.84850114709627,
+            "p05_fps": 59.91757679679661,
+            "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+          }
+        ],
+        "source_skips": 0,
+        "gpu_skips": 0,
+        "other_skips": 0,
+        "mixed_power": false,
+        "all_on_AC": true
+      }
+    ],
+    "summary": {
+      "completed": 1,
+      "valid": 1,
+      "fps_all": [
+        59.7625595812599
+      ],
+      "skips_all": [
+        0
+      ],
+      "fps_best": 59.7625595812599,
+      "fps_median": 59.7625595812599,
+      "fps_worst": 59.7625595812599,
+      "fps_p05_across_trials": 59.7625595812599,
+      "fps_population_stdev": 0.0,
+      "at_least_59_5": 1,
+      "under_30_skips": 1,
+      "zero_underruns": true,
+      "failed_trials": 0
+    }
+  },
+  {
+    "native_binary_sha256": "ac206038cea559f87d784e0ec4fc8485bdebd1421b7c4a78853e7ea037e3f72a",
+    "seconds": 125.0,
+    "width": 960,
+    "layers": 3,
+    "audio_tracks": 3,
+    "cache_policy": "Fresh application each trial; repeated original-source offsets; OS filesystem caches unmanaged",
+    "proxy": false,
+    "rows": [
+      {
+        "trial": 1,
+        "exit_code": 0,
+        "wall_seconds": 139.125,
+        "fps": 59.53841738765369,
+        "skips": 49,
+        "samples": 6000000,
+        "expected_samples": 6000000,
+        "underruns": 0,
+        "first_ready_seconds": 1.040973999974085,
+        "startup_seconds": 2.1396724000223912,
+        "peak_working_set_MiB": 3359.0,
+        "CPU_percent": 6.82,
+        "present_intervals": {
+          "count": 7447,
+          "mean_ms": 16.7762,
+          "p50_upper_ms": 16.7,
+          "p95_upper_ms": 18.1,
+          "p99_upper_ms": 38.3,
+          "max_ms": 177.406,
+          "overflow_100ms": 1
+        },
+        "throughput_windows": [
+          {
+            "window_seconds": 1,
+            "count": 233,
+            "minimum_fps": 47.91566842357443,
+            "p05_fps": 58.552906733584145,
+            "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+          },
+          {
+            "window_seconds": 10,
+            "count": 205,
+            "minimum_fps": 57.937541947964746,
+            "p05_fps": 58.13897617743434,
+            "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+          }
+        ],
+        "source_skips": 22,
+        "gpu_skips": 0,
+        "other_skips": 27,
+        "mixed_power": false,
+        "all_on_AC": true
+      }
+    ],
+    "summary": {
+      "completed": 1,
+      "valid": 1,
+      "fps_all": [
+        59.53841738765369
+      ],
+      "skips_all": [
+        49
+      ],
+      "fps_best": 59.53841738765369,
+      "fps_median": 59.53841738765369,
+      "fps_worst": 59.53841738765369,
+      "fps_p05_across_trials": 59.53841738765369,
+      "fps_population_stdev": 0.0,
+      "at_least_59_5": 1,
+      "under_30_skips": 0,
+      "zero_underruns": true,
+      "failed_trials": 0
+    }
+  }
+]

@@ -1,0 +1,434 @@
+[
+  {
+    "case": "uncontrolled_candidate_run2",
+    "FPS": 58.9899332049225,
+    "skips": 115,
+    "underruns": 0,
+    "timings": {
+      "context_wait": {
+        "count": 49162,
+        "mean_ms": 0.120608,
+        "p50_upper_ms": 0.1,
+        "p95_upper_ms": 0.7,
+        "p99_upper_ms": 1.1,
+        "max_ms": 91.1487,
+        "overflow_100ms": 0
+      },
+      "submit_cpu": {
+        "count": 7385,
+        "mean_ms": 0.580573,
+        "p50_upper_ms": 0.6,
+        "p95_upper_ms": 0.9,
+        "p99_upper_ms": 1.1,
+        "max_ms": 17.73,
+        "overflow_100ms": 0
+      },
+      "completion_observation": {
+        "count": 7385,
+        "mean_ms": 10.8771,
+        "p50_upper_ms": 6.2,
+        "p95_upper_ms": 48.2,
+        "p99_upper_ms": 69.5,
+        "max_ms": 248.735,
+        "overflow_100ms": 9
+      },
+      "composition_gpu": {
+        "count": 7385,
+        "mean_ms": 0.680813,
+        "p50_upper_ms": 0.7,
+        "p95_upper_ms": 0.8,
+        "p99_upper_ms": 1,
+        "max_ms": 3.82988,
+        "overflow_100ms": 0
+      },
+      "present_call": {
+        "count": 7385,
+        "mean_ms": 0.919583,
+        "p50_upper_ms": 0.4,
+        "p95_upper_ms": 3.3,
+        "p99_upper_ms": 16.7,
+        "max_ms": 130.603,
+        "overflow_100ms": 1
+      },
+      "present_call_interval": {
+        "count": 7384,
+        "mean_ms": 17.1413,
+        "p50_upper_ms": 16.7,
+        "p95_upper_ms": 18.1,
+        "p99_upper_ms": 33.6,
+        "max_ms": 1575.76,
+        "overflow_100ms": 3
+      },
+      "playback_present_interval": {
+        "count": 7383,
+        "mean_ms": 16.9302,
+        "p50_upper_ms": 16.7,
+        "p95_upper_ms": 18.1,
+        "p99_upper_ms": 33.5,
+        "max_ms": 1300.36,
+        "overflow_100ms": 2
+      },
+      "source_selection": {
+        "count": 7619,
+        "mean_ms": 0.0720565,
+        "p50_upper_ms": 0.1,
+        "p95_upper_ms": 0.1,
+        "p99_upper_ms": 0.2,
+        "max_ms": 68.9695,
+        "overflow_100ms": 0
+      },
+      "wake_overshoot": {
+        "count": 20472,
+        "mean_ms": 0.35303,
+        "p50_upper_ms": 0.4,
+        "p95_upper_ms": 0.6,
+        "p99_upper_ms": 0.8,
+        "max_ms": 1.8489,
+        "overflow_100ms": 0
+      }
+    },
+    "skipped_after_source_wait": 93,
+    "skipped_after_gpu_wait": 0,
+    "skipped_without_queue_wait": 22,
+    "clock_rewind_hold_iterations": 97,
+    "clock_backwards_frames": 0,
+    "clock_correction_absolute": {
+      "count": 6285,
+      "mean_ms": 0.88191,
+      "p50_upper_ms": 0.4,
+      "p95_upper_ms": 1.3,
+      "p99_upper_ms": 2.9,
+      "max_ms": 104.021,
+      "overflow_100ms": 4
+    },
+    "gpu_slot_budget": 6,
+    "retained_surface_views": 48,
+    "retained_texture_pools": 3,
+    "retained_texture_estimated_MiB": 1317.04,
+    "scope": "Active Present interval differs from the duration of a single Present call. Source-wait association does not establish decoder/driver/scheduler root cause."
+  },
+  {
+    "case": "natural_baseline_pair6",
+    "FPS": 58.974127813964984,
+    "skips": 107,
+    "underruns": 0,
+    "timings": {
+      "context_wait": {
+        "count": 50041,
+        "mean_ms": 0.111205,
+        "p50_upper_ms": 0.1,
+        "p95_upper_ms": 0.6,
+        "p99_upper_ms": 1,
+        "max_ms": 83.0002,
+        "overflow_100ms": 0
+      },
+      "submit_cpu": {
+        "count": 7393,
+        "mean_ms": 0.558382,
+        "p50_upper_ms": 0.6,
+        "p95_upper_ms": 1,
+        "p99_upper_ms": 1.2,
+        "max_ms": 17.7441,
+        "overflow_100ms": 0
+      },
+      "completion_observation": {
+        "count": 7393,
+        "mean_ms": 12.8727,
+        "p50_upper_ms": 6.1,
+        "p95_upper_ms": 56.3,
+        "p99_upper_ms": 75,
+        "max_ms": 193.839,
+        "overflow_100ms": 20
+      },
+      "composition_gpu": {
+        "count": 7393,
+        "mean_ms": 0.816415,
+        "p50_upper_ms": 0.8,
+        "p95_upper_ms": 1.3,
+        "p99_upper_ms": 1.9,
+        "max_ms": 4.63376,
+        "overflow_100ms": 0
+      },
+      "present_call": {
+        "count": 7393,
+        "mean_ms": 1.23001,
+        "p50_upper_ms": 0.3,
+        "p95_upper_ms": 7.3,
+        "p99_upper_ms": 24.1,
+        "max_ms": 77.1311,
+        "overflow_100ms": 0
+      },
+      "present_call_interval": {
+        "count": 7392,
+        "mean_ms": 17.1272,
+        "p50_upper_ms": 16.7,
+        "p95_upper_ms": 18.4,
+        "p99_upper_ms": 38.6,
+        "max_ms": 1637.52,
+        "overflow_100ms": 3
+      },
+      "playback_present_interval": {
+        "count": 7391,
+        "mean_ms": 16.908,
+        "p50_upper_ms": 16.7,
+        "p95_upper_ms": 18.4,
+        "p99_upper_ms": 38.5,
+        "max_ms": 775.66,
+        "overflow_100ms": 2
+      },
+      "source_selection": {
+        "count": 7532,
+        "mean_ms": 0.0612209,
+        "p50_upper_ms": 0.1,
+        "p95_upper_ms": 0.1,
+        "p99_upper_ms": 0.2,
+        "max_ms": 81.1739,
+        "overflow_100ms": 0
+      },
+      "wake_overshoot": {
+        "count": 19681,
+        "mean_ms": 0.35364,
+        "p50_upper_ms": 0.4,
+        "p95_upper_ms": 0.7,
+        "p99_upper_ms": 0.9,
+        "max_ms": 3.736,
+        "overflow_100ms": 0
+      }
+    },
+    "skipped_after_source_wait": 83,
+    "skipped_after_gpu_wait": 0,
+    "skipped_without_queue_wait": 24,
+    "clock_rewind_hold_iterations": 93,
+    "clock_backwards_frames": 0,
+    "clock_correction_absolute": {
+      "count": 8191,
+      "mean_ms": 0.683554,
+      "p50_upper_ms": 0.4,
+      "p95_upper_ms": 1.4,
+      "p99_upper_ms": 2.8,
+      "max_ms": 60.693,
+      "overflow_100ms": 0
+    },
+    "gpu_slot_budget": 6,
+    "retained_surface_views": 48,
+    "retained_texture_pools": 3,
+    "retained_texture_estimated_MiB": 1317.04,
+    "scope": "Active Present interval differs from the duration of a single Present call. Source-wait association does not establish decoder/driver/scheduler root cause."
+  },
+  {
+    "case": "candidate_endurance600",
+    "FPS": 59.87605874129137,
+    "skips": 66,
+    "underruns": 0,
+    "timings": {
+      "context_wait": {
+        "count": 241334,
+        "mean_ms": 0.0761131,
+        "p50_upper_ms": 0.1,
+        "p95_upper_ms": 0.6,
+        "p99_upper_ms": 0.9,
+        "max_ms": 59.9178,
+        "overflow_100ms": 0
+      },
+      "submit_cpu": {
+        "count": 35934,
+        "mean_ms": 0.489168,
+        "p50_upper_ms": 0.5,
+        "p95_upper_ms": 0.9,
+        "p99_upper_ms": 1.1,
+        "max_ms": 6.1394,
+        "overflow_100ms": 0
+      },
+      "completion_observation": {
+        "count": 35934,
+        "mean_ms": 12.3274,
+        "p50_upper_ms": 6.1,
+        "p95_upper_ms": 54.7,
+        "p99_upper_ms": 68.3,
+        "max_ms": 130.159,
+        "overflow_100ms": 5
+      },
+      "composition_gpu": {
+        "count": 35934,
+        "mean_ms": 0.6949,
+        "p50_upper_ms": 0.7,
+        "p95_upper_ms": 0.9,
+        "p99_upper_ms": 1.4,
+        "max_ms": 4.66,
+        "overflow_100ms": 0
+      },
+      "present_call": {
+        "count": 35934,
+        "mean_ms": 1.2193,
+        "p50_upper_ms": 0.3,
+        "p95_upper_ms": 7.5,
+        "p99_upper_ms": 22.3,
+        "max_ms": 93.7485,
+        "overflow_100ms": 0
+      },
+      "present_call_interval": {
+        "count": 35933,
+        "mean_ms": 16.7564,
+        "p50_upper_ms": 16.7,
+        "p95_upper_ms": 18.2,
+        "p99_upper_ms": 38.1,
+        "max_ms": 2108.46,
+        "overflow_100ms": 3
+      },
+      "playback_present_interval": {
+        "count": 35932,
+        "mean_ms": 16.6982,
+        "p50_upper_ms": 16.7,
+        "p95_upper_ms": 18.2,
+        "p99_upper_ms": 38.1,
+        "max_ms": 322.13,
+        "overflow_100ms": 2
+      },
+      "source_selection": {
+        "count": 35971,
+        "mean_ms": 0.0647759,
+        "p50_upper_ms": 0.1,
+        "p95_upper_ms": 0.1,
+        "p99_upper_ms": 0.2,
+        "max_ms": 67.0584,
+        "overflow_100ms": 0
+      },
+      "wake_overshoot": {
+        "count": 95843,
+        "mean_ms": 0.34828,
+        "p50_upper_ms": 0.4,
+        "p95_upper_ms": 0.7,
+        "p99_upper_ms": 0.9,
+        "max_ms": 2.8347,
+        "overflow_100ms": 0
+      }
+    },
+    "skipped_after_source_wait": 22,
+    "skipped_after_gpu_wait": 0,
+    "skipped_without_queue_wait": 44,
+    "clock_rewind_hold_iterations": 402,
+    "clock_backwards_frames": 0,
+    "clock_correction_absolute": {
+      "count": 38673,
+      "mean_ms": 1.29966,
+      "p50_upper_ms": 0.4,
+      "p95_upper_ms": 1.3,
+      "p99_upper_ms": 2.4,
+      "max_ms": 437.204,
+      "overflow_100ms": 148
+    },
+    "gpu_slot_budget": 6,
+    "retained_surface_views": 48,
+    "retained_texture_pools": 3,
+    "retained_texture_estimated_MiB": 1317.04,
+    "scope": "Active Present interval differs from the duration of a single Present call. Source-wait association does not establish decoder/driver/scheduler root cause."
+  },
+  {
+    "case": "baseline_endurance600",
+    "FPS": 46.09494904484188,
+    "skips": 6810,
+    "underruns": 11227,
+    "timings": {
+      "context_wait": {
+        "count": 185235,
+        "mean_ms": 0.410647,
+        "p50_upper_ms": 0.1,
+        "p95_upper_ms": 2.1,
+        "p99_upper_ms": 6.8,
+        "max_ms": 51.6627,
+        "overflow_100ms": 0
+      },
+      "submit_cpu": {
+        "count": 28616,
+        "mean_ms": 1.24725,
+        "p50_upper_ms": 1.2,
+        "p95_upper_ms": 2.2,
+        "p99_upper_ms": 4.8,
+        "max_ms": 15.2682,
+        "overflow_100ms": 0
+      },
+      "completion_observation": {
+        "count": 28613,
+        "mean_ms": 12.5146,
+        "p50_upper_ms": 2.8,
+        "p95_upper_ms": 57.8,
+        "p99_upper_ms": 95.4,
+        "max_ms": 1027.72,
+        "overflow_100ms": 245
+      },
+      "composition_gpu": {
+        "count": 28613,
+        "mean_ms": 0.67063,
+        "p50_upper_ms": 0.7,
+        "p95_upper_ms": 0.9,
+        "p99_upper_ms": 1.2,
+        "max_ms": 4.96972,
+        "overflow_100ms": 0
+      },
+      "present_call": {
+        "count": 28616,
+        "mean_ms": 1.73145,
+        "p50_upper_ms": 0.9,
+        "p95_upper_ms": 5.5,
+        "p99_upper_ms": 24.8,
+        "max_ms": 106.411,
+        "overflow_100ms": 1
+      },
+      "present_call_interval": {
+        "count": 28615,
+        "mean_ms": 21.7368,
+        "p50_upper_ms": 16.7,
+        "p95_upper_ms": 23.1,
+        "p99_upper_ms": 56.9,
+        "max_ms": 2368.43,
+        "overflow_100ms": 162
+      },
+      "playback_present_interval": {
+        "count": 28482,
+        "mean_ms": 19.2251,
+        "p50_upper_ms": 16.7,
+        "p95_upper_ms": 22.5,
+        "p99_upper_ms": 46.1,
+        "max_ms": 1738.44,
+        "overflow_100ms": 68
+      },
+      "source_selection": {
+        "count": 36310,
+        "mean_ms": 0.131007,
+        "p50_upper_ms": 0.2,
+        "p95_upper_ms": 0.3,
+        "p99_upper_ms": 0.5,
+        "max_ms": 79.6825,
+        "overflow_100ms": 0
+      },
+      "wake_overshoot": {
+        "count": 82633,
+        "mean_ms": 0.47468,
+        "p50_upper_ms": 0.5,
+        "p95_upper_ms": 1,
+        "p99_upper_ms": 1.4,
+        "max_ms": 23.2493,
+        "overflow_100ms": 0
+      }
+    },
+    "skipped_after_source_wait": 6473,
+    "skipped_after_gpu_wait": 0,
+    "skipped_without_queue_wait": 337,
+    "clock_rewind_hold_iterations": 1998,
+    "clock_backwards_frames": 17,
+    "clock_correction_absolute": {
+      "count": 7609,
+      "mean_ms": 23.5902,
+      "p50_upper_ms": 1.5,
+      "p95_upper_ms": 16,
+      "p99_upper_ms": 1226.51,
+      "max_ms": 1226.51,
+      "overflow_100ms": 173
+    },
+    "gpu_slot_budget": 6,
+    "retained_surface_views": 48,
+    "retained_texture_pools": 3,
+    "retained_texture_estimated_MiB": 1317.04,
+    "scope": "Active Present interval differs from the duration of a single Present call. Source-wait association does not establish decoder/driver/scheduler root cause."
+  }
+]

@@ -1,0 +1,97 @@
+{
+  "settings": {
+    "codec": "libx264",
+    "resolution": [
+      3840,
+      2160
+    ],
+    "fps": "60/1",
+    "preset": "veryfast",
+    "bitrate_Mbps": 35,
+    "crf": 20
+  },
+  "rows": [
+    {
+      "arm": "baseline",
+      "repeat": 0,
+      "seconds": 7.101545400000759,
+      "frames": 180,
+      "rate": "60/1",
+      "decoded": true,
+      "SSIM_vs_source": 0.997805,
+      "audio_codec": "aac",
+      "audio_sample_rate": 48000,
+      "AV_endpoint_difference_seconds": 0.0
+    },
+    {
+      "arm": "candidate",
+      "repeat": 0,
+      "seconds": 8.086740599988843,
+      "frames": 180,
+      "rate": "60/1",
+      "decoded": true,
+      "SSIM_vs_source": 0.997805,
+      "audio_codec": "aac",
+      "audio_sample_rate": 48000,
+      "AV_endpoint_difference_seconds": 0.0
+    },
+    {
+      "arm": "candidate",
+      "repeat": 1,
+      "seconds": 7.7930658999976,
+      "frames": 180,
+      "rate": "60/1",
+      "decoded": true,
+      "SSIM_vs_source": 0.997805,
+      "audio_codec": "aac",
+      "audio_sample_rate": 48000,
+      "AV_endpoint_difference_seconds": 0.0
+    },
+    {
+      "arm": "baseline",
+      "repeat": 1,
+      "seconds": 8.067687699993257,
+      "frames": 180,
+      "rate": "60/1",
+      "decoded": true,
+      "SSIM_vs_source": 0.997805,
+      "audio_codec": "aac",
+      "audio_sample_rate": 48000,
+      "AV_endpoint_difference_seconds": 0.0
+    },
+    {
+      "arm": "baseline",
+      "repeat": 2,
+      "seconds": 7.494629299995722,
+      "frames": 180,
+      "rate": "60/1",
+      "decoded": true,
+      "SSIM_vs_source": 0.997805,
+      "audio_codec": "aac",
+      "audio_sample_rate": 48000,
+      "AV_endpoint_difference_seconds": 0.0
+    },
+    {
+      "arm": "candidate",
+      "repeat": 2,
+      "seconds": 9.028669899998931,
+      "frames": 180,
+      "rate": "60/1",
+      "decoded": true,
+      "SSIM_vs_source": 0.997805,
+      "audio_codec": "aac",
+      "audio_sample_rate": 48000,
+      "AV_endpoint_difference_seconds": 0.0
+    }
+  ],
+  "summary": {
+    "baseline": {
+      "median_seconds": 7.494629299995722,
+      "worst_seconds": 8.067687699993257
+    },
+    "candidate": {
+      "median_seconds": 8.086740599988843,
+      "worst_seconds": 9.028669899998931
+    }
+  }
+}

@@ -1,0 +1,37 @@
+[
+  {
+    "cycle": 0,
+    "reopened": true,
+    "history_entries": 1,
+    "native_stopped": true,
+    "owned_children_remaining": 0
+  },
+  {
+    "cycle": 1,
+    "reopened": true,
+    "history_entries": 2,
+    "native_stopped": true,
+    "owned_children_remaining": 0
+  },
+  {
+    "cycle": 2,
+    "reopened": true,
+    "history_entries": 3,
+    "native_stopped": true,
+    "owned_children_remaining": 0
+  },
+  {
+    "cycle": 3,
+    "reopened": true,
+    "history_entries": 4,
+    "native_stopped": true,
+    "owned_children_remaining": 0
+  },
+  {
+    "cycle": 4,
+    "reopened": true,
+    "history_entries": 5,
+    "native_stopped": true,
+    "owned_children_remaining": 0
+  }
+]

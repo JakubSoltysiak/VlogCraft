@@ -1,0 +1,322 @@
+[
+  {
+    "arm": "baseline",
+    "trial": 1,
+    "slots": 6,
+    "prefix": [
+      6,
+      6,
+      6
+    ],
+    "hardware_pool": [
+      37,
+      37,
+      37
+    ],
+    "retained_estimated_MiB": 1317.04
+  },
+  {
+    "arm": "baseline",
+    "trial": 2,
+    "slots": 6,
+    "prefix": [
+      6,
+      6,
+      6
+    ],
+    "hardware_pool": [
+      37,
+      37,
+      37
+    ],
+    "retained_estimated_MiB": 1317.04
+  },
+  {
+    "arm": "baseline",
+    "trial": 3,
+    "slots": 6,
+    "prefix": [
+      6,
+      6,
+      6
+    ],
+    "hardware_pool": [
+      37,
+      37,
+      37
+    ],
+    "retained_estimated_MiB": 1317.04
+  },
+  {
+    "arm": "baseline",
+    "trial": 4,
+    "slots": 6,
+    "prefix": [
+      6,
+      6,
+      6
+    ],
+    "hardware_pool": [
+      37,
+      37,
+      37
+    ],
+    "retained_estimated_MiB": 1317.04
+  },
+  {
+    "arm": "baseline",
+    "trial": 5,
+    "slots": 6,
+    "prefix": [
+      6,
+      6,
+      6
+    ],
+    "hardware_pool": [
+      37,
+      37,
+      37
+    ],
+    "retained_estimated_MiB": 1317.04
+  },
+  {
+    "arm": "baseline",
+    "trial": 6,
+    "slots": 6,
+    "prefix": [
+      6,
+      6,
+      6
+    ],
+    "hardware_pool": [
+      37,
+      37,
+      37
+    ],
+    "retained_estimated_MiB": 1317.04
+  },
+  {
+    "arm": "baseline",
+    "trial": 7,
+    "slots": 6,
+    "prefix": [
+      6,
+      6,
+      6
+    ],
+    "hardware_pool": [
+      37,
+      37,
+      37
+    ],
+    "retained_estimated_MiB": 1317.04
+  },
+  {
+    "arm": "baseline",
+    "trial": 8,
+    "slots": 6,
+    "prefix": [
+      6,
+      6,
+      6
+    ],
+    "hardware_pool": [
+      37,
+      37,
+      37
+    ],
+    "retained_estimated_MiB": 1317.04
+  },
+  {
+    "arm": "baseline",
+    "trial": 9,
+    "slots": 6,
+    "prefix": [
+      6,
+      6,
+      6
+    ],
+    "hardware_pool": [
+      37,
+      37,
+      37
+    ],
+    "retained_estimated_MiB": 1317.04
+  },
+  {
+    "arm": "baseline",
+    "trial": 10,
+    "slots": 6,
+    "prefix": [
+      6,
+      6,
+      6
+    ],
+    "hardware_pool": [
+      37,
+      37,
+      37
+    ],
+    "retained_estimated_MiB": 1317.04
+  },
+  {
+    "arm": "candidate",
+    "trial": 1,
+    "slots": 6,
+    "prefix": [
+      6,
+      6,
+      6
+    ],
+    "hardware_pool": [
+      37,
+      37,
+      37
+    ],
+    "retained_estimated_MiB": 1317.04
+  },
+  {
+    "arm": "candidate",
+    "trial": 2,
+    "slots": 6,
+    "prefix": [
+      6,
+      6,
+      6
+    ],
+    "hardware_pool": [
+      37,
+      37,
+      37
+    ],
+    "retained_estimated_MiB": 1317.04
+  },
+  {
+    "arm": "candidate",
+    "trial": 3,
+    "slots": 6,
+    "prefix": [
+      6,
+      6,
+      6
+    ],
+    "hardware_pool": [
+      37,
+      37,
+      37
+    ],
+    "retained_estimated_MiB": 1317.04
+  },
+  {
+    "arm": "candidate",
+    "trial": 4,
+    "slots": 6,
+    "prefix": [
+      6,
+      6,
+      6
+    ],
+    "hardware_pool": [
+      37,
+      37,
+      37
+    ],
+    "retained_estimated_MiB": 1317.04
+  },
+  {
+    "arm": "candidate",
+    "trial": 5,
+    "slots": 6,
+    "prefix": [
+      6,
+      6,
+      6
+    ],
+    "hardware_pool": [
+      37,
+      37,
+      37
+    ],
+    "retained_estimated_MiB": 1317.04
+  },
+  {
+    "arm": "candidate",
+    "trial": 6,
+    "slots": 6,
+    "prefix": [
+      6,
+      6,
+      6
+    ],
+    "hardware_pool": [
+      37,
+      37,
+      37
+    ],
+    "retained_estimated_MiB": 1317.04
+  },
+  {
+    "arm": "candidate",
+    "trial": 7,
+    "slots": 6,
+    "prefix": [
+      6,
+      6,
+      6
+    ],
+    "hardware_pool": [
+      37,
+      37,
+      37
+    ],
+    "retained_estimated_MiB": 1317.04
+  },
+  {
+    "arm": "candidate",
+    "trial": 8,
+    "slots": 6,
+    "prefix": [
+      6,
+      6,
+      6
+    ],
+    "hardware_pool": [
+      37,
+      37,
+      37
+    ],
+    "retained_estimated_MiB": 1317.04
+  },
+  {
+    "arm": "candidate",
+    "trial": 9,
+    "slots": 6,
+    "prefix": [
+      6,
+      6,
+      6
+    ],
+    "hardware_pool": [
+      37,
+      37,
+      37
+    ],
+    "retained_estimated_MiB": 1317.04
+  },
+  {
+    "arm": "candidate",
+    "trial": 10,
+    "slots": 6,
+    "prefix": [
+      6,
+      6,
+      6
+    ],
+    "hardware_pool": [
+      37,
+      37,
+      37
+    ],
+    "retained_estimated_MiB": 1317.04
+  }
+]

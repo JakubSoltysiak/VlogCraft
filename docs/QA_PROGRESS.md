@@ -15,7 +15,7 @@ This opens a small graphical viewer without another terminal. The run selector i
 .venv/Scripts/python.exe tools/qa_status.py --json
 ```
 
-The viewer shows completed/total cases, percentage, pass/fail/skip/cancel counts, running/pending cases, phase, current names, elapsed/declared duration, timestamps and controller/heartbeat/activity status. A completed case can be failed; 100% completed does not mean qualification passed. These are **QA command cases**, which may contain many individual Python/JavaScript tests. Their individual results remain in logs.
+The viewer shows completed/total cases, percentage, pass/fail/skip/cancel counts, running/pending cases, phase, current names, elapsed/declared duration, timestamps and controller/heartbeat/activity status. A completed case can be failed; 100% completed does not mean qualification passed. The separate qualification line carries unresolved milestone blockers. These are **QA command cases**, which may contain many individual Python/JavaScript tests. Their individual results remain in logs.
 
 ## Launch and retry
 

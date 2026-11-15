@@ -1,0 +1,701 @@
+{
+  "mode": "continuous",
+  "seconds": 90,
+  "groups": {
+    "ffmpeg": {
+      "rss_MiB": {
+        "first30_median": 0,
+        "last30_median": 0,
+        "peak": 63.79296875,
+        "after_warmup_slope": {
+          "samples": 1,
+          "available": false
+        },
+        "late_slope": {
+          "samples": 1,
+          "available": false
+        },
+        "30s_medians": [
+          [
+            15,
+            0
+          ],
+          [
+            45,
+            0
+          ],
+          [
+            75,
+            0
+          ]
+        ]
+      },
+      "private_commit_MiB": {
+        "first30_median": 0,
+        "last30_median": 0,
+        "peak": 61.78125,
+        "after_warmup_slope": {
+          "samples": 1,
+          "available": false
+        },
+        "late_slope": {
+          "samples": 1,
+          "available": false
+        },
+        "30s_medians": [
+          [
+            15,
+            0
+          ],
+          [
+            45,
+            0
+          ],
+          [
+            75,
+            0
+          ]
+        ]
+      }
+    },
+    "host": {
+      "rss_MiB": {
+        "first30_median": 193.5859375,
+        "last30_median": 191.87890625,
+        "peak": 201.890625,
+        "after_warmup_slope": {
+          "samples": 1,
+          "available": false
+        },
+        "late_slope": {
+          "samples": 1,
+          "available": false
+        },
+        "30s_medians": [
+          [
+            15,
+            193.5859375
+          ],
+          [
+            45,
+            192.76171875
+          ],
+          [
+            75,
+            191.87890625
+          ]
+        ]
+      },
+      "private_commit_MiB": {
+        "first30_median": 884.671875,
+        "last30_median": 883.23046875,
+        "peak": 893.609375,
+        "after_warmup_slope": {
+          "samples": 1,
+          "available": false
+        },
+        "late_slope": {
+          "samples": 1,
+          "available": false
+        },
+        "30s_medians": [
+          [
+            15,
+            884.671875
+          ],
+          [
+            45,
+            884.10546875
+          ],
+          [
+            75,
+            883.23046875
+          ]
+        ]
+      }
+    },
+    "native": {
+      "rss_MiB": {
+        "first30_median": 1571.62109375,
+        "last30_median": 1572.71875,
+        "peak": 1664.2734375,
+        "after_warmup_slope": {
+          "samples": 1,
+          "available": false
+        },
+        "late_slope": {
+          "samples": 1,
+          "available": false
+        },
+        "30s_medians": [
+          [
+            15,
+            1571.62109375
+          ],
+          [
+            45,
+            1572.3671875
+          ],
+          [
+            75,
+            1572.71875
+          ]
+        ]
+      },
+      "private_commit_MiB": {
+        "first30_median": 2325.375,
+        "last30_median": 2326.375,
+        "peak": 2559.23046875,
+        "after_warmup_slope": {
+          "samples": 1,
+          "available": false
+        },
+        "late_slope": {
+          "samples": 1,
+          "available": false
+        },
+        "30s_medians": [
+          [
+            15,
+            2325.375
+          ],
+          [
+            45,
+            2326.0078125
+          ],
+          [
+            75,
+            2326.375
+          ]
+        ]
+      }
+    },
+    "webview": {
+      "rss_MiB": {
+        "first30_median": 1134.8984375,
+        "last30_median": 1164.5078125,
+        "peak": 1190.703125,
+        "after_warmup_slope": {
+          "samples": 1,
+          "available": false
+        },
+        "late_slope": {
+          "samples": 1,
+          "available": false
+        },
+        "30s_medians": [
+          [
+            15,
+            1134.8984375
+          ],
+          [
+            45,
+            1127.74609375
+          ],
+          [
+            75,
+            1164.5078125
+          ]
+        ]
+      },
+      "private_commit_MiB": {
+        "first30_median": 960.78125,
+        "last30_median": 987.296875,
+        "peak": 1019.4296875,
+        "after_warmup_slope": {
+          "samples": 1,
+          "available": false
+        },
+        "late_slope": {
+          "samples": 1,
+          "available": false
+        },
+        "30s_medians": [
+          [
+            15,
+            960.78125
+          ],
+          [
+            45,
+            952.26171875
+          ],
+          [
+            75,
+            987.296875
+          ]
+        ]
+      }
+    },
+    "total": {
+      "rss_MiB": {
+        "first30_median": 2902.4375,
+        "last30_median": 2935.34375,
+        "peak": 2992.22265625,
+        "after_warmup_slope": {
+          "samples": 1,
+          "available": false
+        },
+        "late_slope": {
+          "samples": 1,
+          "available": false
+        },
+        "30s_medians": [
+          [
+            15,
+            2902.4375
+          ],
+          [
+            45,
+            2904.1640625
+          ],
+          [
+            75,
+            2935.34375
+          ]
+        ]
+      },
+      "private_commit_MiB": {
+        "first30_median": 4176.828125,
+        "last30_median": 4202.1171875,
+        "peak": 4385.3046875,
+        "after_warmup_slope": {
+          "samples": 1,
+          "available": false
+        },
+        "late_slope": {
+          "samples": 1,
+          "available": false
+        },
+        "30s_medians": [
+          [
+            15,
+            4176.828125
+          ],
+          [
+            45,
+            4172.734375
+          ],
+          [
+            75,
+            4202.1171875
+          ]
+        ]
+      }
+    }
+  },
+  "heap_samples": [
+    {
+      "seconds": 1.4374310999992304,
+      "stage": "prepared",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 519,
+        "Nodes": 4993,
+        "JSHeapUsedSize": 19188996,
+        "JSHeapTotalSize": 47595520
+      },
+      "state": {
+        "frame": 0,
+        "playing": false,
+        "underruns": 0,
+        "samples": 0,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 88,
+        "encoded_bytes": 69774
+      },
+      "WebView_roles": {
+        "browser": {
+          "rss_MiB": 130.203125,
+          "private_commit_MiB": 44.31640625,
+          "processes": 1
+        },
+        "other": {
+          "rss_MiB": 11.17578125,
+          "private_commit_MiB": 2.74609375,
+          "processes": 1
+        },
+        "gpu-process": {
+          "rss_MiB": 276.93359375,
+          "private_commit_MiB": 292.90625,
+          "processes": 1
+        },
+        "utility": {
+          "rss_MiB": 90.2578125,
+          "private_commit_MiB": 30.453125,
+          "processes": 3
+        },
+        "renderer": {
+          "rss_MiB": 525.21875,
+          "private_commit_MiB": 502.3359375,
+          "processes": 1
+        }
+      }
+    },
+    {
+      "seconds": 31.231128700004774,
+      "stage": "active",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 621,
+        "Nodes": 5187,
+        "JSHeapUsedSize": 10343764,
+        "JSHeapTotalSize": 12857344
+      },
+      "state": {
+        "frame": 1743,
+        "playing": true,
+        "underruns": 162,
+        "samples": 1406336,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 993,
+        "encoded_bytes": 1349513
+      },
+      "WebView_roles": {
+        "browser": {
+          "rss_MiB": 129.859375,
+          "private_commit_MiB": 43.45703125,
+          "processes": 1
+        },
+        "other": {
+          "rss_MiB": 19.9609375,
+          "private_commit_MiB": 3.640625,
+          "processes": 1
+        },
+        "gpu-process": {
+          "rss_MiB": 275.1171875,
+          "private_commit_MiB": 291.89453125,
+          "processes": 1
+        },
+        "utility": {
+          "rss_MiB": 90.83203125,
+          "private_commit_MiB": 30.94140625,
+          "processes": 3
+        },
+        "renderer": {
+          "rss_MiB": 622.36328125,
+          "private_commit_MiB": 590.60546875,
+          "processes": 1
+        }
+      }
+    },
+    {
+      "seconds": 61.5417318999971,
+      "stage": "active",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 627,
+        "Nodes": 5230,
+        "JSHeapUsedSize": 10517320,
+        "JSHeapTotalSize": 12857344
+      },
+      "state": {
+        "frame": 3475,
+        "playing": true,
+        "underruns": 705,
+        "samples": 2789888,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 1429,
+        "encoded_bytes": 2440982
+      },
+      "WebView_roles": {
+        "browser": {
+          "rss_MiB": 133.8984375,
+          "private_commit_MiB": 42.8515625,
+          "processes": 1
+        },
+        "other": {
+          "rss_MiB": 14.078125,
+          "private_commit_MiB": 3.328125,
+          "processes": 1
+        },
+        "gpu-process": {
+          "rss_MiB": 282.7109375,
+          "private_commit_MiB": 300.58984375,
+          "processes": 1
+        },
+        "utility": {
+          "rss_MiB": 91.234375,
+          "private_commit_MiB": 30.2421875,
+          "processes": 3
+        },
+        "renderer": {
+          "rss_MiB": 624.20703125,
+          "private_commit_MiB": 590.83984375,
+          "processes": 1
+        }
+      }
+    },
+    {
+      "seconds": 90.1835820999986,
+      "stage": "active",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 1129,
+        "Nodes": 9018,
+        "JSHeapUsedSize": 10843928,
+        "JSHeapTotalSize": 14430208
+      },
+      "state": {
+        "frame": 5125,
+        "playing": true,
+        "underruns": 1167,
+        "samples": 4107008,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 1842,
+        "encoded_bytes": 3499209
+      },
+      "WebView_roles": {
+        "browser": {
+          "rss_MiB": 133.75390625,
+          "private_commit_MiB": 42.74609375,
+          "processes": 1
+        },
+        "other": {
+          "rss_MiB": 14.078125,
+          "private_commit_MiB": 3.328125,
+          "processes": 1
+        },
+        "gpu-process": {
+          "rss_MiB": 287.4921875,
+          "private_commit_MiB": 305.9765625,
+          "processes": 1
+        },
+        "utility": {
+          "rss_MiB": 91.2890625,
+          "private_commit_MiB": 30.265625,
+          "processes": 3
+        },
+        "renderer": {
+          "rss_MiB": 645.81640625,
+          "private_commit_MiB": 612.04296875,
+          "processes": 1
+        }
+      }
+    },
+    {
+      "seconds": 90.23792440000398,
+      "stage": "end",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 1129,
+        "Nodes": 9021,
+        "JSHeapUsedSize": 10885804,
+        "JSHeapTotalSize": 14430208
+      },
+      "state": {
+        "frame": 5132,
+        "playing": true,
+        "underruns": 1167,
+        "samples": 4110080,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 1842,
+        "encoded_bytes": 3503422
+      },
+      "WebView_roles": {
+        "browser": {
+          "rss_MiB": 133.75390625,
+          "private_commit_MiB": 42.74609375,
+          "processes": 1
+        },
+        "other": {
+          "rss_MiB": 14.078125,
+          "private_commit_MiB": 3.328125,
+          "processes": 1
+        },
+        "gpu-process": {
+          "rss_MiB": 287.4921875,
+          "private_commit_MiB": 305.9765625,
+          "processes": 1
+        },
+        "utility": {
+          "rss_MiB": 91.2890625,
+          "private_commit_MiB": 30.265625,
+          "processes": 3
+        },
+        "renderer": {
+          "rss_MiB": 645.4921875,
+          "private_commit_MiB": 612.0234375,
+          "processes": 1
+        }
+      }
+    },
+    {
+      "seconds": 92.63821180000377,
+      "stage": "stopped",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 1129,
+        "Nodes": 9033,
+        "JSHeapUsedSize": 11065128,
+        "JSHeapTotalSize": 14692352
+      },
+      "state": {
+        "frame": 5143,
+        "playing": false,
+        "underruns": 1167,
+        "samples": 4114560,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 1969,
+        "encoded_bytes": 3621823
+      },
+      "WebView_roles": {
+        "browser": {
+          "rss_MiB": 133.90234375,
+          "private_commit_MiB": 42.8671875,
+          "processes": 1
+        },
+        "other": {
+          "rss_MiB": 14.078125,
+          "private_commit_MiB": 3.328125,
+          "processes": 1
+        },
+        "gpu-process": {
+          "rss_MiB": 287.7109375,
+          "private_commit_MiB": 306.26171875,
+          "processes": 1
+        },
+        "utility": {
+          "rss_MiB": 91.3046875,
+          "private_commit_MiB": 30.30859375,
+          "processes": 3
+        },
+        "renderer": {
+          "rss_MiB": 646.1171875,
+          "private_commit_MiB": 612.71875,
+          "processes": 1
+        }
+      }
+    },
+    {
+      "seconds": 94.77958740000031,
+      "stage": "diagnostic_GC",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 627,
+        "Nodes": 4996,
+        "JSHeapUsedSize": 10544340,
+        "JSHeapTotalSize": 11546624
+      },
+      "state": {
+        "frame": 5143,
+        "playing": false,
+        "underruns": 1167,
+        "samples": 4114560,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 2104,
+        "encoded_bytes": 3738252
+      },
+      "WebView_roles": {
+        "browser": {
+          "rss_MiB": 133.9140625,
+          "private_commit_MiB": 42.8671875,
+          "processes": 1
+        },
+        "other": {
+          "rss_MiB": 14.078125,
+          "private_commit_MiB": 3.328125,
+          "processes": 1
+        },
+        "gpu-process": {
+          "rss_MiB": 286.99609375,
+          "private_commit_MiB": 306.28125,
+          "processes": 1
+        },
+        "utility": {
+          "rss_MiB": 91.3203125,
+          "private_commit_MiB": 30.32421875,
+          "processes": 3
+        },
+        "renderer": {
+          "rss_MiB": 525.59765625,
+          "private_commit_MiB": 492.54296875,
+          "processes": 1
+        }
+      }
+    },
+    {
+      "seconds": 97.57473380000738,
+      "stage": "native_released",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 627,
+        "Nodes": 4997,
+        "JSHeapUsedSize": 10764628,
+        "JSHeapTotalSize": 11808768
+      },
+      "state": {
+        "frame": null,
+        "playing": false,
+        "underruns": null,
+        "samples": null,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 2109,
+        "encoded_bytes": 3743876
+      },
+      "WebView_roles": {
+        "browser": {
+          "rss_MiB": 133.77734375,
+          "private_commit_MiB": 42.73046875,
+          "processes": 1
+        },
+        "other": {
+          "rss_MiB": 14.078125,
+          "private_commit_MiB": 3.328125,
+          "processes": 1
+        },
+        "gpu-process": {
+          "rss_MiB": 282.84765625,
+          "private_commit_MiB": 301.33203125,
+          "processes": 1
+        },
+        "utility": {
+          "rss_MiB": 91.3203125,
+          "private_commit_MiB": 30.32421875,
+          "processes": 3
+        },
+        "renderer": {
+          "rss_MiB": 515.03515625,
+          "private_commit_MiB": 482.98046875,
+          "processes": 1
+        }
+      }
+    }
+  ],
+  "clock_wire": {
+    "requests": 2109,
+    "encoded_bytes": 3743876
+  },
+  "failure_type": null,
+  "scope": "RSS sums may duplicate shared UMA pages. Private commit, heap, GPU estimates are separate. No forced GC during active measurement.",
+  "browser_error_count": 0,
+  "observed_underruns": 1167,
+  "editing_batch_count": 0,
+  "audio_gate_passed": false,
+  "window_condition_held": null,
+  "active_observer": "attached Performance/Network observer",
+  "qualification_exit_code": null
+}

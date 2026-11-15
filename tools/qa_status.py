@@ -13,7 +13,7 @@ def display(d):
            f"Passed: {count['passed']}   Failed: {count['failed']}   Skipped: {count['skipped']}   Cancelled: {count['cancelled']}",
            f"Running: {count['running']}   Remaining pending: {d['remaining']}",
            f"Attempts: {d['attempts']}   Historical failed attempts: {d['historical_failed_attempts']}",
-           '',f"Phase: {d['phase']}",f"Last update: {d['last_update']}"]
+           '',f"Phase: {d['phase']}",f"Qualification: {d['qualification']}",f"Last update: {d['last_update']}"]
     for r in d['running']:
         elapsed=r['elapsed_seconds'];expected=r.get('expected_seconds')
         fmt=lambda n:f'{int(n)//60:02}:{int(n)%60:02}'
@@ -29,16 +29,22 @@ def view(a):
     from tkinter import ttk
     root=tk.Tk();root.title('VlogCraft Studio — QA progress');root.geometry('940x540');root.configure(bg='#101722')
     selected=tk.StringVar();chooser=ttk.Combobox(root,textvariable=selected,state='readonly');chooser.pack(fill='x',padx=14,pady=10)
-    label=tk.Label(root,bg='#101722',fg='#d7e8fa',justify='left',anchor='nw',font=('Consolas',11),wraplength=900);label.pack(fill='both',expand=True,padx=14,pady=8)
+    content=tk.Frame(root,bg='#101722');content.pack(fill='both',expand=True,padx=14,pady=8)
+    scroll=ttk.Scrollbar(content);scroll.pack(side='right',fill='y')
+    label=tk.Text(content,bg='#101722',fg='#d7e8fa',wrap='word',font=('Consolas',11),state='disabled',yscrollcommand=scroll.set)
+    label.pack(side='left',fill='both',expand=True);scroll.config(command=label.yview)
+    def set_text(value):
+        position=label.yview();label.config(state='normal');label.delete('1.0','end');label.insert('1.0',value);label.config(state='disabled')
+        label.yview_moveto(position[0])
     updates=0;last_good=None;started=time.monotonic();scheduled=None
     def refresh():
         nonlocal updates,last_good,scheduled
         if scheduled is not None:root.after_cancel(scheduled);scheduled=None
         try:
             d=snapshot(a.status,selected.get() or a.run_id);chooser['values']=d['run_ids'];selected.set(d['run_id']);last_good=d
-            label.config(text=display(d));updates+=1
+            set_text(display(d));updates+=1
         except (OSError,ValueError,KeyError) as error:
-            label.config(text=('Status unavailable: '+type(error).__name__+'\n\n'+(display(last_good) if last_good else 'No QA run has written status yet.')))
+            set_text('Status unavailable: '+type(error).__name__+'\n\n'+(display(last_good) if last_good else 'No QA run has written status yet.'))
         if a.smoke_seconds and time.monotonic()-started>=a.smoke_seconds:
             if a.receipt:a.receipt.write_text(json.dumps({'refreshes':updates,'last_good_status':last_good is not None,'closed_normally':True}))
             root.destroy();return

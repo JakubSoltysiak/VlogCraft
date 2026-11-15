@@ -1,0 +1,3969 @@
+{
+  "seconds": 600.0,
+  "measured_seconds": 600.1338000000007,
+  "samples": 28800000,
+  "expected_samples": 28800000,
+  "underruns": 0,
+  "reached_end": true,
+  "distinct_sequence_fps": 57.980403703307424,
+  "present_calls_per_second": 57.980403703307424,
+  "program_resolution": [
+    960,
+    540
+  ],
+  "native_rect": {
+    "x": 621.0982666015625,
+    "y": 220.35714721679688,
+    "width": 203.42857360839844,
+    "height": 114.28572082519531,
+    "dpr": 1.75
+  },
+  "first_ready_seconds": 3.7865848999990703,
+  "application_ready_seconds": 3.7384440999994695,
+  "throughput_windows": [
+    {
+      "window_seconds": 1,
+      "count": 892,
+      "minimum_fps": 40.136635354398216,
+      "p05_fps": 58.797718297498996,
+      "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+    },
+    {
+      "window_seconds": 10,
+      "count": 857,
+      "minimum_fps": 16.350947158524377,
+      "p05_fps": 58.90253261703741,
+      "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout."
+    }
+  ],
+  "active_throughput_windows": [
+    {
+      "window_seconds": 1,
+      "count": 892,
+      "minimum_fps": 40.136635354398216,
+      "p05_fps": 58.797718297498996,
+      "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+    },
+    {
+      "window_seconds": 10,
+      "count": 856,
+      "minimum_fps": 16.350947158524377,
+      "p05_fps": 58.90253261703741,
+      "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+    }
+  ],
+  "window_condition": {
+    "mode": "visible",
+    "samples": [
+      {
+        "seconds": 3.600000127335079e-06,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 1.0082724999992934,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 2.1750257999992755,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 3.714163099999496,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 5.204356599999301,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 6.673782300000312,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 8.377471399999195,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 10.353895399999601,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 11.887291099999857,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 13.355461699999069,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 14.924832099999549,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 16.68485249999867,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 18.566043199998603,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 20.499050799999168,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 22.02560749999975,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 23.612610799998947,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 25.247622400000182,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 26.889185500000167,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 28.439594800000123,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 29.898424999999406,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 31.355232599999,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 32.941976399999476,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 34.66592589999891,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 35.94030120000025,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 37.5676241000001,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 39.04707719999897,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 40.542055099998834,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 42.27888879999955,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 43.60581569999886,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 45.009989700000006,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 46.49248429999898,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 48.250287499999104,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 49.95503199999985,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 51.41008879999936,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 52.918462499999805,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 54.5959471999995,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 56.00008340000022,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 57.58849310000005,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 59.19747239999924,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 60.633658499999,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 62.31274089999897,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 63.681541500000094,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 65.34001949999947,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 66.60762799999975,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 68.34011239999927,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 69.74248979999902,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 71.28376149999895,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 72.87398819999908,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 74.40208989999883,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 76.43337339999925,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 77.53907509999954,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 79.21603849999883,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 80.52336850000029,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 82.30079490000026,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 83.7204230999996,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 85.24232969999866,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 86.64925479999874,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 88.23317820000011,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 90.04825119999987,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 91.46918759999971,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 92.99253209999915,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 94.54361479999898,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 96.09939139999915,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 97.65717239999867,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 99.11854959999982,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 100.68914799999948,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 102.21745829999963,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 103.66868329999852,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 105.18733449999854,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 106.60065880000002,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 108.06597959999999,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 109.47990459999892,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 110.93803599999956,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 112.4756569000001,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 114.11839129999862,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 115.8479385999999,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 117.20640149999963,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 118.85303629999908,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 120.2468059999992,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 121.68962349999856,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 123.28972219999923,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 124.73160289999942,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 126.34969469999851,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 127.74307899999985,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 129.30263439999908,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 130.81037300000025,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 132.3522850999998,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 133.6456978999995,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 135.2383050999997,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 136.75108349999937,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 138.29438859999937,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 139.87357509999856,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 141.35286759999872,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 142.95680840000023,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 144.45875460000025,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 146.22015119999924,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 147.7325725999999,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 149.1096139000001,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 150.72316249999858,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 152.2967792999989,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 153.80389999999898,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 155.33456599999954,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 156.85860059999868,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 158.3717446999999,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 159.85566429999926,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 161.36184279999907,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 162.810937799999,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 164.21551120000004,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 165.63937299999998,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 167.1367984999997,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 168.6217385,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 170.36609919999864,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 171.80973369999992,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 173.31933349999963,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 174.79563729999973,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 176.27192130000003,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 177.83751669999947,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 179.28160989999924,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 180.69956319999983,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 182.19702999999936,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 183.78561929999887,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 185.09602619999896,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 186.68742109999948,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 188.16928159999952,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 189.67149809999864,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 191.1393862999994,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 192.5823658999998,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 194.2696219999998,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 195.78208189999896,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 197.32667479999873,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 198.6816803999991,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 200.06902119999904,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 201.5937058999989,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 203.1690896,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 204.77069889999984,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 206.24768519999998,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 207.77137439999933,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 209.25287229999958,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 210.78356149999854,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 212.26716719999968,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 213.72839449999992,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 215.15160569999898,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 216.6366851999992,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 218.15807099999984,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 219.66490749999866,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 221.0706814999994,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 222.48589410000022,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 224.24931529999958,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 225.79017019999992,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 227.59408970000004,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 229.10234209999908,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 230.7928866000002,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 232.37499839999873,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 234.21348549999857,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 236.0303060999995,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 237.86379849999867,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 239.52879209999992,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 241.22842429999946,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 242.93834269999934,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 244.5851410999985,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 246.07269319999978,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 248.28243719999955,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 250.04921809999905,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 251.88646100000005,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 253.54100209999888,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 255.3817240999997,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 257.1641146000002,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 258.7263691999997,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 260.27606599999854,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 262.14434079999955,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 263.7168839999995,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 265.396487,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 267.08986619999996,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 268.7571388999986,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 270.27075499999955,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 272.03476339999906,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 273.6907635999996,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 275.1389158000002,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 276.6938508000003,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 278.1385835000001,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 280.3679204,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 281.81082349999997,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 283.22295379999923,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 284.7367515999995,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 286.30964329999915,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 287.80586349999976,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 289.26998509999976,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 290.7520375999993,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 292.2366086999991,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 293.75018230000023,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 295.26209259999996,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 296.70912189999945,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 298.1964341999992,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 299.8444072000002,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 301.23223959999996,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 302.8862405,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 304.21319389999917,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 305.89168699999937,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 307.35893399999986,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 308.8083141999996,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 310.3095366999987,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 311.6946699,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 313.2912765000001,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 314.87793280000005,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 316.3224446999993,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 317.74675879999995,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 319.2883411999992,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 320.77405439999893,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 322.33682149999913,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 323.7983428999996,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 325.2428850999986,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 327.00412419999884,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 328.4070200999995,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 330.0405892999988,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 331.6801763000003,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 332.9321799999998,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 334.4942775999989,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 336.05756569999903,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 337.6140063999992,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 339.2152464999999,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 340.80520479999905,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 342.21750710000015,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 343.78905399999894,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 345.25487259999863,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 346.8525235999987,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 348.20063990000017,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 349.5905970999993,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 351.12584219999917,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 352.7385861999992,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 354.4774669999988,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 355.6936319999986,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 357.2596421999988,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 358.86688589999903,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 360.69828400000006,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 362.20541140000023,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 363.7901703999996,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 366.6393632999989,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 369.9404380999986,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 371.3531895999986,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 376.31625939999867,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 378.26250309999887,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 379.88012809999964,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 384.18801279999934,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 385.9287327000002,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 387.4042085000001,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 389.2340803999996,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 392.05214999999953,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 393.8910309999992,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 395.94897630000014,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 397.27416429999903,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 398.8184801999996,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 400.31936249999853,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 401.970335,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 403.47251739999956,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 405.04602089999935,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 406.4620742999996,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 407.94929819999925,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 409.62498479999886,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 411.3868423999993,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 413.00270719999935,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 414.8332688999999,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 416.6190829999996,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 418.1883151000002,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 419.7682186999991,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 421.3445512999988,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 422.9120508999986,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 424.56918459999906,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 426.1420720999995,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 427.71363389999897,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 429.29373529999975,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 430.7162251999998,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 432.3013439999995,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 433.91487919999963,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 435.53560749999997,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 437.0647255999993,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 438.59220060000007,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 440.1976077999989,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 441.89111669999875,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 443.4171881000002,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 445.1268483999993,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 446.7498538999989,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 448.4207213999998,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 450.3986643999997,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 451.77222549999897,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 453.30406159999984,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 454.8838313999986,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 456.5142340000002,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 458.1687972,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 459.6734988999997,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 461.363918699999,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 462.9007296999989,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 464.370458899999,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 466.0761743000003,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 467.65223929999956,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 469.42682779999996,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 471.1239980999999,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 472.80473859999984,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 474.57342439999957,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 476.0214896999987,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 477.4431034999998,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 478.9821796999986,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 480.57759929999884,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 482.2243733999985,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 483.7966058000002,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 485.50817730000017,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 486.92353019999973,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 488.5380609999993,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 490.2053860999986,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 491.58490410000013,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 493.2239176000003,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 494.87488739999935,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 496.6247999999996,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 498.14039609999963,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 499.9255341999997,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 501.4128069999988,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 503.02858489999926,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 504.6130309,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 506.2041924999994,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 507.64243650000026,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": false
+      },
+      {
+        "seconds": 509.1951766000002,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": false
+      },
+      {
+        "seconds": 510.69155630000023,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": false
+      },
+      {
+        "seconds": 512.1600111999996,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": false
+      },
+      {
+        "seconds": 513.7734524999996,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": false
+      },
+      {
+        "seconds": 515.3103305999994,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": false
+      },
+      {
+        "seconds": 516.6605657,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": false
+      },
+      {
+        "seconds": 518.263860699999,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 519.7771240999991,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 521.2524297999989,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 522.6743692,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 524.2348024000003,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 525.7889572999993,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 527.3494917999997,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 528.8621574999997,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 530.4967865999988,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 532.3600116999987,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 534.0949354999993,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 535.5585212999995,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 537.3323382999988,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 538.6903184999992,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 540.3080754999992,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 541.7667196000002,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": false,
+        "foreground_owned": false
+      },
+      {
+        "seconds": 543.1829369999996,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 544.9182951999992,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 546.3769721999997,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 548.0261785000002,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 549.5198617999995,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 551.157314099999,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 552.8377748999992,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 554.3561542999996,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 556.1566494999988,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 557.7832753999992,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 559.3522671999999,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 560.7519040999996,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 562.3172099999992,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 563.9766158000002,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 565.5538743999987,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 567.0234705999992,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 568.6185766999988,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 570.1487793999986,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 571.7461838999989,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 573.4265653999992,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 574.9227520999993,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 576.446277699999,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 578.2314289999995,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 579.7786908999988,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 581.6210998999995,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 582.8526021999987,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 584.4555110999991,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 586.0926017999991,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 587.6533043999989,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 589.1942463999985,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 590.7612449999997,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 592.3309168999986,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 594.0540426999996,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 595.6662858999989,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 597.1348435999989,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 598.7672564999993,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 600.3947062999996,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      },
+      {
+        "seconds": 601.9970763999991,
+        "visible": true,
+        "surface_replaced_during_sample": false,
+        "sampled_native_surface": true,
+        "minimized": false,
+        "editor_topmost": true,
+        "preview_center_unobscured": true,
+        "foreground_owned": true
+      }
+    ],
+    "condition_held": false,
+    "scope": "Physical center hit-test and window state, not physical scanout. Owned QA topmost/cover windows only; no global Windows settings."
+  },
+  "browser_focus_changes": [
+    {
+      "seconds": 0.3721000000014901,
+      "focused": true
+    },
+    {
+      "seconds": 506.5486000000015,
+      "focused": false
+    },
+    {
+      "seconds": 515.8309000000004,
+      "focused": true
+    },
+    {
+      "seconds": 539.4456000000015,
+      "focused": false
+    },
+    {
+      "seconds": 541.1473000000008,
+      "focused": true
+    }
+  ],
+  "focus_emulation": "disabled via connect_over_cdp(no_defaults=True)",
+  "skips": 1203,
+  "timings": {
+    "context_wait": {
+      "count": 235823,
+      "mean_ms": 0.0915642,
+      "p50_upper_ms": 0.1,
+      "p95_upper_ms": 0.6,
+      "p99_upper_ms": 0.9,
+      "max_ms": 157.215,
+      "overflow_100ms": 2
+    },
+    "submit_cpu": {
+      "count": 34797,
+      "mean_ms": 0.541009,
+      "p50_upper_ms": 0.6,
+      "p95_upper_ms": 0.9,
+      "p99_upper_ms": 1.2,
+      "max_ms": 76.8745,
+      "overflow_100ms": 0
+    },
+    "completion_observation": {
+      "count": 34797,
+      "mean_ms": 11.5616,
+      "p50_upper_ms": 6.1,
+      "p95_upper_ms": 49.9,
+      "p99_upper_ms": 67.1,
+      "max_ms": 1428.95,
+      "overflow_100ms": 30
+    },
+    "composition_gpu": {
+      "count": 34797,
+      "mean_ms": 0.728423,
+      "p50_upper_ms": 0.8,
+      "p95_upper_ms": 0.9,
+      "p99_upper_ms": 1.5,
+      "max_ms": 5.68036,
+      "overflow_100ms": 0
+    },
+    "present_call": {
+      "count": 34797,
+      "mean_ms": 1.10974,
+      "p50_upper_ms": 0.3,
+      "p95_upper_ms": 7.2,
+      "p99_upper_ms": 20,
+      "max_ms": 1408.37,
+      "overflow_100ms": 1
+    },
+    "present_call_interval": {
+      "count": 34796,
+      "mean_ms": 17.3004,
+      "p50_upper_ms": 16.7,
+      "p95_upper_ms": 18.2,
+      "p99_upper_ms": 35.5,
+      "max_ms": 4629.36,
+      "overflow_100ms": 18
+    },
+    "playback_present_interval": {
+      "count": 34795,
+      "mean_ms": 17.243,
+      "p50_upper_ms": 16.7,
+      "p95_upper_ms": 18.2,
+      "p99_upper_ms": 35.5,
+      "max_ms": 4629.36,
+      "overflow_100ms": 17
+    },
+    "source_selection": {
+      "count": 35532,
+      "mean_ms": 0.0675067,
+      "p50_upper_ms": 0.1,
+      "p95_upper_ms": 0.1,
+      "p99_upper_ms": 0.2,
+      "max_ms": 169.649,
+      "overflow_100ms": 1
+    },
+    "wake_overshoot": {
+      "count": 94294,
+      "mean_ms": 0.490116,
+      "p50_upper_ms": 0.4,
+      "p95_upper_ms": 0.7,
+      "p99_upper_ms": 1.1,
+      "max_ms": 1463.84,
+      "overflow_100ms": 12
+    }
+  },
+  "queues": {
+    "peak_source_queue_frames": 4,
+    "peak_inflight_gpu_frames": 4,
+    "gpu_slot_budget": 6,
+    "retained_surface_views": 48,
+    "retained_texture_pools": 3,
+    "retained_texture_estimated_MiB": 1317.04
+  },
+  "peak_summed_RSS_MiB": 3804.2,
+  "all_on_AC": false
+}

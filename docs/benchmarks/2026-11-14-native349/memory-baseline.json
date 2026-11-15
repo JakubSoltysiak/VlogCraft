@@ -1,0 +1,1676 @@
+{
+  "mode": "continuous",
+  "seconds": 600,
+  "groups": {
+    "ffmpeg": {
+      "rss_MiB": {
+        "first30_median": 0.0,
+        "last30_median": 0.0,
+        "peak": 64.16796875,
+        "after_warmup_slope": {
+          "available": true,
+          "samples": 18,
+          "MiB_per_minute": 0.0,
+          "approximate_95_percent_interval": [
+            0.0,
+            0.0
+          ],
+          "method": "OLS on30s medians, Newey-West2-lag covariance with finite-sample correction and normal1.96 interval. Single session, approximate serial-correlation treatment; not a population reliability guarantee."
+        },
+        "late_slope": {
+          "available": true,
+          "samples": 18,
+          "MiB_per_minute": 0.0,
+          "approximate_95_percent_interval": [
+            0.0,
+            0.0
+          ],
+          "method": "OLS on30s medians, Newey-West2-lag covariance with finite-sample correction and normal1.96 interval. Single session, approximate serial-correlation treatment; not a population reliability guarantee."
+        },
+        "30s_medians": [
+          [
+            15,
+            0.0
+          ],
+          [
+            45,
+            0.0
+          ],
+          [
+            75,
+            0
+          ],
+          [
+            105,
+            0.0
+          ],
+          [
+            135,
+            0
+          ],
+          [
+            165,
+            0.0
+          ],
+          [
+            195,
+            0.0
+          ],
+          [
+            225,
+            0
+          ],
+          [
+            255,
+            0
+          ],
+          [
+            285,
+            0
+          ],
+          [
+            315,
+            0
+          ],
+          [
+            345,
+            0.0
+          ],
+          [
+            375,
+            0.0
+          ],
+          [
+            405,
+            0
+          ],
+          [
+            435,
+            0
+          ],
+          [
+            465,
+            0
+          ],
+          [
+            495,
+            0
+          ],
+          [
+            525,
+            0
+          ],
+          [
+            555,
+            0
+          ],
+          [
+            585,
+            0.0
+          ]
+        ]
+      },
+      "private_commit_MiB": {
+        "first30_median": 0.0,
+        "last30_median": 0.0,
+        "peak": 62.0390625,
+        "after_warmup_slope": {
+          "available": true,
+          "samples": 18,
+          "MiB_per_minute": 0.0,
+          "approximate_95_percent_interval": [
+            0.0,
+            0.0
+          ],
+          "method": "OLS on30s medians, Newey-West2-lag covariance with finite-sample correction and normal1.96 interval. Single session, approximate serial-correlation treatment; not a population reliability guarantee."
+        },
+        "late_slope": {
+          "available": true,
+          "samples": 18,
+          "MiB_per_minute": 0.0,
+          "approximate_95_percent_interval": [
+            0.0,
+            0.0
+          ],
+          "method": "OLS on30s medians, Newey-West2-lag covariance with finite-sample correction and normal1.96 interval. Single session, approximate serial-correlation treatment; not a population reliability guarantee."
+        },
+        "30s_medians": [
+          [
+            15,
+            0.0
+          ],
+          [
+            45,
+            0.0
+          ],
+          [
+            75,
+            0
+          ],
+          [
+            105,
+            0.0
+          ],
+          [
+            135,
+            0
+          ],
+          [
+            165,
+            0.0
+          ],
+          [
+            195,
+            0.0
+          ],
+          [
+            225,
+            0
+          ],
+          [
+            255,
+            0
+          ],
+          [
+            285,
+            0
+          ],
+          [
+            315,
+            0
+          ],
+          [
+            345,
+            0.0
+          ],
+          [
+            375,
+            0.0
+          ],
+          [
+            405,
+            0
+          ],
+          [
+            435,
+            0
+          ],
+          [
+            465,
+            0
+          ],
+          [
+            495,
+            0
+          ],
+          [
+            525,
+            0
+          ],
+          [
+            555,
+            0
+          ],
+          [
+            585,
+            0.0
+          ]
+        ]
+      }
+    },
+    "host": {
+      "rss_MiB": {
+        "first30_median": 188.177734375,
+        "last30_median": 190.59375,
+        "peak": 198.24609375,
+        "after_warmup_slope": {
+          "available": true,
+          "samples": 18,
+          "MiB_per_minute": 0.27798874484003555,
+          "approximate_95_percent_interval": [
+            0.12012947888507203,
+            0.4358480107949991
+          ],
+          "method": "OLS on30s medians, Newey-West2-lag covariance with finite-sample correction and normal1.96 interval. Single session, approximate serial-correlation treatment; not a population reliability guarantee."
+        },
+        "late_slope": {
+          "available": true,
+          "samples": 18,
+          "MiB_per_minute": 0.27798874484003555,
+          "approximate_95_percent_interval": [
+            0.12012947888507203,
+            0.4358480107949991
+          ],
+          "method": "OLS on30s medians, Newey-West2-lag covariance with finite-sample correction and normal1.96 interval. Single session, approximate serial-correlation treatment; not a population reliability guarantee."
+        },
+        "30s_medians": [
+          [
+            15,
+            188.177734375
+          ],
+          [
+            45,
+            189.60546875
+          ],
+          [
+            75,
+            189.97265625
+          ],
+          [
+            105,
+            188.09375
+          ],
+          [
+            135,
+            187.9921875
+          ],
+          [
+            165,
+            187.9140625
+          ],
+          [
+            195,
+            187.833984375
+          ],
+          [
+            225,
+            189.45703125
+          ],
+          [
+            255,
+            189.55078125
+          ],
+          [
+            285,
+            188.515625
+          ],
+          [
+            315,
+            190.359375
+          ],
+          [
+            345,
+            190.546875
+          ],
+          [
+            375,
+            190.56640625
+          ],
+          [
+            405,
+            190.5
+          ],
+          [
+            435,
+            190.27734375
+          ],
+          [
+            465,
+            190.40625
+          ],
+          [
+            495,
+            190.45703125
+          ],
+          [
+            525,
+            190.16796875
+          ],
+          [
+            555,
+            189.953125
+          ],
+          [
+            585,
+            190.59375
+          ]
+        ]
+      },
+      "private_commit_MiB": {
+        "first30_median": 877.447265625,
+        "last30_median": 883.94140625,
+        "peak": 887.05078125,
+        "after_warmup_slope": {
+          "available": true,
+          "samples": 18,
+          "MiB_per_minute": 0.8373564886480622,
+          "approximate_95_percent_interval": [
+            0.5692485433720034,
+            1.105464433924121
+          ],
+          "method": "OLS on30s medians, Newey-West2-lag covariance with finite-sample correction and normal1.96 interval. Single session, approximate serial-correlation treatment; not a population reliability guarantee."
+        },
+        "late_slope": {
+          "available": true,
+          "samples": 18,
+          "MiB_per_minute": 0.8373564886480622,
+          "approximate_95_percent_interval": [
+            0.5692485433720034,
+            1.105464433924121
+          ],
+          "method": "OLS on30s medians, Newey-West2-lag covariance with finite-sample correction and normal1.96 interval. Single session, approximate serial-correlation treatment; not a population reliability guarantee."
+        },
+        "30s_medians": [
+          [
+            15,
+            877.447265625
+          ],
+          [
+            45,
+            879.6796875
+          ],
+          [
+            75,
+            879.796875
+          ],
+          [
+            105,
+            877.40234375
+          ],
+          [
+            135,
+            877.546875
+          ],
+          [
+            165,
+            877.80078125
+          ],
+          [
+            195,
+            878.13671875
+          ],
+          [
+            225,
+            880.44921875
+          ],
+          [
+            255,
+            880.16015625
+          ],
+          [
+            285,
+            879.02734375
+          ],
+          [
+            315,
+            883.453125
+          ],
+          [
+            345,
+            884.228515625
+          ],
+          [
+            375,
+            883.521484375
+          ],
+          [
+            405,
+            883.9921875
+          ],
+          [
+            435,
+            883.41796875
+          ],
+          [
+            465,
+            883.6328125
+          ],
+          [
+            495,
+            883.4765625
+          ],
+          [
+            525,
+            883.70703125
+          ],
+          [
+            555,
+            883.33984375
+          ],
+          [
+            585,
+            883.94140625
+          ]
+        ]
+      }
+    },
+    "native": {
+      "rss_MiB": {
+        "first30_median": 1506.61328125,
+        "last30_median": 1526.08984375,
+        "peak": 1635.21875,
+        "after_warmup_slope": {
+          "available": true,
+          "samples": 18,
+          "MiB_per_minute": 1.673261738906092,
+          "approximate_95_percent_interval": [
+            1.0860749012882192,
+            2.260448576523965
+          ],
+          "method": "OLS on30s medians, Newey-West2-lag covariance with finite-sample correction and normal1.96 interval. Single session, approximate serial-correlation treatment; not a population reliability guarantee."
+        },
+        "late_slope": {
+          "available": true,
+          "samples": 18,
+          "MiB_per_minute": 1.673261738906092,
+          "approximate_95_percent_interval": [
+            1.0860749012882192,
+            2.260448576523965
+          ],
+          "method": "OLS on30s medians, Newey-West2-lag covariance with finite-sample correction and normal1.96 interval. Single session, approximate serial-correlation treatment; not a population reliability guarantee."
+        },
+        "30s_medians": [
+          [
+            15,
+            1506.61328125
+          ],
+          [
+            45,
+            1508.666015625
+          ],
+          [
+            75,
+            1512.55078125
+          ],
+          [
+            105,
+            1515.630859375
+          ],
+          [
+            135,
+            1515.6640625
+          ],
+          [
+            165,
+            1515.61328125
+          ],
+          [
+            195,
+            1515.88671875
+          ],
+          [
+            225,
+            1516.234375
+          ],
+          [
+            255,
+            1524.81640625
+          ],
+          [
+            285,
+            1525.10546875
+          ],
+          [
+            315,
+            1525.85546875
+          ],
+          [
+            345,
+            1526.212890625
+          ],
+          [
+            375,
+            1526.2265625
+          ],
+          [
+            405,
+            1526.203125
+          ],
+          [
+            435,
+            1525.97265625
+          ],
+          [
+            465,
+            1526.09375
+          ],
+          [
+            495,
+            1526.140625
+          ],
+          [
+            525,
+            1526.21484375
+          ],
+          [
+            555,
+            1526.08984375
+          ],
+          [
+            585,
+            1526.08984375
+          ]
+        ]
+      },
+      "private_commit_MiB": {
+        "first30_median": 2225.357421875,
+        "last30_median": 2243.18359375,
+        "peak": 2497.3046875,
+        "after_warmup_slope": {
+          "available": true,
+          "samples": 18,
+          "MiB_per_minute": 1.5997202334881422,
+          "approximate_95_percent_interval": [
+            1.0563301361754753,
+            2.143110330800809
+          ],
+          "method": "OLS on30s medians, Newey-West2-lag covariance with finite-sample correction and normal1.96 interval. Single session, approximate serial-correlation treatment; not a population reliability guarantee."
+        },
+        "late_slope": {
+          "available": true,
+          "samples": 18,
+          "MiB_per_minute": 1.5997202334881422,
+          "approximate_95_percent_interval": [
+            1.0563301361754753,
+            2.143110330800809
+          ],
+          "method": "OLS on30s medians, Newey-West2-lag covariance with finite-sample correction and normal1.96 interval. Single session, approximate serial-correlation treatment; not a population reliability guarantee."
+        },
+        "30s_medians": [
+          [
+            15,
+            2225.357421875
+          ],
+          [
+            45,
+            2226.42578125
+          ],
+          [
+            75,
+            2230.19921875
+          ],
+          [
+            105,
+            2233.34375
+          ],
+          [
+            135,
+            2233.3515625
+          ],
+          [
+            165,
+            2233.2734375
+          ],
+          [
+            195,
+            2233.48046875
+          ],
+          [
+            225,
+            2233.3203125
+          ],
+          [
+            255,
+            2241.69921875
+          ],
+          [
+            285,
+            2242.08984375
+          ],
+          [
+            315,
+            2242.640625
+          ],
+          [
+            345,
+            2243.091796875
+          ],
+          [
+            375,
+            2243.296875
+          ],
+          [
+            405,
+            2243.25
+          ],
+          [
+            435,
+            2243.22265625
+          ],
+          [
+            465,
+            2243.21484375
+          ],
+          [
+            495,
+            2243.20703125
+          ],
+          [
+            525,
+            2243.234375
+          ],
+          [
+            555,
+            2243.19921875
+          ],
+          [
+            585,
+            2243.18359375
+          ]
+        ]
+      }
+    },
+    "webview": {
+      "rss_MiB": {
+        "first30_median": 1163.69921875,
+        "last30_median": 1990.033203125,
+        "peak": 2023.609375,
+        "after_warmup_slope": {
+          "available": true,
+          "samples": 18,
+          "MiB_per_minute": 81.92446707301337,
+          "approximate_95_percent_interval": [
+            69.3734407802167,
+            94.47549336581005
+          ],
+          "method": "OLS on30s medians, Newey-West2-lag covariance with finite-sample correction and normal1.96 interval. Single session, approximate serial-correlation treatment; not a population reliability guarantee."
+        },
+        "late_slope": {
+          "available": true,
+          "samples": 18,
+          "MiB_per_minute": 81.92446707301337,
+          "approximate_95_percent_interval": [
+            69.3734407802167,
+            94.47549336581005
+          ],
+          "method": "OLS on30s medians, Newey-West2-lag covariance with finite-sample correction and normal1.96 interval. Single session, approximate serial-correlation treatment; not a population reliability guarantee."
+        },
+        "30s_medians": [
+          [
+            15,
+            1163.69921875
+          ],
+          [
+            45,
+            1220.51953125
+          ],
+          [
+            75,
+            1270.53125
+          ],
+          [
+            105,
+            1360.888671875
+          ],
+          [
+            135,
+            1421.78515625
+          ],
+          [
+            165,
+            1486.63671875
+          ],
+          [
+            195,
+            1539.177734375
+          ],
+          [
+            225,
+            1581.4921875
+          ],
+          [
+            255,
+            1632.98828125
+          ],
+          [
+            285,
+            1674.83984375
+          ],
+          [
+            315,
+            1726.91015625
+          ],
+          [
+            345,
+            1793.626953125
+          ],
+          [
+            375,
+            1826.162109375
+          ],
+          [
+            405,
+            1844.08984375
+          ],
+          [
+            435,
+            1867.69921875
+          ],
+          [
+            465,
+            1896.87109375
+          ],
+          [
+            495,
+            1925.63671875
+          ],
+          [
+            525,
+            1934.89453125
+          ],
+          [
+            555,
+            1971.7265625
+          ],
+          [
+            585,
+            1990.033203125
+          ]
+        ]
+      },
+      "private_commit_MiB": {
+        "first30_median": 1002.947265625,
+        "last30_median": 1820.3671875,
+        "peak": 1854.26953125,
+        "after_warmup_slope": {
+          "available": true,
+          "samples": 18,
+          "MiB_per_minute": 80.31000064499483,
+          "approximate_95_percent_interval": [
+            67.92458830338612,
+            92.69541298660354
+          ],
+          "method": "OLS on30s medians, Newey-West2-lag covariance with finite-sample correction and normal1.96 interval. Single session, approximate serial-correlation treatment; not a population reliability guarantee."
+        },
+        "late_slope": {
+          "available": true,
+          "samples": 18,
+          "MiB_per_minute": 80.31000064499483,
+          "approximate_95_percent_interval": [
+            67.92458830338612,
+            92.69541298660354
+          ],
+          "method": "OLS on30s medians, Newey-West2-lag covariance with finite-sample correction and normal1.96 interval. Single session, approximate serial-correlation treatment; not a population reliability guarantee."
+        },
+        "30s_medians": [
+          [
+            15,
+            1002.947265625
+          ],
+          [
+            45,
+            1061.35546875
+          ],
+          [
+            75,
+            1114.171875
+          ],
+          [
+            105,
+            1204.32421875
+          ],
+          [
+            135,
+            1260.765625
+          ],
+          [
+            165,
+            1326.1796875
+          ],
+          [
+            195,
+            1377.962890625
+          ],
+          [
+            225,
+            1419.87109375
+          ],
+          [
+            255,
+            1471.6953125
+          ],
+          [
+            285,
+            1511.44140625
+          ],
+          [
+            315,
+            1562.3203125
+          ],
+          [
+            345,
+            1628.94921875
+          ],
+          [
+            375,
+            1659.505859375
+          ],
+          [
+            405,
+            1676.8203125
+          ],
+          [
+            435,
+            1700.48046875
+          ],
+          [
+            465,
+            1728.8046875
+          ],
+          [
+            495,
+            1755.98828125
+          ],
+          [
+            525,
+            1765.74609375
+          ],
+          [
+            555,
+            1801.25390625
+          ],
+          [
+            585,
+            1820.3671875
+          ]
+        ]
+      }
+    },
+    "total": {
+      "rss_MiB": {
+        "first30_median": 2881.701171875,
+        "last30_median": 3706.66796875,
+        "peak": 3765.76953125,
+        "after_warmup_slope": {
+          "available": true,
+          "samples": 18,
+          "MiB_per_minute": 83.6580922665118,
+          "approximate_95_percent_interval": [
+            70.68852436757015,
+            96.62766016545345
+          ],
+          "method": "OLS on30s medians, Newey-West2-lag covariance with finite-sample correction and normal1.96 interval. Single session, approximate serial-correlation treatment; not a population reliability guarantee."
+        },
+        "late_slope": {
+          "available": true,
+          "samples": 18,
+          "MiB_per_minute": 83.6580922665118,
+          "approximate_95_percent_interval": [
+            70.68852436757015,
+            96.62766016545345
+          ],
+          "method": "OLS on30s medians, Newey-West2-lag covariance with finite-sample correction and normal1.96 interval. Single session, approximate serial-correlation treatment; not a population reliability guarantee."
+        },
+        "30s_medians": [
+          [
+            15,
+            2881.701171875
+          ],
+          [
+            45,
+            2919.68359375
+          ],
+          [
+            75,
+            2971.94921875
+          ],
+          [
+            105,
+            3066.84375
+          ],
+          [
+            135,
+            3127.77734375
+          ],
+          [
+            165,
+            3190.044921875
+          ],
+          [
+            195,
+            3245.845703125
+          ],
+          [
+            225,
+            3287.015625
+          ],
+          [
+            255,
+            3345.88671875
+          ],
+          [
+            285,
+            3387.87890625
+          ],
+          [
+            315,
+            3441.1796875
+          ],
+          [
+            345,
+            3510.26953125
+          ],
+          [
+            375,
+            3540.541015625
+          ],
+          [
+            405,
+            3560.91796875
+          ],
+          [
+            435,
+            3582.875
+          ],
+          [
+            465,
+            3613.62890625
+          ],
+          [
+            495,
+            3639.59375
+          ],
+          [
+            525,
+            3652.55078125
+          ],
+          [
+            555,
+            3686.29296875
+          ],
+          [
+            585,
+            3706.66796875
+          ]
+        ]
+      },
+      "private_commit_MiB": {
+        "first30_median": 4127.82421875,
+        "last30_median": 4947.9140625,
+        "peak": 5006.0078125,
+        "after_warmup_slope": {
+          "available": true,
+          "samples": 18,
+          "MiB_per_minute": 82.49353795794627,
+          "approximate_95_percent_interval": [
+            69.72515692169243,
+            95.26191899420012
+          ],
+          "method": "OLS on30s medians, Newey-West2-lag covariance with finite-sample correction and normal1.96 interval. Single session, approximate serial-correlation treatment; not a population reliability guarantee."
+        },
+        "late_slope": {
+          "available": true,
+          "samples": 18,
+          "MiB_per_minute": 82.49353795794627,
+          "approximate_95_percent_interval": [
+            69.72515692169243,
+            95.26191899420012
+          ],
+          "method": "OLS on30s medians, Newey-West2-lag covariance with finite-sample correction and normal1.96 interval. Single session, approximate serial-correlation treatment; not a population reliability guarantee."
+        },
+        "30s_medians": [
+          [
+            15,
+            4127.82421875
+          ],
+          [
+            45,
+            4168.310546875
+          ],
+          [
+            75,
+            4223.27734375
+          ],
+          [
+            105,
+            4318.212890625
+          ],
+          [
+            135,
+            4374.74609375
+          ],
+          [
+            165,
+            4437.02734375
+          ],
+          [
+            195,
+            4493.216796875
+          ],
+          [
+            225,
+            4532.125
+          ],
+          [
+            255,
+            4591.72265625
+          ],
+          [
+            285,
+            4631.8984375
+          ],
+          [
+            315,
+            4686.0625
+          ],
+          [
+            345,
+            4755.990234375
+          ],
+          [
+            375,
+            4783.96875
+          ],
+          [
+            405,
+            4804.19140625
+          ],
+          [
+            435,
+            4825.2734375
+          ],
+          [
+            465,
+            4855.2421875
+          ],
+          [
+            495,
+            4880.98046875
+          ],
+          [
+            525,
+            4894.19921875
+          ],
+          [
+            555,
+            4925.82421875
+          ],
+          [
+            585,
+            4947.9140625
+          ]
+        ]
+      }
+    }
+  },
+  "heap_samples": [
+    {
+      "seconds": 1.3190868999954546,
+      "stage": "prepared",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 515,
+        "Nodes": 4997,
+        "JSHeapUsedSize": 19275068,
+        "JSHeapTotalSize": 47595520
+      },
+      "state": {
+        "frame": 0,
+        "playing": false,
+        "underruns": 0,
+        "samples": 0,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 81,
+        "encoded_bytes": 327166
+      }
+    },
+    {
+      "seconds": 30.123201299997163,
+      "stage": "active",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 617,
+        "Nodes": 5541,
+        "JSHeapUsedSize": 23873156,
+        "JSHeapTotalSize": 54538240
+      },
+      "state": {
+        "frame": 1721,
+        "playing": true,
+        "underruns": 0,
+        "samples": 1381760,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 1948,
+        "encoded_bytes": 8122450
+      }
+    },
+    {
+      "seconds": 60.62127370000235,
+      "stage": "active",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 623,
+        "Nodes": 5255,
+        "JSHeapUsedSize": 15928780,
+        "JSHeapTotalSize": 55848960
+      },
+      "state": {
+        "frame": 3551,
+        "playing": true,
+        "underruns": 0,
+        "samples": 2845056,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 3874,
+        "encoded_bytes": 16202786
+      }
+    },
+    {
+      "seconds": 90.6261405999976,
+      "stage": "active",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 1125,
+        "Nodes": 9187,
+        "JSHeapUsedSize": 19753596,
+        "JSHeapTotalSize": 59256832
+      },
+      "state": {
+        "frame": 5347,
+        "playing": true,
+        "underruns": 0,
+        "samples": 4283776,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 5777,
+        "encoded_bytes": 24193250
+      }
+    },
+    {
+      "seconds": 120.09058220000588,
+      "stage": "active",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 1131,
+        "Nodes": 9315,
+        "JSHeapUsedSize": 21581480,
+        "JSHeapTotalSize": 60567552
+      },
+      "state": {
+        "frame": 7118,
+        "playing": true,
+        "underruns": 0,
+        "samples": 5699968,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 7659,
+        "encoded_bytes": 32099710
+      }
+    },
+    {
+      "seconds": 150.50238639999588,
+      "stage": "active",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 617,
+        "Nodes": 5443,
+        "JSHeapUsedSize": 21477356,
+        "JSHeapTotalSize": 60567552
+      },
+      "state": {
+        "frame": 8943,
+        "playing": true,
+        "underruns": 0,
+        "samples": 7159168,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 9627,
+        "encoded_bytes": 40371436
+      }
+    },
+    {
+      "seconds": 180.4095140999998,
+      "stage": "active",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 623,
+        "Nodes": 5285,
+        "JSHeapUsedSize": 16665468,
+        "JSHeapTotalSize": 62926848
+      },
+      "state": {
+        "frame": 10739,
+        "playing": true,
+        "underruns": 0,
+        "samples": 8595840,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 11519,
+        "encoded_bytes": 48345014
+      }
+    },
+    {
+      "seconds": 210.9209700999927,
+      "stage": "active",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 1125,
+        "Nodes": 9887,
+        "JSHeapUsedSize": 36117068,
+        "JSHeapTotalSize": 64761856
+      },
+      "state": {
+        "frame": 12564,
+        "playing": true,
+        "underruns": 0,
+        "samples": 10058112,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 13471,
+        "encoded_bytes": 56589642
+      }
+    },
+    {
+      "seconds": 240.97237390000373,
+      "stage": "active",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 1131,
+        "Nodes": 9492,
+        "JSHeapUsedSize": 25387928,
+        "JSHeapTotalSize": 65548288
+      },
+      "state": {
+        "frame": 14369,
+        "playing": true,
+        "underruns": 0,
+        "samples": 11501952,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 15375,
+        "encoded_bytes": 64638978
+      }
+    },
+    {
+      "seconds": 270.78928440000163,
+      "stage": "active",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 1131,
+        "Nodes": 9003,
+        "JSHeapUsedSize": 14341076,
+        "JSHeapTotalSize": 65548288
+      },
+      "state": {
+        "frame": 16159,
+        "playing": true,
+        "underruns": 0,
+        "samples": 12933504,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 17301,
+        "encoded_bytes": 72779785
+      }
+    },
+    {
+      "seconds": 300.32638319999387,
+      "stage": "active",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 623,
+        "Nodes": 5812,
+        "JSHeapUsedSize": 28651912,
+        "JSHeapTotalSize": 65810432
+      },
+      "state": {
+        "frame": 17935,
+        "playing": true,
+        "underruns": 0,
+        "samples": 14350720,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 19192,
+        "encoded_bytes": 80768552
+      }
+    },
+    {
+      "seconds": 330.2093278999964,
+      "stage": "active",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 1125,
+        "Nodes": 10097,
+        "JSHeapUsedSize": 17368104,
+        "JSHeapTotalSize": 66072576
+      },
+      "state": {
+        "frame": 19726,
+        "playing": true,
+        "underruns": 0,
+        "samples": 15785344,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 21117,
+        "encoded_bytes": 88912935
+      }
+    },
+    {
+      "seconds": 360.6827814999997,
+      "stage": "active",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 617,
+        "Nodes": 5489,
+        "JSHeapUsedSize": 22337396,
+        "JSHeapTotalSize": 65548288
+      },
+      "state": {
+        "frame": 21552,
+        "playing": true,
+        "underruns": 0,
+        "samples": 17248640,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 23068,
+        "encoded_bytes": 97163983
+      }
+    },
+    {
+      "seconds": 390.4483962999948,
+      "stage": "active",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 1131,
+        "Nodes": 9720,
+        "JSHeapUsedSize": 31116552,
+        "JSHeapTotalSize": 65810432
+      },
+      "state": {
+        "frame": 23340,
+        "playing": true,
+        "underruns": 0,
+        "samples": 18676096,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 25001,
+        "encoded_bytes": 105336526
+      }
+    },
+    {
+      "seconds": 420.97409530000004,
+      "stage": "active",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 1633,
+        "Nodes": 13881,
+        "JSHeapUsedSize": 16624804,
+        "JSHeapTotalSize": 66072576
+      },
+      "state": {
+        "frame": 25169,
+        "playing": true,
+        "underruns": 0,
+        "samples": 20140416,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 26965,
+        "encoded_bytes": 113650564
+      }
+    },
+    {
+      "seconds": 450.1459365000046,
+      "stage": "active",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 623,
+        "Nodes": 5108,
+        "JSHeapUsedSize": 12354444,
+        "JSHeapTotalSize": 66596864
+      },
+      "state": {
+        "frame": 26925,
+        "playing": true,
+        "underruns": 0,
+        "samples": 21542272,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 28836,
+        "encoded_bytes": 121566507
+      }
+    },
+    {
+      "seconds": 480.2255124999938,
+      "stage": "active",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 617,
+        "Nodes": 5376,
+        "JSHeapUsedSize": 19662148,
+        "JSHeapTotalSize": 66859008
+      },
+      "state": {
+        "frame": 28722,
+        "playing": true,
+        "underruns": 0,
+        "samples": 22986112,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 30767,
+        "encoded_bytes": 129736925
+      }
+    },
+    {
+      "seconds": 510.026279800004,
+      "stage": "active",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 1131,
+        "Nodes": 9396,
+        "JSHeapUsedSize": 23450112,
+        "JSHeapTotalSize": 66596864
+      },
+      "state": {
+        "frame": 30512,
+        "playing": true,
+        "underruns": 0,
+        "samples": 24416640,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 32698,
+        "encoded_bytes": 137908109
+      }
+    },
+    {
+      "seconds": 540.3005468000047,
+      "stage": "active",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 1125,
+        "Nodes": 9576,
+        "JSHeapUsedSize": 28657928,
+        "JSHeapTotalSize": 66859008
+      },
+      "state": {
+        "frame": 32329,
+        "playing": true,
+        "underruns": 0,
+        "samples": 25869696,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 34643,
+        "encoded_bytes": 146135494
+      }
+    },
+    {
+      "seconds": 570.0825399000023,
+      "stage": "active",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 1131,
+        "Nodes": 9643,
+        "JSHeapUsedSize": 29211284,
+        "JSHeapTotalSize": 67121152
+      },
+      "state": {
+        "frame": 34116,
+        "playing": true,
+        "underruns": 0,
+        "samples": 27299200,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 36560,
+        "encoded_bytes": 154251652
+      }
+    },
+    {
+      "seconds": 600.5223909000051,
+      "stage": "active",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 479,
+        "Nodes": 4574,
+        "JSHeapUsedSize": 26894212,
+        "JSHeapTotalSize": 67383296
+      },
+      "state": {
+        "frame": 35943,
+        "playing": true,
+        "underruns": 0,
+        "samples": 28759424,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 38543,
+        "encoded_bytes": 162631042
+      }
+    },
+    {
+      "seconds": 600.5291606999963,
+      "stage": "end",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 479,
+        "Nodes": 4589,
+        "JSHeapUsedSize": 27257304,
+        "JSHeapTotalSize": 67383296
+      },
+      "state": {
+        "frame": 35943,
+        "playing": true,
+        "underruns": 0,
+        "samples": 28760448,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 38544,
+        "encoded_bytes": 162639494
+      }
+    },
+    {
+      "seconds": 601.5370742999949,
+      "stage": "stopped",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 479,
+        "Nodes": 4596,
+        "JSHeapUsedSize": 27769352,
+        "JSHeapTotalSize": 67383296
+      },
+      "state": {
+        "frame": 35952,
+        "playing": false,
+        "underruns": 0,
+        "samples": 28761600,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 38613,
+        "encoded_bytes": 162927261
+      }
+    },
+    {
+      "seconds": 602.7409956000047,
+      "stage": "diagnostic_GC",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 479,
+        "Nodes": 3849,
+        "JSHeapUsedSize": 10213328,
+        "JSHeapTotalSize": 11022336
+      },
+      "state": {
+        "frame": 35952,
+        "playing": false,
+        "underruns": 0,
+        "samples": 28761600,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 38681,
+        "encoded_bytes": 163219326
+      }
+    },
+    {
+      "seconds": 603.9541392999963,
+      "stage": "native_released",
+      "heap": {
+        "Documents": 1,
+        "JSEventListeners": 479,
+        "Nodes": 3850,
+        "JSHeapUsedSize": 10272100,
+        "JSHeapTotalSize": 11022336
+      },
+      "state": {
+        "frame": 35952,
+        "playing": false,
+        "underruns": 0,
+        "samples": 28761600,
+        "undo": 0,
+        "redo": 0
+      },
+      "clock_wire": {
+        "requests": 38681,
+        "encoded_bytes": 163219326
+      }
+    }
+  ],
+  "clock_wire": {
+    "requests": 38681,
+    "encoded_bytes": 163219326
+  },
+  "failure_type": null,
+  "scope": "RSS sums may duplicate shared UMA pages. Private commit, heap, GPU estimates are separate. No forced GC during active measurement.",
+  "browser_error_count": 0,
+  "observed_underruns": 0,
+  "editing_batch_count": 0,
+  "audio_gate_passed": true,
+  "window_condition_held": null,
+  "active_observer": "attached Performance/Network observer",
+  "qualification_exit_code": null
+}

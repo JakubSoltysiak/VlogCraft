@@ -1,0 +1,9 @@
+{
+  "updates": 30,
+  "status_bytes": 99579,
+  "cadence_seconds": 2,
+  "median_update_wall_ms": 23.256999998920946,
+  "maximum_update_wall_ms": 39.34769999978016,
+  "mean_CPU_ms_per_update": 17.1875,
+  "scope": "Synthetic supervisor update cost with retained history and local CPU/I/O sampling, not a playback acceptance result."
+}
