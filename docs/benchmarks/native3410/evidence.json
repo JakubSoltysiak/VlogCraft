@@ -1,0 +1,321 @@
+{
+  "historical_stalls": {
+    "total_skips": 1203,
+    "observed_counter_increases": 1203,
+    "largest_counter_increases": [
+      {
+        "native_elapsed_begin": 382.43397,
+        "native_elapsed_end": 383.09497,
+        "skips_delta": 277
+      },
+      {
+        "native_elapsed_begin": 373.81797,
+        "native_elapsed_end": 374.02597000000003,
+        "skips_delta": 267
+      },
+      {
+        "native_elapsed_begin": 389.07397000000003,
+        "native_elapsed_end": 389.62197000000003,
+        "skips_delta": 250
+      },
+      {
+        "native_elapsed_begin": 364.32197,
+        "native_elapsed_end": 367.20997,
+        "skips_delta": 160
+      },
+      {
+        "native_elapsed_begin": 363.99597,
+        "native_elapsed_end": 364.32197,
+        "skips_delta": 107
+      },
+      {
+        "native_elapsed_begin": 374.33697,
+        "native_elapsed_end": 375.19697,
+        "skips_delta": 20
+      },
+      {
+        "native_elapsed_begin": 117.95196999999999,
+        "native_elapsed_end": 118.90397,
+        "skips_delta": 10
+      },
+      {
+        "native_elapsed_begin": 509.96097,
+        "native_elapsed_end": 511.34197000000006,
+        "skips_delta": 9
+      }
+    ],
+    "first_visibility_violation_seconds": 507.64243650000026,
+    "clock_scope": "Native elapsed subtracts initial paused native status; window time starts before playback. Uncalibrated offset prevents exact alignment. Counter jumps do not timestamp the underlying stalls or individual Present calls."
+  },
+  "historical_memory_roles": {
+    "browser": {
+      "first_MiB": 43.72265625,
+      "last_MiB": 47.6328125
+    },
+    "gpu-process": {
+      "first_MiB": 368.921875,
+      "last_MiB": 450.87109375
+    },
+    "other": {
+      "first_MiB": 3.5078125,
+      "last_MiB": 3.1015625
+    },
+    "renderer": {
+      "first_MiB": 614.27734375,
+      "last_MiB": 1406.15234375
+    },
+    "utility": {
+      "first_MiB": 30.9765625,
+      "last_MiB": 34.64453125
+    }
+  },
+  "new_observations": {
+    "attached": {
+      "seconds": 45,
+      "observation_elapsed_seconds": 45.03199999999924,
+      "reconnection_and_query_tail_seconds": 0.01195000000006985,
+      "natural_idle_seconds": 30.01478660000066,
+      "audio": {
+        "underruns": 0,
+        "samples": 2161024,
+        "playing": true
+      },
+      "transport": {
+        "measured_seconds": 45.04394999999931,
+        "distinct_sequence_fps": 59.386443684446874,
+        "skips": 20,
+        "physical_surface": [
+          666,
+          374
+        ]
+      },
+      "window_condition_held": true,
+      "browser_error_count": 0,
+      "stages": [
+        {
+          "stage": "prepared",
+          "seconds": 0.7587223999980779,
+          "private_commit_MiB": {
+            "host": 907.109375,
+            "webview": 1440.4296875,
+            "native": 2401.265625
+          },
+          "live_JS_MiB": 18.585796356201172
+        },
+        {
+          "stage": "active_network_observer",
+          "seconds": 15.953009699998802,
+          "private_commit_MiB": {
+            "host": 898.26953125,
+            "webview": 1008.36328125,
+            "native": 2278.7421875
+          },
+          "live_JS_MiB": 15.10678482055664
+        },
+        {
+          "stage": "active_network_observer",
+          "seconds": 32.225130299997545,
+          "private_commit_MiB": {
+            "host": 895.53515625,
+            "webview": 1087.421875,
+            "native": 2288.76171875
+          },
+          "live_JS_MiB": 24.779998779296875
+        },
+        {
+          "stage": "active_network_observer",
+          "seconds": 45.843645599998126,
+          "private_commit_MiB": {
+            "host": 894.44140625,
+            "webview": 1125.3046875,
+            "native": 2289.17578125
+          },
+          "live_JS_MiB": 10.762088775634766
+        },
+        {
+          "stage": "stopped",
+          "seconds": 45.88030509999953,
+          "private_commit_MiB": {
+            "host": 898.0546875,
+            "webview": 1125.34375,
+            "native": 2288.19921875
+          },
+          "live_JS_MiB": 10.904212951660156
+        },
+        {
+          "stage": "natural_idle_no_GC",
+          "seconds": 75.90455339999971,
+          "private_commit_MiB": {
+            "host": 895.83203125,
+            "webview": 930.9296875,
+            "native": 2288.328125
+          },
+          "live_JS_MiB": 9.815132141113281
+        },
+        {
+          "stage": "after_GC",
+          "seconds": 76.95202109999809,
+          "private_commit_MiB": {
+            "host": 895.83203125,
+            "webview": 927.265625,
+            "native": 2288.328125
+          },
+          "live_JS_MiB": 9.787345886230469
+        },
+        {
+          "stage": "all_observers_detached",
+          "seconds": 80.09595769999942,
+          "private_commit_MiB": {
+            "host": 895.7734375,
+            "webview": 974.80078125,
+            "native": 2288.328125
+          },
+          "live_JS_MiB": null
+        },
+        {
+          "stage": "fresh_observer_GC",
+          "seconds": 81.18281529999877,
+          "private_commit_MiB": {
+            "host": 895.5703125,
+            "webview": 934.375,
+            "native": 2288.328125
+          },
+          "live_JS_MiB": 9.886253356933594
+        },
+        {
+          "stage": "native_released",
+          "seconds": 82.43897469999865,
+          "private_commit_MiB": {
+            "host": 889.0390625,
+            "webview": 927.68359375
+          },
+          "live_JS_MiB": 9.996650695800781
+        }
+      ]
+    },
+    "detached": {
+      "seconds": 45,
+      "observation_elapsed_seconds": 45.5,
+      "reconnection_and_query_tail_seconds": 0.15518650000012713,
+      "natural_idle_seconds": 30.174235900001804,
+      "audio": {
+        "underruns": 0,
+        "samples": 2191232,
+        "playing": true
+      },
+      "transport": {
+        "measured_seconds": 45.65518650000013,
+        "distinct_sequence_fps": 59.77415074188762,
+        "skips": 5,
+        "physical_surface": [
+          666,
+          374
+        ]
+      },
+      "window_condition_held": true,
+      "browser_error_count": 0,
+      "stages": [
+        {
+          "stage": "prepared",
+          "seconds": 0.7761012999981176,
+          "private_commit_MiB": {
+            "host": 909.42578125,
+            "webview": 1435.94921875,
+            "native": 2409.66796875
+          },
+          "live_JS_MiB": 18.726436614990234
+        },
+        {
+          "stage": "active_detached",
+          "seconds": 17.500172899999598,
+          "private_commit_MiB": {
+            "host": 894.37890625,
+            "webview": 1011.58203125,
+            "native": 2274.5078125
+          },
+          "live_JS_MiB": null
+        },
+        {
+          "stage": "active_detached",
+          "seconds": 32.03125689999797,
+          "private_commit_MiB": {
+            "host": 897.82421875,
+            "webview": 1013.2421875,
+            "native": 2275.27734375,
+            "ffmpeg": 22.9765625
+          },
+          "live_JS_MiB": null
+        },
+        {
+          "stage": "active_detached",
+          "seconds": 46.86214479999762,
+          "private_commit_MiB": {
+            "host": 897.12109375,
+            "webview": 1053.65625,
+            "native": 2275.28515625
+          },
+          "live_JS_MiB": null
+        },
+        {
+          "stage": "stopped",
+          "seconds": 47.3811225999998,
+          "private_commit_MiB": {
+            "host": 898.27734375,
+            "webview": 1043.51953125,
+            "native": 2275.28515625
+          },
+          "live_JS_MiB": 12.9375
+        },
+        {
+          "stage": "natural_idle_no_GC",
+          "seconds": 77.49854469999991,
+          "private_commit_MiB": {
+            "host": 896.02734375,
+            "webview": 894.45703125,
+            "native": 2275.17578125
+          },
+          "live_JS_MiB": 11.137210845947266
+        },
+        {
+          "stage": "after_GC",
+          "seconds": 78.88240299999961,
+          "private_commit_MiB": {
+            "host": 896.80859375,
+            "webview": 892.1328125,
+            "native": 2275.17578125
+          },
+          "live_JS_MiB": 10.062751770019531
+        },
+        {
+          "stage": "all_observers_detached",
+          "seconds": 81.93109479999839,
+          "private_commit_MiB": {
+            "host": 897.05859375,
+            "webview": 896.4453125,
+            "native": 2275.17578125
+          },
+          "live_JS_MiB": null
+        },
+        {
+          "stage": "fresh_observer_GC",
+          "seconds": 83.64421189999848,
+          "private_commit_MiB": {
+            "host": 897.2421875,
+            "webview": 895.5078125,
+            "native": 2275.17578125
+          },
+          "live_JS_MiB": 10.091201782226562
+        },
+        {
+          "stage": "native_released",
+          "seconds": 84.97708779999812,
+          "private_commit_MiB": {
+            "host": 890.34765625,
+            "webview": 895.96484375
+          },
+          "live_JS_MiB": 10.223785400390625
+        }
+      ]
+    }
+  }
+}

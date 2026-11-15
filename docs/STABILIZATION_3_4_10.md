@@ -7,3 +7,21 @@ Confirmed diagnostic correction: observer_memory used one full sleep per loop it
 Targeted attached/detached observations will use the unchanged installed host, generated original-media workload,45 seconds active plus30 seconds natural idle. These are attribution diagnostics, not new ten-run/endurance/4K60 qualification. All new tests report through build/qa/status.json. No private footage is needed. Shipping cache/undo capacities and full clock replies remain preserved. No periodic GC is introduced into the editor.
 
 Qualification remains incomplete. The existing 3.4.9 report and historical failures remain authoritative until additional evidence supports a narrower conclusion. No new installer is warranted for diagnostic-only changes.
+
+## Measured findings
+
+The offline extractor reconstructs all1,203 skipped-counter increases from the retained endurance trace. Its five largest increases total1,061 frames around native elapsed364–390s; the first recorded visibility violation is507.642s. Native/window clocks have different origins and are not precisely aligned. These records do not timestamp individual Present calls, but their broad separation rejects attributing the earlier burst solely to the later recorded occlusion. Decoder availability, context contention and presentation/scheduling remain unresolved; no renderer change is justified yet.
+
+In the failed600s memory diagnostic, first/last active renderer private commit is614.28→1406.15MiB, GPU process368.92→450.87MiB, browser43.72→47.63MiB. This locates most observed growth in the renderer process, without identifying a V8/DOM/network/media allocation stack or proving a leak. No native cache reduction follows from this observation.
+
+New45s controls on the unchanged installed349 host both pass sampled visibility, advancing audio and0underruns. Attached observation45.032s, query tail.012s; detached observation45.500s, reconnect/query tail.155s. These partial-playback counters are not exact full-sequence budgets or a125s consistency comparison.
+
+| WebView private commit MiB | Attached | Detached |
+|---|---:|---:|
+| Immediately after Stop |1125.344|1043.520|
+| After30s natural idle, before explicit GC |930.930|894.457|
+| After subsequent diagnostic GC |927.266|892.133|
+
+Approximately194.4/149.1MiB reclaims naturally before explicit GC, versus3.7/2.3MiB afterward. This demonstrates reclaimable allocations in these short workloads. It does not explain all late-session growth or establish an active plateau. Historical positive30-minute slopes and failed windows remain unchanged. [Selected numeric evidence](benchmarks/native3410/evidence.json).
+
+Four scheduler tests and three extraction tests pass. Process ownership checks leave0owned survivors/new terminal windows in both new observations. A single150s probe of the original600s memory workload is pending, specifically covering the old90–120s underrun interval. No new ten-minute or30-minute test is scheduled without a demonstrated trigger.

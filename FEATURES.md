@@ -84,3 +84,5 @@ The following 3.4.8 table retains the earlier qualification and the first scoped
 3. Add cache budgets, cancellable probes, resumable background analysis, persistent timeline history and operational diagnostic bundles.
 4. Extend the optional API path to the same selected-frame multitrack contract when requested, preserving explicit consent. Add native structural proposal commands with linked timing invariants.
 5. Develop HDR/color management, arbitrary animated masks, planar tracking, sample-accurate audio and interchange on the measured continuous engine.
+
+3.4.10 status: diagnostic methodology tested; playback/audio/memory stabilization remains partial. [Findings](docs/STABILIZATION_3_4_10.md).

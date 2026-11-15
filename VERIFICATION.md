@@ -391,3 +391,5 @@ A single installed run measured 1.047 s from drop to clip insertion, 4.344 s thr
 The encoder smoke matrix exported and decoded H.264, HEVC and AV1 on both CPU and AMD AMF at 640×360/60. NVENC and Quick Sync could not be qualified on this hardware. No paid endpoint was invoked and no camera footage was supplied.
 
 3.4.9 checkpoint B: persistent QA infrastructure passes 15 focused tests; the pythonw GUI refreshes status and closes normally with zero owned survivors/new terminals. Legacy Windows output encoding and atomic-reader sharing failures were reproduced and corrected; failed tracker attempts remain recorded. Profile integration now gives descendants the same bounded three-second normal-shutdown grace as the supervisor; forced cleanup still fails. See [QA progress](docs/QA_PROGRESS.md).
+
+3.4.10 targeted investigation: diagnostic wall deadlines and natural idle separation tested; short controls show194/149MiB natural WebView reclamation,0underruns. Old1,061-frame burst predates recorded late occlusion. No production root cause/fix or full acceptance claimed. [Report](docs/STABILIZATION_3_4_10.md).
