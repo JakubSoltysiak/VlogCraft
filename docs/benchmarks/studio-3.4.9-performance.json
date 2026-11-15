@@ -1,0 +1,86 @@
+{
+  "version": "3.4.9",
+  "qualification": "WORK IN PROGRESS \u2014 QUALIFICATION INCOMPLETE",
+  "baseline": "3.4.8 / PR5 / 6a5532e6efa091d31e1baf633af03864316e63d3",
+  "MSI_sha256": "05bcdbd1abaa0e68f1ac2ad6df73511f5acdfcf60b8dfc07f369f667a7eb9fe4",
+  "scope": "Durable safety checkpoint, not hardware acceptance. Includes every numeric final workload attempt, including failed focus checks. GPU caches and production native binary retained.",
+  "candidate": {
+    "count": 10,
+    "failed_exit_codes": 3,
+    "fps_worst": 59.73429992117747,
+    "fps_all": [
+      59.853317446983034,
+      59.80498825244866,
+      59.7596063009073,
+      59.89382929739242,
+      59.73457868941917,
+      59.88904816307527,
+      59.73429992117747,
+      59.791209606816494,
+      59.88224996102977,
+      59.77392153296881
+    ],
+    "skips_all": [
+      4,
+      18,
+      3,
+      3,
+      22,
+      5,
+      4,
+      7,
+      8,
+      5
+    ],
+    "scope": "All numeric measured attempts, including failed audio/focus/application checks; incomplete attempts without FPS are not assigned an invented score."
+  },
+  "baseline_current": {
+    "count": 10,
+    "failed_exit_codes": 1,
+    "fps_worst": 59.700944633179375,
+    "fps_all": [
+      59.7225375506351,
+      59.83338629500842,
+      59.828057180204965,
+      59.835440561785646,
+      59.764005121034494,
+      59.813997145785066,
+      59.84298007177607,
+      59.700944633179375,
+      59.857116816915195,
+      59.80972029714073
+    ],
+    "skips_all": [
+      2,
+      5,
+      2,
+      5,
+      2,
+      5,
+      7,
+      18,
+      11,
+      8
+    ],
+    "scope": "All numeric measured attempts, including failed audio/focus/application checks; incomplete attempts without FPS are not assigned an invented score."
+  },
+  "candidate_guardrails": {
+    "all_ten_at_least59_5": false,
+    "zero_audio_underruns": false,
+    "exact_samples": false,
+    "median_skips_at_most3_5": false,
+    "maximum_skips_at_most16": false,
+    "continuous_window_condition": false
+  },
+  "remaining": [
+    "Persistent QA tracker",
+    "Final failure classification and documentation",
+    "Large-file final workflow failure",
+    "Long WebView private-commit plateau unproven",
+    "Exact final GitHub Actions receipt"
+  ],
+  "source_fingerprint": "daaa81cab9dfaaadaf64b38f0ff3589c840ba7d43bd44242c02d4d9e7ca8f112",
+  "fingerprint_method": "SHA256 sorted relevant relative path + NUL + LF-normalized source + NUL",
+  "benchmark_protocol_fingerprint": "d0fd54608b8902f4f55e7b0e17826feda6a256eca1f730c673540fe1f4dc8dc1",
+  "benchmark_protocol_fingerprint_method": "SHA256 sorted benchmark driver/observer relative path + NUL + LF-normalized source + NUL"
+}

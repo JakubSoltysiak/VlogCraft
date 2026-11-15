@@ -7,9 +7,21 @@ FILES=sorted({str(p.relative_to(ROOT)).replace('\\','/') for p in ROOT.glob('*.p
  {str(p.relative_to(ROOT)).replace('\\','/') for p in (ROOT/'native').iterdir() if p.suffix in ('.cpp','.h')} |
  {'packaging/requirements.txt','packaging/build_windows.py','web/branding/manifest.json'})
 
-def fingerprint():
+PROTOCOL_FILES=(
+ 'benchmarks/consistency.py','benchmarks/native_playback.py','benchmarks/windows_session.py',
+ 'benchmarks/window_geometry.py','benchmarks/window_visibility.py','benchmarks/runtime_trace.py',
+ 'benchmarks/performance_suite.py','benchmarks/performance_gate.py',
+ 'benchmarks/conditions.py','benchmarks/resource_history.py','benchmarks/generate_media.py',
+ 'benchmarks/session_memory.py','benchmarks/observer_memory.py','benchmarks/memory_metrics.py',
+ 'benchmarks/export_preservation.py','benchmarks/engine_profile.py','benchmarks/multicore_export.py',
+ 'benchmarks/camera_playback.py','benchmarks/camera_recovery.py','benchmarks/checkpoint_profile.py',
+ 'benchmarks/owned_process.py','benchmarks/run_qa.py','tests/qa_guard/sitecustomize.py',
+ 'benchmarks/detached_editing.py','benchmarks/graphics_diagnostics.py',
+ 'tests/performance.py','tests/gpu_metrics.py')
+
+def fingerprint(files=None):
  h=hashlib.sha256()
- for name in sorted(FILES):
+ for name in sorted(FILES if files is None else files):
   data=(ROOT/name).read_bytes().replace(b'\r\n',b'\n');h.update(name.encode()+b'\0'+data+b'\0')
  return h.hexdigest()
 def main():
@@ -17,8 +29,11 @@ def main():
  data=json.loads(a.record.read_text('utf8'))
  if a.stamp:
   data['source_fingerprint']=fingerprint();data['fingerprint_method']='SHA256 sorted relevant relative path + NUL + LF-normalized source + NUL'
+  data['benchmark_protocol_fingerprint']=fingerprint(PROTOCOL_FILES)
+  data['benchmark_protocol_fingerprint_method']='SHA256 sorted benchmark driver/observer relative path + NUL + LF-normalized source + NUL'
   a.record.write_text(json.dumps(data,indent=2)+'\n',encoding='utf8')
  else:
   assert data.get('source_fingerprint')==fingerprint(),'Performance evidence does not match the relevant source tree; run the impacted performance profile and update the record'
-  print(json.dumps({'performance_record_matches_source':True,'qualification':data.get('qualification','partial')}))
+  assert data.get('benchmark_protocol_fingerprint')==fingerprint(PROTOCOL_FILES),'Performance evidence does not match the benchmark protocol; qualify the changed driver/observer and update the record'
+  print(json.dumps({'performance_record_matches_source':True,'performance_record_matches_protocol':True,'qualification':data.get('qualification','partial')}))
 if __name__=='__main__':main()

@@ -5,13 +5,14 @@ from PyInstaller.archive.readers import CArchiveReader
 ROOT=Path(__file__).resolve().parents[1]
 MODULES=['server','render_engine','preview_cache','preview_dependencies','source_frames','timing','project_store',
          'animation','sequences','video_effects','grading','audio_cache','audio_edit','waveform',
-         'motion','review_packet','timeline_proposal','ai_bridge','encoders','native_plan','native_playback','performance_profile']
+         'motion','review_packet','timeline_proposal','ai_bridge','encoders','native_plan','native_playback','performance_profile','desktop_recovery']
 def normalize(code):
  return code.replace(co_filename='<source>',co_consts=tuple(normalize(c) if isinstance(c,types.CodeType) else c for c in code.co_consts))
 def digest(path):return hashlib.sha256(path.read_bytes()).hexdigest()
 def main(a):
  archive=CArchiveReader(str(a.bundle/'VlogCraftStudio.exe'));pyz=archive.open_embedded_archive('PYZ.pyz')
  checks={}
+ checks['qa_modules_excluded']=not any(name=='sitecustomize' or name=='benchmarks' or name.startswith('benchmarks.') for name in pyz.toc)
  from icon_assets import verify_assets,verify_executable
  checks['approved_brand_assets']=verify_assets()
  checks['approved_exe_icon']=verify_executable(a.bundle/'VlogCraftStudio.exe')

@@ -85,3 +85,17 @@ class NativeTransport(unittest.TestCase):
   c.seek(4)
   with self.assertRaises(ValueError):next(chunks)
   c.close();self.assertTrue(all(p.poll() is not None for p in old));self.assertFalse(c.audio_processes)
+
+ def test_full_clock_keeps_commands_errors_and_recovery_position(self):
+  import io
+  c=native_playback.Controller(None,self.root,self.root);c.generation=7;c.latest={'event':'status','sequence_frame':12}
+  p=mock.Mock();p.poll.return_value=None;p.stdin=io.StringIO();c.process=p
+  first=c.clock(200000,True,7);self.assertEqual(first['sequence_frame'],12)
+  self.assertEqual(c.clock(216667,True,7)['sequence_frame'],12);self.assertIn('CLOCK 216667 1 7',p.stdin.getvalue())
+  c.latest={'event':'error','reason':'injected'}
+  self.assertEqual(c.clock(233333,True,7)['event'],'error')
+  self.assertTrue(c.clock(0,False,6)['stale']);self.assertEqual(c.clock_position,233333)
+  c.process=None;c.close()
+ def test_stopped_transport_releases_its_project_snapshot(self):
+  c=native_playback.Controller(None,self.root,self.root);c.snapshot=self.state();c.latest={'event':'status'}
+  c.stop();self.assertIsNone(c.snapshot);self.assertIsNone(c.reader_thread);c.close()

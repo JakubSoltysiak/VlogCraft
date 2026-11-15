@@ -37,8 +37,13 @@ function nativePause(){
  nativeState.node?.port.postMessage({type:'play',generation:nativeState.generation,playing:false});
  if(nativeState.prepared)void request('native/clock','POST',{generation:nativeState.generation,microseconds:Math.round(nativeClock()*1e6),playing:false}).catch(()=>{});
 }
+function nativeReleaseAudio(){
+ nativeState.audioAbort?.abort();nativeState.audioAbort=null;
+ const node=nativeState.node;nativeState.node=null;if(!node)return;
+ try{node.port.postMessage({type:'dispose'});}finally{node.port.onmessage=null;node.port.close();node.disconnect();}
+}
 async function nativeStop(){
- nativeState.serial++;nativeState.pendingSeek=null;nativeState.audioAbort?.abort();nativeState.node?.disconnect();nativeState.node=null;
+ nativeState.serial++;nativeState.pendingSeek=null;nativeReleaseAudio();nativeState.metrics=null;nativeState.signature='';nativeState.bounds='';
  nativeState.prepared=false;nativeState.seeking=false;nativeState.ack=null;clearInterval(nativeState.timer);nativeState.timer=null;
  await request('native/stop','POST',{}).catch(()=>{});
 }
@@ -51,12 +56,11 @@ function nativeFail(message,code){
  else{nativeState.blocked=true;void nativeStop();toast(message+' · Choose Composited preview for explicit SDR output.',true);}
 }
 async function nativeAudio(frame,serial){
- nativeState.audioAbort?.abort();const abort=new AbortController();nativeState.audioAbort=abort;
+ nativeReleaseAudio();const abort=new AbortController();nativeState.audioAbort=abort;
  nativeState.start=frame/sequenceRate();nativeState.sent=0;nativeState.ack=null;
  if(!mixer)await initializeMixer();
  if(mixer.sampleRate!==48000)throw Error('Native PCM currently requires a 48 kHz audio device');
  if(!nativeState.module){await mixer.audioWorklet.addModule('native_audio_worklet.js');nativeState.module=true;}
- nativeState.node?.disconnect();
  const generation=nativeState.generation,node=new AudioWorkletNode(mixer,'vlogcraft-pcm',{numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[2]});
  nativeState.node=node;node.connect(bus);node.port.postMessage({type:'reset',generation});
  node.port.onmessage=event=>{if(event.data.generation===nativeState.generation){if(event.data.error)return nativeFail(event.data.error);nativeState.ack=event.data;}};

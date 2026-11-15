@@ -2,11 +2,13 @@
 
 > **[MASTER TO-DO LIST & PRODUCT ROADMAP](TODO.md)** — shared living backlog for the owner, Codex and ChatGPT. Check priorities and update it with each feature PR.
 
-The 3.4.8 development candidate improves repeated playback consistency while preserving the approved icon in a separate asset commit. [Measured results and remaining gates](docs/PERFORMANCE_CONSISTENCY_3_4_8.md) include every failed attempt. Native preview remains experimental.
+The **3.4.9 reliability development candidate** adds bounded WebView recovery, durable local draft checkpoints, explicit native-audio worklet disposal and safer startup/shutdown. It preserves the 3.4.8 pacing, effective caches, preview quality, encoder policy and approved icon. [Reliability and memory evidence](docs/RELIABILITY_MEMORY_3_4_9.md) distinguishes tested recovery from the still-unexplained historical target losses. Native playback remains experimental; this is not a stable release or HDR qualification.
 
-Windows 11 x64 development project. The local development installer is **release/VlogCraft-Studio-3.4-x64.msi**, currently version 3.4.8 (experimental development candidate; scoped qualification). The installer adds VlogCraft Studio to the Start menu and offers a desktop shortcut. Python, FFmpeg, FFprobe and OpenCV are bundled. WebView2 is required and was present on the qualification machine. Source and preserved tags are on the public repository, with 3.4 development reviewed in pull request 1. [GitHub repository](https://github.com/JakubSoltysiak/VlogCraft), [development PR](https://github.com/JakubSoltysiak/VlogCraft/pull/1).
+The earlier 3.4.8 development candidate improves repeated playback consistency while preserving the approved icon in a separate asset commit. [Measured results and remaining gates](docs/PERFORMANCE_CONSISTENCY_3_4_8.md) include every failed attempt. Native preview remains experimental.
 
-## Playback consistency — 3.4.8 development
+Windows 11 x64 development project. The local development installer is **release/VlogCraft-Studio-3.4-x64.msi**, currently version 3.4.9 (experimental development candidate; scoped qualification). The installer adds VlogCraft Studio to the Start menu and offers a desktop shortcut. Python, FFmpeg, FFprobe and OpenCV are bundled. WebView2 is required and was present on the qualification machine. Source and preserved tags are on the public repository, with 3.4 development reviewed in pull request 1. [GitHub repository](https://github.com/JakubSoltysiak/VlogCraft), [development PR](https://github.com/JakubSoltysiak/VlogCraft/pull/1).
+
+## Playback consistency — historical 3.4.8 development
 
 Ten packaged 125-second trials all exceeded **59.5 FPS**: median **59.810**, worst **59.637**, 2–16 skipped sequence frames, exact audio counts and zero underruns. The unchanged 3.4.7 engine reached the target in seven of ten completed trials. The workload uses three original 4K streams, three audio tracks and 1,500 clips at **540p composition**, not full-size 4K presentation. Browser layout/meter work is reduced; a bounded UHD H.264 encoder-worker policy improved the measured short export case without changing codec/quality settings.
 

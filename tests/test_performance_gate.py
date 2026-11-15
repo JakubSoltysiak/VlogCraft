@@ -1,7 +1,6 @@
 import sys,unittest
 from pathlib import Path
-sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'benchmarks'))
-import performance_gate
+from benchmarks import performance_gate
 def contract(**changes):return dict(dict.fromkeys(performance_gate.COMPATIBILITY,'fixture'),**changes)
 class PerformanceGateTests(unittest.TestCase):
  def test_missing_workload_contract_is_not_assumed_compatible(self):

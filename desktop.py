@@ -24,7 +24,7 @@ def run(project):
     project = project.resolve()
     cache = project.parent / (project.name + '.data')
     cache.mkdir(parents=True, exist_ok=True)
-    logging.basicConfig(filename=cache / 'studio.log', encoding='utf8', level=logging.INFO)
+    logging.basicConfig(filename=cache / 'studio.log', encoding='utf8', level=logging.INFO,format='%(asctime)s %(levelname)s %(message)s')
     lock_file = (cache / 'editor.lock').open('a+b')
     lock_file.seek(0)
     try:
@@ -50,8 +50,10 @@ def run(project):
     http = ThreadingHTTPServer(('127.0.0.1', 0), server.Handler)
     http.daemon_threads = True
     url = f'http://127.0.0.1:{http.server_port}/'
+    from desktop_recovery import RecoveryBridge,WindowsRecovery
+    recovery_bridge=RecoveryBridge()
     window = webview.create_window('VlogCraft Studio • ' + project.stem, url, width=1480,
-                                   height=900, min_size=(960, 640), background_color='#111924')
+                                   height=900, min_size=(960, 640), background_color='#111924',js_api=recovery_bridge)
     webview.settings['ALLOW_DOWNLOADS'] = True
     webview.settings['ALLOW_FILE_URLS'] = False
 
@@ -110,6 +112,7 @@ def run(project):
     server.NATIVE_PLAYBACK=native_playback.Controller(window,cache,BUNDLE)
     import performance_profile
     server.PERFORMANCE_DIAGNOSTICS=performance_profile.Diagnostics(BUNDLE,cache)
+    recovery=WindowsRecovery(window,server,cache,url);recovery_bridge._host=recovery;server.DESKTOP_RECOVERY=recovery
 
     def on_drop(event):
         files = event.get('dataTransfer', {}).get('files', [])
@@ -121,41 +124,32 @@ def run(project):
             return
         window.run_js('void importNative(' + json.dumps(paths) + ')')
 
-    diagnostics_attached=False
     def on_loaded():
-        def attach_diagnostics():
-            nonlocal diagnostics_attached
-            if diagnostics_attached:return
-            try:
-                core=window.native.webview.CoreWebView2
-                def process_failed(sender,event):
-                    try:
-                        logging.error('WebView process failed kind=%s reason=%s exit=%s',
-                                      str(event.ProcessFailedKind),str(getattr(event,'Reason','unavailable')),getattr(event,'ExitCode',None))
-                    except Exception:
-                        logging.error('WebView process failed; extended numeric diagnostics unavailable')
-                def browser_exited(sender,event):
-                    kind=str(event.BrowserProcessExitKind)
-                    logging.log(logging.INFO if kind=='Normal' else logging.ERROR,'WebView browser exited kind=%s',kind)
-                def form_closing(sender,event):
-                    logging.info('Window close reason=%s accepted=%s',str(event.CloseReason),allow_close.is_set())
-                core.ProcessFailed += process_failed
-                core.Environment.BrowserProcessExited += browser_exited
-                window.native.FormClosing += form_closing
-                diagnostics_attached=True
-            except Exception:
-                logging.exception('Attaching local browser failure diagnostics')
+        if recovery.model.closing:return
         from System import Action
-        window.native.Invoke(Action(attach_diagnostics))
-        window.dom.document.events.drop += DOMEventHandler(on_drop, prevent_default=True)
-        window.run_js("document.documentElement.classList.add('native-ready')")
+        try:
+            window.native.Invoke(Action(recovery.attach))
+            if recovery.model.closing:return
+            window.dom.document.events.drop += DOMEventHandler(on_drop, prevent_default=True)
+            if not recovery.model.closing:window.run_js("document.documentElement.classList.add('native-ready')")
+        except Exception:
+            if not recovery.model.closing:raise
 
     closing=threading.Lock()
     allow_close=threading.Event()
 
     def finish_close():
         try:
-            pending = window.evaluate_js('typeof state !== "undefined" && !!state && modified > persisted')
+            # Do not finalize Python/.NET while pywebview is still creating its
+            # DOM bridge and delivering startup callbacks. This wait is owned
+            # by the close worker, never the Windows message thread.
+            if recovery.model.phase=='loading' and not recovery.initial_ready.wait(20):
+                logging.error('Editor initialization did not settle before close')
+                recovery.dispatch(recovery.timeout)
+                return
+            if recovery.model.phase not in ('ready','loading'):
+                recovery.model.preserve(recovery.model.epoch-1);pending=False
+            else:pending = window.evaluate_js('typeof state !== "undefined" && !!state && modified > persisted')
             if pending:
                 done = threading.Event()
                 result = []
@@ -170,17 +164,18 @@ def run(project):
                 busy = any(job['status'] == 'rendering' for job in server.JOBS.values())
             if busy and not window.create_confirmation_dialog('Background work', 'Stop active jobs and close this project?'):
                 return
-            allow_close.set()
+            allow_close.set();recovery.model.closing=True
             window.destroy()
         except Exception:
             logging.exception('Closing project')
             if window.create_confirmation_dialog('Close project', 'The editor could not confirm its save. Close anyway?'):
-                allow_close.set()
+                allow_close.set();recovery.model.closing=True
                 window.destroy()
         finally:
             closing.release()
 
     def on_closing():
+        recovery.event('window_close',accepted=allow_close.is_set())
         if allow_close.is_set():return True
         if closing.acquire(blocking=False):
             threading.Thread(target=finish_close,daemon=True).start()
@@ -194,21 +189,28 @@ def run(project):
                       icon=str(BUNDLE / 'web/branding/vlogcraft-approved.ico'))
     finally:
         import audio_cache
-        server.NATIVE_PLAYBACK.close()
-        server.PERFORMANCE_DIAGNOSTICS.close()
-        audio_cache.cancel()
-        server.FRAME_INDEX.close()
-        server.PROGRAM_PREVIEW.close()
+        recovery.close()
+        def close_step(owner,action):
+            recovery.event('cleanup_begin',owner=owner)
+            try:action()
+            except Exception as error:
+                recovery.event('cleanup_failed',owner=owner,exception_type=type(error).__name__);raise
+            recovery.event('cleanup_end',owner=owner)
+        close_step('native',server.NATIVE_PLAYBACK.close)
+        close_step('diagnostics',server.PERFORMANCE_DIAGNOSTICS.close)
+        close_step('audio_cache',audio_cache.cancel)
+        close_step('frame_index',server.FRAME_INDEX.close)
+        close_step('program_preview',server.PROGRAM_PREVIEW.close)
         with server.JOB_LOCK:
             server.PROXY_QUEUE.clear()
             for key, process in server.CURRENT_PROCESS.items():
                 server.CANCEL[key].set()
                 if process and process.poll() is None:
                     process.terminate()
-        http.shutdown()
-        http.server_close()
-        server.CACHE_WORKERS.shutdown(wait=True, cancel_futures=True)
-        lock_file.close()
+        close_step('http_listener',http.shutdown)
+        close_step('http_connections',http.server_close)
+        close_step('cache_workers',lambda:server.CACHE_WORKERS.shutdown(wait=True,cancel_futures=True))
+        close_step('project_lock',lock_file.close)
 
 
 if __name__ == '__main__':
