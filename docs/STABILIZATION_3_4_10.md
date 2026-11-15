@@ -1,5 +1,13 @@
 # 3.4.10 targeted stabilization
 
+## Current continuation result
+
+The root-cause continuation now includes two minimal production changes: PCM graph preparation outside the clock/status guard and indexed meter iteration to reduce measured allocation churn. The local MSI is now version 3.4.10, SHA256 `8d8cd097de5d2dfd67bb14c0c2c6a16f5750a6a9c004da8ee0371acf844821d2`. Installed playback/fallback, recovery, exact 80-state history, export correctness, source/bundle/icon and upgrade/uninstall/reinstall checks pass. Long-session stabilization is still incomplete. The candidate allocation run has higher WebView private commit than its baseline despite fewer attributed meter samples; there is no aggregate RAM reduction claim. See the [current root-cause report](ROOT_CAUSE_3_4_10.md) and [sanitized numeric evidence](benchmarks/native3410/root-cause-results.json).
+
+## Historical diagnostic checkpoint through 1ab1e62
+
+The following sections describe the earlier diagnostic-only checkpoint and its unchanged 3.4.9 installer. They are retained as history; current installer and production status are above.
+
 Continues exact 3.4.9 checkpoint b2df1cf on codex/studio-3.4.10-stabilization, stacked on PR #6. Production playback/audio/resource code and the installed 05bcdbd 3.4.9 MSI remain unchanged. No root cause is assigned to the old 4.629-second gap,657 underruns or positive late WebView growth without reproducible evidence.
 
 Confirmed diagnostic correction: observer_memory used one full sleep per loop iteration, adding sampling cost to nominal duration. It now uses a monotonic wall deadline, records actual observation and reconnection/query-tail times separately, and samples natural post-stop idle before diagnostic garbage collection. Slow callbacks can still overrun the deadline; actual elapsed time is retained. Four focused scheduling tests pass. Earlier measurements are not rewritten or reclassified as passing.

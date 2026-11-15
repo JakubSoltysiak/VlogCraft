@@ -85,4 +85,11 @@ The following 3.4.8 table retains the earlier qualification and the first scoped
 4. Extend the optional API path to the same selected-frame multitrack contract when requested, preserving explicit consent. Add native structural proposal commands with linked timing invariants.
 5. Develop HDR/color management, arbitrary animated masks, planar tracking, sample-accurate audio and interchange on the measured continuous engine.
 
-3.4.10 status: diagnostic methodology tested; playback/audio/memory stabilization remains partial. [Findings](docs/STABILIZATION_3_4_10.md).
+3.4.10 status ([measurements](docs/ROOT_CAUSE_3_4_10.md)):
+
+| Capability | Status | Verification boundary |
+|---|---|---|
+| PCM graph preparation independent of clock delivery | Implemented, tested | Compiler-barrier clock/Stop/seek and concurrent two-stream budget tests pass; installed PCM/fallback/seek checks pass. Process registration/startup still takes the guard. |
+| Reduced meter allocation churn | Implemented, tested | Same peak arithmetic and cadence; two meter tests pass. Matched 90s sampled profiles attribute 62,655,300 bytes before and no samples after to updateMeter. This is not a zero-allocation or retained-memory claim. |
+| Recovery and exact checkpoint/history preservation | Implemented, tested subset | Installed renderer/browser fault injection preserves all 80 undo states, draft, tracks/output and paused position. |
+| Consistent long-session playback and bounded active memory | Partial, acceptance blocked | Two short matched pairs and one old-host 420s diagnostic do not qualify full-size 4K60 or explain historical 4.629s stalls/657 underruns. Active memory plateau remains unproven. |
