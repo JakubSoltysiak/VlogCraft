@@ -1,0 +1,69 @@
+{
+  "observation_seconds": 150,
+  "timeline_seconds": 600,
+  "observed_underruns": 0,
+  "window_condition_held": true,
+  "browser_error_count": 0,
+  "audio_observations": [
+    {
+      "stage": "prepared",
+      "seconds": 1.0226216000010027,
+      "samples": 0,
+      "underruns": 0
+    },
+    {
+      "stage": "active",
+      "seconds": 30.18627959999867,
+      "samples": 1398656,
+      "underruns": 0
+    },
+    {
+      "stage": "active",
+      "seconds": 61.545876100000896,
+      "samples": 2901888,
+      "underruns": 0
+    },
+    {
+      "stage": "active",
+      "seconds": 90.38728120000087,
+      "samples": 4287360,
+      "underruns": 0
+    },
+    {
+      "stage": "active",
+      "seconds": 120.59279270000116,
+      "samples": 5737344,
+      "underruns": 0
+    },
+    {
+      "stage": "active",
+      "seconds": 150.821497500001,
+      "samples": 7187328,
+      "underruns": 0
+    },
+    {
+      "stage": "end",
+      "seconds": 150.85009150000042,
+      "samples": 7190400,
+      "underruns": 0
+    },
+    {
+      "stage": "stopped",
+      "seconds": 152.01597570000013,
+      "samples": 7191808,
+      "underruns": 0
+    },
+    {
+      "stage": "diagnostic_GC",
+      "seconds": 153.24826419999954,
+      "samples": 7191808,
+      "underruns": 0
+    },
+    {
+      "stage": "native_released",
+      "seconds": 154.47462390000146,
+      "samples": null,
+      "underruns": null
+    }
+  ]
+}

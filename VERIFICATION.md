@@ -1,5 +1,9 @@
 # VlogCraft Studio development qualification
 
+## 3.4.10 targeted stabilization
+
+Seven new focused tests pass normally and offline. Attached/detached45s controls and one150s memory-workload probe pass audio/visibility/resource-release checks. Natural idle releases194.4/149.1MiB before explicit GC. Historical657underruns and long stalls are not declared fixed; active memory stability is unproven. Production sources/MSI remain unchanged. [Full findings](docs/STABILIZATION_3_4_10.md), [draft PR #7](https://github.com/JakubSoltysiak/VlogCraft/pull/7). Exact-final-head CI receipts live in the PR.
+
 ## 3.4.9 finalization — 15 November 2026
 
 **Development delivery; qualification incomplete.** [Draft PR #6](https://github.com/JakubSoltysiak/VlogCraft/pull/6) is stacked on PR #5. Main, PRs #1–#5 and historical tags are preserved/unmerged. [Full report and ten-row comparison](docs/RELIABILITY_MEMORY_3_4_9.md), [sanitized evidence](docs/benchmarks/2026-11-14-native349), [offline QA viewer](docs/QA_PROGRESS.md).
