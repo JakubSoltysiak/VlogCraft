@@ -140,7 +140,7 @@ def save_state(candidate=None):
 
 def probe(path):
     p=subprocess.run(['ffprobe','-v','error','-show_entries',
-                      'format=format_name,duration,start_time:stream=time_base,start_pts,duration_ts,avg_frame_rate,codec_type,codec_name,width,height,r_frame_rate,channels,channel_layout,sample_rate,sample_aspect_ratio,bits_per_raw_sample,color_transfer,color_primaries,color_space,color_range,pix_fmt:stream_side_data=rotation',
+                      'format=format_name,duration,start_time:stream=time_base,start_pts,duration_ts,avg_frame_rate,codec_type,codec_name,profile,width,height,r_frame_rate,channels,channel_layout,sample_rate,sample_aspect_ratio,bits_per_raw_sample,color_transfer,color_primaries,color_space,color_range,pix_fmt:stream_side_data',
                       '-of','json',str(path)],capture_output=True,text=True,timeout=75,
                      creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
     if p.returncode:raise ValueError(f'FFprobe could not read {Path(path).name}: {p.stderr[-500:]}')
@@ -157,7 +157,17 @@ def probe(path):
     video_end=duration
     if v and v.get('duration_ts') is not None:
         video_end=float((int(v.get('start_pts') or 0)+int(v['duration_ts']))*timing.rational(v['time_base'])-timing.rational(info.get('format',{}).get('start_time') or 0))
-    return {'container':info.get('format',{}).get('format_name',''),'duration':duration,'videoEnd':video_end,'timeBase':(v or a or {}).get('time_base','1/1000000000'),
+    import color_management
+    frame=None
+    if v and v.get('color_transfer') in ('smpte2084','arib-std-b67'):
+        try:
+            first=subprocess.run(['ffprobe','-v','error','-select_streams','v:0','-read_intervals','%+#1','-show_frames',
+                '-show_entries','frame=best_effort_timestamp:frame_side_data','-of','json',str(path)],capture_output=True,text=True,timeout=30,
+                creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
+            if first.returncode==0:frame=next(iter(json.loads(first.stdout).get('frames',[])),None)
+        except (OSError,subprocess.TimeoutExpired,ValueError):pass
+    return {'colorMetadata':color_management.metadata(v or {},frame),
+            'container':info.get('format',{}).get('format_name',''),'duration':duration,'videoEnd':video_end,'timeBase':(v or a or {}).get('time_base','1/1000000000'),
             'nominalRate':rate,'averageRate':(v or {}).get('avg_frame_rate','0/1'),
             'formatStart':info.get('format',{}).get('start_time','0'),'streamStartPts':(v or a or {}).get('start_pts',0),
             'width':(v or {}).get('width') or 0,
@@ -317,6 +327,9 @@ def validate_state(d, base=None):
                'fadeIn':_number(src.get('fadeIn',0),'Fade in',0,30),
                'fadeOut':_number(src.get('fadeOut',0),'Fade out',0,30),
                'locked':bool(src.get('locked',False))}
+            import color_management
+            if 'inputColor' in src:c['inputColor']=color_management.validate_input(src['inputColor'])
+            if 'hdrExposure' in src:c['hdrExposure']=_number(src['hdrExposure'],'HDR linear exposure',-8,8)
             for prop,default in [('rotation',0),('brightness',0),('contrast',1),('saturation',1),('maskRadius',.5)]:
                 c[prop]=_number(src.get(prop,default),prop,*animation.LIMITS[prop])
             if src.get('wipe','none') not in ('none','left','right','up','down'):raise ValueError('Unknown wipe direction')
@@ -363,6 +376,10 @@ def validate_state(d, base=None):
     if encoder not in encoders.NAMES:raise ValueError('Unknown video encoder')
     result['output']={'width':w,'height':h,'fps':fps,'crf':crf,'preset':preset,'encoder':encoder,
                       'bitrate':_number(output.get('bitrate',0),'Video bitrate',0,2000)}
+    if output.get('color') is not None:
+        import color_management
+        result['output']['color']=color_management.validate_output(output['color'])
+        if result['output']['color']['output']=='hdr10' and encoder!='libx265':raise ValueError('Managed HDR10 output currently requires HEVC CPU (libx265)')
     return result
 
 def client_state():
@@ -762,7 +779,7 @@ class Handler(BaseHTTPRequestHandler):
             if path=='/' or path=='/index.html':return self.file_response(WEB/'index.html','text/html; charset=utf-8')
             if path in ('/branding/vlogcraft-approved.ico',*(f'/branding/vlogcraft-{n}.png' for n in (16,24,32,48,64,128,256))):
                 return self.file_response(WEB/path.lstrip('/'))
-            if path in ('/app.js','/studio.js','/animation.js','/motion.js','/timeline.js','/timebase.js','/edit_ops.js','/edit_commands.js','/monitor.js','/rendered_preview.js','/native_preview.js','/native_audio_worklet.js','/recovery.js','/performance.js','/playback_cache.js','/effects.js','/grade.js','/audio.js','/nesting.js','/source_frames.js','/style.css'):
+            if path in ('/app.js','/color.js','/studio.js','/animation.js','/motion.js','/timeline.js','/timebase.js','/edit_ops.js','/edit_commands.js','/monitor.js','/rendered_preview.js','/native_preview.js','/native_audio_worklet.js','/recovery.js','/performance.js','/playback_cache.js','/effects.js','/grade.js','/audio.js','/nesting.js','/source_frames.js','/style.css'):
                 return self.file_response(WEB/path.lstrip('/'))
             return self.json_response({'error':'Not found'},404)
         except (BrokenPipeError,ConnectionAbortedError,ConnectionResetError):return
@@ -797,6 +814,9 @@ class Handler(BaseHTTPRequestHandler):
         path=urlparse(self.path).path
         try:
             data=self.read_json()
+            if path=='/api/color/validate':
+                import color_management
+                return self.json_response({'color':color_management.validate_output(data.get('color'))})
             if path=='/api/upload/start':
                 name=Path(str(data.get('name','')).replace('\\','/')).name
                 size=int(data.get('size',0))

@@ -133,6 +133,7 @@ function sizeMonitor(){
 }
 async function openExport(){
   openModal('exportModal');
+  initColorControls();
   const out=state.output;
   const preset=[1280,1920,2560,3840,7680].includes(out.width)&&out.height===out.width*9/16;
   $('exportResolution').value=preset?String(out.width):'custom';
@@ -150,6 +151,7 @@ async function openExport(){
     choice.replaceChildren(...Object.entries(available).map(([id,label])=>new Option(label,id)));
     choice.value=available[out.encoder]?out.encoder:'libx264';
     if(!choice.value)choice.selectedIndex=0;
+    if(state.output.color?.output==='hdr10')choice.value='libx265';
     $('startRender').disabled=!choice.value || (await request('jobs')).export.status==='rendering';
   }catch(error){toast('Encoder check failed: '+error.message,true);}
   finally{choice.disabled=false;}

@@ -52,6 +52,7 @@ function renderInspector(){let html='';if(insTab==='project'){html=renderProject
  html+='<div class="section-label">TIMING</div><div class="prop-row">'+field('Timeline start (sec)','position',c.position,0,1e12,.01)+field('Clip duration (sec)','duration',lengthOf(c),1/sequenceRate(),1e12,.01)+'</div>';
  if(a && a.kind!=='image'){html+='<div class="prop-row">'+field('Source in','start',c.start,0,36000,.01)+field('Source out','end',c.end,.04,36000,.01)+'</div>';html+=range('Playback speed','speed',c.speed,.1,4,.01,false);}
  if(t.type==='video'&&kind!=='title'){
+ html+=inputColorControls(c,a);
  html+='<div class="section-label">COMPOSITION</div>'+range('Opacity','opacity',c.opacity,0,1,.01)+range('Scale','scale',c.scale,.1,3,.05,false);
  html+=field('Rotation (degrees)','rotation',c.rotation??0,-360,360,1)+effectControls(c);
  html+='<div class="prop-row">'+field('Horizontal offset','x',c.x,-2,2,.01)+field('Vertical offset','y',c.y,-2,2,.01)+'</div>';
@@ -69,6 +70,7 @@ function renderInspector(){let html='';if(insTab==='project'){html=renderProject
  html+='<div class="property-actions"><button id="rippleDeleteBtn" class="button secondary">RIPPLE DELETE</button><button id="deleteClipInspector" class="button secondary">'+svg('trash')+' REMOVE CLIP</button><button id="duplicateClipInspector" class="button secondary">'+svg('copy')+' DUPLICATE</button></div>';
  }}
  $('inspectorContent').innerHTML=html;
+ bindInputColor();
  if($('gradeOpen'))$('gradeOpen').onclick=gradeDialog;
  $('inspectorContent').querySelectorAll('[data-proj]').forEach(el=>el.onchange=()=>{snapshot();let key=el.dataset.proj;if(key==='name'){state.name=el.value||'Untitled';}else if(key==='width'){state.output.width=Number(el.value);state.output.height=state.output.width*9/16;}else if(key==='fps')state.output.fps=rateChoice(el.value);redraw();save();});
  $('inspectorContent').querySelectorAll('[data-prop]').forEach(el=>{const action=()=>{
@@ -196,7 +198,7 @@ function makePlayer(c,t,z){const a=assetById(c.assetId);if(!a)return null;const 
  const prepared=waitingPlayers.get(c.id);waitingPlayers.delete(c.id);
  const media=a.kind==='image'?document.createElement('img'):(prepared?.media||sourceVideo(c));
  if(a.kind==='image')media.src='/media/'+a.id;if(media.tagName==='VIDEO'){media.preload='metadata';media.playsInline=true;media.autoplay=false;media.muted=false;media.disablePictureInPicture=true;}media.style.objectFit=c.fit==='cover'?'cover':'contain';wrap.appendChild(media);$('previewLayers').appendChild(wrap);return {media,wrap,clipId:c.id,aId:a.id};}
-function syncPreview(force=false){if(!state)return;if(nativePreview(force))return;if(renderedPreview(force))return;if(force)referenceChanged();const active=getActiveClips();$('emptyPreview').hidden=state.tracks.some(t=>t.clips.length);
+function syncPreview(force=false){if(!state)return;if(state.output.color&&$('playbackEngine').value==='interactive')$('playbackEngine').value='rendered';if(nativePreview(force))return;if(renderedPreview(force))return;if(force)referenceChanged();const active=getActiveClips();$('emptyPreview').hidden=state.tracks.some(t=>t.clips.length);
  const activeIds=new Set(active.map(x=>x.c.id));
  for(const [id,p] of activePlayers)if(!activeIds.has(id)||p.type!=='video'){
   recycleVideo(p);p.wrap?.remove();activePlayers.delete(id);
@@ -282,7 +284,8 @@ async function startExport(){
   const bitrate=$('outputBitrate').valueAsNumber;
   if(![w,h].every(v=>Number.isInteger(v)&&v>=16&&v<=16384&&v%2===0))throw Error('Choose even dimensions between 16 and 16384 pixels');
   if(!Number.isFinite(bitrate)||bitrate<0||bitrate>2000)throw Error('Invalid output bitrate');
-  Object.assign(state.output,{width:w,height:h,fps:rateChoice($('exportFps').value),crf:Number($('exportCrf').value),preset:$('exportPreset').value,encoder:$('encoderChoice').value,bitrate});
+  const color=await validatedColorFromControls();snapshot();
+  Object.assign(state.output,{width:w,height:h,fps:rateChoice($('exportFps').value),crf:Number($('exportCrf').value),preset:$('exportPreset').value,encoder:color?.output==='hdr10'?'libx265':$('encoderChoice').value,bitrate,color});
   redraw();save();await flushSave();
   const res=await request('export','POST',{});
   if(res.cancelled)return;

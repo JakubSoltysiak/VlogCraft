@@ -1,0 +1,11 @@
+{
+  "milestone": "P0 HDR color foundation",
+  "baseline_commit": "83e6afbaffe798cdabbbe48ded8a75ef711c2237",
+  "qualification": "partial: reference HDR10 correctness verified; installed qualification and limited performance comparison pending",
+  "report": "docs/HDR_COLOR_FOUNDATION.md",
+  "scope": "No new protected ten-run/endurance acceptance. Historical stabilization blockers remain open.",
+  "source_fingerprint": "109b8cee5e1b198202c3b19a985564c303d553fbbcae2da7785e113f4bf4b474",
+  "fingerprint_method": "SHA256 sorted relevant relative path + NUL + LF-normalized source + NUL",
+  "benchmark_protocol_fingerprint": "1b770796b6668067985aa66dbbfe4e66b153ca1203b3b2bb92d281f878275339",
+  "benchmark_protocol_fingerprint_method": "SHA256 sorted benchmark driver/observer relative path + NUL + LF-normalized source + NUL"
+}

@@ -36,7 +36,7 @@ jobs:
         run: |
           python tools/audit_repository.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          python tools/performance_record.py docs/benchmarks/studio-3.4.10-performance.json
+          python tools/performance_record.py docs/benchmarks/p0-color-performance.json
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python tests/icon_assets.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
@@ -66,7 +66,7 @@ jobs:
           PYTHONUTF8: "1"
         run: python benchmarks/drain_stress.py --repeat 20
       - name: JavaScript timeline commands
-        run: node --test tests/timeline_commands.test.js tests/native_audio_worklet.test.js tests/native_clock.test.js tests/meter.test.js tests/recovery.test.js tests/flight_recorder.test.js
+        run: node --test tests/timeline_commands.test.js tests/native_audio_worklet.test.js tests/native_clock.test.js tests/meter.test.js tests/recovery.test.js tests/flight_recorder.test.js tests/color_controls.test.js
   native-compile:
     runs-on: windows-2022
     timeout-minutes: 20
