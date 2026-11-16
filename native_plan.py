@@ -7,14 +7,17 @@ VIDEO_KEYS={'x','y','scale','rotation','opacity'}
 class Unsupported(ValueError):pass
 def compile_plan(state,width=960):
  state=sequences.playback(state);fps=timing.rate(state['output']['fps'])
+ if (state['output'].get('color') or {}).get('output')=='sdr':raise Unsupported('Managed SDR monitoring requires the reference tone map')
  width=int(width)
  if width not in (640,960,1280,1920,2560,3840):raise Unsupported('Choose a supported native monitor size')
- height=width*9//16;assets={a['id']:a for a in state['assets']};clips=[];used={}
+ height=max(2,round(width*state['output'].get('height',9)/state['output'].get('width',16)/2)*2);assets={a['id']:a for a in state['assets']};clips=[];used={}
  for track in reversed(state['tracks']):
   if track['type']!='video' or track.get('hidden'):continue
   for c in sorted(track['clips'],key=lambda c:c['position']):
    if c['kind']!='video':raise Unsupported('Titles and still pictures require the reference compositor')
    a=assets[c['assetId']]
+   square_only=c.get('inputColor')=={'profile':'source','range':'auto','pixelAspect':'square'}
+   if (c.get('inputColor') and not square_only) or c.get('hdrExposure',0):raise Unsupported('Technical color overrides/linear exposure require the managed reference compositor')
    if not re.fullmatch(r'[a-zA-Z0-9_/-]+',c['id']) or not re.fullmatch(r'[a-zA-Z0-9_-]+',a['id']):raise Unsupported('Invalid native media identifier')
    if a.get('codec') not in (None,'h264','hevc'):raise Unsupported('This codec requires the reference renderer')
    if str(a.get('pixelFormat','')).startswith(('yuva','rgba','argb','gbrap')):raise Unsupported('Alpha-bearing sources require the reference compositor')
@@ -34,6 +37,7 @@ def compile_plan(state,width=960):
   a=assets.get(c.get('assetId'),{})
   if a.get('hasAudio') and int(a.get('audioChannels') or 2)>2:raise Unsupported('Native audio currently supports mono/stereo; choose an explicit multichannel policy')
  hdr=any(a.get('hdr') or a.get('colorTransfer')=='smpte2084' for a in used.values())
+ if state['output'].get('color') and (not hdr or any(a.get('colorTransfer')!='smpte2084' for a in used.values())):raise Unsupported('Managed mixed/SDR input conversion requires explicit SDR reference monitoring')
  if hdr and any(a.get('colorTransfer')!='smpte2084' or a.get('colorPrimaries')!='bt2020' for a in used.values()):raise Unsupported('Mixed HDR/SDR working-space conversion requires the reference compositor')
  events=[]
  for c,a,start,end in clips:

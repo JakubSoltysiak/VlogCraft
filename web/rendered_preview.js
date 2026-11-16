@@ -54,7 +54,7 @@ async function loadProgram(at){
       if(playhead>=duration()-1e-6)stopPlayback();else void loadProgram(playhead);
     };
     mixSource(item.media,{},1);
-    $('programPreviewStatus').textContent='Composited · '+item.media.videoHeight+'p';
+    $('programPreviewStatus').textContent='Composited · '+item.media.videoHeight+'p'+(state.output.color?' · SDR tone-mapped monitor'+(state.output.color.output==='hdr10'?' · export remains HDR10 PQ':''):'');
     if(isPlaying)await item.media.play();
   }catch(error){
     if(epoch===renderedEpoch&&serial===renderedRequest){

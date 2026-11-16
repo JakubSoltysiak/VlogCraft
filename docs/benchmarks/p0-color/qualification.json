@@ -1,0 +1,2231 @@
+{
+  "production_checkpoint": "3487af7e4035463e52ed78bdcd4099d3f890e221",
+  "baseline_checkpoint": "83e6afbaffe798cdabbbe48ded8a75ef711c2237",
+  "decoded_reference": {
+    "source_commit": "3487af7e4035463e52ed78bdcd4099d3f890e221",
+    "source_fingerprint": "3c47fe5c3441ed75bd9304b9d1248b98884a66a70a959ab3f097ecea40833226",
+    "protocol_fingerprint": "8341eb31784cecba817e2f059e8de49972cc9d8f768e651b724678eb8a1d4f31",
+    "source_dirty": false,
+    "working": "float32 linear Rec.2020,1.0=100cd/m\u00b2",
+    "rows": [
+      {
+        "case": "PQ-ramp",
+        "seconds": 0.3503997000007075,
+        "dimensions": [
+          1024,
+          32
+        ],
+        "pixel_format": "yuv420p10le",
+        "profile": "Main 10",
+        "primaries": "bt2020",
+        "transfer": "smpte2084",
+        "matrix": "bt2020nc",
+        "range": "tv",
+        "rate": "24/1",
+        "decoded_video_frames": 12,
+        "video_seconds": 0.5,
+        "audio_seconds": 0.5,
+        "AV_endpoint_difference_seconds": 0.0,
+        "HDR10Plus_output": false,
+        "distinct_decoded_luma_codes": 868,
+        "max_luma_code_error": 2.0,
+        "declared_MaxCLL": 10000,
+        "declared_MaxFALL": 1072,
+        "static_metadata_verified": true
+      },
+      {
+        "case": "linear-PQ-blend",
+        "seconds": 0.29323000000294996,
+        "dimensions": [
+          128,
+          72
+        ],
+        "pixel_format": "yuv420p10le",
+        "profile": "Main 10",
+        "primaries": "bt2020",
+        "transfer": "smpte2084",
+        "matrix": "bt2020nc",
+        "range": "tv",
+        "rate": "24/1",
+        "decoded_video_frames": 12,
+        "video_seconds": 0.5,
+        "audio_seconds": 0.5,
+        "AV_endpoint_difference_seconds": 0.0,
+        "HDR10Plus_output": false,
+        "decoded_nits": 551.7122617872772,
+        "expected_nits": 550
+      },
+      {
+        "case": "mixed-SDR-PQ",
+        "seconds": 0.2824315000034403,
+        "dimensions": [
+          128,
+          72
+        ],
+        "pixel_format": "yuv420p10le",
+        "profile": "Main 10",
+        "primaries": "bt2020",
+        "transfer": "smpte2084",
+        "matrix": "bt2020nc",
+        "range": "tv",
+        "rate": "24/1",
+        "decoded_video_frames": 12,
+        "video_seconds": 0.5,
+        "audio_seconds": 0.5,
+        "AV_endpoint_difference_seconds": 0.0,
+        "HDR10Plus_output": false,
+        "decoded_nits": 551.7122617872772,
+        "expected_nits": 550
+      },
+      {
+        "case": "CameraA-bounded-HDR10",
+        "seconds": 7.6877152000015485,
+        "dimensions": [
+          144,
+          256
+        ],
+        "pixel_format": "yuv420p10le",
+        "profile": "Main 10",
+        "primaries": "bt2020",
+        "transfer": "smpte2084",
+        "matrix": "bt2020nc",
+        "range": "tv",
+        "rate": "60/1",
+        "decoded_video_frames": 12,
+        "video_seconds": 0.2,
+        "audio_seconds": 0.2,
+        "AV_endpoint_difference_seconds": 0.0,
+        "HDR10Plus_output": false,
+        "source_dynamic_sample_detected": true,
+        "static_metadata_scope": "Unknown output mastering/content levels omitted; source dynamic/static picture metadata not copied",
+        "pixel_aspect_scope": "Source SAR unspecified; explicit square-pixel interpretation selected for this bounded test, not verified camera SAR metadata"
+      },
+      {
+        "case": "CameraB-bounded-HDR10",
+        "seconds": 7.423733499999798,
+        "dimensions": [
+          144,
+          256
+        ],
+        "pixel_format": "yuv420p10le",
+        "profile": "Main 10",
+        "primaries": "bt2020",
+        "transfer": "smpte2084",
+        "matrix": "bt2020nc",
+        "range": "tv",
+        "rate": "60/1",
+        "decoded_video_frames": 12,
+        "video_seconds": 0.2,
+        "audio_seconds": 0.2,
+        "AV_endpoint_difference_seconds": 0.0,
+        "HDR10Plus_output": false,
+        "source_dynamic_sample_detected": true,
+        "static_metadata_scope": "Unknown output mastering/content levels omitted; source dynamic/static picture metadata not copied",
+        "pixel_aspect_scope": "Source SAR unspecified; explicit square-pixel interpretation selected for this bounded test, not verified camera SAR metadata"
+      }
+    ],
+    "scope": "Short reference precision and bounded real-camera HDR10 output; no calibrated display, sustained 4K60 or HDR10+ authoring acceptance. Private paths/frames and complete metadata stay local."
+  },
+  "native_precision": {
+    "native_10bit": {
+      "distinct_luma_values": 877,
+      "mean_error": 0.00016180674660287405
+    },
+    "native_pq": {
+      "distinct_luma_values": 877,
+      "relative_error": 0.0001830715814316433,
+      "max_scrgb": 125.0
+    },
+    "layer_parity": {
+      "mean_absolute_rgb_error": 0.008322379110295104,
+      "p95_absolute_rgb_error": 0.012735523897058842
+    },
+    "full_hdr_display_qualified": false
+  },
+  "initial_decoded_reference": {
+    "source_commit": "37d96dabb15aa1165ae27a07041eab5b36dc469e",
+    "source_fingerprint": "109b8cee5e1b198202c3b19a985564c303d553fbbcae2da7785e113f4bf4b474",
+    "protocol_fingerprint": "1b770796b6668067985aa66dbbfe4e66b153ca1203b3b2bb92d281f878275339",
+    "source_dirty": false,
+    "working": "float32 linear Rec.2020,1.0=100cd/m\u00b2",
+    "rows": [
+      {
+        "case": "PQ-ramp",
+        "seconds": 0.40193109999381704,
+        "dimensions": [
+          1024,
+          32
+        ],
+        "pixel_format": "yuv420p10le",
+        "profile": "Main 10",
+        "primaries": "bt2020",
+        "transfer": "smpte2084",
+        "matrix": "bt2020nc",
+        "range": "tv",
+        "rate": "24/1",
+        "decoded_video_frames": 12,
+        "video_seconds": 0.5,
+        "audio_seconds": 0.5,
+        "AV_endpoint_difference_seconds": 0.0,
+        "HDR10Plus_output": false,
+        "distinct_decoded_luma_codes": 868,
+        "max_luma_code_error": 2.0,
+        "declared_MaxCLL": 10000,
+        "declared_MaxFALL": 1072,
+        "static_metadata_verified": true
+      },
+      {
+        "case": "linear-PQ-blend",
+        "seconds": 0.3362340999956359,
+        "dimensions": [
+          128,
+          72
+        ],
+        "pixel_format": "yuv420p10le",
+        "profile": "Main 10",
+        "primaries": "bt2020",
+        "transfer": "smpte2084",
+        "matrix": "bt2020nc",
+        "range": "tv",
+        "rate": "24/1",
+        "decoded_video_frames": 12,
+        "video_seconds": 0.5,
+        "audio_seconds": 0.5,
+        "AV_endpoint_difference_seconds": 0.0,
+        "HDR10Plus_output": false,
+        "decoded_nits": 551.7122617872772,
+        "expected_nits": 550
+      },
+      {
+        "case": "mixed-SDR-PQ",
+        "seconds": 0.3179840000011609,
+        "dimensions": [
+          128,
+          72
+        ],
+        "pixel_format": "yuv420p10le",
+        "profile": "Main 10",
+        "primaries": "bt2020",
+        "transfer": "smpte2084",
+        "matrix": "bt2020nc",
+        "range": "tv",
+        "rate": "24/1",
+        "decoded_video_frames": 12,
+        "video_seconds": 0.5,
+        "audio_seconds": 0.5,
+        "AV_endpoint_difference_seconds": 0.0,
+        "HDR10Plus_output": false,
+        "decoded_nits": 551.7122617872772,
+        "expected_nits": 550
+      },
+      {
+        "case": "CameraA-bounded-HDR10",
+        "seconds": 2.42096660000243,
+        "dimensions": [
+          144,
+          256
+        ],
+        "pixel_format": "yuv420p10le",
+        "profile": "Main 10",
+        "primaries": "bt2020",
+        "transfer": "smpte2084",
+        "matrix": "bt2020nc",
+        "range": "tv",
+        "rate": "60/1",
+        "decoded_video_frames": 12,
+        "video_seconds": 0.2,
+        "audio_seconds": 0.2,
+        "AV_endpoint_difference_seconds": 0.0,
+        "HDR10Plus_output": false,
+        "source_dynamic_sample_detected": true,
+        "static_metadata_scope": "Unknown output mastering/content levels omitted; source dynamic/static picture metadata not copied",
+        "pixel_aspect_scope": "Source SAR unspecified; explicit square-pixel interpretation selected for this bounded test, not verified camera SAR metadata"
+      },
+      {
+        "case": "CameraB-bounded-HDR10",
+        "seconds": 2.7337284999957774,
+        "dimensions": [
+          144,
+          256
+        ],
+        "pixel_format": "yuv420p10le",
+        "profile": "Main 10",
+        "primaries": "bt2020",
+        "transfer": "smpte2084",
+        "matrix": "bt2020nc",
+        "range": "tv",
+        "rate": "60/1",
+        "decoded_video_frames": 12,
+        "video_seconds": 0.2,
+        "audio_seconds": 0.2,
+        "AV_endpoint_difference_seconds": 0.0,
+        "HDR10Plus_output": false,
+        "source_dynamic_sample_detected": true,
+        "static_metadata_scope": "Unknown output mastering/content levels omitted; source dynamic/static picture metadata not copied",
+        "pixel_aspect_scope": "Source SAR unspecified; explicit square-pixel interpretation selected for this bounded test, not verified camera SAR metadata"
+      }
+    ],
+    "scope": "Short reference precision and bounded real-camera HDR10 output; no calibrated display, sustained 4K60 or HDR10+ authoring acceptance. Private paths/frames and complete metadata stay local."
+  },
+  "installed_color": [
+    {
+      "installed_HDR10_export": true,
+      "color_UI_apply": true,
+      "technical_input_overrides_UI": true,
+      "input_bit_depth": 10,
+      "undo_redo_exposure": true,
+      "SDR_monitor_label": true,
+      "monitor_vs_tonemapped_delivery_MAE_8bit": 0.4066840277777778,
+      "decoded_frames": 12
+    },
+    {
+      "fault": "renderer",
+      "exact_80_history_and_project_color": true,
+      "source_metadata_exact": true,
+      "draft_exact": true,
+      "paused": true
+    },
+    {
+      "fault": "browser",
+      "exact_80_history_and_project_color": true,
+      "source_metadata_exact": true,
+      "draft_exact": true,
+      "paused": true
+    }
+  ],
+  "native_HDR_preview": {
+    "alias": "CameraA",
+    "duration_seconds": 3,
+    "source_PQ_Main10": true,
+    "explicit_square_pixel_interpretation": true,
+    "native_HDR_linear_scRGB": true,
+    "composition": [
+      960,
+      1706
+    ],
+    "physical_surface": [
+      180,
+      320
+    ],
+    "samples": 144000,
+    "underruns": 0,
+    "skips": 0,
+    "dynamic_metadata_decode_retained": true,
+    "window_condition_held": true,
+    "calibrated_monitoring": false,
+    "source_commit": "3487af7e4035463e52ed78bdcd4099d3f890e221",
+    "source_fingerprint": "3c47fe5c3441ed75bd9304b9d1248b98884a66a70a959ab3f097ecea40833226",
+    "host_sha256": "d46bc64d7adf147cd3c245feec87795abf8efcd73927e9aaea465a6c527cabc8",
+    "scope": "Three-second HDR presentation/PCM check, not sustained playback or HDR10+ display mastering."
+  },
+  "installed_UHD_HDR10": {
+    "alias": "CameraA",
+    "source_commit": "3487af7e4035463e52ed78bdcd4099d3f890e221",
+    "source_fingerprint": "3c47fe5c3441ed75bd9304b9d1248b98884a66a70a959ab3f097ecea40833226",
+    "host_sha256": "d46bc64d7adf147cd3c245feec87795abf8efcd73927e9aaea465a6c527cabc8",
+    "dimensions": [
+      2160,
+      3840
+    ],
+    "rate": "60/1",
+    "frames": 12,
+    "pixel_format": "yuv420p10le",
+    "profile": "Main 10",
+    "primaries": "bt2020",
+    "transfer": "smpte2084",
+    "matrix": "bt2020nc",
+    "video_seconds": 0.2,
+    "audio_seconds": 0.2,
+    "seconds": 37.7330751000045,
+    "PQ_code_domain_SSIM_vs_original": 0.980326,
+    "square_pixel_override": true,
+    "scope": "12-frame full-resolution portrait HDR10 export and decoded PQ-code fidelity, not sustained performance, calibrated monitoring or HDR10+ authoring."
+  },
+  "initial_installed_UHD_HDR10": {
+    "alias": "CameraA",
+    "source_commit": "37d96dabb15aa1165ae27a07041eab5b36dc469e",
+    "source_fingerprint": "109b8cee5e1b198202c3b19a985564c303d553fbbcae2da7785e113f4bf4b474",
+    "host_sha256": "f81e833abdafde774b453d2418c79792753336ebf27f243478484e82dc01f483",
+    "dimensions": [
+      2160,
+      3840
+    ],
+    "rate": "60/1",
+    "frames": 12,
+    "pixel_format": "yuv420p10le",
+    "profile": "Main 10",
+    "primaries": "bt2020",
+    "transfer": "smpte2084",
+    "matrix": "bt2020nc",
+    "video_seconds": 0.2,
+    "audio_seconds": 0.2,
+    "seconds": 16.45281629999954,
+    "PQ_code_domain_SSIM_vs_original": 0.980324,
+    "square_pixel_override": true,
+    "scope": "12-frame full-resolution portrait HDR10 export and decoded PQ-code fidelity, not sustained performance, calibrated monitoring or HDR10+ authoring."
+  },
+  "performance": {
+    "performance-baseline30": {
+      "mode": "flight",
+      "requested_seconds": 30,
+      "elapsed_seconds": 30.156192100002954,
+      "timeline_seconds": 600,
+      "geometry": {
+        "composition": 960,
+        "rect": {
+          "x": 621.0982666015625,
+          "y": 220.35714721679688,
+          "width": 203.42857360839844,
+          "height": 114.28572082519531,
+          "dpr": 1.75
+        },
+        "dpr": 1.75
+      },
+      "actual_native_surface": [
+        356,
+        200
+      ],
+      "host_sha256": "a15d5bc40c8a1f9bac418ab160b7cf2aaefb667a2f4cf256a26f9fdaf006ec59",
+      "commit": "37d96dabb15aa1165ae27a07041eab5b36dc469e",
+      "native_binary_sha256": "ac206038cea559f87d784e0ec4fc8485bdebd1421b7c4a78853e7ea037e3f72a",
+      "audio": {
+        "samples": 1448192,
+        "underruns": 0,
+        "queued": 87808,
+        "playing": true
+      },
+      "skips": 14,
+      "timings": {
+        "context_wait": {
+          "count": 11555,
+          "mean_ms": 0.171885,
+          "p50_upper_ms": 0.1,
+          "p95_upper_ms": 0.8,
+          "p99_upper_ms": 2,
+          "max_ms": 65.6165,
+          "overflow_100ms": 0
+        },
+        "submit_cpu": {
+          "count": 1785,
+          "mean_ms": 0.864214,
+          "p50_upper_ms": 0.6,
+          "p95_upper_ms": 3.8,
+          "p99_upper_ms": 6.7,
+          "max_ms": 16.4967,
+          "overflow_100ms": 0
+        },
+        "completion_observation": {
+          "count": 1785,
+          "mean_ms": 9.09391,
+          "p50_upper_ms": 5.8,
+          "p95_upper_ms": 47.7,
+          "p99_upper_ms": 70.4,
+          "max_ms": 119.668,
+          "overflow_100ms": 1
+        },
+        "composition_gpu": {
+          "count": 1785,
+          "mean_ms": 0.785641,
+          "p50_upper_ms": 0.8,
+          "p95_upper_ms": 1.1,
+          "p99_upper_ms": 3.1,
+          "max_ms": 3.94336,
+          "overflow_100ms": 0
+        },
+        "present_call": {
+          "count": 1785,
+          "mean_ms": 1.01054,
+          "p50_upper_ms": 0.3,
+          "p95_upper_ms": 4.3,
+          "p99_upper_ms": 20,
+          "max_ms": 42.5598,
+          "overflow_100ms": 0
+        },
+        "present_call_interval": {
+          "count": 1784,
+          "mean_ms": 16.8708,
+          "p50_upper_ms": 16.7,
+          "p95_upper_ms": 25,
+          "p99_upper_ms": 39.1,
+          "max_ms": 109.104,
+          "overflow_100ms": 1
+        },
+        "playback_present_interval": {
+          "count": 1783,
+          "mean_ms": 16.8191,
+          "p50_upper_ms": 16.7,
+          "p95_upper_ms": 25,
+          "p99_upper_ms": 39.1,
+          "max_ms": 66.9772,
+          "overflow_100ms": 0
+        },
+        "source_selection": {
+          "count": 1842,
+          "mean_ms": 0.131181,
+          "p50_upper_ms": 0.1,
+          "p95_upper_ms": 0.5,
+          "p99_upper_ms": 0.9,
+          "max_ms": 69.4794,
+          "overflow_100ms": 0
+        },
+        "wake_overshoot": {
+          "count": 4612,
+          "mean_ms": 0.462183,
+          "p50_upper_ms": 0.4,
+          "p95_upper_ms": 1.1,
+          "p99_upper_ms": 3.3,
+          "max_ms": 7.3359,
+          "overflow_100ms": 0
+        }
+      },
+      "memory": [
+        {
+          "stage": "prepared",
+          "groups": {
+            "host": {
+              "rss_MiB": 217.9140625,
+              "private_commit_MiB": 908.98046875
+            },
+            "webview": {
+              "rss_MiB": 1582.36328125,
+              "private_commit_MiB": 1442.578125
+            },
+            "native": {
+              "rss_MiB": 1314.95703125,
+              "private_commit_MiB": 2459.07421875
+            },
+            "ffmpeg": {
+              "rss_MiB": 62.3125,
+              "private_commit_MiB": 61.55859375
+            }
+          },
+          "heap": {
+            "Documents": 1,
+            "JSEventListeners": 525,
+            "Nodes": 5046,
+            "JSHeapUsedSize": 19108904,
+            "JSHeapTotalSize": 50352128
+          }
+        },
+        {
+          "stage": "active_end",
+          "groups": {
+            "host": {
+              "rss_MiB": 205.51171875,
+              "private_commit_MiB": 900.18359375
+            },
+            "webview": {
+              "rss_MiB": 2098.84375,
+              "private_commit_MiB": 1944.78515625
+            },
+            "native": {
+              "rss_MiB": 1537.6484375,
+              "private_commit_MiB": 2285.83984375
+            }
+          },
+          "heap": {
+            "Documents": 1,
+            "JSEventListeners": 1040,
+            "Nodes": 10754,
+            "JSHeapUsedSize": 35747400,
+            "JSHeapTotalSize": 56381440
+          }
+        },
+        {
+          "stage": "stopped",
+          "groups": {
+            "host": {
+              "rss_MiB": 207.546875,
+              "private_commit_MiB": 902.27734375
+            },
+            "webview": {
+              "rss_MiB": 2100.28515625,
+              "private_commit_MiB": 1946.6328125
+            },
+            "native": {
+              "rss_MiB": 1537.6484375,
+              "private_commit_MiB": 2285.83984375
+            }
+          },
+          "heap": {
+            "Documents": 1,
+            "JSEventListeners": 1041,
+            "Nodes": 10763,
+            "JSHeapUsedSize": 36692444,
+            "JSHeapTotalSize": 57692160
+          }
+        },
+        {
+          "stage": "natural_idle30_no_GC",
+          "groups": {
+            "host": {
+              "rss_MiB": 200.99609375,
+              "private_commit_MiB": 896.15234375
+            },
+            "webview": {
+              "rss_MiB": 1098.98046875,
+              "private_commit_MiB": 945.85546875
+            },
+            "native": {
+              "rss_MiB": 1537.5859375,
+              "private_commit_MiB": 2285.73046875
+            }
+          },
+          "heap": {
+            "Documents": 1,
+            "JSEventListeners": 633,
+            "Nodes": 5052,
+            "JSHeapUsedSize": 11731936,
+            "JSHeapTotalSize": 12857344
+          }
+        },
+        {
+          "stage": "native_released",
+          "groups": {
+            "host": {
+              "rss_MiB": 188.83203125,
+              "private_commit_MiB": 891.078125
+            },
+            "webview": {
+              "rss_MiB": 1097.8828125,
+              "private_commit_MiB": 946.03515625
+            }
+          },
+          "heap": {
+            "Documents": 1,
+            "JSEventListeners": 633,
+            "Nodes": 5052,
+            "JSHeapUsedSize": 11793196,
+            "JSHeapTotalSize": 12857344
+          }
+        }
+      ],
+      "browser_error_count": 0,
+      "scope": "Partial generated workload; no PDH polling, no forced GC. Flight uses existing ack events and existing bounded native missed-event recorder. Not protected consistency/physical scanout qualification.",
+      "window_condition_held": true,
+      "all_sampled_AC": true,
+      "thermal_scope": "not observable with available public sensors"
+    },
+    "performance-candidate30": {
+      "mode": "flight",
+      "requested_seconds": 30,
+      "elapsed_seconds": 30.157589099995675,
+      "timeline_seconds": 600,
+      "geometry": {
+        "composition": 960,
+        "rect": {
+          "x": 621.0982666015625,
+          "y": 220.35714721679688,
+          "width": 203.42857360839844,
+          "height": 114.28572082519531,
+          "dpr": 1.75
+        },
+        "dpr": 1.75
+      },
+      "actual_native_surface": [
+        356,
+        200
+      ],
+      "host_sha256": "f81e833abdafde774b453d2418c79792753336ebf27f243478484e82dc01f483",
+      "commit": "37d96dabb15aa1165ae27a07041eab5b36dc469e",
+      "native_binary_sha256": "ac206038cea559f87d784e0ec4fc8485bdebd1421b7c4a78853e7ea037e3f72a",
+      "audio": {
+        "samples": 1447296,
+        "underruns": 0,
+        "queued": 88704,
+        "playing": true
+      },
+      "skips": 25,
+      "timings": {
+        "context_wait": {
+          "count": 10765,
+          "mean_ms": 0.208979,
+          "p50_upper_ms": 0.1,
+          "p95_upper_ms": 1.1,
+          "p99_upper_ms": 2,
+          "max_ms": 101.879,
+          "overflow_100ms": 1
+        },
+        "submit_cpu": {
+          "count": 1774,
+          "mean_ms": 1.55605,
+          "p50_upper_ms": 0.8,
+          "p95_upper_ms": 6.1,
+          "p99_upper_ms": 8.3,
+          "max_ms": 11.3234,
+          "overflow_100ms": 0
+        },
+        "completion_observation": {
+          "count": 1774,
+          "mean_ms": 7.44453,
+          "p50_upper_ms": 2.1,
+          "p95_upper_ms": 41.2,
+          "p99_upper_ms": 71.4,
+          "max_ms": 133.547,
+          "overflow_100ms": 4
+        },
+        "composition_gpu": {
+          "count": 1774,
+          "mean_ms": 0.840956,
+          "p50_upper_ms": 0.8,
+          "p95_upper_ms": 2.1,
+          "p99_upper_ms": 3.2,
+          "max_ms": 4.34636,
+          "overflow_100ms": 0
+        },
+        "present_call": {
+          "count": 1774,
+          "mean_ms": 1.13688,
+          "p50_upper_ms": 0.5,
+          "p95_upper_ms": 3.8,
+          "p99_upper_ms": 17.2,
+          "max_ms": 43.1802,
+          "overflow_100ms": 0
+        },
+        "present_call_interval": {
+          "count": 1773,
+          "mean_ms": 17.0607,
+          "p50_upper_ms": 16.7,
+          "p95_upper_ms": 25.2,
+          "p99_upper_ms": 38.8,
+          "max_ms": 248.064,
+          "overflow_100ms": 2
+        },
+        "playback_present_interval": {
+          "count": 1772,
+          "mean_ms": 16.9303,
+          "p50_upper_ms": 16.7,
+          "p95_upper_ms": 25.2,
+          "p99_upper_ms": 37.8,
+          "max_ms": 105.872,
+          "overflow_100ms": 1
+        },
+        "source_selection": {
+          "count": 1827,
+          "mean_ms": 0.229814,
+          "p50_upper_ms": 0.1,
+          "p95_upper_ms": 0.7,
+          "p99_upper_ms": 1.2,
+          "max_ms": 104.565,
+          "overflow_100ms": 1
+        },
+        "wake_overshoot": {
+          "count": 4294,
+          "mean_ms": 0.642984,
+          "p50_upper_ms": 0.5,
+          "p95_upper_ms": 2.3,
+          "p99_upper_ms": 5.3,
+          "max_ms": 9.1312,
+          "overflow_100ms": 0
+        }
+      },
+      "memory": [
+        {
+          "stage": "prepared",
+          "groups": {
+            "host": {
+              "rss_MiB": 216.41015625,
+              "private_commit_MiB": 906.421875
+            },
+            "webview": {
+              "rss_MiB": 1570.5546875,
+              "private_commit_MiB": 1434.69921875
+            },
+            "native": {
+              "rss_MiB": 1421.42578125,
+              "private_commit_MiB": 2554.2734375
+            },
+            "ffmpeg": {
+              "rss_MiB": 61.83984375,
+              "private_commit_MiB": 61.19140625
+            }
+          },
+          "heap": {
+            "Documents": 1,
+            "JSEventListeners": 525,
+            "Nodes": 5170,
+            "JSHeapUsedSize": 19125736,
+            "JSHeapTotalSize": 50614272
+          }
+        },
+        {
+          "stage": "active_end",
+          "groups": {
+            "host": {
+              "rss_MiB": 201.99609375,
+              "private_commit_MiB": 897.9921875
+            },
+            "webview": {
+              "rss_MiB": 2068.18359375,
+              "private_commit_MiB": 1917.56640625
+            },
+            "native": {
+              "rss_MiB": 1547.55859375,
+              "private_commit_MiB": 2286.125
+            }
+          },
+          "heap": {
+            "Documents": 1,
+            "JSEventListeners": 1040,
+            "Nodes": 10874,
+            "JSHeapUsedSize": 33773720,
+            "JSHeapTotalSize": 54808576
+          }
+        },
+        {
+          "stage": "stopped",
+          "groups": {
+            "host": {
+              "rss_MiB": 203.53125,
+              "private_commit_MiB": 899.3046875
+            },
+            "webview": {
+              "rss_MiB": 2069.55078125,
+              "private_commit_MiB": 1918.75390625
+            },
+            "native": {
+              "rss_MiB": 1547.5703125,
+              "private_commit_MiB": 2286.125
+            }
+          },
+          "heap": {
+            "Documents": 1,
+            "JSEventListeners": 1041,
+            "Nodes": 10888,
+            "JSHeapUsedSize": 34763628,
+            "JSHeapTotalSize": 55857152
+          }
+        },
+        {
+          "stage": "natural_idle30_no_GC",
+          "groups": {
+            "host": {
+              "rss_MiB": 199.90625,
+              "private_commit_MiB": 895.3203125
+            },
+            "webview": {
+              "rss_MiB": 1082.52734375,
+              "private_commit_MiB": 934.171875
+            },
+            "native": {
+              "rss_MiB": 1547.50390625,
+              "private_commit_MiB": 2286.01171875
+            }
+          },
+          "heap": {
+            "Documents": 1,
+            "JSEventListeners": 633,
+            "Nodes": 5173,
+            "JSHeapUsedSize": 10733132,
+            "JSHeapTotalSize": 13643776
+          }
+        },
+        {
+          "stage": "native_released",
+          "groups": {
+            "host": {
+              "rss_MiB": 186.55078125,
+              "private_commit_MiB": 889.12109375
+            },
+            "webview": {
+              "rss_MiB": 1081.62890625,
+              "private_commit_MiB": 934.59375
+            }
+          },
+          "heap": {
+            "Documents": 1,
+            "JSEventListeners": 633,
+            "Nodes": 5174,
+            "JSHeapUsedSize": 10796456,
+            "JSHeapTotalSize": 13905920
+          }
+        }
+      ],
+      "browser_error_count": 0,
+      "scope": "Partial generated workload; no PDH polling, no forced GC. Flight uses existing ack events and existing bounded native missed-event recorder. Not protected consistency/physical scanout qualification.",
+      "window_condition_held": true,
+      "all_sampled_AC": true,
+      "thermal_scope": "not observable with available public sensors"
+    }
+  },
+  "SDR_export_initial": {
+    "settings": {
+      "codec": "libx264",
+      "resolution": [
+        3840,
+        2160
+      ],
+      "fps": "60/1",
+      "preset": "veryfast",
+      "bitrate_Mbps": 35,
+      "crf": 20
+    },
+    "rows": [
+      {
+        "arm": "baseline",
+        "repeat": 0,
+        "seconds": 6.036744999997609,
+        "frames": 180,
+        "rate": "60/1",
+        "decoded": true,
+        "SSIM_vs_source": 0.997805,
+        "audio_codec": "aac",
+        "audio_sample_rate": 48000,
+        "AV_endpoint_difference_seconds": 0.0,
+        "conditions": {
+          "samples": [
+            {
+              "seconds": 0.0,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 14620,
+              "system_cpu_percent": 0.0
+            },
+            {
+              "seconds": 1.015,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 12939,
+              "system_cpu_percent": 60.4
+            },
+            {
+              "seconds": 2.031,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 12837,
+              "system_cpu_percent": 53.5
+            },
+            {
+              "seconds": 3.031,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 12863,
+              "system_cpu_percent": 42.9
+            },
+            {
+              "seconds": 4.031,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 12997,
+              "system_cpu_percent": 39.7
+            },
+            {
+              "seconds": 5.031,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 12988,
+              "system_cpu_percent": 36.3
+            }
+          ],
+          "mixed_power": false,
+          "thermal_throttling": "not observable with available public sensors"
+        }
+      },
+      {
+        "arm": "candidate",
+        "repeat": 0,
+        "seconds": 6.723168799995619,
+        "frames": 180,
+        "rate": "60/1",
+        "decoded": true,
+        "SSIM_vs_source": 0.997805,
+        "audio_codec": "aac",
+        "audio_sample_rate": 48000,
+        "AV_endpoint_difference_seconds": 0.0,
+        "conditions": {
+          "samples": [
+            {
+              "seconds": 0.0,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 14500,
+              "system_cpu_percent": 0.0
+            },
+            {
+              "seconds": 1.0,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 12850,
+              "system_cpu_percent": 46.7
+            },
+            {
+              "seconds": 2.015,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 12690,
+              "system_cpu_percent": 61.2
+            },
+            {
+              "seconds": 3.031,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 12710,
+              "system_cpu_percent": 49.3
+            },
+            {
+              "seconds": 4.031,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 12821,
+              "system_cpu_percent": 37.6
+            },
+            {
+              "seconds": 5.047,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 12863,
+              "system_cpu_percent": 31.8
+            },
+            {
+              "seconds": 6.047,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 14006,
+              "system_cpu_percent": 27.4
+            }
+          ],
+          "mixed_power": false,
+          "thermal_throttling": "not observable with available public sensors"
+        }
+      },
+      {
+        "arm": "candidate",
+        "repeat": 1,
+        "seconds": 7.054846699997142,
+        "frames": 180,
+        "rate": "60/1",
+        "decoded": true,
+        "SSIM_vs_source": 0.997805,
+        "audio_codec": "aac",
+        "audio_sample_rate": 48000,
+        "AV_endpoint_difference_seconds": 0.0,
+        "conditions": {
+          "samples": [
+            {
+              "seconds": 0.0,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 14559,
+              "system_cpu_percent": 0.0
+            },
+            {
+              "seconds": 1.0,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 12984,
+              "system_cpu_percent": 53.9
+            },
+            {
+              "seconds": 2.016,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 12793,
+              "system_cpu_percent": 53.5
+            },
+            {
+              "seconds": 3.016,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 12807,
+              "system_cpu_percent": 52.8
+            },
+            {
+              "seconds": 4.031,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 12962,
+              "system_cpu_percent": 54.9
+            },
+            {
+              "seconds": 5.031,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 12955,
+              "system_cpu_percent": 43.5
+            },
+            {
+              "seconds": 6.031,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 13083,
+              "system_cpu_percent": 26.9
+            },
+            {
+              "seconds": 7.031,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 14053,
+              "system_cpu_percent": 29.9
+            }
+          ],
+          "mixed_power": false,
+          "thermal_throttling": "not observable with available public sensors"
+        }
+      },
+      {
+        "arm": "baseline",
+        "repeat": 1,
+        "seconds": 6.8703058999963105,
+        "frames": 180,
+        "rate": "60/1",
+        "decoded": true,
+        "SSIM_vs_source": 0.997805,
+        "audio_codec": "aac",
+        "audio_sample_rate": 48000,
+        "AV_endpoint_difference_seconds": 0.0,
+        "conditions": {
+          "samples": [
+            {
+              "seconds": 0.0,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 14563,
+              "system_cpu_percent": 0.0
+            },
+            {
+              "seconds": 1.016,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 13067,
+              "system_cpu_percent": 54.4
+            },
+            {
+              "seconds": 2.016,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 12732,
+              "system_cpu_percent": 57.9
+            },
+            {
+              "seconds": 3.031,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 12731,
+              "system_cpu_percent": 42.6
+            },
+            {
+              "seconds": 4.031,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 12728,
+              "system_cpu_percent": 42.4
+            },
+            {
+              "seconds": 5.047,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 12871,
+              "system_cpu_percent": 36.9
+            },
+            {
+              "seconds": 6.047,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 13031,
+              "system_cpu_percent": 25.8
+            }
+          ],
+          "mixed_power": false,
+          "thermal_throttling": "not observable with available public sensors"
+        }
+      }
+    ],
+    "summary": {
+      "baseline": {
+        "median_seconds": 6.45352544999696,
+        "worst_seconds": 6.8703058999963105
+      },
+      "candidate": {
+        "median_seconds": 6.889007749996381,
+        "worst_seconds": 7.054846699997142
+      }
+    }
+  },
+  "SDR_export_reverse": {
+    "settings": {
+      "codec": "libx264",
+      "resolution": [
+        3840,
+        2160
+      ],
+      "fps": "60/1",
+      "preset": "veryfast",
+      "bitrate_Mbps": 35,
+      "crf": 20
+    },
+    "rows": [
+      {
+        "arm": "baseline",
+        "repeat": 0,
+        "seconds": 4.106729400002223,
+        "frames": 180,
+        "rate": "60/1",
+        "decoded": true,
+        "SSIM_vs_source": 0.997805,
+        "audio_codec": "aac",
+        "audio_sample_rate": 48000,
+        "AV_endpoint_difference_seconds": 0.0,
+        "conditions": {
+          "samples": [
+            {
+              "seconds": 0.016,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 14674,
+              "system_cpu_percent": 0.0
+            },
+            {
+              "seconds": 1.016,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 12958,
+              "system_cpu_percent": 58.0
+            },
+            {
+              "seconds": 2.031,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 12955,
+              "system_cpu_percent": 61.5
+            },
+            {
+              "seconds": 3.031,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 12939,
+              "system_cpu_percent": 52.0
+            },
+            {
+              "seconds": 4.031,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 14185,
+              "system_cpu_percent": 35.5
+            }
+          ],
+          "mixed_power": false,
+          "thermal_throttling": "not observable with available public sensors"
+        }
+      },
+      {
+        "arm": "candidate",
+        "repeat": 0,
+        "seconds": 4.33812150000449,
+        "frames": 180,
+        "rate": "60/1",
+        "decoded": true,
+        "SSIM_vs_source": 0.997805,
+        "audio_codec": "aac",
+        "audio_sample_rate": 48000,
+        "AV_endpoint_difference_seconds": 0.0,
+        "conditions": {
+          "samples": [
+            {
+              "seconds": 0.0,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 14689,
+              "system_cpu_percent": 0.0
+            },
+            {
+              "seconds": 1.016,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 12903,
+              "system_cpu_percent": 51.8
+            },
+            {
+              "seconds": 2.016,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 12847,
+              "system_cpu_percent": 59.0
+            },
+            {
+              "seconds": 3.016,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 12871,
+              "system_cpu_percent": 38.9
+            },
+            {
+              "seconds": 4.016,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 14139,
+              "system_cpu_percent": 44.2
+            }
+          ],
+          "mixed_power": false,
+          "thermal_throttling": "not observable with available public sensors"
+        }
+      },
+      {
+        "arm": "candidate",
+        "repeat": 1,
+        "seconds": 4.3298318999950425,
+        "frames": 180,
+        "rate": "60/1",
+        "decoded": true,
+        "SSIM_vs_source": 0.997805,
+        "audio_codec": "aac",
+        "audio_sample_rate": 48000,
+        "AV_endpoint_difference_seconds": 0.0,
+        "conditions": {
+          "samples": [
+            {
+              "seconds": 0.0,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 14590,
+              "system_cpu_percent": 0.0
+            },
+            {
+              "seconds": 1.015,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 12816,
+              "system_cpu_percent": 47.9
+            },
+            {
+              "seconds": 2.015,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 12783,
+              "system_cpu_percent": 55.2
+            },
+            {
+              "seconds": 3.015,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 12774,
+              "system_cpu_percent": 40.7
+            },
+            {
+              "seconds": 4.031,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 14052,
+              "system_cpu_percent": 50.8
+            }
+          ],
+          "mixed_power": false,
+          "thermal_throttling": "not observable with available public sensors"
+        }
+      },
+      {
+        "arm": "baseline",
+        "repeat": 1,
+        "seconds": 4.354779599998437,
+        "frames": 180,
+        "rate": "60/1",
+        "decoded": true,
+        "SSIM_vs_source": 0.997805,
+        "audio_codec": "aac",
+        "audio_sample_rate": 48000,
+        "AV_endpoint_difference_seconds": 0.0,
+        "conditions": {
+          "samples": [
+            {
+              "seconds": 0.0,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 14497,
+              "system_cpu_percent": 0.0
+            },
+            {
+              "seconds": 1.016,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 12725,
+              "system_cpu_percent": 63.0
+            },
+            {
+              "seconds": 2.031,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 12732,
+              "system_cpu_percent": 49.0
+            },
+            {
+              "seconds": 3.031,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 12717,
+              "system_cpu_percent": 51.2
+            },
+            {
+              "seconds": 4.031,
+              "ac_power": true,
+              "battery_percent": 100,
+              "available_memory_MiB": 13957,
+              "system_cpu_percent": 38.7
+            }
+          ],
+          "mixed_power": false,
+          "thermal_throttling": "not observable with available public sensors"
+        }
+      }
+    ],
+    "summary": {
+      "baseline": {
+        "median_seconds": 4.23075450000033,
+        "worst_seconds": 4.354779599998437
+      },
+      "candidate": {
+        "median_seconds": 4.333976699999766,
+        "worst_seconds": 4.33812150000449
+      }
+    }
+  },
+  "reverse_arm_mapping": {
+    "baseline": "P0 candidate",
+    "candidate": "frozen 3.4.10"
+  },
+  "SDR_compiler_equality": {
+    "video_command_equal": true,
+    "video_graph_equal": true,
+    "audio_command_equal": true,
+    "audio_graph_equal": true
+  },
+  "installer": {
+    "upgrade_exit": 0,
+    "upgrade_preserved_projects_settings": true,
+    "uninstall_exit": 0,
+    "uninstall_preserved_projects_settings": true,
+    "reinstall_exit": 0,
+    "reinstall_preserved_projects_settings": true,
+    "removed_executable_shortcuts": true,
+    "protected_file_count": 1,
+    "msi_sha256": "32feee1ea0b3a3155822e2ff44a55361d442d8ce085d709914bbde6eeb71b8f5"
+  },
+  "SDR_export_final": {
+    "settings": {
+      "codec": "libx264",
+      "resolution": [
+        3840,
+        2160
+      ],
+      "fps": "60/1",
+      "preset": "veryfast",
+      "bitrate_Mbps": 35,
+      "crf": 20
+    },
+    "rows": [
+      {
+        "arm": "baseline",
+        "repeat": 0,
+        "seconds": 5.103559299997869,
+        "frames": 180,
+        "rate": "60/1",
+        "decoded": true,
+        "SSIM_vs_source": 0.997805,
+        "audio_codec": "aac",
+        "audio_sample_rate": 48000,
+        "AV_endpoint_difference_seconds": 0.0,
+        "conditions": {
+          "samples": [
+            {
+              "seconds": 0.0,
+              "ac_power": true,
+              "battery_percent": 97,
+              "available_memory_MiB": 14855,
+              "system_cpu_percent": 0.0
+            },
+            {
+              "seconds": 1.015,
+              "ac_power": true,
+              "battery_percent": 97,
+              "available_memory_MiB": 13121,
+              "system_cpu_percent": 56.4
+            },
+            {
+              "seconds": 2.031,
+              "ac_power": true,
+              "battery_percent": 97,
+              "available_memory_MiB": 13150,
+              "system_cpu_percent": 44.9
+            },
+            {
+              "seconds": 3.031,
+              "ac_power": true,
+              "battery_percent": 97,
+              "available_memory_MiB": 13151,
+              "system_cpu_percent": 39.2
+            },
+            {
+              "seconds": 4.047,
+              "ac_power": true,
+              "battery_percent": 97,
+              "available_memory_MiB": 13308,
+              "system_cpu_percent": 40.2
+            },
+            {
+              "seconds": 5.047,
+              "ac_power": true,
+              "battery_percent": 97,
+              "available_memory_MiB": 14401,
+              "system_cpu_percent": 23.7
+            }
+          ],
+          "mixed_power": false,
+          "thermal_throttling": "not observable with available public sensors"
+        }
+      },
+      {
+        "arm": "candidate",
+        "repeat": 0,
+        "seconds": 5.487338300001284,
+        "frames": 180,
+        "rate": "60/1",
+        "decoded": true,
+        "SSIM_vs_source": 0.997805,
+        "audio_codec": "aac",
+        "audio_sample_rate": 48000,
+        "AV_endpoint_difference_seconds": 0.0,
+        "conditions": {
+          "samples": [
+            {
+              "seconds": 0.0,
+              "ac_power": true,
+              "battery_percent": 97,
+              "available_memory_MiB": 14947,
+              "system_cpu_percent": 0.0
+            },
+            {
+              "seconds": 1.0,
+              "ac_power": true,
+              "battery_percent": 97,
+              "available_memory_MiB": 13194,
+              "system_cpu_percent": 52.2
+            },
+            {
+              "seconds": 2.016,
+              "ac_power": true,
+              "battery_percent": 97,
+              "available_memory_MiB": 13145,
+              "system_cpu_percent": 48.1
+            },
+            {
+              "seconds": 3.016,
+              "ac_power": true,
+              "battery_percent": 97,
+              "available_memory_MiB": 13145,
+              "system_cpu_percent": 47.8
+            },
+            {
+              "seconds": 4.031,
+              "ac_power": true,
+              "battery_percent": 97,
+              "available_memory_MiB": 13155,
+              "system_cpu_percent": 35.6
+            },
+            {
+              "seconds": 5.047,
+              "ac_power": true,
+              "battery_percent": 97,
+              "available_memory_MiB": 14412,
+              "system_cpu_percent": 29.5
+            }
+          ],
+          "mixed_power": false,
+          "thermal_throttling": "not observable with available public sensors"
+        }
+      }
+    ],
+    "summary": {
+      "baseline": {
+        "median_seconds": 5.103559299997869,
+        "worst_seconds": 5.103559299997869
+      },
+      "candidate": {
+        "median_seconds": 5.487338300001284,
+        "worst_seconds": 5.487338300001284
+      }
+    }
+  },
+  "source_installed_bundle": {
+    "qa_modules_excluded": true,
+    "approved_brand_assets": true,
+    "approved_exe_icon": true,
+    "server": true,
+    "render_engine": true,
+    "color_management": true,
+    "hdr_render": true,
+    "preview_cache": true,
+    "preview_dependencies": true,
+    "source_frames": true,
+    "timing": true,
+    "project_store": true,
+    "animation": true,
+    "sequences": true,
+    "video_effects": true,
+    "grading": true,
+    "audio_cache": true,
+    "audio_edit": true,
+    "waveform": true,
+    "motion": true,
+    "review_packet": true,
+    "timeline_proposal": true,
+    "ai_bridge": true,
+    "encoders": true,
+    "native_plan": true,
+    "native_playback": true,
+    "performance_profile": true,
+    "desktop_recovery": true,
+    "desktop": true,
+    "web": true,
+    "native_runtime": true,
+    "installed_native_runtime": true,
+    "installed_icon": true,
+    "installed_executable": true,
+    "installed_web": true
+  },
+  "capabilities": {
+    "ffmpeg": "ffmpeg version 9.0.2-full_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers",
+    "float32_probes": [
+      {
+        "filter": "pad",
+        "exit": 4294967274,
+        "bytes": 0,
+        "graph": "[0:v]zscale=pin=709:tin=709:min=709:rin=limited:p=2020:t=linear:m=gbr:r=full:npl=100,format=gbrpf32le,pad=128:72:32:18:color=black,format=gbrpf32le[out]"
+      },
+      {
+        "filter": "blend",
+        "exit": 0,
+        "bytes": 27648,
+        "graph": "[0:v]zscale=pin=709:tin=709:min=709:rin=limited:p=2020:t=linear:m=gbr:r=full:npl=100,format=gbrpf32le,split[a][b];[a][b]blend=all_expr=A*.5+B*.5,format=gbrpf32le[out]"
+      }
+    ],
+    "zscale_available": true,
+    "tonemap_available": true,
+    "libx265_10bit": true
+  },
+  "metadata_samples": [
+    {
+      "alias": "CameraA",
+      "width": 3840,
+      "height": 2160,
+      "codec": "hevc",
+      "rotation": -90,
+      "bitDepth": 10,
+      "chroma": "420",
+      "profile": "Main 10",
+      "primaries": "bt2020",
+      "transfer": "smpte2084",
+      "matrix": "bt2020nc",
+      "range": "tv",
+      "metadata_coverage": "stream_and_first_decoded_frame",
+      "dynamic_HDR10Plus_detected": true,
+      "preserved_side_data_count": 5
+    },
+    {
+      "alias": "CameraB",
+      "width": 3840,
+      "height": 2160,
+      "codec": "hevc",
+      "rotation": -90,
+      "bitDepth": 10,
+      "chroma": "420",
+      "profile": "Main 10",
+      "primaries": "bt2020",
+      "transfer": "smpte2084",
+      "matrix": "bt2020nc",
+      "range": "tv",
+      "metadata_coverage": "stream_and_first_decoded_frame",
+      "dynamic_HDR10Plus_detected": true,
+      "preserved_side_data_count": 5
+    },
+    {
+      "alias": "CameraC",
+      "width": 3840,
+      "height": 2160,
+      "codec": "h264",
+      "rotation": 0,
+      "bitDepth": 8,
+      "chroma": "420",
+      "profile": "High",
+      "primaries": "unknown",
+      "transfer": "unknown",
+      "matrix": "bt470bg",
+      "range": "pc",
+      "metadata_coverage": "stream_only_first_frame_unavailable",
+      "dynamic_HDR10Plus_detected": false,
+      "preserved_side_data_count": 0
+    }
+  ],
+  "qualification": "Scoped first HDR10 workflow only; slow CPU HDR rendering, variable SDR export timings, full HDR/HDR10+ and historical reliability/active-memory acceptance remain incomplete.",
+  "scope": "Only sanitized technical results. Camera originals, extracted frames, project/checkpoint contents, identifying paths and full metadata stay local. Initial poor trials and failed fixtures remain in the report and local QA history.",
+  "local_QA_attempt_ledger": [
+    {
+      "case": "capabilities",
+      "scope_notes": null,
+      "attempts": [
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 0.46661972999572754,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "case": "color-unit",
+      "scope_notes": null,
+      "attempts": [
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 42.515480518341064,
+          "reason": null
+        },
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 42.957629680633545,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "case": "HDR-export",
+      "scope_notes": null,
+      "attempts": [
+        {
+          "status": "failed",
+          "exit_code": 1,
+          "elapsed_seconds": 1.7903974056243896,
+          "reason": null
+        },
+        {
+          "status": "failed",
+          "exit_code": 1,
+          "elapsed_seconds": 1.6904804706573486,
+          "reason": null
+        },
+        {
+          "status": "failed",
+          "exit_code": 1,
+          "elapsed_seconds": 1.450878381729126,
+          "reason": null
+        },
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 3.1972968578338623,
+          "reason": null
+        },
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 4.038809537887573,
+          "reason": null
+        },
+        {
+          "status": "failed",
+          "exit_code": 1,
+          "elapsed_seconds": 0.36075735092163086,
+          "reason": null
+        },
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 4.208627939224243,
+          "reason": null
+        },
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 5.191737651824951,
+          "reason": null
+        },
+        {
+          "status": "failed",
+          "exit_code": 1,
+          "elapsed_seconds": 6.423748254776001,
+          "reason": null
+        },
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 6.642679929733276,
+          "reason": null
+        },
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 6.97446870803833,
+          "reason": null
+        },
+        {
+          "status": "failed",
+          "exit_code": 1,
+          "elapsed_seconds": 6.847663402557373,
+          "reason": null
+        },
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 8.666852712631226,
+          "reason": null
+        },
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 8.13408374786377,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "case": "mixed-composition",
+      "scope_notes": null,
+      "attempts": [
+        {
+          "status": "failed",
+          "exit_code": 1,
+          "elapsed_seconds": 2.6953060626983643,
+          "reason": null
+        },
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 7.305638551712036,
+          "reason": null
+        },
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 8.947970628738403,
+          "reason": null
+        },
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 18.146840572357178,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "case": "metadata",
+      "scope_notes": null,
+      "attempts": [
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 1.1424076557159424,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "case": "project",
+      "scope_notes": null,
+      "attempts": [
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 0.02201104164123535,
+          "reason": "Verified existing14-test output includes exact project roundtrip/cache test; installed HDR recovery also preserves all80 states. No test rerun."
+        }
+      ]
+    },
+    {
+      "case": "offline",
+      "scope_notes": null,
+      "attempts": [
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 46.23899745941162,
+          "reason": null
+        },
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 45.65770149230957,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "case": "JS",
+      "scope_notes": null,
+      "attempts": [
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 0.4045851230621338,
+          "reason": null
+        },
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 0.30612993240356445,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "case": "native",
+      "scope_notes": null,
+      "attempts": [
+        {
+          "status": "failed",
+          "exit_code": 1,
+          "elapsed_seconds": 125.1528971195221,
+          "reason": null
+        },
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 9.717042207717896,
+          "reason": null
+        },
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 9.059540748596191,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "case": "private-integrity",
+      "scope_notes": null,
+      "attempts": [
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 3.554316997528076,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "case": "performance",
+      "scope_notes": null,
+      "attempts": [
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 57.155436992645264,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "case": "recovery",
+      "scope_notes": null,
+      "attempts": [
+        {
+          "status": "failed",
+          "exit_code": 1,
+          "elapsed_seconds": 128.62294912338257,
+          "reason": null
+        },
+        {
+          "status": "failed",
+          "exit_code": 1,
+          "elapsed_seconds": 129.59427618980408,
+          "reason": null
+        },
+        {
+          "status": "failed",
+          "exit_code": 1,
+          "elapsed_seconds": 8.065079927444458,
+          "reason": null
+        },
+        {
+          "status": "failed",
+          "exit_code": 1,
+          "elapsed_seconds": 8.810754299163818,
+          "reason": null
+        },
+        {
+          "status": "failed",
+          "exit_code": 1,
+          "elapsed_seconds": 8.858492374420166,
+          "reason": null
+        },
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 10.11972689628601,
+          "reason": null
+        },
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 9.818034648895264,
+          "reason": null
+        },
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 10.20756721496582,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "case": "build",
+      "scope_notes": null,
+      "attempts": [
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 92.01314496994019,
+          "reason": null
+        },
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 121.42906618118286,
+          "reason": null
+        },
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 99.76635193824768,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "case": "bundle",
+      "scope_notes": null,
+      "attempts": [
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 2.448781728744507,
+          "reason": null
+        },
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 1.8394775390625,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "case": "lifecycle",
+      "scope_notes": "Attempt1 used retained3.4.10 MSI and is not P0 candidate qualification; correct3.5 MSI requires separate lifecycle plus installed/source equality before UI testing.",
+      "attempts": [
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 12.617027044296265,
+          "reason": null
+        },
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 28.437925577163696,
+          "reason": null
+        },
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 28.43233036994934,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "case": "private-integrity-before",
+      "scope_notes": null,
+      "attempts": [
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 3.374605655670166,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "case": "native-precision",
+      "scope_notes": null,
+      "attempts": [
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 2.4379947185516357,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "case": "bundle-source",
+      "scope_notes": null,
+      "attempts": [
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 0.9142191410064697,
+          "reason": null
+        },
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 1.0417182445526123,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "case": "HDR-UHD",
+      "scope_notes": null,
+      "attempts": [
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 22.888850450515747,
+          "reason": null
+        },
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 44.706961154937744,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "case": "native-SDR-installed",
+      "scope_notes": null,
+      "attempts": [
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 15.099880695343018,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "case": "performance-baseline30",
+      "scope_notes": null,
+      "attempts": [
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 78.4112811088562,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "case": "performance-candidate30",
+      "scope_notes": null,
+      "attempts": [
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 77.48091626167297,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "case": "performance-reverse",
+      "scope_notes": null,
+      "attempts": [
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 41.23394727706909,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "case": "SDR-compiler-equality",
+      "scope_notes": null,
+      "attempts": [
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 0.5953402519226074,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "case": "color-save-fault",
+      "scope_notes": null,
+      "attempts": [
+        {
+          "status": "failed",
+          "exit_code": 1,
+          "elapsed_seconds": 0.22598028182983398,
+          "reason": null
+        },
+        {
+          "status": "failed",
+          "exit_code": 1,
+          "elapsed_seconds": 0.2317490577697754,
+          "reason": null
+        },
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 0.22600364685058594,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "case": "performance-final",
+      "scope_notes": null,
+      "attempts": [
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 23.841257572174072,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "case": "publication-working",
+      "scope_notes": null,
+      "attempts": [
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 3.536512851715088,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "case": "mixed-8bit",
+      "scope_notes": null,
+      "attempts": [
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 3.2691714763641357,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "case": "binding-final",
+      "scope_notes": null,
+      "attempts": [
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 0.3955068588256836,
+          "reason": null
+        }
+      ]
+    }
+  ]
+}

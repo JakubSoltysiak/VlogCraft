@@ -1,8 +1,10 @@
-# VlogCraft Studio 3.4 for Windows
+# VlogCraft Studio for Windows
 
 > **[MASTER TO-DO LIST & PRODUCT ROADMAP](TODO.md)** — shared living backlog for the owner, Codex and ChatGPT. Check priorities and update it with each feature PR.
 
-The **3.4.10 stabilization investigation** continues on [draft PR #7](https://github.com/JakubSoltysiak/VlogCraft/pull/7). The local 3.4.10 development installer includes a verified PCM preparation lock correction and reduced meter allocation churn. Recovery, exact 80-state history, fallback, offline regression and installer checks pass within their documented scope. Historical long stalls, intermittent underruns and active memory growth remain acceptance blockers. [Measured findings and limits](docs/ROOT_CAUSE_3_4_10.md). This is not a stable release.
+The **P0 HDR color foundation** is a development draft on [PR #8](https://github.com/JakubSoltysiak/VlogCraft/pull/8), stacked on unmerged PR #7. It adds explicit source/working/output color contracts, float32 linear composition and a first supported HDR10 HEVC workflow. Supported operations and measured precision, display, export and recovery limits are in the [color report](docs/HDR_COLOR_FOUNDATION.md). HLG, Samsung Log, HDR10+ authoring, calibrated monitoring and complete HDR effect parity remain unfinished. This is not a stable release or Kenya-project readiness approval.
+
+The preserved **3.4.10 stabilization checkpoint** on [draft PR #7](https://github.com/JakubSoltysiak/VlogCraft/pull/7) includes the verified PCM preparation lock correction and reduced meter allocation churn. Historical long stalls, intermittent underruns and active memory growth remain acceptance blockers. [Measured findings](docs/ROOT_CAUSE_3_4_10.md).
 
 The **3.4.9 development candidate** provides bounded WebView recovery, exact80-state draft/undo restoration, compressed checkpoints, explicit audio-worklet disposal and Windows process cleanup. It is [draft PR #6](https://github.com/JakubSoltysiak/VlogCraft/pull/6), stacked on PR #5. **Qualification remains incomplete:** long playback tails, a diagnostic audio failure and continuing WebView growth block production HDR adoption. [Actual results and every retained failure](docs/RELIABILITY_MEMORY_3_4_9.md), [verification](VERIFICATION.md), [feature matrix](FEATURES.md).
 

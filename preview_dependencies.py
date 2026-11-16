@@ -38,7 +38,7 @@ def project(state,first,last,width,proxy_paths=None):
         if original['id'] not in used:continue
         asset=deepcopy(original);path=Path(asset['path']);identity=file_identity(path)
         proxy=(proxy_paths or {}).get(asset['id'])
-        if proxy and not asset.get('hdr'):
+        if proxy and not asset.get('hdr') and not state['output'].get('color'):
             candidate=Path(proxy)
             # An older derivative cannot represent a subsequently changed original.
             if candidate.is_file() and (not path.is_file() or candidate.stat().st_mtime_ns>=path.stat().st_mtime_ns):
@@ -50,6 +50,7 @@ def project(state,first,last,width,proxy_paths=None):
                         'height':max(2,round(output['height']*scale/2)*2),'fps':str(fps)},
               'tracks':tracks,'assets':assets,
               'luts':{key:deepcopy(state.get('luts',{}).get(key)) for key in sorted(luts)}}
+    if output.get('color'):snapshot['output']['color']=deepcopy(output['color'])
     payload=[FORMAT,first,last,snapshot,files]
     key=hashlib.sha256(json.dumps(payload,sort_keys=True,allow_nan=False).encode()).hexdigest()
     return key,snapshot

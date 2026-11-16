@@ -1,0 +1,22 @@
+{
+  "milestone": "P0 HDR color foundation",
+  "baseline_commit": "83e6afbaffe798cdabbbe48ded8a75ef711c2237",
+  "qualification": "partial: scoped HDR10 correctness/installed recovery pass; slow HDR CPU and variable SDR timings remain open",
+  "report": "docs/HDR_COLOR_FOUNDATION.md",
+  "scope": "First HDR10 subset. Initial paired SDR native measurements at37d96da; final HDR-only precision/save-fault refinements retain the unchanged native clock and SDR compiler. Final-build SDR export pair is retained with its7.52percent timing trigger. No protected ten-run/endurance or calibrated display acceptance.",
+  "source_fingerprint": "3c47fe5c3441ed75bd9304b9d1248b98884a66a70a959ab3f097ecea40833226",
+  "fingerprint_method": "SHA256 sorted relevant relative path + NUL + LF-normalized source + NUL",
+  "benchmark_protocol_fingerprint": "7e8235a176221f5d52fd15f897dd9b2c12909ca32659937e19a3e2c992731f51",
+  "benchmark_protocol_fingerprint_method": "SHA256 sorted benchmark driver/observer relative path + NUL + LF-normalized source + NUL",
+  "production_checkpoint": "3487af7e4035463e52ed78bdcd4099d3f890e221",
+  "evidence": "docs/benchmarks/p0-color/qualification.json",
+  "installer_version": "3.5.1",
+  "installer_sha256": "32feee1ea0b3a3155822e2ff44a55361d442d8ce085d709914bbde6eeb71b8f5",
+  "blockers": [
+    "Slow high-precision CPU HDR rendering",
+    "Variable SDR export timings:6.75percent initial and7.52percent final slowdown triggers, opposite reversed cohort",
+    "Full frame-indexed HDR10+ metadata and regeneration missing",
+    "HLG/Log, HDR geometry/effect/gamut/monitoring breadth unqualified",
+    "Historical4.629s stall/657underruns and active memory plateau remain unresolved"
+  ]
+}

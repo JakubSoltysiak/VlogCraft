@@ -152,6 +152,12 @@ def _opaque_base(video,assets,start,end,fps,width,height):
 
 
 def segment_command(state, start, end, target, jobdir, quality='final', stream=None):
+    if not state['output'].get('color') and stream!='audio' and any(c.get('inputColor') or c.get('hdrExposure',0) for c in sequences.clips(state['tracks'])):
+        raise ValueError('Technical input overrides/linear exposure require an explicit managed color setup')
+    if state['output'].get('color') and stream!='audio':
+        if stream is None and quality!='frame':raise ValueError('Managed color requires independently drained video/audio rendering')
+        import hdr_render
+        return hdr_render.command(state,start,end,target,jobdir,quality)
     state=sequences.playback(state)
     assets={a['id']:a for a in state['assets']}
     w=int(state['output']['width']); h=int(state['output']['height']); fps=timing.rate(state['output']['fps'])
@@ -353,8 +359,9 @@ def render(state, output, work, *, review=False, on_progress=None, cancelled=lam
     part=jobdir/'delivery.partial.mp4'
     if part.exists():part.unlink()
     try:
+        color_timescale=['-movie_timescale','120000','-video_track_timescale','120000'] if state['output'].get('color') else []
         runner(['ffmpeg','-hide_banner','-nostdin','-loglevel','error','-y',
-               '-f','concat','-safe','0','-i',str(files),'-c:v','copy','-c:a','aac','-b:a','192k','-movflags','+faststart',str(part)],str(jobdir))
+               '-f','concat','-safe','0','-i',str(files),'-c:v','copy','-c:a','aac','-b:a','192k',*color_timescale,'-movflags','+faststart',str(part)],str(jobdir))
         if cancelled():raise RuntimeError('Export cancelled')
         os.replace(part,target)
     finally:
