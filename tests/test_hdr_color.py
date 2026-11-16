@@ -75,7 +75,8 @@ class HDRDecodedTests(unittest.TestCase):
  def test_known_primary_conversion_and_colored_hdr_luminance(self):
   with tempfile.TemporaryDirectory() as folder:
    root=Path(folder)
-   for label,asset,expected,tolerance in [('red709',source(root,'red709',sdr=True,rgb=[1,0,0]),np.array([.627404,.069097,.016391])*100,2),('colorPQ',source(root,'colorPQ',rgb=[1000,100,10]),np.array([1000,100,10]),18)]:
+   # zimg display-referred REC_709 selects ideal-black BT.1886, not inverse camera OETF.
+   for label,asset,expected,tolerance in [('red709',source(root,'red709',sdr=True,rgb=[1,0,0]),np.array([.627404,.069097,.016391])*100,2),('gray709',source(root,'gray709',sdr=True,rgb=[.5,.5,.5]),np.full(3,.5**2.4*100),1),('colorPQ',source(root,'colorPQ',rgb=[1000,100,10]),np.array([1000,100,10]),18)]:
     s=project([asset]);out=root/(label+'.mp4');engine.render(s,out,root/(label+'job'))
     data=run(['ffmpeg','-v','error','-i',str(out),'-frames:v','1','-pix_fmt','yuv444p10le','-f','rawvideo','pipe:1']).stdout
     planes=np.frombuffer(data,dtype='<u2').reshape(3,72,128).mean(axis=(1,2));y=(planes[0]-64)/876;cb=(planes[1]-512)/896;cr=(planes[2]-512)/896
@@ -90,12 +91,20 @@ class HDRDecodedTests(unittest.TestCase):
    out=root/'trim.mp4';engine.render(s,out,root/'job');data=run(['ffmpeg','-v','error','-i',str(out),'-pix_fmt','yuv444p10le','-f','rawvideo','pipe:1']).stdout
    frames=np.frombuffer(data,dtype='<u2').reshape(-1,3,72,128);self.assertEqual(len(frames),15)
    got=color.pq_to_nits((frames[:,0].mean(axis=(1,2))-64)/876);np.testing.assert_allclose(got,[100]*3+[500]*9+[1000]*3,rtol=.03,atol=4)
+   s['tracks'][0]['clips'][0]['speed']=2;fast=root/'speed.mp4';engine.render(s,fast,root/'speedjob')
+   raw=run(['ffmpeg','-v','error','-i',str(fast),'-pix_fmt','yuv444p10le','-f','rawvideo','pipe:1']).stdout
+   f=np.frombuffer(raw,dtype='<u2').reshape(-1,3,72,128);self.assertEqual(len(f),8)
+   got=color.pq_to_nits((f[:,0].mean(axis=(1,2))-64)/876);np.testing.assert_allclose(got,[100]*2+[500]*4+[1000]*2,rtol=.03,atol=4)
  def test_right_angle_orientation_preserves_float32_pixel_values(self):
   with tempfile.TemporaryDirectory() as folder:
-   root=Path(folder);s=project([source(root,'rot',ramp=True)]);s['assets'][0]['rotation']=-90;s['output'].update(width=72,height=128)
-   out=root/'portrait.mp4';engine.render(s,out,root/'rotjob');p=probe(out);v=next(x for x in p['streams'] if x['codec_type']=='video');self.assertEqual((v['width'],v['height']),(72,128))
-   self.assertFalse(any(x['side_data_type']=='Display Matrix' for f in p['frames'] for x in f.get('side_data_list',[])))
-   y=decoded_y(out,72,128).mean(axis=1);self.assertLess(np.max(abs(y-np.linspace(64,940,128).round())),10)
+   root=Path(folder);asset=source(root,'rot',ramp=True)
+   for angle,w,h in [(-90,72,128),(90,72,128),(180,128,72)]:
+    s=project([copy.deepcopy(asset)]);s['assets'][0]['rotation']=angle;s['output'].update(width=w,height=h)
+    out=root/(str(angle)+'.mp4');engine.render(s,out,root/('rotjob'+str(angle)));p=probe(out);v=next(x for x in p['streams'] if x['codec_type']=='video');self.assertEqual((v['width'],v['height']),(w,h))
+    self.assertFalse(any(x['side_data_type']=='Display Matrix' for f in p['frames'] for x in f.get('side_data_list',[])))
+    y=decoded_y(out,w,h).mean(axis=1 if w==72 else 0);expected=np.linspace(64,940,128).round()
+    if angle!=-90:expected=expected[::-1]
+    self.assertLess(np.max(abs(y-expected)),10)
  def test_unknown_mastering_does_not_invent_display_or_content_light_values(self):
   with tempfile.TemporaryDirectory() as folder:
    root=Path(folder);s=project([source(root,'unknown')]);s['output']['color']={k:v for k,v in CONTRACT.items() if k not in ('mastering','maxCLL','maxFALL')}
@@ -138,6 +147,9 @@ class HDRDecodedTests(unittest.TestCase):
    for label,assets,expected in [('pq',[source(root,'high',1000),source(root,'low',100)],550),('mixed',[source(root,'sdr',sdr=True),source(root,'pq',1000)],550)]:
     s=project(assets);out=root/(label+'.mp4');engine.render(s,out,root/label)
     y=float(np.median(decoded_y(out,128,72)));n=float(color.pq_to_nits((y-64)/876));self.assertLess(abs(n-expected),16,(label,n))
+   s=project([assets[-1]]);s['tracks'][0]['clips'][0]['keys']={'opacity':[{'time':0,'value':0,'mode':'linear'},{'time':.5,'value':1,'mode':'linear'}]};out=root/'opacity-keys.mp4';engine.render(s,out,root/'keyjob')
+   raw=run(['ffmpeg','-v','error','-i',str(out),'-pix_fmt','yuv444p10le','-f','rawvideo','pipe:1']).stdout;f=np.frombuffer(raw,dtype='<u2').reshape(-1,3,72,128)
+   self.assertLessEqual(int(f[0,0].max()),66);n=float(color.pq_to_nits((float(f[6,0].mean())-64)/876));self.assertLess(abs(n-500),16)
  def test_tone_mapped_monitor_is_sdr_and_not_relabelled_hdr(self):
   with tempfile.TemporaryDirectory() as folder:
    root=Path(folder);s=project([source(root,'monitor',1000)]);out=root/'monitor.mp4'

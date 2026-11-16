@@ -20,6 +20,8 @@ PROTOCOL_FILES=(
  'benchmarks/root_cause_probe.py','benchmarks/flight_recorder.js',
  'benchmarks/allocation_summary.py','benchmarks/stabilization_evidence.py',
  'benchmarks/color_qualification.py','tests/test_hdr_color.py',
+ 'benchmarks/color_native_preview.py','tests/windows_color.py',
+ 'benchmarks/color_uhd.py',
  'tests/performance.py','tests/gpu_metrics.py')
 
 def fingerprint(files=None):

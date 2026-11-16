@@ -15,7 +15,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 BUILD = ROOT / 'build'
 RELEASE = ROOT / 'release'
-VERSION = '3.5.0'
+VERSION = '3.5.1'
 WIX_NS = 'http://schemas.microsoft.com/wix/2006/wi'
 UPGRADE_CODE = '09FA364C-4D7B-4B43-A1CF-7D82A0B62F02'
 ET.register_namespace('', WIX_NS)

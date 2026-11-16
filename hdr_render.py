@@ -10,7 +10,7 @@ def command(state,start,end,target,jobdir,quality='final'):
  video,_=engine.active_clips(state,start,end);assets={a['id']:a for a in state['assets']}
  cmd=['ffmpeg','-hide_banner','-nostdin','-loglevel','error','-noauto_conversion_filters','-filter_complex_threads','1','-y',
       '-f','lavfi','-i',f'color=black:s={w}x{h}:r={fps}:d={engine._num(end-start)}']
- linear='zscale=pin=709:tin=709:min=709:rin=limited:p=2020:t=linear:m=gbr:r=full:npl=100,format=gbrpf32le'
+ linear='zscale=agamma=0:pin=709:tin=709:min=709:rin=limited:p=2020:t=linear:m=gbr:r=full:npl=100,format=gbrpf32le'
  filters=['[0:v]'+linear+'[base0]'];back='base0'
  for n,(_,c) in enumerate(video,1):
   if c.get('kind')!='video':raise ValueError('Managed HDR currently supports video layers; titles/stills require a qualified HDR implementation')
@@ -30,8 +30,8 @@ def command(state,start,end,target,jobdir,quality='final'):
   cmd+=['-noautorotate'];engine._media_input(cmd,a['path'],'video',seek,c.get('speed',1),end-start,fps,'video')
   orientation={0:'',90:'transpose=clock,',180:'hflip,vflip,',270:'transpose=cclock,'}[angle]
   filters.append(f'[{n}:v]setpts=PTS/{engine._num(c.get("speed",1))},fps={fps}:start_time=0:round=up,'
-    f'zscale=pin={p}:tin={t}:min={m}:rin={r}:p=2020:t=linear:m=gbr:r=full:npl=100,format=gbrpf32le,'
-    f'{orientation}setsar=1,zscale=w={w}:h={h}:filter=bilinear,format=gbrpf32le,'
+    f'zscale=agamma=0:pin={p}:tin={t}:min={m}:rin={r}:p=2020:t=linear:m=gbr:r=full:npl=100,format=gbrpf32le,'
+    f'{orientation}setsar=1,zscale=agamma=0:w={w}:h={h}:filter=bilinear,format=gbrpf32le,'
     f'trim=end_frame={timing.frame_at(until,fps)-timing.frame_at(at,fps)},setpts=PTS+{engine._num(delay)}/TB[lay{n}]')
   alpha=re.sub(r'\bt\b','T',animation.expression(c,'opacity',start));off=start-c['position']
   if c.get('fadeIn',0):alpha+=f'*min(1,max(0,(T+{engine._num(off)})/{engine._num(c["fadeIn"])}))'
@@ -43,9 +43,9 @@ def command(state,start,end,target,jobdir,quality='final'):
  tail=',sidedata=mode=delete'
  hdr=contract['output']=='hdr10' and quality=='final'
  if hdr:
-  tail+=',zscale=pin=2020:tin=linear:min=gbr:rin=full:p=2020:t=smpte2084:m=2020_ncl:r=limited:npl=100:dither=error_diffusion,format=yuv420p10le'
+  tail+=',zscale=agamma=0:pin=2020:tin=linear:min=gbr:rin=full:p=2020:t=smpte2084:m=2020_ncl:r=limited:npl=100:dither=error_diffusion,format=yuv420p10le'
  else:
-  tail+=',zscale=pin=2020:tin=linear:min=gbr:rin=full:p=709:t=linear:m=gbr:r=full,format=gbrpf32le,tonemap=hable:desat=0:peak=100,zscale=pin=709:tin=linear:min=gbr:rin=full:p=709:t=709:m=709:r=limited:npl=100:dither=error_diffusion,format=yuv420p'
+  tail+=',zscale=agamma=0:pin=2020:tin=linear:min=gbr:rin=full:p=709:t=linear:m=gbr:r=full,format=gbrpf32le,tonemap=hable:desat=0:peak=100,zscale=agamma=0:pin=709:tin=linear:min=gbr:rin=full:p=709:t=709:m=709:r=limited:npl=100:dither=error_diffusion,format=yuv420p'
  filters.append(f'[{back}]trim=end_frame={last-first}{tail}[finished]')
  script=Path(jobdir)/('hdr_graph_'+Path(target).stem+'.txt');script.write_text(';\n'.join(filters)+'\n',encoding='utf8')
  cmd+=['-/filter_complex',str(script),'-map','[finished]','-an','-frames:v',str(1 if quality=='frame' else last-first),'-r',str(fps)]

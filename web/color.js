@@ -24,8 +24,9 @@ function initColorControls(){
    const color=await validatedColorFromControls();
    // Validate through the normal save path before showing the chosen setup as accepted.
    const proposed={...state.output,color,encoder:color?.output==='hdr10'?'libx265':state.output.encoder};
-   const old=structuredClone(state.output);snapshot();state.output=proposed;save();
-   try{await flushSave();}catch(e){state.output=old;undoStack.pop();throw e;}
+   // A failed disk publication retains the unsaved edit, undo and recovery draft,
+   // as ordinary timeline edits do; never roll back only the live view.
+   snapshot();state.output=proposed;save();await flushSave();
    if(color)$('playbackEngine').value='rendered';
    redraw();syncPreview(true);toast(color?'Managed color applied. Composited monitoring is SDR tone-mapped; native PQ remains opt-in.':'Legacy SDR setup applied.');
   }catch(error){toast(error.message,true);}
