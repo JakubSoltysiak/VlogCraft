@@ -144,7 +144,10 @@ class HDRDecodedTests(unittest.TestCase):
  def test_linear_opacity_blend_and_sdr_input_reference_white(self):
   with tempfile.TemporaryDirectory() as folder:
    root=Path(folder)
-   for label,assets,expected in [('pq',[source(root,'high',1000),source(root,'low',100)],550),('mixed',[source(root,'sdr',sdr=True),source(root,'pq',1000)],550)]:
+   sdr=source(root,'sdr',sdr=True);eight=root/'sdr8.mp4';run(['ffmpeg','-v','error','-y','-i',sdr['path'],'-vf','format=yuv420p,setparams=range=limited:color_primaries=bt709:color_trc=bt709:colorspace=bt709','-c:v','libx264','-preset','ultrafast',str(eight)])
+   sdr8=dict(id='eight',kind='video',name='SDR8',path=str(eight),**server.probe(eight));self.assertEqual(sdr8['colorMetadata']['bitDepth'],8)
+   pq=source(root,'pq',1000)
+   for label,assets,expected in [('pq',[source(root,'high',1000),source(root,'low',100)],550),('mixed',[sdr,pq],550),('mixed8',[sdr8,pq],550)]:
     s=project(assets);out=root/(label+'.mp4');engine.render(s,out,root/label)
     y=float(np.median(decoded_y(out,128,72)));n=float(color.pq_to_nits((y-64)/876));self.assertLess(abs(n-expected),16,(label,n))
    s=project([assets[-1]]);s['tracks'][0]['clips'][0]['keys']={'opacity':[{'time':0,'value':0,'mode':'linear'},{'time':.5,'value':1,'mode':'linear'}]};out=root/'opacity-keys.mp4';engine.render(s,out,root/'keyjob')

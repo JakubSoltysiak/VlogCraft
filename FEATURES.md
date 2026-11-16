@@ -46,7 +46,7 @@ The following 3.4.8 table retains the earlier qualification and the first scoped
 | PCM/audio clock | Tested subset | Exact 6,000,000 samples in 125 s, zero underruns; mono/stereo only, source offsets retained. Acoustic/hour-long/device-change drift pending. |
 | PTS/VFR/rational seek | Tested subset | Real-camera bounded PTS seeks and 60000/1001 transport; pause/resume/cancel. Full corpus/long VFR pending. |
 | Transforms/keys/nests | Partial | Position/scale/opacity/rotation and supported source-time keys; flatten existing nests. Reference fallback for unsupported visual operations. |
-| FP16/PQ/HDR10+ | Partial | 877 ramp levels; linear PQ above SDR white; side data retained at decode. Inactive-HDR display rejection verified. No HLG/Log/mixed-color transform, HDR10+ mastering or HDR export. |
+| FP16/PQ/HDR10+ | Partial | Native877-level precision and PQ/scRGB are retained. P0 adds a managed float32 reference/HDR10 slice below. Mixed color is reference-only; HLG/Log, calibrated monitoring and HDR10+ mastering remain unqualified. |
 | Native GPU export | Missing | Existing original-media FFmpeg CPU/hardware fallback remains the delivery engine. |
 | Actual device reset / calibrated HDR | Missing qualification | Owned-child kill/fallback/retry differs from GPU removal; no physical HDR scanout claim. |
 
@@ -65,7 +65,7 @@ The following 3.4.8 table retains the earlier qualification and the first scoped
 | Transitions and compositing | Partial | Layered alpha, titles, fades, overlap dissolves, directional entrance wipes, chroma key and feathered ellipse. Decoded checks cover visible geometry and wipe direction. Transition handles, arbitrary masks, blend modes, spill suppression and motion-blurred transitions remain. |
 | Motion and stabilization | Partial | Feature consensus with forward/backward optical flow checks, translation stabilization, robust affine camera-roll estimation, smoothing, zoom compensation and editable keys. Synthetic encoded translation and roll checks pass. Wildlife occlusion, corrective anchors, planar tracking, rolling shutter and perspective stabilization remain. |
 | SDR grading and scopes | Partial | RGB/master five-point curves, three tonal wheels, validated embedded 3D cube LUTs, shared trilinear transforms, paused luma histogram/waveform/vectorscope from the reference. Imported LUT and curve tests pass. Color management, calibrated scopes, skin targets, secondary qualifiers and external monitoring remain. |
-| HDR | Partial | PQ/HLG detection and original-media SDR tone mapping. HDR metadata, proxy parity, reference-chart accuracy and HDR mastering remain unqualified. |
+| HDR | Partial | Explicit managed PQ/Rec.709 working/output choices and tested HDR10 subset below. Legacy SDR tone mapping remains. Complete metadata indexing, HDR effects, gamut management and mastering acceptance remain open. |
 | Audio | Partial | Multitrack mixing, gain, pan, shelves, compressor, peak meter, peak normalization, dialogue-energy ducking and editable gain curves. Original-audio decoded tests cover pan, normalization and ducking. Interactive processors differ from FFmpeg. Loudness/LUFS, noise reduction, sample-locked transport, buses and WAV delivery remain. |
 | Offline AI Director | Tested | All-track/nested review manifest, actual composited selected or sampled frames, track-addressed properties, curves, locks and parent checks, approval token bound to exact state, undo and redo. Original media stays local. Creative quality depends on the review assistant and material supplied. |
 | Optional online AI | Partial | Existing opt-in legacy main-track request preserved, with no required credential for the editor. Live requests and full multitrack online analysis are unqualified. Speech recognition and autonomous motion-job proposals remain missing. |
@@ -78,6 +78,8 @@ The following 3.4.8 table retains the earlier qualification and the first scoped
 | Professional finishing | Missing | Multicam, AAF/OTIO/XML, ProRes/DNxHR intermediates, batch/range delivery, collaborative editing and managed external monitoring. |
 
 ## Next development priorities
+
+The owner authorized the independent P0 color slice while the stabilization gates stay open. The next color work follows the measured scope below; it does not close those gates.
 
 1. Incrementally develop the measured native GPU candidate behind parity/fallback gates (docs/ARCHITECTURE_DECISION.md). Replace browser cut scheduling with a continuous decoder/compositor transport behind the current project and command model. Qualify one-hour A/V drift, VFR/B-frame boundaries, proxies and managed color.
 2. Add a repeatable camera-media corpus and clean Windows/driver tests. Qualify independent large originals, MTS/HEVC/AV1, DPI, long renders, cancellation and storage failures.
@@ -93,3 +95,19 @@ The following 3.4.8 table retains the earlier qualification and the first scoped
 | Reduced meter allocation churn | Implemented, tested | Same peak arithmetic and cadence; two meter tests pass. Matched 90s sampled profiles attribute 62,655,300 bytes before and no samples after to updateMeter. This is not a zero-allocation or retained-memory claim. |
 | Recovery and exact checkpoint/history preservation | Implemented, tested subset | Installed renderer/browser fault injection preserves all 80 undo states, draft, tracks/output and paused position. |
 | Consistent long-session playback and bounded active memory | Partial, acceptance blocked | Two short matched pairs and one old-host 420s diagnostic do not qualify full-size 4K60 or explain historical 4.629s stalls/657 underruns. Active memory plateau remains unproven. |
+
+## P0 HDR color foundation — 16 November 2026
+
+| Capability | Status | Actual boundary |
+|---|---|---|
+| Versioned technical color/project contract | Implemented, tested subset | Legacy projects retain SDR behavior. Explicit input profile/range/pixel-aspect overrides, float32 working space and output/metadata decisions survive save/reopen, undo/redo and80-state renderer/browser recovery. |
+| High-precision managed composition | Implemented, tested subset | PQ + display-referred Rec.709/BT.1886 to linear Rec.2020; gamma approximation disabled. Full-frame resize, exact right-angle source orientation, trims, rational timing, VFR holds/2× speed, nested tracks, opacity keys/fades and exposure. No8-bit image intermediate in this graph. |
+| HDR10 delivery | Implemented, tested subset | Software HEVC Main10,10-bit4:2:0/PQ/Rec.2020, static reference metadata and actual decoded image checks. Full-resolution portrait2160×3840/60 tested for12frames; not a sustained throughput or broad mastering qualification. CPU path is slow. |
+| HDR monitoring | Partial | Actual short native PQ/FP16/scRGB display/PCM check on the local active HDR output; uncalibrated and limited native effect subset. Explicit SDR tone-mapped reference/composited monitoring uses the same linear composition. |
+| HDR10+ input metadata | Partial | Actual first-frame ST2094-40 detection/sample preservation and original-bitstream association, including private PQ originals. Native decode retention remains. Full frame-indexed extraction/retiming is missing. |
+| HDR10+ authoring | Missing | Explicit requests fail; no automatic HDR10 downgrade. Regeneration after picture changes and standards-level decoded validation remain required. |
+| HDR masks/LUTs/titles/arbitrary spatial effects | Missing in managed reference/export | Existing SDR tools and the experimental native transform subset remain functional. Unsupported HDR operations fail explicitly rather than silently using SDR maths. |
+| HLG / Samsung Log /12-bit corpus | Representation only / unqualified | Future input identifiers persist; HLG/Log rendering fails clearly. Verified input corpus is8/10-bit; native P010 upload does not establish preservation above10-bit. |
+| Full production adoption | Blocked | Historical playback/audio/memory gates, HDR parity, gamut/clipping/nits scopes, calibrated external monitoring, long-form sync, hardware/device breadth and release obligations remain open. |
+
+[Detailed results, retained failures and references](docs/HDR_COLOR_FOUNDATION.md).

@@ -2,13 +2,15 @@
 
 **Canonical living document for the owner, ChatGPT, and Codex.**  
 **Project:** [JakubSoltysiak/VlogCraft](https://github.com/JakubSoltysiak/VlogCraft)  
-**Last consolidated:** 2026-11-15\
+**Last consolidated:** 2026-11-16\
 **Source of requirements:** discussions about VlogCraft Studio, the Kenya travel vlog, Samsung Galaxy footage, the 3.0–3.4 development history, and GitHub PR #1.  
-**Current development state:** 3.3 verified baseline on main; **3.4.9 reliability is a stacked development draft on codex/studio-3.4.9-reliability**, based on verified3.4.8 / unmerged PR #5. PRs #1–#5 and historical tags remain untouched. Scoped passing results do not make the native engine production-ready.
+**Current development state:** 3.3 verified baseline on main; **P0 HDR color foundation is a stacked development draft on codex/p0-hdr-color-foundation / PR #8**, from3.4.10 checkpoint83e6afb. PRs #1–#7 and historical tags remain untouched. The owner's independent HDR milestone does not close outstanding reliability or production-HDR gates.
 
 > **Mission:** A free, private, offline-first, genuinely capable Windows filmmaking editor. Give one person Premiere-like creative freedom and professional picture/audio quality without cloud processing, subscriptions, arbitrary source-size limits, or unnecessary complexity. Prioritize editing actual travel/wildlife footage over collecting features. It should be delightful for a casual annual vlog yet powerful when needed.
 
 ## 3.4.9 reliability acceptance — 14 November 2026
+
+Current P0 color work is recorded below under VC-HDR-011 onward. This section preserves the earlier3.4.9 milestone scope and its open acceptance failures.
 
 [Evidence and limitations](docs/RELIABILITY_MEMORY_3_4_9.md). Canonical `origin/main` was fetched/read at `dbfb843`; its future AI/profile/audio requirements are retained. No HDR or AI feature work belongs in this milestone.
 
@@ -143,6 +145,13 @@ See [implementation and capability matrix](docs/NATIVE_PLAYBACK_3_4_6.md) and [m
 ## P1 — HDR-first professional picture and Galaxy-native workflows
 
 ### Real HDR, not just an HDR-labelled file
+
+Owner-authorized P0 foundation update,16November2026: [scope/results](docs/HDR_COLOR_FOUNDATION.md), [draft PR #8](https://github.com/JakubSoltysiak/VlogCraft/pull/8). The broad VC-HDR-001–010 items remain unchecked because a tested first slice does not complete them. Existing VC-REL349/3410 blockers are preserved.
+
+- [x] **VC-HDR-011 — First versioned technical color contract, tested scope.** Non-destructive input profile/range/pixel-aspect decisions, display-linear Rec.2020 float32, explicit SDR/HDR10 output and metadata.14 focused HDR tests and new color-control/fault tests; old projects retain legacy behavior. Exact80-state color/draft/history recovery is tested in the installed workflow.
+- [x] **VC-HDR-012 — First bounded HDR10 reference workflow, tested scope.** PQ/Rec.709 sources, full-frame resize, right-angle orientation, trim/VFR/constant-speed timing, nested tracks, opacity/fades/exposure; actual Main10/PQ/2020 decoded precision/static signalling and bounded real-camera exports. Unsupported HDR operations error. Full-size portrait UHD60 test is12frames, not realtime or long-form acceptance.
+- [ ] **VC-HDR-013 — Complete HDR10+ input index and authoring.** Current first-frame sample/original-bitstream association is not a full per-frame track. Implement cancellable extraction and source-PTS mapping, valid identity reuse, regenerated metadata for altered pictures, actual decoded per-frame validation and applicable toolchain/license review. Never silently downgrade an explicit HDR10+ request.
+- [ ] **VC-HDR-014 — Broaden managed HDR composition and qualification.** Float precision for letterbox/position/animated spatial transforms, masks/chroma, stills/titles, HDR-aware creative LUTs/grades, gamut/highlight handling and nits scopes; optimize the measured slow CPU HDR reference path with exact image checks. HLG OOTF/Log transforms,12-bit corpus, calibrated monitoring and full long-form reliability remain separate gates.
 - [ ] **VC-HDR-001 — True high-bit-depth processing.** Plan 10-bit/12-bit input and suitable 16-bit float or other high-precision internal linear/light/color representation; avoid forcing 8-bit yuv420p in the HDR path. Validate transforms, effects, alpha and gamut integrity.
 - [ ] **VC-HDR-002 — Correctly identify color.** Parse primaries, transfer function, matrix, range, bit depth, mastering display/CLL/FALL, ICC/other applicable metadata and HLG vs PQ vs Log; distinguish missing/contradictory metadata and allow manual overrides.
 - [ ] **VC-HDR-003 — HDR10 end-to-end.** Import, calibrated preview, trim/grade/effects, 10-bit HEVC/appropriate codec export, Rec.2020 + PQ signalling and valid static HDR metadata. Preserve legitimate input metadata where applicable; test transformed clips with test patterns and a real TV.
@@ -209,6 +218,7 @@ See [implementation and capability matrix](docs/NATIVE_PLAYBACK_3_4_6.md) and [m
 - [ ] **VC-EDIT-011 — Polish interface.** Attractive coherent native Windows UI, docking/multiple panels, source/program monitor, comprehensive inspector, timeline tracks, effects search, clear feedback, accessibility, OLED/high-DPI and shortcut discovery without clutter.
 - [ ] **VC-EDIT-012 — Quality/reliability extras.** Automatic scene detection and optional shot tagging, smart reframing, proxy relink, progress estimates, optional media integrity checks, missing codecs/error explanations, local diagnostics and selective cache cleanup.
 - [ ] **VC-EDIT-013 — Advanced visual AI (later).** Optional offline object removal or content-aware fills, face/object tracking, auto reframing and highlight suggestions; benchmark quality and privacy, not placeholders.
+- [ ] **VC-EDIT-014 — First-class optional YouTube export/upload with Studio-like customization (owner-required before first Kenya-vlog delivery).** Add `Export → Upload to YouTube` via official YouTube Data API and user-authorized OAuth; fully optional, never a sign-in/network dependency for offline editing or local exports. Allow account/channel selection; explicit final review and upload consent; **default privacy PRIVATE**, with user-choice unlisted/public; title, description, tags, category, language, playlist, custom thumbnail, audience/made-for-kids, altered/synthetic-media disclosure, license, embedding and scheduled publication when supported; support chapters via description timestamps and optional subtitle uploads with appropriate scopes. Offer resumable upload, progress, pause/retry/cancel where supported, errors/quota/token handling, safe credential storage, no hidden uploads and no automatic publication. Open the resulting YouTube Studio video settings for controls the public API does not expose; do not promise complete Studio parity. Provide high-quality 4K60/10-bit Rec.2020 PQ/HLG YouTube-safe output and, where genuinely valid, a single best-quality HDR10+ master/upload choice for the owner's Samsung QE55QN92F; never silently downconvert HDR, re-render after upload without consent, or claim that YouTube's `2160p60 HDR` badge proves HDR10+ dynamic-metadata playback. YouTube transcodes uploads: verify local source metadata and YouTube-reported HDR processing separately, document that HDR10+ playback/passthrough is not guaranteed. Local master remains available; video visibility and publish settings must always be confirmed before uploading. Include automated API-mock tests for private-by-default/explicit consent, auth, metadata validation, upload resumption and redaction; do not expose tokens, video content, project identifiers or location metadata in GitHub.
 
 ## P2 — AI-assisted editing (explicit consent, offline core)
 
