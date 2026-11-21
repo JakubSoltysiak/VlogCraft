@@ -31,6 +31,9 @@
 
 ## 3.6.0 performance investigation
 
+- [x] **VC-PERF-360-001 — Isolate the managed HDR rendering bottleneck.** Frozen scene ablations separate the affine and matte expression cost from decoding, encoding and HDR10+ authoring. Preserve the 720p and UHD spatial timeouts and decoded-quality comparisons. [Phase 1 evidence](docs/STUDIO_3_6_0_RENDERING.md).
+- [ ] **VC-PERF-360-002 — Make longer mixed UHD renders practical.** Use the independently verified 3.6.0 short runs as the comparator. Measure remaining affine sampling, float-surface ownership and bandwidth on longer, higher-entropy content. Keep the full 60-second export gate open until shorter trials support it.
+- [ ] **VC-PERF-360-003 — Qualify any HDR AV backend.** Keep the verified CPU Main10 path. A hardware path needs independently verified image quality, static mastering and content-light signalling, audio and frame clocks, dynamic metadata association and practical speed improvement.
 - [ ] **Compare VlogCraft and Adobe Premiere Pro on equivalent local workloads.** Begin with published techniques and measured export and playback traces using Windows Performance Recorder and GPUView where applicable. Consider REA or Ghidra only after reviewing law, licensing, necessity and the narrow technical question. Use independently developed techniques and keep proprietary Adobe implementation material out of VlogCraft. This investigation is deferred to 3.6.0.
 
 ## 3.4.9 reliability acceptance — 14 November 2026

@@ -1,5 +1,9 @@
 # Architecture and continuation
 
+## 3.6.0 managed rendering
+
+The managed compositor bounds FFmpeg picture-filter slicing at four workers. zimg conversions, resizing and error diffusion keep the reference single slice. Motion expressions reuse per-row values while retaining float32 premultiplied bilinear sampling. Static still frames are prepared before repetition. Opacity keys and fades can vary the coverage independently of prepared RGB. Direct RGB and alpha maps avoid intermediate grayscale RGB copies. Source cadence, PCM, encoder settings and HDR10+ authoring keep their existing contracts. [Rendering evidence](docs/STUDIO_3_6_0_RENDERING.md).
+
 ## 3.5.7 HDR creative layers and cuts
 
 `hdr_layers.py` decodes sRGB color separately from coverage, then combines float32 planes. Premultiplied geometry keeps RGB and coverage aligned. Direct plane extraction avoids the RGB format conversion that clipped linear values above reference white. Existing compatible opaque video uses the prior path. Title glyphs are an app-owned temporary raster. Existing project clip keys and an optional title font drive the same Reference, Composited and export paths.

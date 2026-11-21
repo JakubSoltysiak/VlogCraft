@@ -32,10 +32,11 @@ def uses_geometry(clip):
                for key,initial in GEOMETRY.items())
 
 
-def still_needs_frame_clock(clip):
-    return bool(clip.get('fadeIn') or clip.get('fadeOut') or any(
-        clip.get('keys',{}).get(name)
-        for name in (*GEOMETRY, 'maskRadius', 'opacity', 'contrast', 'saturation')))
+def still_needs_frame_clock(clip, *, include_opacity=True):
+    keys=clip.get('keys',{})
+    if any(keys.get(name) for name in (*GEOMETRY, 'maskRadius', 'contrast', 'saturation')):
+        return True
+    return include_opacity and bool(clip.get('fadeIn') or clip.get('fadeOut') or keys.get('opacity'))
 
 
 def photo_info(path):
@@ -103,13 +104,19 @@ def title_image(clip, width, height, folder):
     return path
 
 
-def picture_alpha(filters, label, result, number):
+def picture_alpha(filters, label, result, number, *, hold='', tail='', opacity=None):
     rgb,alpha=f'picture{number}',f'alpha{number}'
     # Copy directly from GBRA planes. This preserves values above 1.0
     # without intermediate grayscale RGB buffers or swscale conversion.
     filters.append(f'{label}split=2[{rgb}][{alpha}]')
-    filters.append(f'[{rgb}]mergeplanes=0x000102:format=gbrpf32le[{result}]')
-    filters.append(f'[{alpha}]mergeplanes=0x030303:format=gbrpf32le[{result}mask]')
+    filters.append(f'[{rgb}]mergeplanes=0x000102:format=gbrpf32le{hold}{tail}[{result}]')
+    if opacity is None:
+        filters.append(f'[{alpha}]mergeplanes=0x030303:format=gbrpf32le[{result}mask]')
+    else:
+        coverage=opacity_expression(opacity,'lum')
+        filters.append(f'[{alpha}]extractplanes=a,setparams=colorspace=gbr:range=full{hold},'
+                       f"geq=lum='{coverage}':i=nearest,format=grayf32le{tail},"
+                       f'mergeplanes=0x000000:format=gbrpf32le[{result}mask]')
 
 
 def linear_still(filters, index, transfer):
@@ -200,6 +207,13 @@ def soft_mask(clip,start):
     return 'geq='+':'.join(channels)+':i=nearest'
 
 
+def opacity_expression(alpha, sample):
+    value=f'{sample}(X,Y)'
+    if 'T' in alpha:
+        return f'ifnot(X,st(0,({alpha})));clip({value}*ld(0),0,1)'
+    return f'clip({value}*({alpha}),0,1)'
+
+
 def matte_expression(clip, start, alpha, gain):
     contrast=parameter(clip,'contrast',1,start)
     saturation=parameter(clip,'saturation',1,start)
@@ -213,6 +227,5 @@ def matte_expression(clip, start, alpha, gain):
                f'st(6,max(0,.18+(ld(3)*{gain:.12g}-.18)*({contrast})));')
         channels=[f"{p}='{setup}if(gt(ld(3),1e-12),ld(6)*(ld(3)+(ld({i})-ld(3))*ld(5))/ld(3),ld(6))'"
                   for i,p in enumerate('rgb')]
-    opacity = (f'ifnot(X,st(0,({alpha})));clip(alpha(X,Y)*ld(0),0,1)'
-               if 'T' in alpha else f'clip(alpha(X,Y)*({alpha}),0,1)')
+    opacity = 'alpha(X,Y)' if alpha is None else opacity_expression(alpha,'alpha')
     return 'geq='+':'.join([*channels, f"a='{opacity}'"])+':i=nearest'

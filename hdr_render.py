@@ -94,15 +94,20 @@ def command(state,start,end,target,jobdir,quality='final'):
    chain=hdr_layers.canvas_fit(filters,chain,f'fit{n}',source=source,canvas=(w,h),fit=c.get('fit','contain'),fps=fps)
    hold=f',loop=loop={max(0,count-1)}:size=1:start=0,setpts=N/({fps}*TB)' if still else ''
    animated_still=still and hdr_layers.still_needs_frame_clock(c)
-   if animated_still:chain+=hold
+   opacity_only=animated_still and not hdr_layers.still_needs_frame_clock(c,include_opacity=False)
+   if animated_still and not opacity_only:chain+=hold
    if has_mask:chain+=','+hdr_layers.soft_mask(c,at)
    if transform:chain+=','+hdr_layers.transform(c,at)
-   chain+=',unpremultiply=inplace=1,'+hdr_layers.matte_expression(c,at,alpha,gain)
-   if not animated_still:chain+=hold
-   chain+=f',trim=end_frame={count},setpts=PTS-STARTPTS'
+   chain+=',unpremultiply=inplace=1,'+hdr_layers.matte_expression(c,at,None if opacity_only else alpha,gain)
+   tail=f',trim=end_frame={count},setpts=PTS-STARTPTS'
    if local_first>first or local_last<last:
-    chain+=f',tpad=start={local_first-first}:start_mode=clone:stop={last-local_last}:stop_mode=clone'
-   hdr_layers.picture_alpha(filters,chain+f'[raw{n}];[raw{n}]',f'lay{n}',n)
+    tail+=f',tpad=start={local_first-first}:start_mode=clone:stop={last-local_last}:stop_mode=clone'
+   # Fades and opacity keys can reuse prepared RGB while varying only coverage.
+   if opacity_only:
+    hdr_layers.picture_alpha(filters,chain+f'[raw{n}];[raw{n}]',f'lay{n}',n,hold=hold,tail=tail,opacity=alpha)
+   else:
+    if not animated_still:chain+=hold
+    hdr_layers.picture_alpha(filters,chain+tail+f'[raw{n}];[raw{n}]',f'lay{n}',n)
    filters.append(f"[{back}][lay{n}][lay{n}mask]maskedmerge=enable='gte(n,{local_first-first})*lt(n,{local_last-first})'[base{n}]")
   else:
    filters.append(f'[{n}:v]{cadence}{convert},format=gbrpf32le,'

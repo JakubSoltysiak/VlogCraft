@@ -121,12 +121,23 @@ def verify_encoders(fixture, folder, count):
     results = {}
     for label in ('cpu-encode', 'amf-encode'):
         source, marked = folder/(label+'.mp4'), folder/(label+'-authored.mp4')
+        if not source.is_file() or not source.stat().st_size:
+            results[label] = {'encoder_output_missing': True}
+            continue
         info = json.loads(fixture.ff('ffprobe','-v','error','-show_streams','-of','json',str(source)))
         video = info['streams'][0]
         row = {key: video.get(key) for key in (*fixture.hdr10plus_master.VIDEO_FIELDS,
                                               'nb_frames','time_base','duration_ts','avg_frame_rate')}
         row['static_metadata'] = [v['side_data_type'] for v in fixture.hdr10plus_master.static_metadata(video)]
         row['bytes'] = source.stat().st_size
+        quality = subprocess.run(['ffmpeg','-v','info','-threads','2','-i',str(source),
+                                  '-f','rawvideo','-pixel_format','yuv420p10le',
+                                  '-video_size',f"{video['width']}x{video['height']}",
+                                  '-framerate','60','-i',str(folder/'same-input.yuv'),
+                                  '-lavfi','psnr','-an','-f','null','-'], capture_output=True,
+                                 creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0),check=True,timeout=90)
+        psnr = re.search(rb'PSNR y:([\d.]+|inf) u:([\d.]+|inf) v:([\d.]+|inf) average:([\d.]+|inf)',quality.stderr)
+        row['raw_reference_psnr_db'] = [part.decode() for part in psnr.groups()] if psnr else None
         results[label] = row
         work = folder/(label+'-master')
         work.mkdir()
@@ -236,9 +247,21 @@ def main(args):
                 from hdr_layers import luma_linear
                 selected += ['-vf',luma_linear('2020','smpte2084','2020_ncl','limited')+',format=gbrpf32le']
             selected += ['-c:v','copy','-f','null','-'] if label == 'source-demux' else null_picture
-        if label == 'still-decode':
+        if label in ('still-decode','still-linear','still-fit'):
             selected = ['ffmpeg','-v','error','-nostdin','-threads','1','-i',str(sources[2]),
                         '-frames:v','1',*null_picture]
+            if label != 'still-decode':
+                import hdr_layers
+                picture_filters = []
+                chain = hdr_layers.linear_still(picture_filters,0,hdr_layers.luma_linear(*hdr_layers.SRGB[:4]))
+                if label == 'still-fit':
+                    sw,sh,orientation = hdr_layers.photo_info(sources[2])
+                    chain += ','+(orientation+',' if orientation else '')+'setsar=1,premultiply=inplace=1'
+                    chain = hdr_layers.canvas_fit(picture_filters,chain,'diagnostic',source=(sw,sh),
+                                                  canvas=(width,height),fit='contain',fps=60)
+                picture_filters.append(chain+'[picture]')
+                selected[1:1] = ['-noauto_conversion_filters','-filter_complex_threads','1']
+                selected[-len(null_picture):-len(null_picture)] = ['-filter_complex',';'.join(picture_filters),'-map','[picture]']
         if label == 'write-pq':
             selected = selected[:encoder]+['-c:v','rawvideo','-threads:v','1','-f','rawvideo',str(raw)]
         if label in ('cpu-encode', 'amf-encode'):
@@ -271,6 +294,7 @@ if __name__ == '__main__':
     parser.add_argument('--variant', action='append', default=[],
                         choices=('full', 'graph-only', 'slice4', 'decode-geometry-off', 'no-matte',
                                  'no-pq-tail', 'no-transition-arithmetic', 'startup', 'source-demux',
-                                 'source-decode', 'video-to-linear', 'still-decode', 'write-pq',
+                                 'source-decode', 'video-to-linear', 'still-decode', 'still-linear',
+                                 'still-fit', 'write-pq',
                                  'cpu-encode', 'amf-encode'))
     raise SystemExit(main(parser.parse_args()))

@@ -8,14 +8,26 @@
     "frames": 48,
     "fps": 60,
     "baseline_seconds": 18.5,
-    "candidate_seconds": 7.781,
+    "candidate_seconds": 7.703,
     "baseline_sampled_peak_rss_bytes": 293208064,
-    "candidate_sampled_peak_rss_bytes": 282656768,
+    "candidate_sampled_peak_rss_bytes": 279343104,
     "decoded_picture_pcm_and_timestamps_equal": true,
     "dynamic_metadata_equal_at_each_pts": true
   },
-  "source_fingerprint": "d75eb0459d8fff7fc762ffd9badb5820f7687e2443f7252188ce41a46d9f359e",
+  "matched_uhd_opacity_checkpoint": {
+    "width": 3840,
+    "height": 2160,
+    "frames": 24,
+    "fps": 60,
+    "baseline_seconds": 137.125,
+    "candidate_seconds": 65.671,
+    "baseline_sampled_peak_rss_bytes": 5540335616,
+    "candidate_sampled_peak_rss_bytes": 4750491648,
+    "decoded_picture_pcm_and_timestamps_equal": true,
+    "dynamic_metadata_equal_at_each_pts": true
+  },
+  "source_fingerprint": "f43aed10a6c41f42825f1799410214690563bd529276512585ac72eccdf610f8",
   "fingerprint_method": "SHA256 sorted relevant relative path + NUL + LF-normalized source + NUL",
-  "benchmark_protocol_fingerprint": "2e3605a0e8de1c0a39f1616717503beb8b1a0daf575e2a60fe282239d3e65152",
+  "benchmark_protocol_fingerprint": "11ba4acb6306e7c7ea714d7487f284b0408d6aece3cc48841926bd6bdb75c468",
   "benchmark_protocol_fingerprint_method": "SHA256 sorted benchmark driver/observer relative path + NUL + LF-normalized source + NUL"
 }
