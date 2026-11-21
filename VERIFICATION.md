@@ -1,5 +1,13 @@
 # VlogCraft Studio development qualification
 
+## 3.5.5 HDR10+ preservation and editing — 21 November 2026
+
+The 3.5.5 development MSI was built from `b989e344dfb0ce92d58d1cb075529fef72d5be3a`, SHA-256 `fad30d2d2b5cad81afedb52ed0ffab66e00c4938f9ce2686b1276d4abe6b7901`. Local install, upgrade, removal, reinstall and bundle identity passed. [Draft PR #12](https://github.com/JakubSoltysiak/VlogCraft/pull/12) is stacked on #11. [Detailed qualification and retained failures](docs/STUDIO_3_5_5.md).
+
+- Encoded and decoded evidence matched for all 7,619 private camera blocks. All failed the version-1 reserved 5% field requirement. Zero were valid, unsupported or limited by the implementation. All three original hashes remained unchanged.
+- The installed HDR10+ copy path preserved exact decoded video/audio and dynamic metadata on every frame of the 12-frame fixture. Installed SDR fade, HDR10 monitoring, exact 80-state WebView recovery, 33-asset library, linked camera PCM and Windows icon checks passed in the scopes recorded in the report.
+- Six-seek Live Layers median was 553.5 ms on frozen 3.5.4 and 467.3 ms on 3.5.5. Playback callback gaps reached about 42 ms on both. Preview was 666 × 374 physical px for the UHD60 source. Sustained playback, memory and audio stability remain open. [Paired measurements](docs/benchmarks/studio-3.5.5-performance.json).
+
 ## P0 export, HDR10+ source indexing and editing — 21 November 2026
 
 [Draft PR #11](https://github.com/JakubSoltysiak/VlogCraft/pull/11) is stacked on PR #8. The combined development installer is 3.5.4, built from production checkpoint `20eaaf3`. The [qualification report](docs/HDR10PLUS_EDITING.md) records scope, failures and open requirements.

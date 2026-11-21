@@ -32,4 +32,33 @@ Clip Inspector identifies embedded versus separated camera audio and exposes the
 
 Project Storage reports linked source and known project/cache sizes. Its confirmation-gated cleanup is limited to app-owned thumbnails for removed library entries, excluding any active cache or linked source path. Restore can regenerate those thumbnails. General proxy/preview deletion and abandoned export recovery remain open.
 
-The approved original artwork is unchanged. The ICO now crops outside the alpha-4 artwork bounds with a 3.5% border, then uses premultiplied-alpha scaling for all seven resolutions. Only near-invisible fringe falls outside the crop. The source/ICO pixel checks pass. Actual Windows installer and shell-resource verification follow on the combined 3.5.5 build.
+The approved original artwork is unchanged. The ICO now crops outside the alpha-4 artwork bounds with a 3.5% border, then uses premultiplied-alpha scaling for all seven resolutions from 16 to 256 px. Only near-invisible fringe falls outside the crop. The 16 and 64 px renders were visually checked. Installed checks matched the MSI and all seven executable resources, Start and desktop shortcuts, and the native taskbar and title-bar handles. No previous icon files were found in the installed tree.
+
+## D. Windows qualification and performance
+
+The MSI was built from production checkpoint `b989e344dfb0ce92d58d1cb075529fef72d5be3a`. SHA-256 is `fad30d2d2b5cad81afedb52ed0ffab66e00c4938f9ce2686b1276d4abe6b7901`. Upgrade, uninstall and reinstall exited successfully and retained seven protected project/settings files. The installed application, web assets, icon and optional native runtime matched the bundle. The MSI is a local development build.
+
+- **Installed HDR10+.** The offline desktop Export workflow produced all 12 changing dynamic-metadata frames and exact decoded picture and audio from the generated conforming-field fixture. FFprobe inspected frame association and Main10/PQ/Rec.2020 signaling. The source file and project output settings stayed unchanged. The private-camera recheck verified three original hashes with zero changes and zero worktree/history matches.
+- **Installed SDR and HDR10.** A two-photo fade produced live opacity endpoints 0 and 1, with rendered reference and decoded SDR export endpoints within two RGB code values per channel. The default and numeric key survived reopen. On the 12-frame HDR10 test, the tone-mapped reference compared to independently decoded delivery at 0.407 mean absolute 8-bit RGB code values. Renderer and browser fault injection each restored the draft, source metadata, paused position and exact 80-state history. The prior verified UHD60 AMD AMF path remains covered by the parent milestone's fixture.
+- **Installed library and audio.** The 33-asset test exercised grid/list, resizing, scroll, used-source removal protection, undo/redo and thumbnail regeneration. Separation into a linked track and reopen preserved exactly 38,400 decoded stereo PCM bytes. All fixture sources stayed byte-identical.
+- **Retained attempts.** The initial source motion test passed a leading-decimal seek string FFmpeg rejected. The first installed test read the server reference before the preset save completed and saw an unfaded frame. Persisting the edits before requesting server-rendered frames reproduced the normal Reference monitor path and passed on the same MSI. Early Windows run [56](https://github.com/JakubSoltysiak/VlogCraft/actions/runs/44911200507) reported frame 17 of the existing continuous-preview comparison at 7.941 RGB MAE against a limit of 7 in the offline pass. The hosted production-checkpoint regression and local final offline suite passed the unchanged test. This single intermittent failure has no demonstrated root cause.
+- **Local regression.** 151 loopback-only Python tests passed in 55.004s. The supervised local desktop/build cases left zero owned processes or new terminal windows at cleanup. Child cleanup was checked at each run boundary.
+
+### Paired Live Layers diagnostic
+
+One visible pair used the same generated five-second original, one H.264 source layer at 3840 × 2160 and 60 FPS, with no proxy or source audio. Both ran at 175% display scaling with a 380 × 214 CSS px preview and 666 × 374 physical px. JavaScript observed browser video callbacks, actual source presentation times, and browser-reported drops. Working set was sampled across owned WebView processes. No native workers were active.
+
+| Measurement | Frozen 3.5.4 | Candidate 3.5.5 |
+|---|---:|---:|
+| Seek median, six correct target frames | 553.5 ms | 467.3 ms |
+| First measured seek | 412.5 ms | 267.9 ms |
+| Worst seek and timeouts | 870.5 ms / 0 | 838.7 ms / 0 |
+| Browser dropped frames / callbacks | 2 / 230 | 0 / 229 |
+| Longest callback gap | 41.7 ms | 41.9 ms |
+| WebView working set before / active / after | 635 / 1,349 / 1,353 MiB | 682 / 1,375 / 1,206 MiB |
+
+The candidate still took up to about 839 ms to show the requested frame. The single short pair cannot establish a repeatable improvement, sustained UHD composition, first-play-frame latency, acoustic sync, a memory plateau or native GPU performance. The candidate had one FFmpeg process at the initial sample and zero during and after playback. Proxy contention, native UHD60 with audio, long-project work and hardware utilization remain open. [Raw sanitized measurements](benchmarks/studio-3.5.5-performance.json).
+
+## Remaining release gates
+
+HDR10+ regeneration requires generating and independently validating metadata against the actual edited pictures. Trimming, speed changes, cadence conversion and other edits remain outside the copy-only delivery mode. There is no Samsung TV master or YouTube HDR preset, and no device playback or YouTube transcode evidence. Adjacent-clip transition handles, crossfades and batch boundary editing remain open. Current batch motion does not recurse into nested sequences. General proxy/preview and abandoned-export cleanup remain open. Keep the installer as a development build and preserve the open native performance and reliability gates before any stable release.

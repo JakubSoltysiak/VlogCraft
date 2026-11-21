@@ -1,5 +1,11 @@
 # Architecture and continuation
 
+## 3.5.5 HDR10+ preservation and project editing
+
+`hdr10plus_bitstream.py` independently reads registered SEI from original length-prefixed HEVC samples. FFprobe supplies packet offsets and rational timestamps. The local comparison matches decoded cached fields against the original integers by presentation time. `hdr10plus_export.py` gates the explicit complete-source copy path on matching video/audio/project properties, frame timestamps and conforming frame-associated metadata. It probes the temporary remux and compares compressed packet hashes, PTS/DTS/durations and stream configuration before publishing. The existing renderer remains responsible for configured SDR and HDR10 delivery. Edited HDR10+ needs output-picture analysis and validation.
+
+Motion presets generate regular source-time keys with an optional preset marker, which lets replacement/clear preserve manual edits. The project output snapshot keeps new-clip defaults with undo and on-disk state. The same snapshot holds IDs hidden by library removal, with validation against referenced clips including nested sequences. The archive retains original asset records and supports undo, relink and restore. Storage cleanup deletes only eligible app-owned removed-asset thumbnail paths after confirmation and guards active sharing, media paths and symlinks. [Qualification](docs/STUDIO_3_5_5.md).
+
 ## 3.4.9 recovery and resource ownership
 
 `desktop_recovery.py` owns a bounded event-driven WebView recovery controller and one coalescing atomic checkpoint writer. Renderer failure reloads the view; browser failure recreates its control. The host/backend/project lock survive. Epoch-fenced saves reject late obsolete-view requests; a completed newer save outranks an older draft. Startup drafts must match the published project digest. `web/recovery.js` captures acknowledged draft/UI/undo changes without credentials/media or periodic polling. Recovery stops native preview/PCM, restores paused, and limits automatic retries. Storage failures are observable and do not prevent remaining shutdown cleanup.

@@ -1,5 +1,7 @@
 """Exercise batch presets, default insertion, numeric key editing and decoded export."""
 import argparse
+import base64
+import io
 import json
 from pathlib import Path
 import sys
@@ -40,6 +42,21 @@ def main(executable,results):
         apply(page,'project','fade-in')
         count="state.tracks.flatMap(t=>t.clips).filter(c=>c.keys?.opacity?.length===2).length"
         assert page.evaluate(count)==2
+        monitor=[]
+        for time_seconds in (0,0.65):
+            monitor.append(page.evaluate("""time=>{
+              seek(time);
+              return Number(document.querySelector('#previewLayers img').parentElement.style.opacity);
+            }""",time_seconds))
+        assert monitor==[0,1],monitor
+        saved=page.evaluate('flushSave()')
+        assert sum(len(clip.get('keys',{}).get('opacity',[]))==2
+                   for track in saved['tracks'] for clip in track['clips'])==2
+        reference=[]
+        for frame in (0,16):
+            request=page.evaluate("frame=>request('program/frame','POST',{frame})",frame)
+            png=Image.open(io.BytesIO(base64.b64decode(request['image'].split(',',1)[1]))).convert('RGB')
+            reference.append(list(png.resize((1,1)).getpixel((0,0))))
         page.evaluate('restoreHistory(undoStack,redoStack)')
         assert page.evaluate(count)==0
         page.evaluate('restoreHistory(redoStack,undoStack)')
@@ -69,13 +86,15 @@ def main(executable,results):
     early,late=[list(ffmpeg('-ss',timecode,'-i',output,'-frames:v','1','-vf','scale=1:1',
                             '-pix_fmt','rgb24','-f','rawvideo','pipe:1')) for timecode in ('0','0.65')]
     assert late[0]-early[0]>160,(early,late)
+    assert max(abs(a-b) for picture,ref in zip((early,late),reference) for a,b in zip(picture,ref))<=4,reference
     with session(executable,results/'reopen',offline=True,project_path=project) as (page,_,__,errors):
         assert page.evaluate(count)==2
         assert page.evaluate("state.output.defaultMotion.preset")=='zoom-in'
         assert page.evaluate("state.tracks.flatMap(t=>t.clips).some(c=>c.keys?.scale?.[1]?.time===1)")
         assert not errors,errors
     data={'batch_clips':2,'undo_redo':True,'default_and_numeric_key_persisted':True,
-          'decoded_first_pixel':early,'decoded_after_fade':late}
+          'decoded_first_pixel':early,'decoded_after_fade':late,
+          'live_opacity':monitor,'reference_pixels':reference}
     (results/'verification.json').write_text(json.dumps(data,indent=2),encoding='utf8')
     print(json.dumps(data))
 
