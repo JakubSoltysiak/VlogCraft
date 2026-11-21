@@ -25,6 +25,10 @@ PROTOCOL_FILES=(
  'benchmarks/mixed_still_export.py','tests/test_export_workflow.py','tests/windows_export_workflow.py',
  'benchmarks/hdr10plus_source_index.py','tests/test_hdr10plus_index.py',
  'tests/windows_timeline_editing.py',
+ 'benchmarks/compare_hdr10plus_bits.py','tests/test_hdr10plus_export.py','tests/windows_hdr10plus.py',
+ 'tests/windows_motion.py','tests/motion_presets.test.js',
+ 'tests/windows_library.py','tests/windows_icons.py',
+ 'benchmarks/studio355_live_flight.py',
  'tests/performance.py','tests/gpu_metrics.py')
 
 def fingerprint(files=None):

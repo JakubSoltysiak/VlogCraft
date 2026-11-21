@@ -19,6 +19,16 @@ def verify_assets():
     original=ROOT/'assets/branding/vlogcraft-original.png'
     manifest=json.loads((BRAND/'manifest.json').read_text('utf8'))
     assert hashlib.sha256(original.read_bytes()).hexdigest()==manifest['source_sha256']
+    source=Image.open(original).convert('RGBA')
+    alpha=source.getchannel('A')
+    if 'render_crop' in manifest:
+        meaningful=alpha.point(lambda value:255 if value>=4 else 0).getbbox()
+        crop=manifest['render_crop']
+        assert crop[0]<=meaningful[0] and crop[1]<=meaningful[1] and crop[2]>=meaningful[2] and crop[3]>=meaningful[3]
+        source=source.crop(crop)
+    side=max(source.size)
+    square=Image.new('RGBA',(side,side))
+    square.paste(source,((side-source.width)//2,(side-source.height)//2))
     payloads=ico_payloads(BRAND/'vlogcraft-approved.ico')
     assert sorted(n for n,h in payloads)==[16,24,32,48,64,128,256]
     for (n,h),data in payloads.items():
@@ -26,6 +36,7 @@ def verify_assets():
         expected=Image.open(BRAND/f'vlogcraft-{n}.png').convert('RGBA')
         assert actual.size==(n,n) and actual.tobytes()==expected.tobytes()
         assert actual.getchannel('A').getextrema()[0]==0 and actual.getchannel('A').getextrema()[1]>128
+        assert actual.tobytes()==square.convert('RGBa').resize((n,n),Image.Resampling.LANCZOS).convert('RGBA').tobytes()
     return True
 
 def verify_executable(path):

@@ -1,0 +1,366 @@
+{
+  "baseline": "fb48c7dd7bccfdf6a5ee552787f7ff68dead8dcc",
+  "qualification": "Scoped HDR10+ transport and desktop editing qualification. Short Live Layers comparison only for interactive performance.",
+  "scope": "Raw MP4 sample audit against existing decoded cache. No camera files, timestamps or payload records published.",
+  "private_camera_block_counts": [
+    {
+      "source": "Camera 1",
+      "frames": 4674,
+      "seconds": 1.2159958999982337,
+      "valid": 0,
+      "invalid": 4674,
+      "unsupported": 0,
+      "implementation_limited": 0,
+      "untagged": 0,
+      "exact_bitstream_matches": 4674,
+      "valid_fenced_by_index": 0,
+      "reasons": {
+        "reserved_5_percent": 4674
+      },
+      "field_differences": {}
+    },
+    {
+      "source": "Camera 2",
+      "frames": 2945,
+      "seconds": 0.7571481999984826,
+      "valid": 0,
+      "invalid": 2945,
+      "unsupported": 0,
+      "implementation_limited": 0,
+      "untagged": 0,
+      "exact_bitstream_matches": 2945,
+      "valid_fenced_by_index": 0,
+      "reasons": {
+        "reserved_5_percent": 2945
+      },
+      "field_differences": {}
+    }
+  ],
+  "source_fingerprint": "d5f49dc2e1da589fd49e2b707198f094b5825ab45fc5d0b2ccbe785da78c3ea6",
+  "fingerprint_method": "SHA256 sorted relevant relative path + NUL + LF-normalized source + NUL",
+  "benchmark_protocol_fingerprint": "2db40215357f58226b9a68accd6e84f045c4eae8655fc3155d0d713223c55e4f",
+  "benchmark_protocol_fingerprint_method": "SHA256 sorted benchmark driver/observer relative path + NUL + LF-normalized source + NUL",
+  "motion_desktop_source": {
+    "batch_clips": 2,
+    "undo_redo": true,
+    "default_and_numeric_key_persisted": true,
+    "decoded_first_pixel": [
+      14,
+      18,
+      26
+    ],
+    "decoded_after_fade": [
+      235,
+      35,
+      23
+    ]
+  },
+  "production_checkpoint": "b989e344dfb0ce92d58d1cb075529fef72d5be3a",
+  "live_layers_installed_pair": {
+    "scope": "Live Layers with one generated original, 6 seeks and under 4 seconds of playback per build. No proxy, native audio or GPU metrics. CSS composition and physical viewport differ from source.",
+    "runs": [
+      {
+        "version": "3.5.4",
+        "geometry": {
+          "source": [
+            3840,
+            2160
+          ],
+          "composition": [
+            380.4375305175781,
+            213.85714721679688
+          ],
+          "physical": [
+            666,
+            374
+          ],
+          "dpr": 1.75,
+          "visibility": "visible"
+        },
+        "seekSamples": [
+          {
+            "target": 0.5,
+            "milliseconds": 412.5,
+            "mediaTime": 0.5
+          },
+          {
+            "target": 2,
+            "milliseconds": 849.5,
+            "mediaTime": 2
+          },
+          {
+            "target": 1,
+            "milliseconds": 308.1000000014901,
+            "mediaTime": 1
+          },
+          {
+            "target": 3,
+            "milliseconds": 870.5,
+            "mediaTime": 3
+          },
+          {
+            "target": 0.25,
+            "milliseconds": 77.5,
+            "mediaTime": 0.25
+          },
+          {
+            "target": 2.5,
+            "milliseconds": 694.3999999985099,
+            "mediaTime": 2.5
+          }
+        ],
+        "seekMedianMs": 553.4499999992549,
+        "seekTimeouts": 0,
+        "browserPlayback": {
+          "callbackCount": 230,
+          "totalIncrement": 246,
+          "droppedIncrement": 2,
+          "callbackSpanSeconds": 3.867,
+          "maxCallbackGapMs": 41.69999999999982
+        },
+        "resources": {
+          "before": {
+            "webviewMiB": 635.3671875,
+            "nativeMiB": 0,
+            "ffmpegProcesses": 0
+          },
+          "active": {
+            "webviewMiB": 1348.6640625,
+            "nativeMiB": 0,
+            "ffmpegProcesses": 0
+          },
+          "after": {
+            "webviewMiB": 1353.12890625,
+            "nativeMiB": 0,
+            "ffmpegProcesses": 0
+          }
+        }
+      },
+      {
+        "version": "3.5.5",
+        "geometry": {
+          "source": [
+            3840,
+            2160
+          ],
+          "composition": [
+            380.4375305175781,
+            213.85714721679688
+          ],
+          "physical": [
+            666,
+            374
+          ],
+          "dpr": 1.75,
+          "visibility": "visible"
+        },
+        "seekSamples": [
+          {
+            "target": 0.5,
+            "milliseconds": 267.8999999985099,
+            "mediaTime": 0.5
+          },
+          {
+            "target": 2,
+            "milliseconds": 641.7000000029802,
+            "mediaTime": 2
+          },
+          {
+            "target": 1,
+            "milliseconds": 292.79999999701977,
+            "mediaTime": 1
+          },
+          {
+            "target": 3,
+            "milliseconds": 838.6999999955297,
+            "mediaTime": 3
+          },
+          {
+            "target": 0.25,
+            "milliseconds": 73.5,
+            "mediaTime": 0.25
+          },
+          {
+            "target": 2.5,
+            "milliseconds": 644.5,
+            "mediaTime": 2.5
+          }
+        ],
+        "seekMedianMs": 467.25,
+        "seekTimeouts": 0,
+        "browserPlayback": {
+          "callbackCount": 229,
+          "totalIncrement": 240,
+          "droppedIncrement": 0,
+          "callbackSpanSeconds": 3.8670999999999993,
+          "maxCallbackGapMs": 41.899999999999636
+        },
+        "resources": {
+          "before": {
+            "webviewMiB": 682.0546875,
+            "nativeMiB": 0,
+            "ffmpegProcesses": 1
+          },
+          "active": {
+            "webviewMiB": 1374.72265625,
+            "nativeMiB": 0,
+            "ffmpegProcesses": 0
+          },
+          "after": {
+            "webviewMiB": 1206.453125,
+            "nativeMiB": 0,
+            "ffmpegProcesses": 0
+          }
+        }
+      }
+    ]
+  },
+  "installed_motion": {
+    "batch_clips": 2,
+    "undo_redo": true,
+    "default_and_numeric_key_persisted": true,
+    "decoded_first_pixel": [
+      14,
+      18,
+      26
+    ],
+    "decoded_after_fade": [
+      235,
+      35,
+      23
+    ],
+    "live_opacity": [
+      0,
+      1
+    ],
+    "reference_pixels": [
+      [
+        13,
+        16,
+        25
+      ],
+      [
+        235,
+        33,
+        22
+      ]
+    ]
+  },
+  "installed_hdr10plus": {
+    "frames": 12,
+    "exact_decoded_video_and_audio": true,
+    "metadata_per_frame": true,
+    "seconds": 0.4,
+    "source_unchanged": true,
+    "project_settings_unchanged": true
+  },
+  "private_media_integrity": {
+    "source_count": 3,
+    "private_folder_tracked_files": 0,
+    "private_history_path_matches": 0,
+    "private_content_objects": 0,
+    "private_text_objects": 0,
+    "private_working_text_files": 0,
+    "missing_originals": 0,
+    "original_hashes_verified": true,
+    "changed_originals": 0
+  },
+  "local_cases": {
+    "bitstream": {
+      "exit_code": 0,
+      "seconds": 2.2810000000026776,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "build-355": {
+      "exit_code": 0,
+      "seconds": 89.34399999999732,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "copy-initial": {
+      "exit_code": 0,
+      "seconds": 1.235000000000582,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "hdr-suite": {
+      "exit_code": 0,
+      "seconds": 10.5,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "installed-color": {
+      "exit_code": 0,
+      "seconds": 12.781000000002678,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "installed-hdr10plus": {
+      "exit_code": 0,
+      "seconds": 11.343999999997322,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "installed-icons": {
+      "exit_code": 0,
+      "seconds": 7.3439999999973224,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "installed-library": {
+      "exit_code": 0,
+      "seconds": 15.985000000000582,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "installed-motion": {
+      "exit_code": 1,
+      "seconds": 8.171999999998661,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "installed-motion-2": {
+      "exit_code": 0,
+      "seconds": 12.046999999998661,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "library-source": {
+      "exit_code": 0,
+      "seconds": 14.014999999999418,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "lifecycle": {
+      "exit_code": 0,
+      "seconds": 29.7190000000046,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "live-flight": {
+      "exit_code": 0,
+      "seconds": 39.25,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "motion-source": {
+      "exit_code": 1,
+      "seconds": 7.530999999995402,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "motion-source-2": {
+      "exit_code": 0,
+      "seconds": 10.625,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "offline-final": {
+      "exit_code": 0,
+      "seconds": 55.937000000005355,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    }
+  }
+}

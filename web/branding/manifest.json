@@ -13,5 +13,11 @@
     128,
     256
   ],
-  "method": "Unmodified RGBA original, centered transparent square; premultiplied-alpha Lanczos; no crop, recolor or redraw."
+  "render_crop": [
+    238,
+    68,
+    1296,
+    949
+  ],
+  "method": "Crop near-invisible alpha margins only, center with safe padding and scale with premultiplied-alpha Lanczos. Original RGBA unchanged."
 }

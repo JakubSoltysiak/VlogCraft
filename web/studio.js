@@ -134,6 +134,9 @@ function sizeMonitor(){
 async function openExport(){
   openModal('exportModal');
   initColorControls();
+  $('exportWorkflow').value='render';
+  $('exportWorkflow').onchange=updateExportWorkflow;
+  updateExportWorkflow();
   const out=state.output;
   const preset=[1280,1920,2560,3840,7680].includes(out.width)&&out.height===out.width*9/16;
   $('exportResolution').value=preset?String(out.width):'custom';
@@ -167,6 +170,47 @@ async function openExport(){
     $('startRender').disabled=!choice.value || (await request('jobs')).export.status==='rendering';
   }catch(error){toast('Encoder check failed: '+error.message,true);}
   finally{choice.disabled=false;updateEncoderControls();}
+}
+
+function updateExportWorkflow(){
+  const preserving=$('exportWorkflow').value==='hdr10plus-copy';
+  $('exportRenderSettings').hidden=preserving;
+  $('exportCopyRequirements').hidden=!preserving;
+}
+
+function openProjectStorage(){
+  const dialog=document.createElement('dialog');
+  dialog.className='motion-dialog';
+  dialog.innerHTML='<h2>Project storage</h2><dl id="storageCategories"></dl>'+
+    '<p class="dialog-note">Original sources, backups and recovery data stay available. Temporary exports are handled by the export job.</p>'+
+    '<div class="property-actions"><button type="button" id="clearRemovedThumbs" class="button secondary">Clear thumbnails of removed media</button>'+
+    '<button type="button" id="closeStorage" class="button primary">Close</button></div>';
+  document.body.appendChild(dialog);
+  async function refresh(){
+    try{
+      const data=await request('storage');
+      const container=dialog.querySelector('dl');
+      container.replaceChildren();
+      for(const [label,bytes] of Object.entries(data.bytes)){
+        const name=document.createElement('dt'),value=document.createElement('dd');
+        name.textContent=label;
+        value.textContent=fileSize(bytes);
+        container.append(name,value);
+      }
+    }catch(error){toast('Storage usage: '+error.message,true);}
+  }
+  $('clearRemovedThumbs').onclick=async()=>{
+    if(!confirm('Clear cached thumbnails for removed library items?'))return;
+    try{
+      const result=await request('storage/clear-removed-thumbnails','POST',{confirmed:true});
+      toast('Cleared '+result.count+' cached thumbnail(s)');
+      await refresh();
+    }catch(error){toast(error.message,true);}
+  };
+  $('closeStorage').onclick=()=>dialog.close();
+  dialog.onclose=()=>dialog.remove();
+  dialog.showModal();
+  void refresh();
 }
 
 function updateEncoderControls(){

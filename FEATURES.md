@@ -2,6 +2,15 @@
 
 Tested means the specific check in VERIFICATION.md passed. Implemented means code is available with further acceptance coverage needed. Partial identifies implemented behavior with material gaps. Missing identifies an unavailable capability. A test result qualifies its fixture and environment.
 
+| 3.5.5 development capability | Status | Verified scope / remaining limits |
+|---|---|---|
+| HDR10+ source validation and export | Independently tested subset | Encoded/decoded comparison on 7,619 camera blocks, all rejected for the reserved 5% field. Installed identity remux verified on every frame and decoded audio sample of a generated 12-frame fixture. Only a matching complete source is accepted. |
+| HDR10+ authoring and delivery profiles | Missing | Changed pictures, edited timing, Samsung TV and YouTube profiles need separate validation and delivery work. |
+| Batch motion and keyframes | Tested subset | Selected/track/project/default presets and editable generated keys. Installed SDR fade reference/export endpoints and undo/save/reopen passed. Adjacent-clip transitions, nested batch application and broader HDR motion parity remain open. |
+| Library and linked camera audio | Tested subset | 33 assets, grid/list, resizing, safe restore and undo, linked waveform controls and byte-identical decoded PCM after separation. |
+| Storage and Windows icon | Tested subset | Storage classification and targeted removed-item thumbnail cleanup; general cleanup remains open. Approved artwork verified in MSI, EXE, shortcuts and live Windows icon handles. |
+| Live Layers performance | Experimental evidence | Short paired UHD-source test with a 666 × 374 physical preview. No sustained native UHD60 or long-session memory qualification. [Evidence](docs/STUDIO_3_5_5.md). |
+
 3.4.9 is a focused reliability development candidate. Bounded renderer/browser view recovery and acknowledged draft/undo restoration have installed fault tests; repeated-seek AudioWorklet retention has a measured ownership fix. Historical target-loss causes and broader production reliability remain open. [Scope and measurements](docs/RELIABILITY_MEMORY_3_4_9.md).
 
 3.4.8 is a scoped consistency checkpoint. [The report](docs/PERFORMANCE_CONSISTENCY_3_4_8.md) and VERIFICATION.md distinguish passing tests from remaining acceptance gates.

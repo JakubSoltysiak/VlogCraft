@@ -4,6 +4,15 @@ import math
 LIMITS = {'x':(-2,2), 'y':(-2,2), 'volume':(0,3), 'scale':(.1,3), 'rotation':(-360,360), 'opacity':(0,1),
           'brightness':(-1,1), 'contrast':(0,2), 'saturation':(0,3), 'maskRadius':(.01,1)}
 MODES = ('linear','hold','ease-in','ease-out','bezier')
+PRESETS = ('fade-in','fade-out','fade-both','zoom-in','zoom-out','pan','ken-burns','slide-in','slide-out')
+
+
+def validate_default_motion(value):
+    if not isinstance(value,dict) or set(value)!={'preset','duration','direction','easing'}:
+        raise ValueError('Invalid default motion preset')
+    if value['preset'] not in PRESETS or value['direction'] not in ('left','right','up','down') or value['easing'] not in ('linear','smooth'):
+        raise ValueError('Unknown default motion setting')
+    return {**value,'duration':number(value['duration'],.05,30)}
 
 
 def number(value, low, high):
@@ -26,6 +35,8 @@ def validate(curves):
             if mode not in MODES or (clean and at<=clean[-1]['time']):
                 raise ValueError('Keys need distinct increasing times and supported interpolation')
             item={'time':at,'value':number(key.get('value'),*LIMITS[prop]),'mode':mode}
+            if key.get('preset') is True:
+                item['preset']=True
             if mode=='bezier':
                 handles=key.get('handles',[.25,.1,.25,1])
                 if not isinstance(handles,list) or len(handles)!=4:raise ValueError('Four Bézier handle coordinates required')
