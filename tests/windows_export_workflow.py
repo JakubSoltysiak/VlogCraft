@@ -101,6 +101,10 @@ def test(executable,results,baseline):
             assert page.locator('#cpuExportPreset').get_attribute('hidden') is not None
             page.fill('#outputBitrate','60')
         page.click('#startRender')
+        deadline = time.monotonic()+12
+        while time.monotonic()<deadline and page.evaluate("request('jobs')")['export']['status']=='idle':
+            time.sleep(.15)
+        assert page.evaluate("request('jobs')")['export']['status']!='idle',page.locator('#toast').text_content()
         samples = []
         start = time.monotonic()
         while time.monotonic()-start<180:
@@ -113,7 +117,7 @@ def test(executable,results,baseline):
             time.sleep(.15)
         assert status['status']=='done',status
         assert any(0<row.get('frames',0)<300 and row.get('stage')=='video' for row in samples), samples
-        assert page.locator('#openExportFolder').is_visible()
+        page.locator('#openExportFolder').wait_for(state='visible',timeout=5000)
         assert not errors,errors
     video,audio=decode(destination)
     assert (video['width'],video['height'],video['avg_frame_rate'])==(3840,2160,'60/1'),video

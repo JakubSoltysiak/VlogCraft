@@ -3,7 +3,7 @@ import argparse,hashlib,json,marshal,types
 from pathlib import Path
 from PyInstaller.archive.readers import CArchiveReader
 ROOT=Path(__file__).resolve().parents[1]
-MODULES=['server','render_engine','color_management','hdr_render','preview_cache','preview_dependencies','source_frames','timing','project_store',
+MODULES=['server','render_engine','color_management','hdr_render','hdr10plus_index','preview_cache','preview_dependencies','source_frames','timing','project_store',
          'animation','sequences','video_effects','grading','audio_cache','audio_edit','waveform',
          'motion','review_packet','timeline_proposal','ai_bridge','encoders','native_plan','native_playback','performance_profile','desktop_recovery']
 def normalize(code):

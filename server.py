@@ -36,6 +36,7 @@ import grading
 import encoders
 import timeline_proposal
 import ai_bridge
+from hdr10plus_index import HDR10PlusIndex
 import render_engine as engine
 
 ROOT=Path(__file__).resolve().parent
@@ -43,6 +44,7 @@ WEB=ROOT/'web'
 WORK=Path(os.environ.get('VLOGCRAFT_WORK',ROOT/'workspace'))
 PROJECT=Path(os.environ.get('VLOGCRAFT_PROJECT',WORK/'project.json'))
 FRAME_INDEX=source_frames.FrameIndex(WORK/'frame-index')
+HDR10PLUS_INDEX=HDR10PlusIndex(WORK/'hdr10plus-index')
 CACHE_WORKERS=ThreadPoolExecutor(max_workers=2,thread_name_prefix='media-cache')
 MEDIA=WORK/'media'; THUMBS=WORK/'thumbnails'; PROXIES=WORK/'proxies'; REVIEWS=WORK/'reviews'; EXPORTS=WORK/'exports'
 AI_UNDO=WORK/'ai_undo.json'
@@ -939,6 +941,17 @@ class Handler(BaseHTTPRequestHandler):
             if path=='/api/color/validate':
                 import color_management
                 return self.json_response({'color':color_management.validate_output(data.get('color'))})
+            if path in ('/api/color/index/start','/api/color/index/status','/api/color/index/cancel'):
+                aid = data.get('assetId')
+                with LOCK:
+                    asset = deepcopy(next((a for a in STATE['assets'] if a['id']==aid),None))
+                if asset is None or asset['kind']!='video':
+                    raise ValueError('Select an original video to index')
+                if path.endswith('/start'):
+                    return self.json_response(HDR10PLUS_INDEX.start(asset))
+                if path.endswith('/cancel'):
+                    HDR10PLUS_INDEX.cancel(asset)
+                return self.json_response(HDR10PLUS_INDEX.status(asset))
             if path=='/api/upload/start':
                 name=Path(str(data.get('name','')).replace('\\','/')).name
                 size=int(data.get('size',0))
@@ -1206,5 +1219,6 @@ def main():
     except KeyboardInterrupt:pass
     finally:
         PROGRAM_PREVIEW.close()
+        HDR10PLUS_INDEX.close()
         server.server_close()
 if __name__=='__main__':main()

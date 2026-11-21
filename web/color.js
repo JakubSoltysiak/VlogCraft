@@ -45,9 +45,13 @@ function initColorControls(){
  $('colorOutput').onchange();
 }
 function inputColorControls(c,a){
- const m=a?.colorMetadata;return '<details class="fx-panel"><summary>Technical input color</summary><p class="dialog-note">Detected: '+esc([a?.colorPrimaries,a?.colorTransfer,a?.colorRange,m?.bitDepth?m.bitDepth+'-bit':'depth unknown'].filter(Boolean).join(' · '))+'</p>'+
+ const m=a?.colorMetadata;
+ const index=a?.codec==='hevc' && a.colorTransfer==='smpte2084' && a.colorPrimaries==='bt2020';
+ const observed=m?.dynamicHDR10PlusDetected?'HDR10+ sample detected':'';
+ return '<details class="fx-panel"><summary>Technical input color</summary><p class="dialog-note">Detected: '+esc([a?.colorPrimaries,a?.colorTransfer,a?.colorRange,m?.bitDepth?m.bitDepth+'-bit':'depth unknown',observed].filter(Boolean).join(' · '))+'</p>'+
  '<label>Interpretation<select id="inputColorProfile"><option value="">Source tags</option><option value="rec709">Rec.709</option><option value="pq2020">Rec.2020 PQ</option></select></label><label>Range<select id="inputColorRange"><option value="auto">Source range</option><option value="limited">Limited</option><option value="full">Full</option></select></label><label>Pixel aspect<select id="inputPixelAspect"><option value="source">Source metadata</option><option value="square">Explicitly interpret as square pixels</option></select></label>'+
  '<p class="dialog-note">Overrides apply to this clip without changing its source. They require managed color in Export → Color setup. HLG and Samsung Log transforms remain unsupported.</p>'+
+ (index?'<button type="button" id="indexHdr10Plus" class="button secondary">Scan HDR10+ metadata</button> <button type="button" id="cancelHdr10Plus" class="button secondary" hidden>Cancel scan</button><p id="hdr10PlusStatus" class="dialog-note" role="status"></p>':'')+
  (state.output.color?field('Linear exposure (stops)','hdrExposure',c.hdrExposure||0,-8,8,.1):'')+'</details>';
 }
 function bindInputColor(){
@@ -62,4 +66,37 @@ function bindInputColor(){
   redraw();save();syncPreview(true);
  };
  $('inputColorProfile').onchange=change;$('inputColorRange').onchange=change;$('inputPixelAspect').onchange=change;
+ const scan=$('indexHdr10Plus');
+ if(scan)bindHdr10PlusScan(c.assetId,scan,$('cancelHdr10Plus'),$('hdr10PlusStatus'));
+}
+
+function bindHdr10PlusScan(assetId,scan,cancel,label){
+ let generation=0;
+ async function refresh(action){
+  const run=++generation;
+  try{
+   let result;
+   do{
+    result=await request('color/index/'+action,'POST',{assetId});
+    if(run!==generation || !scan.isConnected)return;
+    scan.disabled=result.status==='indexing' || result.status==='ready';
+    cancel.hidden=result.status!=='indexing';
+    if(result.status==='ready'){
+     label.textContent=result.dynamicFrames
+      ? result.dynamicFrames.toLocaleString()+' HDR10+ frames among '+result.frames.toLocaleString()+' decoded frames.'
+      : 'No supported HDR10+ metadata detected in '+result.frames.toLocaleString()+' frames.';
+     if(result.rejectedFrames)label.textContent+=' '+result.rejectedFrames.toLocaleString()+' frames contain unsupported or malformed metadata.';
+     if(result.nonconformingDistributionFrames)label.textContent+=' Metadata is preserved for '+result.nonconformingDistributionFrames.toLocaleString()+' frames with nonconforming distribution values. These frames are blocked from metadata reuse.';
+    }else if(result.status==='indexing')label.textContent='Scanning the original video…';
+    else label.textContent=result.error || (result.status==='cancelled'?'Scan cancelled.':'');
+    if(result.status==='indexing')await new Promise(resolve=>setTimeout(resolve,600));
+    action='status';
+   }while(result.status==='indexing' && run===generation && scan.isConnected);
+  }catch(error){
+   if(run===generation && scan.isConnected){scan.disabled=false;cancel.hidden=true;label.textContent=error.message;}
+  }
+ }
+ scan.onclick=()=>void refresh('start');
+ cancel.onclick=()=>void refresh('cancel');
+ void refresh('status');
 }

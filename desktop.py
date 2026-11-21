@@ -203,6 +203,7 @@ def run(project):
         close_step('diagnostics',server.PERFORMANCE_DIAGNOSTICS.close)
         close_step('audio_cache',audio_cache.cancel)
         close_step('frame_index',server.FRAME_INDEX.close)
+        close_step('hdr10plus_index',server.HDR10PLUS_INDEX.close)
         close_step('program_preview',server.PROGRAM_PREVIEW.close)
         with server.JOB_LOCK:
             server.PROXY_QUEUE.clear()

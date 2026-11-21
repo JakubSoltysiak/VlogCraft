@@ -28,8 +28,8 @@
   "qualification": "Partial. One paired synthetic still-heavy SDR export. 3.5.3 installed acceptance is tracked separately; historical native playback, audio and memory gates remain open.",
   "measurement_scope": "One matched pair with common FFmpeg 9.0.2 and source workload. Includes drain/mux; decoded RGB compared at 96\u00d754. No long-form or general encoder-throughput inference.",
   "report": "docs/HDR10PLUS_EDITING.md",
-  "source_fingerprint": "710dc8910181ce530abeb0d5576edb441324145bc7aa7c2cd1b057dad3538ba5",
+  "source_fingerprint": "a0b6d6b9e6d93c914ab670f0d1761b7bebff7fd24dd5ed4eec1a8b9e90ef6495",
   "fingerprint_method": "SHA256 sorted relevant relative path + NUL + LF-normalized source + NUL",
-  "benchmark_protocol_fingerprint": "61964d174969db9499c25845f396e2976ea93d71045d8a65d78e803db4e91acb",
+  "benchmark_protocol_fingerprint": "049b234d6b5d697ff7749ae8c46e243fe250b0fd247031f481d5296e9e06b406",
   "benchmark_protocol_fingerprint_method": "SHA256 sorted benchmark driver/observer relative path + NUL + LF-normalized source + NUL"
 }
