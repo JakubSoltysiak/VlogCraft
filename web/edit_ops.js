@@ -37,6 +37,8 @@ function editTimeline(tracks, assetList, fps, ids, command, args={}, makeId=()=>
   function split(t,c,at,linkMap){
     if(at<=first(c)||at>=last(c))throw Error('Place the playhead inside each selected clip');
     const tail=structuredClone(c);tail.id=makeId();
+    delete tail.transitionIn;
+    for(const adjacent of t.clips)if(adjacent.transitionIn?.from===c.id)adjacent.transitionIn.from=tail.id;
     left(tail,at);right(c,at);c.fadeOut=0;tail.fadeIn=0;
     if(c.linkId){
       if(!linkMap.has(c.linkId))linkMap.set(c.linkId,makeId());
@@ -67,7 +69,9 @@ function editTimeline(tracks, assetList, fps, ids, command, args={}, makeId=()=>
         if(a>=at)c.position=seconds(a+span);
         else split(track,c,at,new Map()).position=seconds(end);
       }else if(a<at && b>end){
-        const tail=structuredClone(c);tail.id=makeId();left(tail,end);right(c,at);track.clips.push(tail);
+        const tail=structuredClone(c);tail.id=makeId();delete tail.transitionIn;
+        for(const adjacent of track.clips)if(adjacent.transitionIn?.from===c.id)adjacent.transitionIn.from=tail.id;
+        left(tail,end);right(c,at);track.clips.push(tail);
       }else if(a<at)right(c,at);
       else if(b>end)left(c,end);
       else track.clips.splice(track.clips.indexOf(c),1);
@@ -103,6 +107,7 @@ function editTimeline(tracks, assetList, fps, ids, command, args={}, makeId=()=>
       case 'delete':track.clips.splice(track.clips.indexOf(c),1);break;
       case 'duplicate':{
         const copy=structuredClone(c);copy.id=makeId();copy.position=seconds(first(c)+groupEnd-groupStart);
+        delete copy.transitionIn;
         if(copy.linkId){if(!idMap.has(copy.linkId))idMap.set(copy.linkId,makeId());copy.linkId=idMap.get(copy.linkId);}
         track.clips.push(copy);nextIds.push(copy.id);break;
       }
@@ -113,6 +118,7 @@ function editTimeline(tracks, assetList, fps, ids, command, args={}, makeId=()=>
         let dest=result.find(t=>t.type==='audio'&&!t.locked && !t.clips.some(x=>last(x)>first(c)&&first(x)<last(c)));
         if(!dest){dest={id:makeId(),type:'audio',name:'Camera audio',muted:false,hidden:false,locked:false,volume:1,clips:[]};result.push(dest);}
         const audio=structuredClone(c);audio.id=makeId();audio.kind='audio';audio.linkId=c.linkId=makeId();c.audioDetached=true;
+        delete audio.transitionIn;
         dest.clips.push(audio);nextIds.push(c.id,audio.id);break;
       }
       default:throw Error('Unknown timeline operation');

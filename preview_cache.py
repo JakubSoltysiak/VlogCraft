@@ -127,7 +127,8 @@ class PreviewCache:
             with tempfile.TemporaryDirectory(dir=self.folder,prefix='range-') as directory:
                 work=Path(directory);dest=work/'program.mp4'
                 render_engine.render_range(state,job['start'],job['end'],dest,work,'preview',
-                                           lambda command,cwd:self._execute(job,command,cwd))
+                                           lambda command,cwd:self._execute(job,command,cwd),
+                                           lambda name:job.update(_stage=name))
                 if dest.stat().st_size>self.max_bytes:raise ValueError('Preview cache budget exceeded; choose a lower monitor resolution')
                 digest=self._digest(dest)
                 with self.guard:
@@ -143,8 +144,7 @@ class PreviewCache:
                 if not job['cancel'].is_set():job.update(status='error',error=str(error))
 
     def _execute(self,job,command,cwd):
-        stage=job.get('_stage',0)
-        offsets=(0,85,95);weights=(85,10,4)
+        offset,weight={'video':(0,85),'audio':(85,10),'segment-mux':(95,4)}.get(job.get('_stage'),(0,85))
         command=[command[0],'-progress','pipe:1',*command[1:]]
         with tempfile.TemporaryFile() as errors:
             with self.guard:
@@ -157,14 +157,13 @@ class PreviewCache:
                     if line.startswith(b'out_time_us='):
                         try:seconds=int(line.split(b'=')[1])/1e6
                         except ValueError:continue
-                        percent=offsets[stage]+weights[stage]*seconds/(job['end']-job['start'])
-                        with self.guard:job['percent']=min(99,round(percent))
+                        percent=offset+weight*seconds/(job['end']-job['start'])
+                        with self.guard:job['percent']=max(job['percent'],min(99,round(percent)))
                 result=process.wait()
                 if job['cancel'].is_set():raise RuntimeError('Preview cancelled')
                 if result:
                     errors.seek(0,2);errors.seek(max(0,errors.tell()-1600))
                     raise RuntimeError(errors.read().decode(errors='replace'))
-                job['_stage']=stage+1
             finally:
                 if process.poll() is None:process.kill();process.wait()
                 process.stdout.close()

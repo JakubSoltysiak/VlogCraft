@@ -10,6 +10,7 @@ import color_management
 import hdr_render
 import render_engine
 import sequences
+import timeline_transitions
 from hdr10plus_authoring import PAYLOAD_BYTES, decoded_frames, payload, prefix_sei
 from hdr10plus_bitstream import codec_configuration, length_size, packet_records, sei_payloads
 from hdr10plus_export import AUDIO_FIELDS, VIDEO_FIELDS, media, static_metadata
@@ -17,6 +18,8 @@ from hdr10plus_export import AUDIO_FIELDS, VIDEO_FIELDS, media, static_metadata
 
 def preflight(state, require_mastering=True):
     state = sequences.playback(state)
+    if timeline_transitions.present(state):
+        timeline_transitions.plan(state)
     output = state['output']
     if (output.get('color') or {}).get('output') != 'hdr10' or output.get('encoder') != 'libx265':
         raise ValueError('This HDR delivery requires managed PQ and the HEVC CPU encoder')

@@ -3,10 +3,12 @@ from fractions import Fraction
 from pathlib import Path
 import math,re
 import animation,sequences,timing,render_engine
+import timeline_transitions
 VIDEO_KEYS={'x','y','scale','rotation','opacity'}
 class Unsupported(ValueError):pass
 def compile_plan(state,width=960):
  state=sequences.playback(state);fps=timing.rate(state['output']['fps'])
+ if timeline_transitions.present(state):raise Unsupported('Boundary transitions require Composited playback')
  if (state['output'].get('color') or {}).get('output')=='sdr':raise Unsupported('Managed SDR monitoring requires the reference tone map')
  width=int(width)
  if width not in (640,960,1280,1920,2560,3840):raise Unsupported('Choose a supported native monitor size')

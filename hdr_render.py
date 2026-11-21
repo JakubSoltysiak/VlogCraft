@@ -4,6 +4,7 @@ from pathlib import Path
 import animation,color_management as color,sequences,timing
 from hdr10plus_bitstream import packet_records
 import hdr_layers
+import timeline_transitions
 
 
 def final_clock(files, fps, frames, cancelled):
@@ -57,13 +58,17 @@ def command(state,start,end,target,jobdir,quality='final'):
       '-f','lavfi','-i',f'color=black:s={w}x{h}:r={fps}:d={engine._num(end-start)}']
  linear='zscale=agamma=0:pin=709:tin=709:min=709:rin=limited:p=2020:t=linear:m=gbr:r=full:npl=100,format=gbrpf32le'
  filters=['[0:v]'+linear+'[base0]'];back='base0'
- for n,(_,c) in enumerate(video,1):
+ input_count=0
+ def append_layer(back,c):
+  nonlocal input_count
+  input_count+=1
+  n=input_count
   a,source,orientation,(p,t,m,r,profile)=layer_contract(assets,c,w,h)
   at=max(start,float(timing.frame_at(c['position'],fps)/fps));until=min(end,float(timing.frame_at(engine.clip_finish(c),fps)/fps));delay=at-start
   seek=float(c['start'])+max(0,at-float(c['position']))*float(c.get('speed',1))
   still=c.get('kind') in ('image','title')
   path=hdr_layers.title_image(c,w,h,jobdir) if a is None else a['path']
-  cmd+=['-noautorotate'];engine._media_input(cmd,path,'image' if still else 'video',seek,c.get('speed',1),end-start,fps,'video')
+  cmd.append('-noautorotate');engine._media_input(cmd,path,'image' if still else 'video',seek,c.get('speed',1),end-start,fps,'video')
   transform=hdr_layers.uses_geometry(c)
   has_mask=c.get('mask','none')!='none'
   adjusted=any(c.get(key,1)!=1 or c.get('keys',{}).get(key) for key in ('contrast','saturation'))
@@ -98,7 +103,36 @@ def command(state,start,end,target,jobdir,quality='final'):
     f'{oriented},zscale=agamma=0:w={w}:h={h}:filter=bilinear,format=gbrpf32le,'
     f'trim=end_frame={count},setpts=PTS+{engine._num(delay)}/TB[lay{n}]')
    filters.append(f"[{back}][lay{n}]blend=all_expr='A*(1-({alpha}))+B*{gain:.12g}*({alpha})':eof_action=pass:repeatlast=0:enable='gte(t,{engine._num(delay)})*lt(t,{engine._num(until-start)})'[base{n}]")
-  back=f'base{n}'
+  return f'base{n}'
+ pictures=timeline_transitions.plan(state)[0] if timeline_transitions.present(state) else []
+ pairs={}
+ for pair in pictures:
+  if pair.end<=first or pair.start>=last:continue
+  if first<pair.start or last>pair.end:
+   raise ValueError('Managed transition ranges must stop on boundary frames')
+  pairs[id(pair.track)]=pair
+ for track in reversed(state['tracks']):
+  pair=pairs.get(id(track))
+  if pair:
+   left,right=pair.virtual(fps)
+   tag='transition'+str(input_count)
+   filters.append(f'[{back}]split=2[{tag}left][{tag}right]')
+   a=append_layer(tag+'left',left)
+   b=append_layer(tag+'right',right)
+   seconds=float((pair.end-pair.start-1)/fps)
+   elapsed=float((first-pair.start)/fps)
+   weight=f'clip((T+{elapsed:.12g})/{seconds:.12g},0,1)'
+   if pair.ease=='smooth':weight=f'({weight})^2*(3-2*({weight}))'
+   if pair.kind=='dissolve':
+    expression=f'A*(1-({weight}))+B*({weight})'
+   else:
+    level=contract['sdrWhiteNits']/100 if pair.kind=='dip-white' else 0
+    expression=f'if(lt(({weight}),.5),A*(1-2*({weight}))+{level:.12g}*2*({weight}),B*(2*({weight})-1)+{level:.12g}*(2-2*({weight})))'
+   filters.append(f"[{a}][{b}]blend=all_expr='{expression}'[{tag}]")
+   back=tag
+  else:
+   for t,clip in video:
+    if t is track:back=append_layer(back,clip)
  # Picture-dependent/source-master metadata is deliberately removed before fresh signalling.
  tail=',sidedata=mode=delete'
  hdr=contract['output']=='hdr10' and quality=='final'

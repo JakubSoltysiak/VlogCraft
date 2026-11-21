@@ -379,6 +379,9 @@ def validate_state(d, base=None):
                 if src['lutId'] not in base.get('luts',{}):raise ValueError('Missing project LUT')
                 c['lutId']=src['lutId']
             if 'keys' in src:c['keys']=animation.validate(src['keys'])
+            if src.get('transitionIn'):
+                import timeline_transitions
+                c['transitionIn']=timeline_transitions.spec(src['transitionIn'],t['type'])
             if c['grade'] not in engine.GRADES:raise ValueError('Invalid color grade')
             if c['fit'] not in ('contain','cover'):raise ValueError('Invalid fit')
             if kind=='title':
@@ -407,6 +410,13 @@ def validate_state(d, base=None):
                       'bitrate':_number(output.get('bitrate',0),'Video bitrate',0,2000)}
     if output.get('defaultMotion') is not None:
         result['output']['defaultMotion']=animation.validate_default_motion(output['defaultMotion'])
+    for key,track_type in (('defaultVideoTransition','video'),('defaultAudioTransition','audio')):
+        if key in output:
+            import timeline_transitions
+            raw=output[key]
+            if not isinstance(raw,dict) or 'from' in raw:raise ValueError('Invalid default transition')
+            resolved=timeline_transitions.spec({**raw,'from':'template'},track_type)
+            result['output'][key]={name:value for name,value in resolved.items() if name!='from'}
     removed=output.get('removedMedia',[])
     if not isinstance(removed,list) or any(not isinstance(ident,str) or ident not in assets for ident in removed):
         raise ValueError('Invalid removed media list')
@@ -1045,7 +1055,7 @@ class Handler(BaseHTTPRequestHandler):
             if path=='/' or path=='/index.html':return self.file_response(WEB/'index.html','text/html; charset=utf-8')
             if path in ('/branding/vlogcraft-approved.ico',*(f'/branding/vlogcraft-{n}.png' for n in (16,24,32,48,64,128,256))):
                 return self.file_response(WEB/path.lstrip('/'))
-            if path in ('/app.js','/color.js','/studio.js','/animation.js','/motion.js','/timeline.js','/timebase.js','/edit_ops.js','/edit_commands.js','/monitor.js','/rendered_preview.js','/native_preview.js','/native_audio_worklet.js','/recovery.js','/performance.js','/playback_cache.js','/effects.js','/grade.js','/audio.js','/nesting.js','/source_frames.js','/style.css'):
+            if path in ('/app.js','/color.js','/studio.js','/animation.js','/transitions.js','/motion.js','/timeline.js','/timebase.js','/edit_ops.js','/edit_commands.js','/monitor.js','/rendered_preview.js','/native_preview.js','/native_audio_worklet.js','/recovery.js','/performance.js','/playback_cache.js','/effects.js','/grade.js','/audio.js','/nesting.js','/source_frames.js','/style.css'):
                 return self.file_response(WEB/path.lstrip('/'))
             return self.json_response({'error':'Not found'},404)
         except (BrokenPipeError,ConnectionAbortedError,ConnectionResetError):return
@@ -1186,6 +1196,35 @@ class Handler(BaseHTTPRequestHandler):
                     engine._run(cmd,str(jobdir))
                     import base64
                     return self.json_response({'frame':frame,'image':'data:image/png;base64,'+base64.b64encode(dest.read_bytes()).decode('ascii')})
+            if path=='/api/transition/check':
+                import timeline_transitions
+                edits=data.get('edits')
+                if not isinstance(edits,list) or not edits:raise ValueError('Choose at least one clip boundary')
+                with LOCK:trial=deepcopy(STATE)
+                by_id={t['id']:t for t in trial['tracks']}
+                accepted,skipped=[],[]
+                for edit in edits:
+                    if not isinstance(edit,dict):raise ValueError('Invalid transition edit')
+                    track=by_id.get(edit.get('track'))
+                    clip=next((c for c in track['clips'] if c['id']==edit.get('clip')),None) if track else None
+                    if not clip or track.get('locked') or clip.get('locked'):
+                        skipped.append('Boundary is locked or missing')
+                        continue
+                    previous=clip.pop('transitionIn',None)
+                    try:
+                        if edit.get('transition'):
+                            if track['type']=='video' and not trial['output'].get('color'):
+                                raise ValueError('Apply managed color before adding video transitions')
+                            clip['transitionIn']=timeline_transitions.spec(edit['transition'],track['type'])
+                            left=next((c for c in track['clips'] if c['id']==clip['transitionIn']['from']),None)
+                            if left and left.get('locked'):raise ValueError('The outgoing clip is locked')
+                            timeline_transitions.plan(sequences.playback(trial))
+                        accepted.append({'track':track['id'],'clip':clip['id'],'transition':clip.get('transitionIn')})
+                    except ValueError as error:
+                        clip.pop('transitionIn',None)
+                        if previous:clip['transitionIn']=previous
+                        skipped.append(str(error))
+                return self.json_response({'accepted':accepted,'skipped':skipped})
             if path=='/api/source/cancel':
                 FRAME_INDEX.cancel(str(data.get('assetId','')))
                 return self.json_response({'cancelled':True})
