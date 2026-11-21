@@ -134,6 +134,9 @@ function sizeMonitor(){
 async function openExport(){
   openModal('exportModal');
   initColorControls();
+  $('exportWorkflow').value='render';
+  $('exportWorkflow').onchange=updateExportWorkflow;
+  updateExportWorkflow();
   const out=state.output;
   const preset=[1280,1920,2560,3840,7680].includes(out.width)&&out.height===out.width*9/16;
   $('exportResolution').value=preset?String(out.width):'custom';
@@ -167,6 +170,12 @@ async function openExport(){
     $('startRender').disabled=!choice.value || (await request('jobs')).export.status==='rendering';
   }catch(error){toast('Encoder check failed: '+error.message,true);}
   finally{choice.disabled=false;updateEncoderControls();}
+}
+
+function updateExportWorkflow(){
+  const preserving=$('exportWorkflow').value==='hdr10plus-copy';
+  $('exportRenderSettings').hidden=preserving;
+  $('exportCopyRequirements').hidden=!preserving;
 }
 
 function updateEncoderControls(){

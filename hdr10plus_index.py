@@ -67,7 +67,7 @@ def validated_metadata(data):
     if any(key in fields for key in ('knee_point_x','knee_point_y','num_bezier_curve_anchors')):
         values('knee_point_x',1,1)
         values('knee_point_y',1,1)
-        anchors = count('num_bezier_curve_anchors',15)
+        anchors = count('num_bezier_curve_anchors',9)
         values('bezier_curve_anchors',anchors,1)
     if fields:
         raise ValueError('HDR10+ metadata contains unqualified optional fields')

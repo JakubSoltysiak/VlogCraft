@@ -1,0 +1,43 @@
+{
+  "baseline": "fb48c7dd7bccfdf6a5ee552787f7ff68dead8dcc",
+  "qualification": "Partial. Independent source SEI audit and complete-clip HDR10+ preservation, not a sustained playback or export throughput acceptance.",
+  "scope": "Raw MP4 sample audit against existing decoded cache. No camera files, timestamps or payload records published.",
+  "private_camera_block_counts": [
+    {
+      "source": "Camera 1",
+      "frames": 4674,
+      "seconds": 1.2159958999982337,
+      "valid": 0,
+      "invalid": 4674,
+      "unsupported": 0,
+      "implementation_limited": 0,
+      "untagged": 0,
+      "exact_bitstream_matches": 4674,
+      "valid_fenced_by_index": 0,
+      "reasons": {
+        "reserved_5_percent": 4674
+      },
+      "field_differences": {}
+    },
+    {
+      "source": "Camera 2",
+      "frames": 2945,
+      "seconds": 0.7571481999984826,
+      "valid": 0,
+      "invalid": 2945,
+      "unsupported": 0,
+      "implementation_limited": 0,
+      "untagged": 0,
+      "exact_bitstream_matches": 2945,
+      "valid_fenced_by_index": 0,
+      "reasons": {
+        "reserved_5_percent": 2945
+      },
+      "field_differences": {}
+    }
+  ],
+  "source_fingerprint": "6e2c8b6252ceb44c1cb39fb320c70f23d2a25b6b98c4aa89176a7d63b55d3f42",
+  "fingerprint_method": "SHA256 sorted relevant relative path + NUL + LF-normalized source + NUL",
+  "benchmark_protocol_fingerprint": "af76bee3aa452ad635bb07fae50a7f43d4186668a9f9ca49e67f2e3bd8269992",
+  "benchmark_protocol_fingerprint_method": "SHA256 sorted benchmark driver/observer relative path + NUL + LF-normalized source + NUL"
+}

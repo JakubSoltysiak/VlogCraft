@@ -626,6 +626,32 @@ def run_export(snapshot,path,review=False,overwrite=False):
     finally:
         if temp:shutil.rmtree(temp,ignore_errors=True)
 
+
+def run_hdr10plus_copy(snapshot,path,overwrite):
+    import hdr10plus_export
+
+    dest = Path(path)
+    cancelled = CANCEL['export'].is_set
+
+    def stage(message,percent):
+        job_status('export',stage='preservation',message=message,percent=percent,
+                   encoder='HEVC stream copy',_activity=time.monotonic())
+
+    try:
+        stage('Checking original HDR10+ pictures and metadata',1)
+        with tempfile.TemporaryDirectory(prefix='.vlogcraft_',dir=dest.parent) as scratch:
+            part = Path(scratch)/'preserved.mp4'
+            frames = hdr10plus_export.render(snapshot,part,lambda c,d:exec_process(c,d,'export'),stage,cancelled)
+            if cancelled():
+                raise RuntimeError('Export cancelled')
+            publish_export(part,dest,snapshot['assets'],overwrite)
+        job_status('export',status='done',percent=100,path=str(dest),frames=frames,
+                   message='Verified HDR10+ copy completed',_finished=time.monotonic())
+    except Exception as error:
+        job_status('export',status='cancelled' if cancelled() else 'error',error=str(error),
+                   message='HDR10+ copy stopped',_finished=time.monotonic())
+
+
 def cache_id(asset):
     return asset.get('cacheId',asset['id'])
 
@@ -1124,6 +1150,9 @@ class Handler(BaseHTTPRequestHandler):
                 with LOCK:snap=deepcopy(STATE)
                 if engine.sequence_duration(snap)<=0:raise ValueError('Timeline empty')
                 review=path=='/api/review/video'
+                delivery=data.get('delivery','render')
+                if delivery not in ('render','hdr10plus-copy') or (review and delivery!='render'):
+                    raise ValueError('Unknown export delivery mode')
                 if review:
                     snap['output'].update(width=1280,height=720,fps=24,crf=27,preset='veryfast')
                     dest=REVIEWS/f'Kenya_Review_{uuid.uuid4().hex[:10]}.mp4'
@@ -1140,7 +1169,11 @@ class Handler(BaseHTTPRequestHandler):
                     CANCEL['export'].clear()
                     JOBS['export'] = dict(status='rendering',percent=0,path=None,error=None,message='Preparing export',
                                           stage='preparing',frames=0,encodedSeconds=0,_started=time.monotonic())
-                    threading.Thread(target=run_export,args=(snap,str(dest),review,overwrite),daemon=True).start()
+                    if delivery=='hdr10plus-copy':
+                        target,args=run_hdr10plus_copy,(snap,str(dest),overwrite)
+                    else:
+                        target,args=run_export,(snap,str(dest),review,overwrite)
+                    threading.Thread(target=target,args=args,daemon=True).start()
                 if not review:remember_export_folder(dest)
                 return self.json_response({'started':True,'url':'/download/'+dest.name if review else None})
             if path=='/api/job/cancel':
