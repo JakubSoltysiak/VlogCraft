@@ -87,7 +87,9 @@ function bindHdr10PlusScan(assetId,scan,cancel,label){
       : 'No supported HDR10+ metadata detected in '+result.frames.toLocaleString()+' frames.';
      if(result.rejectedFrames)label.textContent+=' '+result.rejectedFrames.toLocaleString()+' frames contain unsupported or malformed metadata.';
      if(result.nonconformingDistributionFrames)label.textContent+=' Metadata is preserved for '+result.nonconformingDistributionFrames.toLocaleString()+' frames with nonconforming distribution values. These frames are blocked from metadata reuse.';
-    }else if(result.status==='indexing')label.textContent='Scanning the original video…';
+    }else if(result.status==='indexing')label.textContent=result.frames
+     ? 'Scanning the original video · '+result.frames.toLocaleString()+' frames read'
+     : 'Scanning the original video…';
     else label.textContent=result.error || (result.status==='cancelled'?'Scan cancelled.':'');
     if(result.status==='indexing')await new Promise(resolve=>setTimeout(resolve,600));
     action='status';

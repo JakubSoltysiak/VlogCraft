@@ -1,6 +1,42 @@
 // Prefix maxima also find long clips which begin before the visible range.
 let laneIndex=new Map();
 let sequenceEnd=0,programTracks=[];
+
+const sequenceDimensions = [
+  ['1280x720','16:9 · 1280 × 720',1280,720],
+  ['1920x1080','16:9 · 1920 × 1080',1920,1080],
+  ['2560x1440','16:9 · 2560 × 1440',2560,1440],
+  ['3840x2160','16:9 · 3840 × 2160',3840,2160],
+  ['7680x4320','16:9 · 7680 × 4320',7680,4320],
+  ['9:16','9:16 · 2160 × 3840',2160,3840],
+  ['1:1','1:1 · 2160 × 2160',2160,2160],
+  ['4:3','4:3 · 2880 × 2160',2880,2160],
+  ['21:9','21:9 · 2520 × 1080',2520,1080],
+];
+
+function gridFrame(seconds,interval,fps){
+  return interval==='frame'
+    ? Math.round(seconds*fps)
+    : Math.round(Math.round(seconds/Number(interval))*Number(interval)*fps);
+}
+
+function zoomScrollOffset(anchor,oldZoom,newZoom,scroll,trackHeader){
+  return Math.max(0,((scroll+anchor-trackHeader)/oldZoom)*newZoom+trackHeader-anchor);
+}
+
+function applySequenceDimensions(width,height){
+  if(![width,height].every(n=>Number.isInteger(n)&&n>=16&&n<=16384&&n%2===0)){
+    toast('Enter even dimensions between 16 and 16384 pixels.',true);
+    return;
+  }
+  if(width===state.output.width && height===state.output.height)return;
+  stopPlayback();
+  snapshot();
+  Object.assign(state.output,{width,height});
+  redraw();
+  save();
+}
+
 function rebuildIndex(){
   laneIndex=new Map();sequenceEnd=0;
   programTracks=playbackTracks(state.tracks);

@@ -1,0 +1,37 @@
+{
+  "sources": [
+    {
+      "source": "Camera 1",
+      "seconds": 7.105952400001115,
+      "distinct_frame_intervals": 3,
+      "cached_reused": true,
+      "index_bytes": 229376,
+      "status": "ready",
+      "frames": 105,
+      "dynamicFrames": 105,
+      "rejectedFrames": 0,
+      "nonconformingDistributionFrames": 105,
+      "timeBase": "1/90000",
+      "formatStart": "0",
+      "schema": 2
+    },
+    {
+      "source": "Camera 2",
+      "seconds": 4.246071000001393,
+      "distinct_frame_intervals": 3,
+      "cached_reused": true,
+      "index_bytes": 217088,
+      "status": "ready",
+      "frames": 99,
+      "dynamicFrames": 99,
+      "rejectedFrames": 0,
+      "nonconformingDistributionFrames": 99,
+      "timeBase": "1/90000",
+      "formatStart": "0",
+      "schema": 2
+    }
+  ],
+  "cancelled_without_cache_publication": true,
+  "sample_seconds": 1.5,
+  "scope": "Source metadata only. Bounded derivatives, when requested, use video stream copy."
+}

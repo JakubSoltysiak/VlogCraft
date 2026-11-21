@@ -62,6 +62,7 @@ async function recoveryInitialize(){
   if(['clip','project'].includes(ui.insTab))insTab=ui.insTab;
   document.querySelectorAll('[data-tab]').forEach(button=>button.classList.toggle('active',button.dataset.tab===insTab));
   $('snapBtn').classList.toggle('active',snap);
+  $('snapBtn').setAttribute('aria-pressed',String(snap));
   if([...$('previewSource').options].some(o=>o.value===ui.source))$('previewSource').value=ui.source;
   let history=ui;
   if(ui.history){

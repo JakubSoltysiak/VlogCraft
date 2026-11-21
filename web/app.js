@@ -17,6 +17,7 @@ let state=null, zoom=70, playhead=0, selectedId=null,selectedAssetId=null,insTab
 let undoStack=[],redoStack=[],saveTimer=null,saveInFlight=Promise.resolve(),modified=0,persisted=0;
 let lastPreviewKey='',activePlayers=new Map(),snap=true,clipGesture=null,transferStop=false,transferId=null,toastTimeout=null;
 let renderPoll=null,proposalToken=null,proposalSnapshot=null;
+let timelineScrollManualUntil=0;
 async function request(path,method='GET',body=null){const o={method,cache:'no-store'};if(body!==null){o.headers={'Content-Type':'application/json'};o.body=JSON.stringify(body);}const r=await fetch('/api/'+path,o);let data=await r.json().catch(()=>({error:'Unexpected response from local editor'}));if(!r.ok)throw Error(data.error||`HTTP ${r.status}`);return data;}
 function toast(message,warning=false){const box=$('toast');box.textContent=message;box.className='toast visible'+(warning?' warn':'');clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>box.className='toast',4200);}
 function setSaveStatus(txt){$('saveStatus').textContent=txt;}
@@ -37,7 +38,22 @@ function renderAssets(){const filter=$('assetFilter').value;const search=$('sear
  $('assetList').querySelectorAll('[draggable="true"]').forEach(el=>{el.ondragstart=e=>{e.dataTransfer.setData('application/x-vlogcraft',el.dataset.asset);e.dataTransfer.effectAllowed='copy';};el.ondblclick=()=>{const a=assetById(el.dataset.asset);addAsset(a);};});
  $('assetList').querySelectorAll('[data-source]').forEach(b=>b.onclick=()=>sourceMonitor(assetById(b.dataset.source)));
  $('assetList').querySelectorAll('[data-add]').forEach(el=>el.onclick=e=>{e.stopPropagation();const a=assetById(el.dataset.add);addAsset(a);});}
-function renderProjectInspector(){const out=state.output;return `<div class="section-label">SEQUENCE</div><div class="property"><label>Project name</label><input data-proj="name" value="${esc(state.name)}" maxlength="160"></div><div class="property"><label>Sequence length</label><div class="prop-time">${format(duration())}</div></div><div class="section-label">DELIVERY</div><div class="property"><label>Frame dimensions</label><select data-proj="width"><option value="1280" ${out.width===1280?'selected':''}>1280 × 720</option><option value="1920" ${out.width===1920?'selected':''}>1920 × 1080</option><option value="2560" ${out.width===2560?'selected':''}>2560 × 1440</option><option value="3840" ${out.width===3840?'selected':''}>3840 × 2160 (4K)</option><option value="7680" ${out.width===7680?'selected':''}>7680 × 4320 (8K)</option></select></div><div class="property"><label>Frames per second</label><select data-proj="fps">${rateOptions(out.fps)}</select></div><div class="section-label">NOTES</div><p class="dialog-note">All editing is non-destructive. Preview may use 720p proxies; export always renders from originals in the selected resolution.</p>`;}
+function renderProjectInspector(){
+ const out=state.output;
+ const preset=sequenceDimensions.find(([, ,width,height])=>width===out.width&&height===out.height);
+ return `<div class="section-label">SEQUENCE</div>
+ <div class="property"><label>Project name</label><input data-proj="name" value="${esc(state.name)}" maxlength="160"></div>
+ <div class="property"><label>Sequence length</label><div class="prop-time">${timecode(duration())}</div></div>
+ <div class="property"><label for="sequenceAspect">Aspect ratio and size</label><select id="sequenceAspect">
+ ${sequenceDimensions.map(([id,label])=>`<option value="${id}" ${preset?.[0]===id?'selected':''}>${label}</option>`).join('')}
+ <option value="custom" ${!preset?'selected':''}>Custom dimensions</option></select></div>
+ <div id="sequenceCustom" ${preset?'hidden':''}><div class="prop-row">
+ <div class="property"><label for="sequenceWidth">Width</label><input id="sequenceWidth" type="number" min="16" max="16384" step="2" value="${out.width}"></div>
+ <div class="property"><label for="sequenceHeight">Height</label><input id="sequenceHeight" type="number" min="16" max="16384" step="2" value="${out.height}"></div></div>
+ <button type="button" class="button secondary" id="applySequenceSize">Apply size</button></div>
+ <p class="dialog-note">Existing clip fit and transforms are preserved. Review framing after changing the canvas.</p>
+ <div class="property"><label>Frames per second</label><select data-proj="fps">${rateOptions(out.fps)}</select></div>`;
+}
 const field=(label,key,value,min,max,step=.1)=>`<div class="property"><label>${label}</label><input data-prop="${key}" type="number" min="${min}" max="${max}" step="${step}" value="${round(value)}"></div>`;
 const range=(label,key,value,min,max,step=.05,percent=true)=>`<div class="property"><label>${label}</label><div class="range-line"><input data-prop="${key}" type="range" min="${min}" max="${max}" step="${step}" value="${value}"><output>${percent?Math.round(value*100)+'%':round(value)}</output></div></div>`;
 function renderInspector(){let html='';if(insTab==='project'){html=renderProjectInspector();}else{
@@ -72,12 +88,20 @@ function renderInspector(){let html='';if(insTab==='project'){html=renderProject
  $('inspectorContent').innerHTML=html;
  bindInputColor();
  if($('gradeOpen'))$('gradeOpen').onclick=gradeDialog;
- $('inspectorContent').querySelectorAll('[data-proj]').forEach(el=>el.onchange=()=>{snapshot();let key=el.dataset.proj;if(key==='name'){state.name=el.value||'Untitled';}else if(key==='width'){state.output.width=Number(el.value);state.output.height=state.output.width*9/16;}else if(key==='fps')state.output.fps=rateChoice(el.value);redraw();save();});
+ $('inspectorContent').querySelectorAll('[data-proj]').forEach(el=>el.onchange=()=>{snapshot();const key=el.dataset.proj;if(key==='name')state.name=el.value||'Untitled';else if(key==='fps')state.output.fps=rateChoice(el.value);redraw();save();});
+ if($('sequenceAspect')){
+  $('sequenceAspect').onchange=event=>{
+   const dimensions=sequenceDimensions.find(row=>row[0]===event.target.value);
+   $('sequenceCustom').hidden=!!dimensions;
+   if(dimensions)applySequenceDimensions(dimensions[2],dimensions[3]);
+  };
+  $('applySequenceSize').onclick=()=>applySequenceDimensions($('sequenceWidth').valueAsNumber,$('sequenceHeight').valueAsNumber);
+ }
  $('inspectorContent').querySelectorAll('[data-prop]').forEach(el=>{const action=()=>{
   const cur=sel();if(!cur || cur.track.locked || cur.clip.locked)return;const c=cur.clip,k=el.dataset.prop;
   if(c.linkId && ['position','duration','start','end','speed'].includes(k)){toast('Use timeline handles to trim the linked pair, or unlink for independent timing',true);renderInspector();return;}
   const old=c[k];let v=el.type==='checkbox'?el.checked:el.type==='number'||el.type==='range'?Number(el.value):el.value;
-  if(k==='duration'){v=clamp(v,1/sequenceRate(),1e12);c.end=c.start+v*c.speed;}
+  if(k==='duration'){v=atFrame(Math.max(1,frameIndex(clamp(v,0,1e12))));c.end=c.start+v*(c.speed||1);}
   else if(k==='position')c.position=frameTime(Math.max(0,v));
   else if(k==='end')c.end=Math.max(c.start+c.speed/sequenceRate(),v);
   else if(k==='start')c.start=Math.min(v,c.end-c.speed/sequenceRate());
@@ -113,7 +137,7 @@ function renderTimeline(scrollOnly=false){if(!scrollOnly)rebuildIndex();const to
  }
  html+='</div></div>';
  }
- html+='<div class="playhead" id="timelinePlayhead"></div>';
+ html+='<div class="playhead" id="timelinePlayhead"></div><div id="timelineSnapGuide" class="snap-guide" hidden></div>';
  const scroller=$('timelineScroller');const sx=scroller.scrollLeft,sy=scroller.scrollTop;
  $('timelineContent').innerHTML=html;
  scroller.scrollLeft=sx;scroller.scrollTop=sy;
@@ -122,7 +146,7 @@ function renderTimeline(scrollOnly=false){if(!scrollOnly)rebuildIndex();const to
  $('timelineContent').querySelectorAll('[data-track-settings]').forEach(b=>b.onclick=()=>trackSettings(trackById(b.dataset.trackSettings)));
  $('timelineContent').querySelectorAll('[data-track-action]').forEach(btn=>btn.onclick=e=>{e.stopPropagation();let t=trackById(btn.dataset.track);snapshot();t[btn.dataset.trackAction]=!t[btn.dataset.trackAction];redraw();save();});
  $('timelineContent').querySelectorAll('[data-clip]').forEach(el=>el.onpointerdown=startClipGesture);
- $('timelineContent').querySelectorAll('[data-ruler]').forEach(el=>el.onpointerdown=e=>{if(e.button!==0)return;seek((e.clientX-el.getBoundingClientRect().left)/zoom);const onMove=ev=>seek((ev.clientX-el.getBoundingClientRect().left)/zoom);const onUp=()=>{window.removeEventListener('pointermove',onMove);window.removeEventListener('pointerup',onUp);};window.addEventListener('pointermove',onMove);window.addEventListener('pointerup',onUp);});
+ $('timelineContent').querySelectorAll('[data-ruler]').forEach(el=>el.onpointerdown=startRulerGesture);
  $('timelineContent').querySelectorAll('[data-lane]').forEach(el=>{
   el.ondragover=e=>{if(e.dataTransfer.types.includes('application/x-vlogcraft')){e.preventDefault();el.classList.add('drop-ready');e.dataTransfer.dropEffect='copy';}};
   el.ondragleave=()=>el.classList.remove('drop-ready');
@@ -138,7 +162,59 @@ function positionPlayhead(){
  if(head.textContent!==value)head.textContent=value;if(total.textContent!==end)total.textContent=end;
 }
 function seek(t){playhead=clamp(frameTime(t),0,Math.max(0,duration()));if(isPlaying){playAt=playhead;playStart=transportNow();}positionPlayhead();syncPreview(true);recoveryCheckpoint(false);}
-function snapTo(value,ignore=null){value=Math.max(0,value);if(!snap)return frameTime(value);const others=[0,playhead];for(const t of state.tracks)for(const c of t.clips)if(c.id!==ignore)others.push(c.position,endOf(c));const nearest=others.reduce((best,v)=>Math.abs(v-value)<Math.abs(best-value)?v:best,Infinity);return frameTime(Math.abs(nearest-value)<=Math.max(.08,9/zoom)?nearest:value);}
+function snapTo(value,ignore=null,{bypass=false,guide=false,skipPlayhead=false}={}){
+ value=Math.max(0,value);
+ let nearest=0;
+ let distance=Math.abs(value);
+ const candidate=time=>{
+  const delta=Math.abs(time-value);
+  if(delta<=distance){nearest=time;distance=delta;}
+ };
+ const grid=$('snapGrid').value;
+ if(snap && !bypass){
+  if(!skipPlayhead)candidate(playhead);
+  for(const track of state.tracks)for(const clip of track.clips){
+   if(clip.id===ignore)continue;
+   candidate(clip.position);candidate(endOf(clip));
+  }
+  if(grid!=='edges')candidate(atFrame(gridFrame(value,grid,sequenceRate())));
+ }
+ const snapped=snap && !bypass && distance<=Math.max(.08,9/zoom);
+ const result=frameTime(snapped?nearest:value);
+ if(guide)showSnapGuide(snapped?result:null);
+ return result;
+}
+function showSnapGuide(time){
+ const guide=$('timelineSnapGuide'),ruler=document.querySelector('.ruler-left');
+ if(!guide)return;
+ guide.hidden=time===null;
+ if(time!==null)guide.style.left=((ruler?.offsetWidth||151)+time*zoom)+'px';
+}
+function startRulerGesture(event){
+ if(event.button!==0)return;
+ let queued=null,raf=null;
+ const update=()=>{
+  raf=null;
+  const ruler=document.querySelector('[data-ruler]');
+  if(!queued||!ruler)return;
+  const target=snapTo((queued.clientX-ruler.getBoundingClientRect().left)/zoom,null,
+                      {bypass:queued.shiftKey,guide:true,skipPlayhead:true});
+  queued=null;
+  if(frameIndex(target)!==frameIndex(playhead))seek(target);
+ };
+ const move=ev=>{queued=ev;if(raf===null)raf=requestAnimationFrame(update);};
+ const finish=ev=>{
+  if(raf!==null)cancelAnimationFrame(raf);
+  queued=ev.type==='pointerup'?ev:null;update();showSnapGuide(null);
+  window.removeEventListener('pointermove',move);
+  window.removeEventListener('pointerup',finish);
+  window.removeEventListener('pointercancel',finish);
+ };
+ queued=event;update();
+ window.addEventListener('pointermove',move);
+ window.addEventListener('pointerup',finish);
+ window.addEventListener('pointercancel',finish);
+}
 function startClipGesture(e){if(e.button!==0)return;const el=e.currentTarget,cid=el.dataset.clip,t=trackById(el.dataset.parent),c=t.clips.find(c=>c.id===cid);if(!c||t.locked||c.locked)return;
  e.stopPropagation();
  if(e.ctrlKey||e.metaKey){
@@ -148,28 +224,46 @@ function startClipGesture(e){if(e.button!==0)return;const el=e.currentTarget,cid
  }
  if(!chosenClip(cid))multiple.clear();
  selectedId=cid;document.querySelectorAll('.track-clip').forEach(node=>node.classList.toggle('selected',chosenClip(node.dataset.clip)));renderInspector();const handle=e.target.closest('[data-handle]');const mode=handle?.dataset.handle||'move';let startX=e.clientX,baseline=structuredClone(c),newTrack=null,moved=false;el.setPointerCapture(e.pointerId);let hover=null;
- const move=ev=>{const dx=(ev.clientX-startX)/zoom;if(Math.abs(ev.clientX-startX)>2)moved=true;
+ const label=el.querySelector('.clip-content small');
+ const asset=assetById(c.assetId);
+ const anchor=mode==='right'?endOf(baseline):baseline.position;
+ const point=(ev,guide)=>snapTo(anchor+(ev.clientX-startX)/zoom,c.id,{bypass:ev.shiftKey,guide});
+ const move=ev=>{const target=point(ev,true);if(Math.abs(ev.clientX-startX)>2)moved=true;
    if(mode==='move'){
-    const proposed=snap&& !ev.shiftKey?snapTo(baseline.position+dx,c.id):frameTime(Math.max(0,baseline.position+dx));
-    el.style.left=(proposed*zoom)+'px';
+    el.style.left=(target*zoom)+'px';
+    label.textContent=timecode(target)+' → '+timecode(target+lengthOf(baseline));
     const lane=document.elementFromPoint(ev.clientX,ev.clientY)?.closest('[data-lane]');
     if(hover&&hover!==lane)hover.classList.remove('drop-ready');
     if(lane&&lane.dataset.lane!==t.id){let dest=trackById(lane.dataset.lane),a=assetById(c.assetId);
       if(dest&&!dest.locked&&((c.kind==='title'||c.kind==='sequence')?dest.type==='video':canPlace(a,dest))){lane.classList.add('drop-ready');hover=lane;newTrack=dest;}else newTrack=null;
     }else{newTrack=null;hover=null;}
-   }else if(mode==='right')el.style.width=Math.max(4,(lengthOf(baseline)+dx)*zoom)+'px';
-   else {el.style.left=(baseline.position+dx)*zoom+'px';el.style.width=Math.max(4,(lengthOf(baseline)-dx)*zoom)+'px';}
+   }else{
+    const from=mode==='left'?target:baseline.position;
+    const to=mode==='right'?target:endOf(baseline);
+    const length=to-from;
+    const out=baseline.start+length*(baseline.speed||1);
+    const inPoint=baseline.start+(target-baseline.position)*(baseline.speed||1);
+    const timed=asset && asset.kind!=='image';
+    if(length<1/sequenceRate()-.000001 || (timed && (mode==='left'?inPoint<-.000001:out>asset.duration+.000001))){
+     label.textContent='Source or frame limit';
+     return;
+    }
+    el.style.left=(from*zoom)+'px';
+    el.style.width=Math.max(4,length*zoom)+'px';
+    label.textContent=timecode(from)+' → '+timecode(to)+' · '+timecode(length);
+   }
  };
- const up=ev=>{el.releasePointerCapture?.(e.pointerId);el.removeEventListener('pointermove',move);el.removeEventListener('pointerup',up);el.removeEventListener('pointercancel',up);if(hover)hover.classList.remove('drop-ready');if(!moved){renderTimeline();return;}
-  const dx=frameTime((ev.clientX-startX)/zoom);
+ const up=ev=>{if(el.hasPointerCapture(e.pointerId))el.releasePointerCapture(e.pointerId);el.removeEventListener('pointermove',move);el.removeEventListener('pointerup',up);el.removeEventListener('pointercancel',up);if(hover)hover.classList.remove('drop-ready');showSnapGuide(null);if(!moved||ev.type==='pointercancel'){renderTimeline(true);return;}
+  const target=point(ev,false);
   if(mode!=='move' || !newTrack || newTrack.id===t.id){
-    const moved=mode==='move'&&snap&&!ev.shiftKey?snapTo(baseline.position+dx,c.id)-baseline.position:dx;
-    commitEdit(mode==='move'?'move':mode==='left'?'trimLeft':'trimRight',{frames:frameIndex(moved)});
+    const frames=frameIndex(target)-frameIndex(anchor);
+    if(frames)commitEdit(mode==='move'?'move':mode==='left'?'trimLeft':'trimRight',{frames});
+    else renderTimeline(true);
     return;
   }
   if(c.linkId||editingIds().length>1){toast('Move linked or multiple clips within their tracks, or unlink before changing tracks',true);redraw();return;}
   const next=structuredClone(baseline);
-  next.position=snap&&!ev.shiftKey?snapTo(baseline.position+dx,c.id):frameTime(Math.max(0,baseline.position+dx));
+  next.position=target;
   if(next.position<0)next.position=0;
   if(JSON.stringify(next)!==JSON.stringify(baseline)||newTrack){snapshot();Object.assign(c,next);if(newTrack&&newTrack.id!==t.id){const a=assetById(c.assetId);t.clips.splice(t.clips.indexOf(c),1);c.kind=['title','sequence'].includes(c.kind)?c.kind:newTrack.type==='audio'?'audio':a.kind;newTrack.clips.push(c);}
    redraw();save();toast(`${mode==='move'?'Moved':'Trimmed'} clip to ${format(c.position)}`);
@@ -242,7 +336,36 @@ function syncAudio(force=false){const active=[];
 function stopPlayback(){isPlaying=false;recoveryCheckpoint(false);updateMeter.peak=0;updateMeter.lastPaint=undefined;nativePause();pauseRendered();$('masterMeter').value=-60;referenceChanged();$('playBtn').innerHTML=svg('play');for(const p of activePlayers.values())p.media?.pause?.();for(const p of audioPlayers.values())p.pause();}
 async function playPause(){if(nativeSelected())return nativePlayPause();if(isPlaying){stopPlayback();return;}if(duration()<=0)return toast('Add footage first',true);if(playhead>=duration()-.001)playhead=0;try{await initializeMixer();transportClock=mixer.state==='running'?mixer:null;}catch{transportClock=null;}
  isPlaying=true;playAt=playhead;playStart=transportNow();$('playBtn').innerHTML=svg('pause');syncPreview(true);requestAnimationFrame(animate);}
-function animate(){if(!isPlaying)return;updateMeter();playhead=nativeSelected()?nativeClock():renderedEnabled()?renderedClock():playAt+(transportNow()-playStart)/1000;if(nativeSelected()&&playhead>=nativeDuration()){playhead=nativeDuration();positionPlayhead();stopPlayback();return;}if(!nativeSelected()&&playhead>=duration()){seek(duration());stopPlayback();return;}positionPlayhead();syncPreview(false);const p=$('timelinePlayhead');if(p){const scroller=$('timelineScroller');const edge=151+playhead*zoom;if(edge>scroller.scrollLeft+scroller.clientWidth-50)scroller.scrollLeft=edge-200;}requestAnimationFrame(animate);}
+function animate(){if(!isPlaying)return;updateMeter();playhead=nativeSelected()?nativeClock():renderedEnabled()?renderedClock():playAt+(transportNow()-playStart)/1000;if(nativeSelected()&&playhead>=nativeDuration()){playhead=nativeDuration();positionPlayhead();stopPlayback();return;}if(!nativeSelected()&&playhead>=duration()){seek(duration());stopPlayback();return;}positionPlayhead();syncPreview(false);followTimelinePlayhead();requestAnimationFrame(animate);}
+
+function followTimelinePlayhead(){
+ const mode=$('timelineFollow').value;
+ if(mode==='off'||performance.now()<timelineScrollManualUntil)return;
+ const scroller=$('timelineScroller');
+ const width=scroller.clientWidth, header=151;
+ const local=header+playhead*zoom-scroller.scrollLeft;
+ const anchor=mode==='center'?(width+header)/2:header+30;
+ if(mode==='center'||local>width-45||local<header){
+  scroller.scrollLeft=Math.max(0,header+playhead*zoom-anchor);
+ }
+}
+
+function changeTimelineZoom(value,anchor=null){
+ const next=clamp(value,14,190);
+ if(next===zoom)return;
+ const viewport=$('timelineScroller');
+ const header=document.querySelector('.ruler-left')?.offsetWidth||151;
+ const local=header+playhead*zoom-viewport.scrollLeft;
+ const visible=local>=header&&local<=viewport.clientWidth;
+ const x=anchor??(visible?local:(header+viewport.clientWidth)/2);
+ const scroll=zoomScrollOffset(x,zoom,next,viewport.scrollLeft,header);
+ zoom=next;
+ $('timelineZoom').value=zoom;
+ $('zoomLabel').textContent=zoom+' px/s';
+ renderTimeline(true);
+ viewport.scrollLeft=scroll;
+ timelineScrollManualUntil=performance.now()+4000;
+}
 function redraw(){if(!state)return;rebuildIndex();$('projectTitle').textContent=state.name;$('renderRes').textContent=`${state.output.width} × ${state.output.height} · ${rateLabel(state.output.fps)} FPS`;$('exportEstimate').textContent=`${state.output.width===3840?'4K UHD':state.output.width+'p'} · ${rateLabel(state.output.fps)} FPS · H.264`;
  document.querySelector('.export-feature strong').textContent=state.name;sizeMonitor();renderAssets();renderTimeline(true);renderInspector();$('timelineStatus').textContent=`${state.tracks.length} TRACKS · ${state.tracks.reduce((n,t)=>n+t.clips.length,0)} CLIPS`;
  syncPreview(true);
@@ -349,11 +472,21 @@ function setup(){
  $('playBtn').onclick=playPause;$('stepBack').onclick=()=>seek(playhead-1/sequenceRate());$('stepForward').onclick=()=>seek(playhead+1/sequenceRate());$('jumpStart').onclick=()=>seek(0);
  $('undoBtn').onclick=()=>restoreHistory(undoStack,redoStack);$('redoBtn').onclick=()=>restoreHistory(redoStack,undoStack);
  $('splitBtn').onclick=splitSelected;$('duplicateBtn').onclick=duplicateSelected;$('deleteBtn').onclick=removeSelected;
- $('snapBtn').onclick=()=>{snap=!snap;$('snapBtn').classList.toggle('active',snap);};
+ $('snapBtn').onclick=()=>{snap=!snap;$('snapBtn').classList.toggle('active',snap);$('snapBtn').setAttribute('aria-pressed',String(snap));};
+ $('timelineFollow').onchange=()=>{timelineScrollManualUntil=0;if(isPlaying)followTimelinePlayhead();};
  $('addVideoTrack').onclick=()=>addTrack('video');$('addAudioTrack').onclick=()=>addTrack('audio');$('addTitle').onclick=addTitle;
- $('timelineZoom').oninput=e=>{zoom=Number(e.target.value);$('zoomLabel').textContent=zoom+' px/s';renderTimeline();};
+ $('timelineZoom').oninput=e=>changeTimelineZoom(Number(e.target.value));
  $('zoomOut').onclick=()=>{$('timelineZoom').value=Math.max(14,zoom-15);$('timelineZoom').oninput({target:$('timelineZoom')});};
  $('zoomIn').onclick=()=>{$('timelineZoom').value=Math.min(190,zoom+15);$('timelineZoom').oninput({target:$('timelineZoom')});};
+ const timelineViewport=$('timelineScroller');
+ timelineViewport.addEventListener('wheel',event=>{
+  timelineScrollManualUntil=performance.now()+4000;
+  if(!event.ctrlKey)return;
+  event.preventDefault();
+  if(event.deltaY)changeTimelineZoom(zoom+(event.deltaY<0?12:-12),
+                                     Math.max(151,event.clientX-timelineViewport.getBoundingClientRect().left));
+ },{passive:false});
+ timelineViewport.addEventListener('pointerdown',()=>{timelineScrollManualUntil=performance.now()+4000;});
  document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{insTab=b.dataset.tab;document.querySelectorAll('[data-tab]').forEach(n=>n.classList.toggle('active',n===b));renderInspector();});
  $('startRender').onclick=()=>void startExport();$('cancelRender').onclick=()=>void request('job/cancel','POST',{job:'export'});
  $('browseExport').onclick=()=>void browseExport().catch(e=>toast(e.message,true));

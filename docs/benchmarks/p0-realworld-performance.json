@@ -25,11 +25,12 @@
   ],
   "mean_absolute_RGB_error_8bit": 0.0,
   "original_hashes_match": true,
-  "qualification": "Partial. One paired synthetic still-heavy SDR export. 3.5.3 installed acceptance is tracked separately; historical native playback, audio and memory gates remain open.",
+  "qualification": "Partial. One matched synthetic UHD60 renderer pair and a separate installed AMF export. HDR10+ delivery and sustained editing/playback remain open.",
   "measurement_scope": "One matched pair with common FFmpeg 9.0.2 and source workload. Includes drain/mux; decoded RGB compared at 96\u00d754. No long-form or general encoder-throughput inference.",
   "report": "docs/HDR10PLUS_EDITING.md",
-  "source_fingerprint": "a0b6d6b9e6d93c914ab670f0d1761b7bebff7fd24dd5ed4eec1a8b9e90ef6495",
+  "source_fingerprint": "55680984ddfd9261eece374ad65942017dccff7f49eb78c141bbb5fe8c6789d5",
   "fingerprint_method": "SHA256 sorted relevant relative path + NUL + LF-normalized source + NUL",
-  "benchmark_protocol_fingerprint": "049b234d6b5d697ff7749ae8c46e243fe250b0fd247031f481d5296e9e06b406",
-  "benchmark_protocol_fingerprint_method": "SHA256 sorted benchmark driver/observer relative path + NUL + LF-normalized source + NUL"
+  "benchmark_protocol_fingerprint": "6806d924a3a6f15262640f49d803a6fa5fae627151618a5cee7902dc8ee0dad3",
+  "benchmark_protocol_fingerprint_method": "SHA256 sorted benchmark driver/observer relative path + NUL + LF-normalized source + NUL",
+  "measured_renderer_commit": "eb0035a380af2c384e03655636dc1c182ef3d735"
 }

@@ -74,7 +74,7 @@ def validated_metadata(data):
     return [[item.get('key'),item.get('value')] for item in data if item.get('key')!='side_data_type'], conforming_distribution
 
 
-def index_xml(stream, database, cancelled=lambda:False):
+def index_xml(stream, database, cancelled=lambda:False, progress=lambda frames:None):
     """Stream FFprobe XML, releasing each decoded frame before reading the next."""
     database.executescript("""
         CREATE TABLE frames (pts INTEGER PRIMARY KEY, duration INTEGER, metadata TEXT, rejected INTEGER NOT NULL);
@@ -120,6 +120,8 @@ def index_xml(stream, database, cancelled=lambda:False):
                     rejected = True
             database.execute('INSERT INTO frames VALUES (?,?,?,?)',(pts,duration,payload,rejected))
             counts['frames']+=1
+            if counts['frames']%120==0:
+                progress(counts['frames'])
             parents[-2].remove(element)
         elif element.tag=='stream':
             if base is not None:
@@ -192,7 +194,7 @@ class HDR10PlusIndex:
         destination = self.path(asset)
         with self.lock:
             if self.active and self.active['destination']==destination:
-                return {'status':'indexing'}
+                return {'status':'indexing','frames':self.active['frames']}
             if self.last and self.last[0]==destination:
                 return self.last[1]
         if destination.exists():
@@ -212,7 +214,7 @@ class HDR10PlusIndex:
                     return {'status':'indexing'}
                 raise ValueError('Another HDR10+ source is being indexed')
             if not destination.is_file():
-                task = {'destination':destination,'cancel':threading.Event(),'process':None}
+                task = {'destination':destination,'cancel':threading.Event(),'process':None,'frames':0}
                 self.active = task
                 self.last = None
                 worker = threading.Thread(target=self._run,args=(asset,task),daemon=True,name='hdr10plus-index')
@@ -248,7 +250,7 @@ class HDR10PlusIndex:
             self.folder.mkdir(parents=True,exist_ok=True)
             with tempfile.NamedTemporaryFile(dir=self.folder,suffix='.part',delete=False) as handle:
                 temporary = Path(handle.name)
-            command = ['ffprobe','-v','error','-threads','1','-select_streams','v:0',
+            command = ['ffprobe','-v','error','-threads','3','-select_streams','v:0',
                        '-show_frames','-show_streams','-show_format','-show_entries',
                        'frame=pts,best_effort_timestamp,duration:frame_side_data:stream=time_base:format=start_time',
                        '-of','xml',asset['path']]
@@ -261,7 +263,10 @@ class HDR10PlusIndex:
                     task['process'] = process
                 with process as probe,closing(sqlite3.connect(temporary)) as database:
                     try:
-                        summary = index_xml(probe.stdout,database,cancelled)
+                        def progress(frames):
+                            with self.lock:
+                                task['frames'] = frames
+                        summary = index_xml(probe.stdout,database,cancelled,progress)
                         if probe.wait() or errors.seek(0,os.SEEK_END):
                             raise ValueError('FFprobe reported a source decode error')
                         database.commit()

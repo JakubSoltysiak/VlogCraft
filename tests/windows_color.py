@@ -23,6 +23,8 @@ def main(a):
   page.wait_for_function("renderedCurrent?.media?.videoWidth===128&&$('programPreviewStatus').textContent.includes('SDR tone-mapped')",timeout=45000)
   assert page.evaluate("state.assets[0].colorMetadata.bitDepth===10")
   page.get_by_text('Technical input color',exact=True).click()
+  page.click('#indexHdr10Plus')
+  page.wait_for_function("$('hdr10PlusStatus').textContent.startsWith('No supported HDR10+ metadata detected')",timeout=15000)
   page.select_option('#inputPixelAspect','square');assert page.evaluate('state.tracks[0].clips[0].inputColor.pixelAspect')=='square'
   page.get_by_text('Technical input color',exact=True).click();page.select_option('#inputColorProfile','pq2020')
   page.get_by_text('Technical input color',exact=True).click();page.select_option('#inputColorRange','limited')

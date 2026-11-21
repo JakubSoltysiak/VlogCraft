@@ -4,6 +4,7 @@ from contextlib import closing
 import json
 from pathlib import Path
 import sqlite3
+import subprocess
 import sys
 import time
 
@@ -23,7 +24,7 @@ def wait(index,asset,limit=210):
     raise TimeoutError('HDR10+ scan did not finish')
 
 
-def main(manifest,results):
+def main(manifest,results, sample_seconds=None):
     results = results.resolve()
     results.mkdir(parents=True,exist_ok=True)
     sources = json.loads(manifest.read_text('utf8'))
@@ -36,6 +37,14 @@ def main(manifest,results):
             if asset['codec']!='hevc' or asset['colorTransfer']!='smpte2084':
                 continue
             eligible = asset
+            if sample_seconds is not None:
+                # Keep bounded derivatives private. Copy the compressed video
+                # stream so the probe sees the camera's original SEI payloads.
+                sample = results/f'camera-sample-{len(rows)+1}.mp4'
+                subprocess.run(['ffmpeg','-nostdin','-v','error','-i',asset['path'],'-map','0:v:0',
+                                '-t',str(sample_seconds),'-c:v','copy',str(sample)],check=True,
+                               capture_output=True,timeout=20)
+                asset = {'path':str(sample),**probe(sample)}
             started = time.perf_counter()
             assert index.start(asset)['status']=='indexing'
             state = wait(index,asset)
@@ -64,7 +73,8 @@ def main(manifest,results):
         assert not list(cancellation.folder.glob('*.part'))
     finally:
         cancellation.close()
-    report={'sources':rows,'cancelled_without_cache_publication':True,'scope':'Decoded source metadata only; no HDR10+ export.'}
+    report={'sources':rows,'cancelled_without_cache_publication':True,'sample_seconds':sample_seconds,
+            'scope':'Source metadata only. Bounded derivatives, when requested, use video stream copy.'}
     (results/'summary.json').write_text(json.dumps(report,indent=2),encoding='utf8')
     print(json.dumps(report))
 
@@ -73,5 +83,6 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser()
     parser.add_argument('manifest',type=Path)
     parser.add_argument('results',type=Path)
+    parser.add_argument('--sample-seconds',type=float)
     args=parser.parse_args()
-    main(args.manifest,args.results)
+    main(args.manifest,args.results,args.sample_seconds)
