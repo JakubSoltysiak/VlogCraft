@@ -93,3 +93,13 @@ class ManagedEditingTests(unittest.TestCase):
             self.assertLess(nits[0,36,94],120)
             self.assertGreater(nits[11,36,94],750)
             self.assertLess(nits[11,36,33],120)
+
+    def test_linear_contrast_keeps_values_above_sdr_white(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory)
+            state=project([source(root,'contrast',400)])
+            state['tracks'][0]['clips'][0]['contrast']=1.5
+            target=root/'contrast.mp4'
+            engine.render(state,target,root/'render')
+            expected=18+(400-18)*1.5
+            np.testing.assert_allclose(luminance(target)[:,36,64],expected,rtol=.035)

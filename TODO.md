@@ -4,7 +4,7 @@
 **Project:** [JakubSoltysiak/VlogCraft](https://github.com/JakubSoltysiak/VlogCraft)  
 **Last consolidated:** 2026-11-21\
 **Source of requirements:** discussions about VlogCraft Studio, the Kenya travel vlog, Samsung Galaxy footage, the 3.0–3.4 development history, and GitHub PR #1.  
-**Current development state:** 3.3 verified baseline on main. **3.5.6 development is in draft PR #13**, stacked on #12, #11 and #8. A managed-video subset can author descriptive HDR10+ metadata. Full editing support, device playback and production performance remain open.
+**Current development state:** 3.3 verified baseline on main. **3.5.7 editing is in draft PR #14**, stacked on #13. Managed sRGB photographs, titles, keyframed spatial layers and centered transitions now join edited HDR10+ delivery. Advanced effects, device playback and production performance remain open.
 
 > **Mission:** A free, private, offline-first, genuinely capable Windows filmmaking editor. Give one person Premiere-like creative freedom and professional picture/audio quality without cloud processing, subscriptions, arbitrary source-size limits, or unnecessary complexity. Prioritize editing actual travel/wildlife footage over collecting features. It should be delightful for a casual annual vlog yet powerful when needed.
 
@@ -18,12 +18,15 @@
 - [x] **VC-EDIT-015 — Timeline grid, live trim and canvas controls in the tested scope.** Real mouse trim, frame-aligned numeric duration, zoom anchoring, ruler seek coalescing, follow modes and Project Inspector aspect ratios. Preserve fit/transform properties and verify undo/reopen.
 - [x] **VC-EDIT-016A — Batch motion and editable preset keys.** Selected, track and eligible project-wide clips, new-clip defaults, undo, numeric editing and save/reopen. Installed SDR fade endpoints match the reference renderer. Broader HDR/native parity and nested batch application remain open.
 - [ ] **VC-EDIT-016 — Clip-boundary transitions.** Support source handles, linked audio, selected and default boundaries and managed HDR composition. Qualify timing and preview/export across adjacent clips.
+- [x] **VC-EDIT-016B — Centered dissolve, dips and PCM crossfades.** Managed picture transitions keep genuine source handles and the cut clock. Linear/equal-power audio matches between contiguous and segmented renders at 29.97 fps. Slide/push/zoom boundaries and broader multi-project tests remain open.
 - [x] **VC-EDIT-017A — Media Library, camera audio and targeted thumbnail cleanup.** Installed 33-asset grid/list, resizing, safe undoable removal and linked audio separation, verified by decoded PCM. Confirmed cleanup only for eligible removed-media thumbnails.
 - [ ] **VC-EDIT-017 — Complete storage management.** Qualify unused proxy and preview cleanup and interrupted-export recovery. Preserve project variants, backups and repaired source dependencies.
+- [x] **VC-EDIT-017B — Registered export scratch.** Per-job ownership and confirmation-gated stale cleanup, qualified with active leases and an abruptly terminated worker. Unregistered directories and general cache cleanup remain open.
 - [x] **VC-EDIT-018 — Taskbar icon occupancy.** Approved artwork retained. Installed shell, shortcut, taskbar/title-bar resource and MSI checks passed.
 - [x] **VC-HDR-015A — Verify camera payloads and conforming complete-source export.** All 7,619 encoded blocks matched decoded values and failed the version-1 reserved entry. A generated fixture passed installed HEVC Main10 HDR10+ preservation with exact packet timing and independent decode.
 - [x] **VC-HDR-015B — HDR10+ descriptive authoring for managed video.** Independently qualified short Main10/PQ exports from rendered pixels, VFR hold and 2× mapping, and fractional-rate mixed layers with audible audio. Preserve exact render packets and timestamp association through insertion.
-- [ ] **VC-HDR-015 — Complete HDR authoring and delivery acceptance.** Extend managed titles, stills, transforms, creative grades, clip-boundary transitions and cut-aware policies. Qualify longer mixed workloads and actual Samsung QN92F playback. Keep static YouTube HDR separate and check an authorized transcode.
+- [x] **VC-HDR-015C — Managed sRGB photographs, titles and transform/mask subset.** Keep float image and alpha precision. Reference/Composited/export share the layer graph. Qualify final pictures and ST 2094-40 metadata with independent decoding.
+- [ ] **VC-HDR-015 — Complete HDR effects and delivery acceptance.** Extend calibrated profiles, creative grades/curves, additional transitions, effects and cut-aware authoring. Qualify the 60-second UHD mixed workload and actual Samsung QN92F playback. Keep static YouTube HDR separate and check an authorized transcode.
 - [ ] **VC-REL-040 — Real timeline latency and active resources.** The matched short Live Layers pair measured 553.5 → 467.3 ms median seek. Measure repeatable scrubbing, native UHD60 with audio, proxy contention and longer memory behavior. Previous stall and underrun gates remain open.
 
 ## 3.6.0 performance investigation

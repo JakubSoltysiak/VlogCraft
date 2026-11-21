@@ -1,8 +1,379 @@
 {
   "baseline": "8b7b394795f8a1b085ac789453851d3a43c3995b",
-  "qualification": "Checkpoint A. Decoded managed titles, JPEG orientation, PNG alpha and animated PQ geometry; delivery benchmark pending.",
+  "qualification": "Verified bounded HDR editing and UHD60 opacity control; spatial full-size and 60-second workload remain open",
   "source_fingerprint": "916eda42a4ac84297049ff9be89cc733864ed97add4010b1bc34e15b55ae1413",
   "fingerprint_method": "SHA256 sorted relevant relative path + NUL + LF-normalized source + NUL",
-  "benchmark_protocol_fingerprint": "204e2cfd3b7729f4d4976adf6979c8dfec60c91862ff04b7c3c1611034dabf29",
-  "benchmark_protocol_fingerprint_method": "SHA256 sorted benchmark driver/observer relative path + NUL + LF-normalized source + NUL"
+  "benchmark_protocol_fingerprint": "a4f7949501733d326ac5b1af81a07c90bc5146b89fbab4daa903dfd30822212c",
+  "benchmark_protocol_fingerprint_method": "SHA256 sorted benchmark driver/observer relative path + NUL + LF-normalized source + NUL",
+  "production_checkpoint": "9eb1160bf8569a277febafc27b01d411eb21c971",
+  "installer": {
+    "msi": "3.5.7",
+    "executable_file": "3.5.7",
+    "executable_product": "3.5.7",
+    "sha256": "c6963b94160c796b4650c2a1ecb4e7d8af7ae844c4f27d6540203e98e538f90d"
+  },
+  "benchmark_60_seconds_attempted": false,
+  "installed_editor": {
+    "frames": 18,
+    "equal_decoded_static_and_hdr10plus": true,
+    "dynamic_blocks": 18,
+    "body_duration_seconds": 0.75,
+    "undo_redo_reopen": true,
+    "versions_match": true,
+    "source_hashes_match": true
+  },
+  "installed_profile_control": {
+    "static": {
+      "seconds": 17.5,
+      "wall_seconds": 17.688000000009197,
+      "media_worker_peak_rss_mib": 1159.98,
+      "sampled_process_tree_peak_rss_mib": 2568.86,
+      "media_worker_observed_cpu_seconds": 18.609,
+      "sampled_scratch_bytes": 30442,
+      "bytes": 13097,
+      "first_observed_authoring_stages_seconds": {},
+      "frames": 6,
+      "video_size": [
+        3840,
+        2160
+      ],
+      "fps": 60,
+      "dynamic_metadata": false,
+      "video_audio_endpoint_seconds": 0.1
+    },
+    "samsung": {
+      "seconds": 16.5,
+      "wall_seconds": 16.625,
+      "media_worker_peak_rss_mib": 1159.66,
+      "sampled_process_tree_peak_rss_mib": 2473.64,
+      "media_worker_observed_cpu_seconds": 15.219,
+      "sampled_scratch_bytes": 67642,
+      "bytes": 13433,
+      "first_observed_authoring_stages_seconds": {
+        "Analyzing final PQ pictures for HDR10+ metadata": 14.922000000005937,
+        "Attaching metadata in HEVC decode order": 16.218999999997322,
+        "Verifying HDR10+ pictures, audio and timestamps": 16.360000000000582,
+        "Verified edited HDR10+ master completed": 16.625
+      },
+      "frames": 6,
+      "video_size": [
+        3840,
+        2160
+      ],
+      "fps": 60,
+      "dynamic_metadata": true,
+      "video_audio_endpoint_seconds": 0.1
+    },
+    "youtube": {
+      "seconds": 15.1,
+      "wall_seconds": 15.26600000000326,
+      "media_worker_peak_rss_mib": 1159.91,
+      "sampled_process_tree_peak_rss_mib": 2419.71,
+      "media_worker_observed_cpu_seconds": 15.297,
+      "sampled_scratch_bytes": 55057,
+      "bytes": 14046,
+      "first_observed_authoring_stages_seconds": {},
+      "frames": 6,
+      "video_size": [
+        3840,
+        2160
+      ],
+      "fps": 60,
+      "dynamic_metadata": false,
+      "video_audio_endpoint_seconds": 0.1
+    },
+    "static_samsung_decoded_equality": true
+  },
+  "private_integrity": {
+    "source_count": 3,
+    "private_folder_tracked_files": 0,
+    "private_history_path_matches": 0,
+    "private_content_objects": 0,
+    "private_text_objects": 0,
+    "private_working_text_files": 0,
+    "missing_originals": 0,
+    "original_hashes_verified": true,
+    "changed_originals": 0
+  },
+  "performance": {
+    "smoke": {
+      "canvas": [
+        160,
+        90
+      ],
+      "input_video_size": "160x90",
+      "video_sources": 2,
+      "frames": 24,
+      "fps": 60,
+      "audio_rate": 48000,
+      "audio_sources": 3,
+      "visual_clips": 5,
+      "two_dissolves": true,
+      "embedded_camera_crossfade": "linear",
+      "encoder": "libx265 Main 10",
+      "source_commit": "9eb1160bf8569a277febafc27b01d411eb21c971",
+      "static_seconds": 3.0460000000020955,
+      "author_seconds": 0.5,
+      "edited_total_seconds": 3.5460000000020955,
+      "authoring_stages": {
+        "Analyzing final PQ pictures for HDR10+ metadata": 0.046999999991385266,
+        "Attaching metadata in HEVC decode order": 0.125,
+        "Verifying HDR10+ pictures, audio and timestamps": 0.3129999999946449
+      },
+      "process_tree_peak_rss_bytes": 133627904,
+      "scratch_peak_bytes": 177895,
+      "observed_child_cpu_seconds": 1.891,
+      "effective_output_fps": 6.768189509302261,
+      "independent_decoded_picture_pcm_equality": true,
+      "all_frames_have_metadata": true,
+      "distinct_metadata_average_values": 16,
+      "audio_endpoint_samples": 19200,
+      "source_hashes_match": true
+    },
+    "short_spatial": {
+      "canvas": [
+        640,
+        360
+      ],
+      "input_video_size": "640x360",
+      "video_sources": 2,
+      "frames": 48,
+      "fps": 60,
+      "audio_rate": 48000,
+      "audio_sources": 3,
+      "visual_clips": 5,
+      "two_dissolves": true,
+      "photograph_spatial_motion": true,
+      "embedded_camera_crossfade": "linear",
+      "encoder": "libx265 Main 10",
+      "source_commit": "9eb1160bf8569a277febafc27b01d411eb21c971",
+      "static_seconds": 21.093999999997322,
+      "author_seconds": 0.5149999999994179,
+      "edited_total_seconds": 21.60899999999674,
+      "authoring_stages": {
+        "Analyzing final PQ pictures for HDR10+ metadata": 0.046999999991385266,
+        "Attaching metadata in HEVC decode order": 0.20299999999406282,
+        "Verifying HDR10+ pictures, audio and timestamps": 0.35899999999674037
+      },
+      "process_tree_peak_rss_bytes": 295550976,
+      "scratch_peak_bytes": 274560,
+      "observed_child_cpu_seconds": 21.75,
+      "effective_output_fps": 2.2212966819384166,
+      "independent_decoded_picture_pcm_equality": true,
+      "all_frames_have_metadata": true,
+      "distinct_metadata_average_values": 19,
+      "audio_endpoint_samples": 38400,
+      "source_hashes_match": true
+    },
+    "uhd_opacity": {
+      "canvas": [
+        3840,
+        2160
+      ],
+      "input_video_size": "3840x2160",
+      "video_sources": 2,
+      "frames": 24,
+      "fps": 60,
+      "audio_rate": 48000,
+      "audio_sources": 3,
+      "visual_clips": 5,
+      "two_dissolves": true,
+      "photograph_spatial_motion": false,
+      "embedded_camera_crossfade": "linear",
+      "encoder": "libx265 Main 10",
+      "source_commit": "9eb1160bf8569a277febafc27b01d411eb21c971",
+      "static_seconds": 140.10899999999674,
+      "author_seconds": 4.6560000000026776,
+      "edited_total_seconds": 144.76499999999942,
+      "authoring_stages": {
+        "Analyzing final PQ pictures for HDR10+ metadata": 0.04700000000593718,
+        "Attaching metadata in HEVC decode order": 4.328000000008615,
+        "Verifying HDR10+ pictures, audio and timestamps": 4.5
+      },
+      "process_tree_peak_rss_bytes": 5540282368,
+      "scratch_peak_bytes": 297081,
+      "observed_child_cpu_seconds": 156.359,
+      "effective_output_fps": 0.16578592891928365,
+      "independent_decoded_picture_pcm_equality": true,
+      "all_frames_have_metadata": true,
+      "distinct_metadata_average_values": 14,
+      "audio_endpoint_samples": 19200,
+      "source_hashes_match": true
+    }
+  },
+  "local_regression": {
+    "loopback_python_tests": 165,
+    "loopback_python_seconds": 63.192,
+    "javascript_tests": 29
+  },
+  "local_cases": {
+    "build-357": {
+      "exit_code": 0,
+      "seconds": 120.82799999999406,
+      "reason": null,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "desktop-source": {
+      "exit_code": 0,
+      "seconds": 16.218999999997322,
+      "reason": null,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "hdr-scene": {
+      "exit_code": 0,
+      "seconds": 16.860000000000582,
+      "reason": null,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "installed-amf": {
+      "exit_code": 0,
+      "seconds": 36.95299999999406,
+      "reason": null,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "installed-color": {
+      "exit_code": 0,
+      "seconds": 12.172000000005937,
+      "reason": null,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "installed-editor": {
+      "exit_code": 0,
+      "seconds": 20.26600000000326,
+      "reason": null,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "installed-icons": {
+      "exit_code": 0,
+      "seconds": 7.3439999999973224,
+      "reason": null,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "installed-library": {
+      "exit_code": 0,
+      "seconds": 26.453000000008615,
+      "reason": null,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "installed-preserve": {
+      "exit_code": 0,
+      "seconds": 8.906000000002678,
+      "reason": null,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "installed-profiles": {
+      "exit_code": 0,
+      "seconds": 60.171999999991385,
+      "reason": null,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "installed-timeline": {
+      "exit_code": 0,
+      "seconds": 12.437000000005355,
+      "reason": null,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "layers-first": {
+      "exit_code": 1,
+      "seconds": 3.9210000000020955,
+      "reason": null,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "layers-float": {
+      "exit_code": 1,
+      "seconds": 2.0939999999973224,
+      "reason": null,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "layers-planes": {
+      "exit_code": 0,
+      "seconds": 4.0,
+      "reason": null,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "lifecycle": {
+      "exit_code": 0,
+      "seconds": 42.92200000000594,
+      "reason": null,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "offline-final": {
+      "exit_code": 0,
+      "seconds": 63.96899999999732,
+      "reason": null,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "sequence-medium": {
+      "exit_code": 124,
+      "seconds": 190.10899999999674,
+      "reason": "timeout",
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "sequence-short-motion": {
+      "exit_code": 0,
+      "seconds": 23.09299999999348,
+      "reason": null,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "sequence-smoke": {
+      "exit_code": 0,
+      "seconds": 5.0939999999973224,
+      "reason": null,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "sequence-uhd-opacity": {
+      "exit_code": 0,
+      "seconds": 150.875,
+      "reason": null,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "transitions-controller": {
+      "exit_code": 0,
+      "seconds": 6.26600000000326,
+      "reason": null,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "transitions-first": {
+      "exit_code": 1,
+      "seconds": 1.4069999999919673,
+      "reason": null,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "transitions-pcm": {
+      "exit_code": 0,
+      "seconds": 5.592999999993481,
+      "reason": null,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "transitions-scene": {
+      "exit_code": 0,
+      "seconds": 3.375,
+      "reason": null,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    }
+  }
 }

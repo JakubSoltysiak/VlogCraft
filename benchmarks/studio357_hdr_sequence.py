@@ -40,7 +40,7 @@ def camera(folder,index,size,duration):
     return name
 
 
-def state_for(folder,canvas,source_canvas,count):
+def state_for(folder,canvas,source_canvas,count,spatial_motion):
     w,h=canvas
     block=count//3; duration=block/60
     photos=[folder/'photograph.jpg',folder/'overlay.png']
@@ -65,8 +65,10 @@ def state_for(folder,canvas,source_canvas,count):
     frames=max(4,block//3)
     second.update(start=.15,end=.15+duration,transitionIn=settings(first,frames,audio='linear'))
     still=server.default_clip(assets[2],2*duration)
-    still.update(end=duration,transitionIn=settings(second,frames),keys={'scale':[
-        {'time':0,'value':1,'mode':'linear'},{'time':duration,'value':1.1,'mode':'linear'}]})
+    property_name='scale' if spatial_motion else 'opacity'
+    still.update(end=duration,transitionIn=settings(second,frames),keys={property_name:[
+        {'time':0,'value':1,'mode':'linear'},
+        {'time':duration,'value':1.1 if spatial_motion else .85,'mode':'linear'}]})
     state['tracks'][0]['clips']=[first,second,still]
     top=server.default_clip(assets[3],2*duration)
     top.update(end=duration,opacity=.6)
@@ -118,11 +120,11 @@ def hashes(path):
               '-fps_mode','passthrough','-c:v','rawvideo','-threads:v','1','-f','framemd5','-')
 
 
-def main(folder,size,source_size,count):
+def main(folder,size,source_size,count,spatial_motion=True):
     folder=folder.resolve()
     folder.mkdir(parents=True,exist_ok=False)
     w,h=map(int,size.split('x'))
-    state,inputs=state_for(folder,(w,h),source_size,count)
+    state,inputs=state_for(folder,(w,h),source_size,count,spatial_motion)
     static,master=folder/'static.mp4',folder/'master.mp4'
     work=folder/'author'
     work.mkdir()
@@ -130,6 +132,7 @@ def main(folder,size,source_size,count):
     notes={}
     report={'canvas':[w,h],'input_video_size':source_size,'video_sources':2,'frames':count,'fps':60,
             'audio_rate':48000,'audio_sources':3,'visual_clips':5,'two_dissolves':True,
+            'photograph_spatial_motion':spatial_motion,
             'embedded_camera_crossfade':'linear','encoder':'libx265 Main 10',
             'source_commit':ff('git','rev-parse','HEAD').decode().strip()}
     with resources(folder) as stats:
@@ -177,6 +180,7 @@ if __name__=='__main__':
     parser.add_argument('--size',default='1280x720')
     parser.add_argument('--source-size',default='1280x720')
     parser.add_argument('--frames',type=int,default=120)
+    parser.add_argument('--opacity-motion',action='store_true',help='Use photo opacity animation as a separate control')
     args=parser.parse_args()
     if args.frames<24 or args.frames%3:parser.error('Use at least 24 frames, divisible by three')
-    main(args.results,args.size,args.source_size,args.frames)
+    main(args.results,args.size,args.source_size,args.frames,not args.opacity_motion)

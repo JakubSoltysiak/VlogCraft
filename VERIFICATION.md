@@ -1,5 +1,15 @@
 # VlogCraft Studio development qualification
 
+## 3.5.7 managed HDR editing and boundaries
+
+The development MSI was built from production checkpoint `9eb1160bf8569a277febafc27b01d411eb21c971`, SHA-256 `c6963b94160c796b4650c2a1ecb4e7d8af7ae844c4f27d6540203e98e538f90d`. Upgrade, uninstall/reinstall, version labeling, installed bundle identity and approved icon resources passed. [Draft PR #14](https://github.com/JakubSoltysiak/VlogCraft/pull/14) is stacked on #13. [Qualification report](docs/STUDIO_3_5_7_HDR_EDITING.md).
+
+- The installed offline test authored 18 HDR10+ pictures containing edited PQ video, a still photo, an animated title and a dissolve. The decoded static and dynamic outputs matched. Undo/redo and save/reopen preserved the boundary and title. Unit fixtures verified EXIF rotation, sRGB white behavior, transparent PNG over PQ highlights, masked motion, linear contrast and dips.
+- Both 29.97 fps PCM crossfades matched between continuous and segmented render at every sample. A 129-asset library fixture verified camera audio separation, tagged waveform, active-source protection and safe thumbnail restoration. Installed timeline checks passed a 600-frame live trim, 0.143 CSS-pixel zoom anchoring and portrait/custom reopen.
+- Loopback-only Python 165/165 and JavaScript 29/29 passed. Installed Preserve Original, static HDR10, exact 80-state WebView recovery, SDR AMD HEVC export and 4K60 delivery presets passed their scoped regressions. The three private originals matched their existing hashes.
+- The two-second 720p mixed preset with photo zoom timed out in the final animated scene at 190 seconds while the supervisor continued observing work. The shorter 48-frame, 640 × 360 spatial fixture passed with exact decoded picture and PCM equality. The 60-second UHD workload remains unqualified.
+- A separate full-resolution control with two UHD sources, JPEG, transparent PNG, title, two dissolves and embedded camera audio crossfade passed 24 UHD60 frames and 19,200 audio samples. It used photo opacity motion. Timing was 140.109 s static plus 4.656 s for HDR10+, with approximately 5.16 GiB peak summed process RSS.
+
 ## 3.5.6 edited HDR10+ and UHD60 delivery — 21 November 2026
 
 The 3.5.6 development MSI was built from `df1a61eecd169c389bf2f1a95f258601f2605714`, SHA-256 `e31ba92f50dd7830ee002f983632e84bdd9e45a8b7b9b654a92f25a93d00a49c`. Installed code and runtime matched the bundle. Upgrade, uninstall, reinstall, release version and icon checks passed. [Draft PR #13](https://github.com/JakubSoltysiak/VlogCraft/pull/13) is stacked on #12. [Qualification, retained failures and scope](docs/STUDIO_3_5_6_HDR10PLUS.md).

@@ -2,6 +2,14 @@
 
 Tested means the specific check in VERIFICATION.md passed. Implemented means code is available with further acceptance coverage needed. Partial identifies implemented behavior with material gaps. Missing identifies an unavailable capability. A test result qualifies its fixture and environment.
 
+| 3.5.7 editing capability | Status | Verified scope / remaining limits |
+|---|---|---|
+| Managed photographs, titles and spatial layers | Tested subset | sRGB PNG alpha/JPEG orientation, title typography and motion, fit/fill, scale, position, rotation and exposure. Decoded PQ and SDR composite checks. Other photo profiles and unrestricted crop are open. |
+| Managed color controls and masks | Partial | Linear contrast, saturation and feathered rectangle/ellipse. Existing artistic SDR grades, curves/LUTs, HLG, Log, arbitrary paths and chroma key remain outside managed HDR. |
+| Picture boundaries | Tested subset | Centered dissolve, dip to black and dip to reference white with source handles and stable sequence duration. Timeline markers, batch scopes and defaults. Slide, push and zoom boundary effects remain open. |
+| Audio crossfades | Tested subset | Linear/equal-power independent boundaries and explicitly aligned camera-audio routing. Exact 29.97 fps PCM comparison and Composited playback. |
+| Export scratch | Tested subset | Registered owned scratch, live lease protection and confirmed abandoned cleanup. Legacy debris, unused proxies and general preview-cache clearing remain open. |
+
 | 3.5.6 HDR delivery | Status | Verified scope / remaining limits |
 |---|---|---|
 | HDR10+ Edited Master | Tested subset | CPU HEVC Main10 and authored Profile A statistics from final decoded PQ. Exact compressed picture/audio and rational timestamps across insertion. Generated mixed video layers, trims, VFR holds and 2× speed. Requires known mastering metadata. |
