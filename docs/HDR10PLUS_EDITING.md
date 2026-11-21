@@ -12,3 +12,15 @@ Issues #9 and #10 describe an invalid native MP4 filter, a reproduced PNG demux/
 - D. Measure affected interactive workflows and retain every failed attempt. Use short runs to isolate individual defects. Keep private sources, saved projects and local diagnostic logs outside Git.
 
 Each checkpoint is published separately as it becomes reviewable. Production changes require a freshly built and verified development installer.
+
+## A. Export fixes in development
+
+The native Save dialog uses the codec-neutral filter `MP4 video (*.mp4)`. The normal export panel accepts a path or browses for one, checks source aliases and requires explicit confirmation for an existing target. Export publishes the completed MP4 atomically. A new file appearing during rendering is protected when overwrite was not authorized. The last accepted directory is remembered. The panel shows CPU settings only when relevant and places HDR declarations under Advanced.
+
+PNG and JPEG use FFmpeg image2 with literal filenames. The renderer decodes and resizes once per segment, then holds the picture before the animated filters so motion and fades still run at sequence rate. Tests check eXIf and alpha, JPEG orientation, source hashes, mixed timeline audio and decoded frames. The new fixture initially failed because the opaque background was above its alpha layer, then because downscaling blended both orientation patches. Both attempts are retained.
+
+The state endpoint reports stage, segment count, FFmpeg frames and encoded duration, processing FPS, elapsed time, most recent progress and fallback. The overall percentage weights stage work. It is not a wall-clock projection and currently supplies no ETA. A period without reported progress is shown separately from failure. The independent stream drains and final stream-copy video mux remain in place. Concurrent proxy impact, process and disk costs on the owner’s 30-segment workload remain open.
+
+One matched 5.4-second UHD60 generated PNG/JPEG/video + audio libx264 pair measured 69.390s frozen and 23.181s candidate, 4.669 and 13.977 processing FPS. Both decoded 324 frames with matching 5.4s video/audio endpoints. Decoded 96×54 RGB mean absolute error was 0.0. All generated input hashes matched. This is one still-heavy pair. See [the numeric record](benchmarks/p0-realworld-performance.json).
+
+The installed 3.5.1 error reproduced. The initial 3.5.2 installer passed lifecycle and installed-bundle checks. Two packaged GUI attempts exposed an unregistered test asset, then a real missing `ultrafast` option for an existing project. The latter is corrected for 3.5.3. The requalification results are tracked separately. All 143 local offline Python tests passed before the UI-only saved-preset correction, and four focused color-control JS tests passed.

@@ -1,0 +1,35 @@
+{
+  "baseline": "7d1b2b4a38f51bd5aae383512971e8fbfa1c6492",
+  "output": "3840x2160/60",
+  "encoder": "libx264",
+  "scope": "One pair on generated mixed PNG, JPEG and video with audio. Wall time includes segment drains and final mux.",
+  "runs": [
+    {
+      "arm": "baseline",
+      "seconds": 69.39041179999913,
+      "status": "passed",
+      "frames": 324,
+      "frames_per_second": 4.669232990486505,
+      "audio_duration": 5.4,
+      "video_duration": 5.4
+    },
+    {
+      "arm": "candidate",
+      "seconds": 23.180872900004033,
+      "status": "passed",
+      "frames": 324,
+      "frames_per_second": 13.97704052809606,
+      "audio_duration": 5.4,
+      "video_duration": 5.4
+    }
+  ],
+  "mean_absolute_RGB_error_8bit": 0.0,
+  "original_hashes_match": true,
+  "qualification": "Partial. One paired synthetic still-heavy SDR export. 3.5.3 installed acceptance is tracked separately; historical native playback, audio and memory gates remain open.",
+  "measurement_scope": "One matched pair with common FFmpeg 9.0.2 and source workload. Includes drain/mux; decoded RGB compared at 96\u00d754. No long-form or general encoder-throughput inference.",
+  "report": "docs/HDR10PLUS_EDITING.md",
+  "source_fingerprint": "710dc8910181ce530abeb0d5576edb441324145bc7aa7c2cd1b057dad3538ba5",
+  "fingerprint_method": "SHA256 sorted relevant relative path + NUL + LF-normalized source + NUL",
+  "benchmark_protocol_fingerprint": "61964d174969db9499c25845f396e2976ea93d71045d8a65d78e803db4e91acb",
+  "benchmark_protocol_fingerprint_method": "SHA256 sorted benchmark driver/observer relative path + NUL + LF-normalized source + NUL"
+}

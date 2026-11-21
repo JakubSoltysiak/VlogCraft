@@ -60,6 +60,7 @@ UPLOADS={}
 JOBS={'export':{'status':'idle','percent':0,'message':'','path':None,'error':None},'proxy':{'status':'idle','percent':0,'message':'','assetId':None,'error':None}}
 DESKTOP_ACTION=None
 DESKTOP_RECOVERY=None
+EXPORT_PREFERENCES=WORK/'export-location.json'
 PROXY_QUEUE=collections.deque()
 CURRENT_PROCESS={'export':None,'proxy':None}
 CANCEL={'export':threading.Event(),'proxy':threading.Event()}
@@ -434,18 +435,71 @@ def choose_files():
     try:return list(filedialog.askopenfilenames(title='Link original media'))
     finally:tk.destroy()
 
-def choose_save_path():
+def export_dialog_defaults(suggested=''):
+    folder = PROJECT.resolve().parent
+    try:
+        previous = Path(json.loads(EXPORT_PREFERENCES.read_text(encoding='utf8'))['folder'])
+        if previous.is_dir():
+            folder = previous
+    except (OSError, ValueError, TypeError, KeyError):
+        pass
+    name = PROJECT.stem + '.mp4'
+    if isinstance(suggested, str) and suggested.strip():
+        proposed = Path(suggested.strip())
+        if proposed.is_absolute() and proposed.parent.is_dir():
+            folder = proposed.parent
+        if proposed.name:
+            name = proposed.name
+    return folder, name
+
+
+def export_destination(value, assets):
+    from pathlib import PureWindowsPath
+
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError('Enter an output filename and folder')
+    path = Path(value.strip()).expanduser()
+    if not path.is_absolute():
+        path = export_dialog_defaults()[0] / path
+    if not path.suffix:
+        path = path.with_suffix('.mp4')
+    if path.suffix.lower() != '.mp4':
+        raise ValueError('Choose an MP4 output file')
+    if PureWindowsPath(path.name).is_reserved() or any(ord(c)<32 or c in '<>:"|?*' for c in path.name):
+        raise ValueError('Enter a valid Windows output filename')
+    path = path.resolve()
+    if not path.parent.is_dir() or (path.exists() and not path.is_file()):
+        raise ValueError('Choose an existing output folder and an MP4 filename')
+    for asset in assets:
+        source = Path(asset['path']).resolve()
+        if path == source or (path.exists() and source.exists() and path.samefile(source)):
+            raise ValueError('Refusing to overwrite your original footage')
+    return path
+
+
+def remember_export_folder(dest):
+    try:
+        EXPORT_PREFERENCES.parent.mkdir(parents=True, exist_ok=True)
+        project_store.atomic_write(EXPORT_PREFERENCES, json.dumps({'folder':str(dest.parent)}).encode('utf8'))
+    except OSError:
+        pass
+
+
+def choose_save_path(suggested=''):
+    folder, name = export_dialog_defaults(suggested)
     if os.name=='nt':
         ps=('Add-Type -AssemblyName System.Windows.Forms; '
             '$d=New-Object System.Windows.Forms.SaveFileDialog; $d.Filter="MP4 video|*.mp4"; '
-            '$d.DefaultExt="mp4"; $d.FileName="Kenya_Vlog_4K.mp4"; '
+            '$d.DefaultExt="mp4"; $d.FileName=$env:VLOGCRAFT_EXPORT_NAME; '
+            '$d.InitialDirectory=$env:VLOGCRAFT_EXPORT_FOLDER; '
             'if($d.ShowDialog() -eq "OK") {$d.FileName}')
-        r=subprocess.run(['powershell.exe','-NoProfile','-STA','-Command',ps],capture_output=True,text=True,timeout=300)
+        r=subprocess.run(['powershell.exe','-NoProfile','-STA','-Command',ps],capture_output=True,text=True,timeout=300,
+                         env={**os.environ,'VLOGCRAFT_EXPORT_NAME':name,'VLOGCRAFT_EXPORT_FOLDER':str(folder)})
         if r.returncode:raise RuntimeError(r.stderr[-500:])
         return r.stdout.strip() or None
     from tkinter import filedialog,Tk
     tk=Tk();tk.withdraw();tk.attributes('-topmost',True)
-    try:return filedialog.asksaveasfilename(defaultextension='.mp4',initialfile='Kenya_Vlog_4K.mp4',filetypes=[('MP4','*.mp4')]) or None
+    try:return filedialog.asksaveasfilename(defaultextension='.mp4',initialfile=name,initialdir=str(folder),filetypes=[('MP4','*.mp4')]) or None
     finally:tk.destroy()
 
 def job_status(which,**kw):
@@ -454,8 +508,6 @@ def job_status(which,**kw):
 def exec_process(command,cwd,which):
     if CANCEL[which].is_set():raise RuntimeError('Cancelled')
     creationflags=subprocess.CREATE_NO_WINDOW if os.name=='nt' else 0
-    start=JOBS[which]['percent']
-    total=JOBS[which].get('duration',0)
     with tempfile.TemporaryFile() as errors:
         cmd=[command[0],'-progress','pipe:1',*command[1:]]
         p=subprocess.Popen(cmd,cwd=cwd,stdout=subprocess.PIPE,stderr=errors,creationflags=creationflags)
@@ -463,11 +515,14 @@ def exec_process(command,cwd,which):
             CURRENT_PROCESS[which]=p
             if CANCEL[which].is_set():p.terminate()
         try:
+            fields = {}
             for line in p.stdout:
-                if total and start<96 and line.startswith(b'out_time_us='):
-                    try:seconds=int(line.split(b'=')[1])/1e6
-                    except ValueError:continue
-                    job_status(which,percent=min(94,round(start+91*seconds/total)))
+                key, _, value = line.strip().partition(b'=')
+                if key in (b'frame', b'fps', b'out_time_us'):
+                    fields[key] = value
+                if key == b'progress':
+                    update_export_progress(fields)
+                    fields.clear()
             p.wait()
             if CANCEL[which].is_set():raise RuntimeError('Cancelled')
             if p.returncode:
@@ -475,9 +530,63 @@ def exec_process(command,cwd,which):
                 raise RuntimeError('FFmpeg: '+errors.read().decode(errors='replace'))
         finally:
             p.stdout.close()
+            if p.poll() is None:
+                p.kill()
+                p.wait()
             with JOB_LOCK:CURRENT_PROCESS[which]=None
 
-def run_export(snapshot,path,review=False):
+
+EXPORT_STAGES = {
+    'video': ('Encoding video', 0, .90),
+    'audio': ('Rendering audio', .90, .08),
+    'segment-mux': ('Joining segment streams', .98, .02),
+    'final-mux': ('Muxing final MP4', 0, 1),
+}
+
+
+def update_export_progress(fields):
+    with JOB_LOCK:
+        job = JOBS['export']
+        stage = job.get('stage')
+        if stage not in EXPORT_STAGES:
+            return
+        try:
+            seconds = int(fields.get(b'out_time_us', 0)) / 1e6
+        except ValueError:
+            seconds = 0
+        try:
+            frames = int(fields.get(b'frame', 0))
+            fps = float(fields.get(b'fps', 0))
+        except ValueError:
+            frames, fps = 0, 0
+        segment_length = job['_end'] - job['_start']
+        # Video PTS may lag submissions due to B-frame reordering.
+        fraction = frames / max(1, job['_frames']) if stage == 'video' else seconds / max(.001, segment_length)
+        fraction = min(1, max(job['stageFraction'], fraction))
+        if fraction > job['stageFraction']:
+            job['_activity'] = time.monotonic()
+        _, offset, weight = EXPORT_STAGES[stage]
+        pct = 96 + 3 * fraction if stage == 'final-mux' else 2 + 94 * (
+            job['_start'] + segment_length * (offset + weight * fraction)
+        ) / job['duration']
+        job.update(percent=max(job['percent'], min(99, int(pct))),stageFraction=fraction)
+        if stage == 'video':
+            job['frames'] = job['_first'] + round(job['_frames'] * fraction)
+            job['encodedSeconds'] = job['_start'] + segment_length * fraction
+            job['fps'] = fps if math.isfinite(fps) and fps > 0 else None
+
+
+def publish_export(part, dest, assets, overwrite):
+    export_destination(str(dest), assets)
+    if overwrite:
+        os.replace(part,dest)
+    elif os.name == 'nt':
+        os.rename(part,dest)  # Windows rejects an existing destination.
+    else:
+        os.link(part,dest)  # Atomic no-clobber publication on POSIX.
+
+
+def run_export(snapshot,path,review=False,overwrite=False):
     dest=Path(path)
     temp=None
     try:
@@ -488,13 +597,16 @@ def run_export(snapshot,path,review=False):
             replacement=encoders.CODECS[encoder.split('_')[0]][0]
             snapshot['output']['encoder']=replacement
             fallback=' · used '+encoders.NAMES[replacement]+' (hardware unavailable)'
-        job_status('export',duration=engine.sequence_duration(snapshot))
-
-        job_status('export',status='rendering',percent=1,message='Preparing timeline…',path=None,error=None)
+        job_status('export',duration=engine.sequence_duration(snapshot),fallback=fallback.strip(' ·'))
+        def stage(name,index,count,start,end,fps):
+            first,last = timing.frame_at(start,fps),timing.frame_at(end,fps)
+            job_status('export',stage=name,message=EXPORT_STAGES[name][0],segment=index,segments=count,
+                       _start=start,_end=end,_first=first,_frames=last-first,_activity=time.monotonic(),
+                       stageFraction=0,fps=None,encoder='libx264' if review else snapshot['output'].get('encoder','libx264'))
         def deliver():
             return engine.render(snapshot,dest,temp,review=review,cancelled=CANCEL['export'].is_set,
                                  popen=lambda c,d:exec_process(c,d,'export'),
-                                 on_progress=lambda pct,msg:job_status('export',percent=pct,message=msg))
+                                 on_stage=stage,publish=lambda part,target:publish_export(part,target,snapshot['assets'],overwrite))
         try:
             deliver()
         except Exception:
@@ -503,11 +615,12 @@ def run_export(snapshot,path,review=False):
             replacement=encoders.CODECS[chosen.split('_')[0]][0]
             snapshot['output']['encoder']=replacement
             fallback=' · used '+encoders.NAMES[replacement]+' after hardware encoder failure'
-            job_status('export',percent=1,message='Hardware encoder failed. Retrying with '+encoders.NAMES[replacement])
+            job_status('export',percent=1,stage='preparing',frames=0,encodedSeconds=0,
+                       fallback=fallback.strip(' ·'),message='Hardware encoder failed. Retrying with '+encoders.NAMES[replacement])
             deliver()
-        job_status('export',status='done',percent=100,path=str(dest),message='Export completed'+fallback)
+        job_status('export',status='done',percent=100,path=str(dest),message='Export completed'+fallback,_finished=time.monotonic())
     except Exception as ex:
-        job_status('export',status='cancelled' if CANCEL['export'].is_set() else 'error',error=str(ex),message='Export stopped')
+        job_status('export',status='cancelled' if CANCEL['export'].is_set() else 'error',error=str(ex),message='Export stopped',_finished=time.monotonic())
     finally:
         if temp:shutil.rmtree(temp,ignore_errors=True)
 
@@ -728,6 +841,15 @@ class Handler(BaseHTTPRequestHandler):
             if path=='/api/encoders':return self.json_response(encoders.available())
             if path=='/api/jobs':
                 with JOB_LOCK:jobs=deepcopy(JOBS);jobs['proxy']['queued']=len(PROXY_QUEUE)
+                export = jobs['export']
+                now = time.monotonic()
+                started = export.get('_started')
+                if started is not None:
+                    export['elapsedSeconds'] = round(export.get('_finished',now)-started,1)
+                    export['activityAge'] = round(now-export.get('_activity',started),1)
+                for key in list(export):
+                    if key.startswith('_'):
+                        del export[key]
                 with LOCK:
                     jobs['readyProxies']=[a['id'] for a in STATE['assets'] if proxy_path(a).is_file()]
                     jobs['readyAudio']=[a['id'] for a in STATE['assets'] if (THUMBS/(cache_id(a)+'.flac')).is_file()]
@@ -967,6 +1089,22 @@ class Handler(BaseHTTPRequestHandler):
                 if not a or a['kind']!='video':raise ValueError('Select a video to create proxy')
                 queue_proxy(a)
                 return self.json_response({'started':True})
+            if path in ('/api/export/browse','/api/export/destination'):
+                with LOCK:assets=deepcopy(STATE['assets'])
+                choice=data.get('path','')
+                if path.endswith('/browse'):
+                    choice=choose_save_path(choice)
+                    if not choice:return self.json_response({'cancelled':True})
+                dest=export_destination(choice,assets)
+                return self.json_response({'path':str(dest),'exists':dest.exists()})
+            if path=='/api/export/open-folder':
+                with JOB_LOCK:
+                    job=JOBS['export']
+                    result=job.get('path') if job['status']=='done' else None
+                if not result or os.name!='nt':
+                    raise ValueError('No completed Windows export folder to open')
+                os.startfile(Path(result).parent)
+                return self.json_response({'opened':True})
             if path=='/api/export' or path=='/api/review/video':
                 with JOB_LOCK:
                     if JOBS['export']['status']=='rendering':raise ValueError('Another export is active')
@@ -979,16 +1117,18 @@ class Handler(BaseHTTPRequestHandler):
                 else:
                     save_to=data.get('path') or choose_save_path()
                     if not save_to:return self.json_response({'cancelled':True})
-                    dest=Path(save_to).expanduser().resolve()
-                    if dest.suffix.lower()!='.mp4':raise ValueError('Choose an MP4 output file')
-                    if dest in {Path(a['path']).resolve() for a in snap['assets']}:
-                        raise ValueError('Refusing to overwrite your original footage')
+                    dest=export_destination(save_to,snap['assets'])
+                overwrite=not review and (data.get('overwrite') is True or not data.get('path'))
+                if dest.exists() and not overwrite:
+                    raise ValueError('Output already exists. Confirm replacement to export.')
                 dest.parent.mkdir(parents=True,exist_ok=True)
                 with JOB_LOCK:
                     if JOBS['export']['status']=='rendering':raise ValueError('Another export is active')
                     CANCEL['export'].clear()
-                    job_status('export',status='rendering',percent=0,path=None,error=None,message='Starting…')
-                    threading.Thread(target=run_export,args=(snap,str(dest),review),daemon=True).start()
+                    JOBS['export'] = dict(status='rendering',percent=0,path=None,error=None,message='Preparing export',
+                                          stage='preparing',frames=0,encodedSeconds=0,_started=time.monotonic())
+                    threading.Thread(target=run_export,args=(snap,str(dest),review,overwrite),daemon=True).start()
+                if not review:remember_export_folder(dest)
                 return self.json_response({'started':True,'url':'/download/'+dest.name if review else None})
             if path=='/api/job/cancel':
                 kind=data.get('job','export')

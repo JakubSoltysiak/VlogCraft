@@ -276,7 +276,15 @@ async function importDropped(files,trackId=null,pos=null){const supported=[...fi
 }
 function openModal(id){$(id).hidden=false;}
 function closeModal(id){$(id).hidden=true;}
+async function browseExport(){
+ const result=await request('export/browse','POST',{path:$('exportPath').value});
+ if(result.cancelled)return false;
+ $('exportPath').value=result.path;
+ return true;
+}
 async function startExport(){
+ $('startRender').disabled=true;
+ let started=false;
  try{
   const custom=$('exportResolution').value==='custom';
   const w=Number(custom?$('outputWidth').value:$('exportResolution').value);
@@ -284,16 +292,36 @@ async function startExport(){
   const bitrate=$('outputBitrate').valueAsNumber;
   if(![w,h].every(v=>Number.isInteger(v)&&v>=16&&v<=16384&&v%2===0))throw Error('Choose even dimensions between 16 and 16384 pixels');
   if(!Number.isFinite(bitrate)||bitrate<0||bitrate>2000)throw Error('Invalid output bitrate');
-  const color=await validatedColorFromControls();snapshot();
+  const color=await validatedColorFromControls();
+  if(!$('exportPath').value.trim() && !await browseExport())return;
+  const destination=await request('export/destination','POST',{path:$('exportPath').value});
+  if(destination.exists && !confirm('Replace the existing MP4 at this destination?'))return;
+  $('exportPath').value=destination.path;
+  snapshot();
   Object.assign(state.output,{width:w,height:h,fps:rateChoice($('exportFps').value),crf:Number($('exportCrf').value),preset:$('exportPreset').value,encoder:color?.output==='hdr10'?'libx265':$('encoderChoice').value,bitrate,color});
   redraw();save();await flushSave();
-  const res=await request('export','POST',{});
+  const res=await request('export','POST',{path:destination.path,overwrite:destination.exists});
   if(res.cancelled)return;
-  $('renderProgress').hidden=false;$('startRender').disabled=true;$('cancelRender').hidden=false;beginJobPoll('export');
+  started=true;
+  $('renderProgress').hidden=false;$('openExportFolder').hidden=true;
+  $('cancelRender').hidden=false;beginJobPoll('export');
  }catch(e){toast('Export: '+e.message,true);}
+ finally{if(!started)$('startRender').disabled=false;}
 }
 function beginJobPoll(which,onDone){clearInterval(renderPoll);renderPoll=setInterval(async()=>{try{const d=await request('jobs');const j=d[which];if(which==='export'){
   $('renderMessage').textContent=j.message;$('renderPercent').textContent=j.percent+'%';$('renderBar').style.width=j.percent+'%';$('renderResult').textContent=j.error||j.path||'';
+  const details=[];
+  if(j.segment && j.stage!=='final-mux')details.push('Segment '+j.segment+' / '+j.segments);
+  if(j.encoder)details.push(j.encoder);
+  if(j.frames!=null)details.push(j.frames.toLocaleString()+' video frames');
+  if(j.encodedSeconds!=null)details.push(j.encodedSeconds.toFixed(2)+'s encoded');
+  if(j.fps)details.push(j.fps.toFixed(1)+' processing fps');
+  if(j.elapsedSeconds!=null)details.push(j.elapsedSeconds.toFixed(1)+'s elapsed');
+  if(j.status==='rendering' && j.activityAge!=null)details.push(
+   j.activityAge>=15?'No FFmpeg progress reported for '+Math.floor(j.activityAge)+'s':'Last progress '+j.activityAge.toFixed(1)+'s ago');
+  if(j.fallback)details.push(j.fallback);
+  $('renderDetails').textContent=details.join(' · ');
+  $('openExportFolder').hidden=j.status!=='done' || !document.documentElement.classList.contains('native-ready');
  }else{$('diskHint').textContent=j.message;}
  if(['done','error','cancelled'].includes(j.status)){clearInterval(renderPoll);renderPoll=null;$('startRender').disabled=false;$('cancelRender').hidden=true;if(which==='export'&&j.status==='done')toast('Export saved: '+j.path);if(j.status==='error')toast(j.error||'Render failed',true);onDone?.(j);}
  }catch(e){clearInterval(renderPoll);renderPoll=null;toast(e.message,true);}},900);}
@@ -328,6 +356,8 @@ function setup(){
  $('zoomIn').onclick=()=>{$('timelineZoom').value=Math.min(190,zoom+15);$('timelineZoom').oninput({target:$('timelineZoom')});};
  document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{insTab=b.dataset.tab;document.querySelectorAll('[data-tab]').forEach(n=>n.classList.toggle('active',n===b));renderInspector();});
  $('startRender').onclick=()=>void startExport();$('cancelRender').onclick=()=>void request('job/cancel','POST',{job:'export'});
+ $('browseExport').onclick=()=>void browseExport().catch(e=>toast(e.message,true));
+ $('openExportFolder').onclick=()=>void request('export/open-folder','POST',{}).catch(e=>toast(e.message,true));
  $('reviewPackBtn').onclick=()=>void makeReviewPack();$('reviewVideoBtn').onclick=()=>void makeReviewVideo();$('openChat').onclick=()=>window.open('https://chatgpt.com/','_blank','noopener');
  $('analyzeBtn').onclick=()=>void analyzeAi();$('previewAiBtn').onclick=()=>void previewAi();$('applyAiBtn').onclick=()=>void applyAi();$('undoAiBtn').onclick=()=>void undoAi();
  $('proposalJson').oninput=()=>{proposalToken=null;$('applyAiBtn').disabled=true;};$('transferCancel').onclick=()=>{transferStop=true;toast('Cancel requested');};

@@ -140,10 +140,22 @@ async function openExport(){
   $('customDimensions').hidden=preset;
   $('exportResolution').onchange=e=>{$('customDimensions').hidden=e.target.value!=='custom';};
   $('outputWidth').value=out.width;$('outputHeight').value=out.height;
-  $('exportFps').innerHTML=rateOptions(out.fps);$('exportCrf').value=out.crf||20;$('exportPreset').value=out.preset||'medium';
+  $('exportFps').innerHTML=rateOptions(out.fps);
+  const quality=$('exportCrf');
+  const crf=out.crf??20;
+  quality.querySelector('[data-project-value]')?.remove();
+  if(!Array.from(quality.options).some(option=>Number(option.value)===crf)){
+    const saved=new Option('Project quality · CRF '+crf,crf);
+    saved.dataset.projectValue='true';
+    quality.add(saved);
+  }
+  quality.value=crf;
+  $('exportPreset').value=out.preset||'medium';
   $('outputBitrate').value=out.bitrate||0;
   $('exportEstimate').textContent=out.width+' × '+out.height+' · '+out.fps+' fps · '+duration().toFixed(2)+' seconds';
   const choice=$('encoderChoice');
+  choice.onchange=updateEncoderControls;
+  $('outputBitrate').oninput=updateEncoderControls;
   choice.disabled=true;choice.replaceChildren(new Option('Checking local encoders…',''));
   $('startRender').disabled=true;
   try{
@@ -154,5 +166,16 @@ async function openExport(){
     if(state.output.color?.output==='hdr10')choice.value='libx265';
     $('startRender').disabled=!choice.value || (await request('jobs')).export.status==='rendering';
   }catch(error){toast('Encoder check failed: '+error.message,true);}
-  finally{choice.disabled=false;}
+  finally{choice.disabled=false;updateEncoderControls();}
+}
+
+function updateEncoderControls(){
+  const hdr=$('colorOutput').value==='hdr10';
+  const cpu=hdr || ['libx264','libx265','libsvtav1'].includes($('encoderChoice').value);
+  $('cpuExportPreset').hidden=!cpu;
+  $('cpuExportQuality').hidden=!cpu || (!hdr && $('outputBitrate').valueAsNumber>0);
+  $('exportBitrateNote').textContent=hdr
+    ? 'HDR10 uses the HEVC CPU encoder. CRF controls quality. A nonzero bitrate also sets an encoder target.'
+    : cpu ? 'Set 0 to use CRF quality mode. A nonzero value sets the target bitrate instead.'
+          : 'Hardware encoding uses a target bitrate. Set 0 to use 35 Mb/s.';
 }

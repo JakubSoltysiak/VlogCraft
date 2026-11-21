@@ -5,8 +5,8 @@ function colorOutputFromControls(){
  const result={version:1,workingSpace:'linear-rec2020-100nits',output:mode,sdrWhiteNits:$('sdrWhiteNits').valueAsNumber};
  if(!Number.isFinite(result.sdrWhiteNits))throw Error('Choose an SDR reference white');
  const gamut=$('masteringGamut').value;
- if(gamut!=='unknown')result.mastering={primaries:gamut==='p3'?[[.68,.32],[.265,.69],[.15,.06]]:[[.708,.292],[.17,.797],[.131,.046]],whitePoint:[.3127,.329],minLuminance:$('masteringMin').valueAsNumber,maxLuminance:$('masteringMax').valueAsNumber};
- if($('maxCLL').value||$('maxFALL').value){result.maxCLL=$('maxCLL').valueAsNumber;result.maxFALL=$('maxFALL').valueAsNumber;}
+ if(mode==='hdr10' && gamut!=='unknown')result.mastering={primaries:gamut==='p3'?[[.68,.32],[.265,.69],[.15,.06]]:[[.708,.292],[.17,.797],[.131,.046]],whitePoint:[.3127,.329],minLuminance:$('masteringMin').valueAsNumber,maxLuminance:$('masteringMax').valueAsNumber};
+ if(mode==='hdr10' && ($('maxCLL').value||$('maxFALL').value)){result.maxCLL=$('maxCLL').valueAsNumber;result.maxFALL=$('maxFALL').valueAsNumber;}
  return result;
 }
 async function validatedColorFromControls(){
@@ -32,7 +32,14 @@ function initColorControls(){
   }catch(error){toast(error.message,true);}
  };
  $('colorOutput').onchange=()=>{
-  if($('colorOutput').value==='hdr10')$('encoderChoice').value='libx265';
+  const hdr=$('colorOutput').value==='hdr10';
+  if(hdr)$('encoderChoice').value='libx265';
+  for(const id of ['masteringGamut','masteringMin','masteringMax','maxCLL','maxFALL']){
+   const label=$(id).closest?.('label');if(label)label.hidden=!hdr;
+  }
+  if($('hdrMetadataNote'))$('hdrMetadataNote').hidden=!hdr;
+  const white=$('sdrWhiteNits').closest?.('label');if(white)white.hidden=$('colorOutput').value==='legacy';
+  if(typeof updateEncoderControls==='function')updateEncoderControls();
   $('colorDeliveryNote').textContent=$('colorOutput').value==='hdr10'?'HDR10: float32 linear Rec.2020 → 10-bit HEVC PQ. Supported: matching-aspect video, trims/speed, full-frame resize, opacity/fades, linear exposure and nested tracks. Other effects/transforms fail explicitly. HDR10+ is not authored.':'SDR output. Managed monitoring uses an explicit tone map; legacy projects retain the existing SDR compositor.';
  };
  $('colorOutput').onchange();
