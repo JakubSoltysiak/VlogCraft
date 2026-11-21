@@ -379,6 +379,8 @@ def validate_state(d, base=None):
     if encoder not in encoders.NAMES:raise ValueError('Unknown video encoder')
     result['output']={'width':w,'height':h,'fps':fps,'crf':crf,'preset':preset,'encoder':encoder,
                       'bitrate':_number(output.get('bitrate',0),'Video bitrate',0,2000)}
+    if output.get('defaultMotion') is not None:
+        result['output']['defaultMotion']=animation.validate_default_motion(output['defaultMotion'])
     if output.get('color') is not None:
         import color_management
         result['output']['color']=color_management.validate_output(output['color'])

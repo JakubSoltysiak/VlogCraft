@@ -36,8 +36,23 @@
       "field_differences": {}
     }
   ],
-  "source_fingerprint": "6e2c8b6252ceb44c1cb39fb320c70f23d2a25b6b98c4aa89176a7d63b55d3f42",
+  "source_fingerprint": "89d353fbe60c47bfad388f194a736eff68bf88a2c255204115c29e2b2cc9a9df",
   "fingerprint_method": "SHA256 sorted relevant relative path + NUL + LF-normalized source + NUL",
-  "benchmark_protocol_fingerprint": "af76bee3aa452ad635bb07fae50a7f43d4186668a9f9ca49e67f2e3bd8269992",
-  "benchmark_protocol_fingerprint_method": "SHA256 sorted benchmark driver/observer relative path + NUL + LF-normalized source + NUL"
+  "benchmark_protocol_fingerprint": "52fd21ca510b1731abc65105b8ebcd3c5620613df0e38f0ecc552076f95adc81",
+  "benchmark_protocol_fingerprint_method": "SHA256 sorted benchmark driver/observer relative path + NUL + LF-normalized source + NUL",
+  "motion_desktop_source": {
+    "batch_clips": 2,
+    "undo_redo": true,
+    "default_and_numeric_key_persisted": true,
+    "decoded_first_pixel": [
+      14,
+      18,
+      26
+    ],
+    "decoded_after_fade": [
+      235,
+      35,
+      23
+    ]
+  }
 }

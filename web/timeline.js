@@ -107,6 +107,8 @@ function sourceMonitor(a) {
     const clip=clipFromAsset(a,0,t.type);
     if(!still)Object.assign(clip,marks);
     const at=placement==='append'?Math.max(0,...t.clips.map(c=>frameIndex(endOf(c)))):frameIndex(playhead);
+    clip.position=atFrame(at);
+    applyDefaultMotion(clip);
     if(commitEdit(placement==='append'?'insert':placement,{trackId:t.id,at,clip},[]))dlg.close();
   };
   if(a.kind==='video')preciseSource(dlg,a,media);
