@@ -203,7 +203,8 @@ def main(args):
     for label in args.variant:
         selected = command[:]
         input_graph = graph
-        if label in ('graph-only', 'slice4', 'decode-geometry-off', 'no-matte'):
+        if label in ('graph-only', 'slice4', 'decode-geometry-off', 'no-matte',
+                     'no-pq-tail', 'no-transition-arithmetic'):
             selected = selected[:encoder]+null_picture
         if label == 'slice4':
             selected[selected.index('-filter_complex_threads')+1] = '4'
@@ -215,12 +216,26 @@ def main(args):
             input_graph, removed = re.subn(r",geq=r='[^'\n]+'(?::[gba]='[^'\n]+')+:?[^,;\n]*,trim=", ',trim=', graph)
             if not removed:
                 raise ValueError('Expected at least one matte')
+        if label == 'no-pq-tail':
+            input_graph, removed = re.subn(r',sidedata=mode=delete,zscale=[^;]+\[finished\]',
+                                            '[finished]', graph)
+            if removed != 1:
+                raise ValueError('Expected one final PQ conversion')
+        if label == 'no-transition-arithmetic':
+            input_graph, removed = re.subn(r"(\[base\d+\]\[base\d+\])blend=all_expr='[^']+'(\[transition\d+\])",
+                                            r'\1blend=all_mode=normal\2', graph)
+            if removed != 1:
+                raise ValueError('Select a scene with one video boundary')
         if label == 'startup':
             selected = ['ffmpeg','-v','error','-nostdin','-f','lavfi','-i','color=s=16x16:r=60',
                         '-frames:v','1',*null_picture]
-        if label == 'source-decode':
+        if label in ('source-demux', 'source-decode', 'video-to-linear'):
             selected = ['ffmpeg','-v','error','-nostdin','-threads','1','-i',str(sources[0]),
-                        '-an','-frames:v',command[command.index('-frames:v')+1],*null_picture]
+                        '-an','-frames:v',command[command.index('-frames:v')+1]]
+            if label == 'video-to-linear':
+                from hdr_layers import luma_linear
+                selected += ['-vf',luma_linear('2020','smpte2084','2020_ncl','limited')+',format=gbrpf32le']
+            selected += ['-c:v','copy','-f','null','-'] if label == 'source-demux' else null_picture
         if label == 'still-decode':
             selected = ['ffmpeg','-v','error','-nostdin','-threads','1','-i',str(sources[2]),
                         '-frames:v','1',*null_picture]
@@ -255,6 +270,7 @@ if __name__ == '__main__':
     parser.add_argument('--gpu', action='store_true', help='Separately sample Windows GPU engines for this diagnostic')
     parser.add_argument('--variant', action='append', default=[],
                         choices=('full', 'graph-only', 'slice4', 'decode-geometry-off', 'no-matte',
-                                 'startup', 'source-decode', 'still-decode', 'write-pq',
+                                 'no-pq-tail', 'no-transition-arithmetic', 'startup', 'source-demux',
+                                 'source-decode', 'video-to-linear', 'still-decode', 'write-pq',
                                  'cpu-encode', 'amf-encode'))
     raise SystemExit(main(parser.parse_args()))

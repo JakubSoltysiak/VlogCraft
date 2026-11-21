@@ -32,6 +32,12 @@ def uses_geometry(clip):
                for key,initial in GEOMETRY.items())
 
 
+def still_needs_frame_clock(clip):
+    return bool(clip.get('fadeIn') or clip.get('fadeOut') or any(
+        clip.get('keys',{}).get(name)
+        for name in (*GEOMETRY, 'maskRadius', 'opacity', 'contrast', 'saturation')))
+
+
 def photo_info(path):
     stat=Path(path).stat()
     return _photo_info(path,stat.st_size,stat.st_mtime_ns)
@@ -98,14 +104,12 @@ def title_image(clip, width, height, folder):
 
 
 def picture_alpha(filters, label, result, number):
-    colors=[f'{result}{plane}{number}' for plane in ('r','g','b','a')]
-    r,g,b,a=colors
-    filters.append(label+'extractplanes=r+g+b+a'+''.join(f'[{plane}]' for plane in colors))
-    filters.append(f'[{g}][{b}][{r}]mergeplanes=0x001020:format=gbrpf32le[{result}]')
-    duplicates=[f'{a}{item}' for item in range(3)]
-    planes=''.join(f'[{item}]' for item in duplicates)
-    filters.append(f'[{a}]split=3{planes}')
-    filters.append(f'{planes}mergeplanes=0x001020:format=gbrpf32le[{result}mask]')
+    rgb,alpha=f'picture{number}',f'alpha{number}'
+    # Copy directly from GBRA planes. This preserves values above 1.0
+    # without intermediate grayscale RGB buffers or swscale conversion.
+    filters.append(f'{label}split=2[{rgb}][{alpha}]')
+    filters.append(f'[{rgb}]mergeplanes=0x000102:format=gbrpf32le[{result}]')
+    filters.append(f'[{alpha}]mergeplanes=0x030303:format=gbrpf32le[{result}mask]')
 
 
 def linear_still(filters, index, transfer):
@@ -122,7 +126,7 @@ def linear_still(filters, index, transfer):
 
 
 def luma_linear(p,t,m,r):
-    return f'zscale=agamma=0:pin={p}:tin={t}:min={m}:rin={r}:p=2020:t=linear:m=gbr:r=full:npl=100'
+    return f'zscale=threads=1:agamma=0:pin={p}:tin={t}:min={m}:rin={r}:p=2020:t=linear:m=gbr:r=full:npl=100'
 
 
 def canvas_fit(filters, chain, label, *, source, canvas, fit, fps):
@@ -131,7 +135,7 @@ def canvas_fit(filters, chain, label, *, source, canvas, fit, fps):
     scale=(max if fit=='cover' else min)(w/sw,h/sh)
     rw,rh=max(1,round(sw*scale)),max(1,round(sh*scale))
     if (rw,rh)!=(sw,sh):
-        chain+=f',zscale=w={rw}:h={rh}:filter=bilinear,format={FLOAT_ALPHA}'
+        chain+=f',zscale=threads=1:w={rw}:h={rh}:filter=bilinear,format={FLOAT_ALPHA}'
     if fit=='cover':
         return chain+f',crop={w}:{h}'
     if (rw,rh)==(w,h):
@@ -171,12 +175,12 @@ def transform(clip, start):
     x=parameter(clip,'x',0,start)
     y=parameter(clip,'y',0,start)
     degrees=parameter(clip,'rotation',0,start)
-    # The four planes use exactly the same reverse mapping. Work on
-    # premultiplied linear values so transparent edges do not acquire halos.
+    # Each FFmpeg slice owns expression registers and starts every row at
+    # X=0. Hoist row-invariant terms while preserving the bilinear mapping.
     angle=f'({degrees})*PI/180'
-    setup=(f'st(0,(X-(W-1)/2-W*({x}))/({scale}));'
-           f'st(1,(Y-(H-1)/2-H*({y}))/({scale}));'
-           f'st(2,cos({angle}));st(3,sin({angle}));'
+    setup=(f'ifnot(X,st(6,({scale}));st(7,W*({x}));'
+           f'st(1,(Y-(H-1)/2-H*({y}))/ld(6));st(2,cos({angle}));st(3,sin({angle})));'
+           'st(0,(X-(W-1)/2-ld(7))/ld(6));'
            'st(4,(W-1)/2+ld(0)*ld(2)+ld(1)*ld(3));'
            'st(5,(H-1)/2-ld(0)*ld(3)+ld(1)*ld(2));')
     inside='between(ld(4),-0.5,W-0.5)*between(ld(5),-0.5,H-0.5)'
@@ -191,8 +195,9 @@ def soft_mask(clip,start):
     y=f'abs((Y+.5)/H-.5)/({radius})'
     distance=f'hypot({x},{y})' if clip['mask']=='ellipse' else f'max({x},{y})'
     mask=f'clip((1-({distance}))/{max(.00001,clip.get("feather",.1)):.12g},0,1)'
-    return 'geq='+':'.join(f"{plane}='{fn}(X,Y)*({mask})'"
-                           for plane,fn in (('r','r'),('g','g'),('b','b'),('a','alpha')))
+    channels=[f"{plane}='{fn}(X,Y)*({mask})'"
+              for plane,fn in (('r','r'),('g','g'),('b','b'),('a','alpha'))]
+    return 'geq='+':'.join(channels)+':i=nearest'
 
 
 def matte_expression(clip, start, alpha, gain):
@@ -208,4 +213,6 @@ def matte_expression(clip, start, alpha, gain):
                f'st(6,max(0,.18+(ld(3)*{gain:.12g}-.18)*({contrast})));')
         channels=[f"{p}='{setup}if(gt(ld(3),1e-12),ld(6)*(ld(3)+(ld({i})-ld(3))*ld(5))/ld(3),ld(6))'"
                   for i,p in enumerate('rgb')]
-    return 'geq='+':'.join([*channels,f"a='clip(alpha(X,Y)*({alpha}),0,1)'"])
+    opacity = (f'ifnot(X,st(0,({alpha})));clip(alpha(X,Y)*ld(0),0,1)'
+               if 'T' in alpha else f'clip(alpha(X,Y)*({alpha}),0,1)')
+    return 'geq='+':'.join([*channels, f"a='{opacity}'"])+':i=nearest'

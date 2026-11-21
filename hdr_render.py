@@ -1,5 +1,6 @@
 """First managed reference slice: full-canvas float32 linear blends -> HDR10 or SDR monitor."""
 from fractions import Fraction
+import os
 from pathlib import Path
 import animation,color_management as color,sequences,timing
 from hdr10plus_bitstream import packet_records
@@ -54,9 +55,12 @@ def command(state,start,end,target,jobdir,quality='final'):
  state=sequences.playback(state);o=state['output'];contract=color.validate_output(o['color'])
  w,h=int(o['width']),int(o['height']);fps=timing.rate(o['fps']);first,last=timing.frame_at(start,fps),timing.frame_at(end,fps)
  video,_=engine.active_clips(state,start,end);assets={a['id']:a for a in state['assets']}
- cmd=['ffmpeg','-hide_banner','-nostdin','-loglevel','error','-noauto_conversion_filters','-filter_complex_threads','1','-y',
+ # Parallelize independent rows. Decode and zimg's resampling/dither
+ # remain serial to preserve picture selection and the original raster.
+ filter_threads=min(4,os.cpu_count() or 1)
+ cmd=['ffmpeg','-hide_banner','-nostdin','-loglevel','error','-noauto_conversion_filters','-filter_complex_threads',str(filter_threads),'-y',
       '-f','lavfi','-i',f'color=black:s={w}x{h}:r={fps}:d={engine._num(end-start)}']
- linear='zscale=agamma=0:pin=709:tin=709:min=709:rin=limited:p=2020:t=linear:m=gbr:r=full:npl=100,format=gbrpf32le'
+ linear='zscale=threads=1:agamma=0:pin=709:tin=709:min=709:rin=limited:p=2020:t=linear:m=gbr:r=full:npl=100,format=gbrpf32le'
  filters=['[0:v]'+linear+'[base0]'];back='base0'
  input_count=0
  def append_layer(back,c):
@@ -88,11 +92,13 @@ def command(state,start,end,target,jobdir,quality='final'):
                 f'[{n}:v]{cadence}{convert},format=gbrapf32le')
    chain=input_chain+f',{oriented},premultiply=inplace=1'
    chain=hdr_layers.canvas_fit(filters,chain,f'fit{n}',source=source,canvas=(w,h),fit=c.get('fit','contain'),fps=fps)
-   if still:
-    chain+=f',loop=loop={max(0,count-1)}:size=1:start=0,setpts=N/({fps}*TB)'
+   hold=f',loop=loop={max(0,count-1)}:size=1:start=0,setpts=N/({fps}*TB)' if still else ''
+   animated_still=still and hdr_layers.still_needs_frame_clock(c)
+   if animated_still:chain+=hold
    if has_mask:chain+=','+hdr_layers.soft_mask(c,at)
    if transform:chain+=','+hdr_layers.transform(c,at)
    chain+=',unpremultiply=inplace=1,'+hdr_layers.matte_expression(c,at,alpha,gain)
+   if not animated_still:chain+=hold
    chain+=f',trim=end_frame={count},setpts=PTS-STARTPTS'
    if local_first>first or local_last<last:
     chain+=f',tpad=start={local_first-first}:start_mode=clone:stop={last-local_last}:stop_mode=clone'
@@ -100,7 +106,7 @@ def command(state,start,end,target,jobdir,quality='final'):
    filters.append(f"[{back}][lay{n}][lay{n}mask]maskedmerge=enable='gte(n,{local_first-first})*lt(n,{local_last-first})'[base{n}]")
   else:
    filters.append(f'[{n}:v]{cadence}{convert},format=gbrpf32le,'
-    f'{oriented},zscale=agamma=0:w={w}:h={h}:filter=bilinear,format=gbrpf32le,'
+    f'{oriented},zscale=threads=1:agamma=0:w={w}:h={h}:filter=bilinear,format=gbrpf32le,'
     f'trim=end_frame={count},setpts=PTS+{engine._num(delay)}/TB[lay{n}]')
    filters.append(f"[{back}][lay{n}]blend=all_expr='A*(1-({alpha}))+B*{gain:.12g}*({alpha})':eof_action=pass:repeatlast=0:enable='gte(t,{engine._num(delay)})*lt(t,{engine._num(until-start)})'[base{n}]")
   return f'base{n}'
@@ -137,9 +143,9 @@ def command(state,start,end,target,jobdir,quality='final'):
  tail=',sidedata=mode=delete'
  hdr=contract['output']=='hdr10' and quality=='final'
  if hdr:
-  tail+=',zscale=agamma=0:pin=2020:tin=linear:min=gbr:rin=full:p=2020:t=smpte2084:m=2020_ncl:r=limited:npl=100:dither=error_diffusion,format=yuv420p10le'
+  tail+=',zscale=threads=1:agamma=0:pin=2020:tin=linear:min=gbr:rin=full:p=2020:t=smpte2084:m=2020_ncl:r=limited:npl=100:dither=error_diffusion,format=yuv420p10le'
  else:
-  tail+=',zscale=agamma=0:pin=2020:tin=linear:min=gbr:rin=full:p=709:t=linear:m=gbr:r=full,format=gbrpf32le,tonemap=hable:desat=0:peak=100,zscale=agamma=0:pin=709:tin=linear:min=gbr:rin=full:p=709:t=709:m=709:r=limited:npl=100:dither=error_diffusion,format=yuv420p'
+  tail+=',zscale=threads=1:agamma=0:pin=2020:tin=linear:min=gbr:rin=full:p=709:t=linear:m=gbr:r=full,format=gbrpf32le,tonemap=hable:desat=0:peak=100,zscale=threads=1:agamma=0:pin=709:tin=linear:min=gbr:rin=full:p=709:t=709:m=709:r=limited:npl=100:dither=error_diffusion,format=yuv420p'
  filters.append(f'[{back}]trim=end_frame={last-first}{tail}[finished]')
  script=Path(jobdir)/('hdr_graph_'+Path(target).stem+'.txt');script.write_text(';\n'.join(filters)+'\n',encoding='utf8')
  cmd+=['-/filter_complex',str(script),'-map','[finished]','-an','-frames:v',str(1 if quality=='frame' else last-first),'-r',str(fps)]
