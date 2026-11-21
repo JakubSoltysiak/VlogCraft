@@ -18,10 +18,14 @@ from hdr10plus_index import SIDE_DATA
 
 def sample(process, folder):
     workers = []
-    for child in psutil.Process(process.pid).children(recursive=True):
+    host = psutil.Process(process.pid)
+    aggregate = host.memory_info().rss
+    for child in host.children(recursive=True):
         try:
+            rss = child.memory_info().rss
+            aggregate += rss
             if child.name().lower() in ('ffmpeg.exe','ffprobe.exe'):
-                workers.append((child.pid,child.memory_info().rss,sum(child.cpu_times()[:2])))
+                workers.append((child.pid,rss,sum(child.cpu_times()[:2])))
         except psutil.Error:
             continue
     footprint = 0
@@ -31,7 +35,7 @@ def sample(process, folder):
                 footprint += work.stat().st_size
         except FileNotFoundError:
             continue
-    return workers, footprint
+    return workers, footprint, aggregate
 
 
 def export(page, process, results, delivery, filename):
@@ -55,13 +59,17 @@ def export(page, process, results, delivery, filename):
     with page.expect_response(lambda response:response.url.endswith('/api/export')) as submitted:
         page.click('#startRender')
     assert submitted.value.ok,submitted.value.json()
-    peak_rss = disk = 0
+    peak_rss = disk = aggregate_rss = 0
     cpu = {}
+    stages = {}
     deadline = start+130
     while time.monotonic() < deadline:
         job = page.evaluate("request('jobs')")['export']
-        workers, footprint = sample(process,results)
+        workers, footprint, aggregate = sample(process,results)
+        if job['stage']=='hdr10plus-authoring':
+            stages.setdefault(job['message'],time.monotonic()-start)
         peak_rss=max(peak_rss,sum(item[1] for item in workers))
+        aggregate_rss=max(aggregate_rss,aggregate)
         disk=max(disk,footprint)
         for pid,_,seconds in workers:
             cpu[pid]=max(seconds,cpu.get(pid,0))
@@ -75,8 +83,10 @@ def export(page, process, results, delivery, filename):
     assert not list(results.glob('.vlogcraft_*'))
     report={'seconds':job['elapsedSeconds'],'wall_seconds':time.monotonic()-start,
             'media_worker_peak_rss_mib':round(peak_rss/2**20,2),
+            'sampled_process_tree_peak_rss_mib':round(aggregate_rss/2**20,2),
             'media_worker_observed_cpu_seconds':round(sum(cpu.values()),3),
-            'sampled_scratch_bytes':disk,'bytes':output.stat().st_size}
+            'sampled_scratch_bytes':disk,'bytes':output.stat().st_size,
+            'first_observed_authoring_stages_seconds':stages}
     page.locator('#exportModal .dialog-actions [data-close]').click()
     return output,report
 

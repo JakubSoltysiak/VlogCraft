@@ -31,6 +31,7 @@ PROTOCOL_FILES=(
  'benchmarks/studio355_live_flight.py',
  'tests/test_hdr10plus_authoring.py','tests/test_hdr10plus_master.py',
  'tests/windows_hdr10plus_master.py','tests/windows_hdr_profiles.py',
+ 'benchmarks/hdr10plus_camera_analysis.py',
  'tests/performance.py','tests/gpu_metrics.py')
 
 def fingerprint(files=None):

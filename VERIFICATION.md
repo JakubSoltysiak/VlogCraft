@@ -1,5 +1,15 @@
 # VlogCraft Studio development qualification
 
+## 3.5.6 edited HDR10+ and UHD60 delivery — 21 November 2026
+
+The 3.5.6 development MSI was built from `df1a61eecd169c389bf2f1a95f258601f2605714`, SHA-256 `e31ba92f50dd7830ee002f983632e84bdd9e45a8b7b9b654a92f25a93d00a49c`. Installed code and runtime matched the bundle. Upgrade, uninstall, reinstall, release version and icon checks passed. [Draft PR #13](https://github.com/JakubSoltysiak/VlogCraft/pull/13) is stacked on #12. [Qualification, retained failures and scope](docs/STUDIO_3_5_6_HDR10PLUS.md).
+
+- The installed Edited Master passed 12 mixed SDR/PQ frames with exact static-render picture and audio content and independently verified per-frame dynamic metadata. A 15-frame edited 29.97 fps fixture with audible audio and an eight-frame VFR 2× trim fixture passed exact PTS, duration and metadata association. The test uncovered and verified a fix to the managed HDR mux's adjacent short GOP decode-clock collision.
+- The installed 4K60 six-frame comparison measured 16.6 s for static HDR10 and 17.4 s for the Samsung-targeted HDR10+ file. The two decoded streams matched exactly in the controlled pair. Static YouTube HDR took 15.2 s. All three met their local picture/audio duration and Main10/PQ signaling checks. There is no device or upload result.
+- Installed Preserve Original passed the earlier generated fixture. Static HDR preview/export and renderer/browser recovery preserved the exact 80-state history. The Windows Save As/cancel test also passed on the actual AMD HEVC encoder with 324 UHD60 SDR pictures and matching 5.4 s audio/video duration.
+- The local read-only camera test analyzed 12 trimmed PQ frames per recording at a reduced canvas and kept unknown mastering values omitted. The three original hashes matched before and after testing. The full camera indexes and prior conformance findings were retained.
+- The local loopback-only regression passed 156 Python tests in 50.922 s. All 29 JavaScript tests passed. Final GitHub Actions status is recorded in the draft PR.
+
 ## 3.5.5 HDR10+ preservation and editing — 21 November 2026
 
 The 3.5.5 development MSI was built from `b989e344dfb0ce92d58d1cb075529fef72d5be3a`, SHA-256 `fad30d2d2b5cad81afedb52ed0ffab66e00c4938f9ce2686b1276d4abe6b7901`. Local install, upgrade, removal, reinstall and bundle identity passed. [Draft PR #12](https://github.com/JakubSoltysiak/VlogCraft/pull/12) is stacked on #11. [Detailed qualification and retained failures](docs/STUDIO_3_5_5.md).

@@ -29,3 +29,31 @@ A 29.97 fps test with audible audio and short segments exposed a managed HDR mux
 The source Windows GUI passed 12 edited frames with exact decoded SDR/PQ composite video and audio against the static HDR10 export. Independent FFprobe decoded metadata and a scalar ST 2084 oracle agreed with the final decoded pictures. The initial test fixture created duplicate track IDs; the second run found a missing tracks argument in export-only validation. Both failures were retained and the normal Export path passed after correction. The initial independent mixed-layer test also exposed FFprobe JSON's repeated field names. The XML oracle preserves all channel maxima and percentile records.
 
 The Samsung profile uses the verified CPU authoring path with a 4K60 canvas and CRF 17. The separate YouTube profile uses HDR10/PQ HEVC Main10 at 4K60, a 75 Mb/s video target and 48 kHz stereo AAC with a 384 kb/s target. That is an export target; a short compressible clip will come in below it. YouTube's HDR requirements allow HEVC at this cadence. No upload or transcode test was run. Playback on the owner's Samsung TV remains pending. [YouTube HDR requirements](https://support.google.com/youtube/answer/7126552), [upload bitrate recommendations](https://support.google.com/youtube/answer/1722171).
+
+## Installed qualification and measured cost
+
+The local 3.5.6 MSI was built from `df1a61eecd169c389bf2f1a95f258601f2605714` in 116.02 seconds. The SHA-256 is `e31ba92f50dd7830ee002f983632e84bdd9e45a8b7b9b654a92f25a93d00a49c`. Upgrade from the previous local 3.5.5 installation, uninstall and reinstall passed in 30.08 seconds, with protected projects and settings preserved. The installed code and native runtime matched the source bundle. Windows Installer, executable file/product properties, header, footer and About show 3.5.6.
+
+On one generated UHD60 scene, the installed app ran three exports sequentially. Each decoded six full-resolution Main10/PQ frames and 0.100 seconds of stereo AAC at 48 kHz with exact video PTS and matching endpoints. Only the Samsung export carried dynamic metadata. Every decoded video and audio frame hash matched between the same-CRF static and Samsung outputs. The short mixed-layer GUI test separately validated the authored statistics for all 12 frames.
+
+| Installed 3840 × 2160 / 60 workload | Static HDR10 | Samsung HDR10+ | YouTube HDR10 |
+|---|---:|---:|---:|
+| Export time | 16.6 s | 17.4 s | 15.2 s |
+| Peak sampled FFmpeg/FFprobe working set | 1,172 MiB | 1,160 MiB | 1,160 MiB |
+| Peak sampled total process working sets | 2,684 MiB | 2,420 MiB | 2,445 MiB |
+| Observed media worker CPU time | 17.50 CPU-s | 16.27 CPU-s | 15.22 CPU-s |
+| Peak sampled temporary bytes | 30,410 | 67,610 | 30,346 |
+
+The matched pair took 0.8 seconds longer for HDR10+ on this run. The interval between first observing PQ analysis and first observing insertion was approximately 1.30 seconds or 4.6 analyzed frames/s, including decoder startup and polling. The pre-fix source GUI pair was 15.5 and 18.0 seconds. These observations are too short to infer throughput on a long, high-entropy project. Summed working sets can count shared pages more than once. GPU memory and utilization were not measured. The CPU path requires compressed working space for analysis and remux, with a free-space check after the measured static output is available. [Sanitized measurements](benchmarks/studio-3.5.6-hdr10plus.json).
+
+The installed regression verified 12 preserved HDR10+ frames, exact compressed/decoded identity on that source fixture, SDR monitor versus independently decoded HDR10 delivery, both WebView recovery faults and their exact 80-state history, and the approved seven-size Windows icon. The Unicode native Save As and cancel workflow exported 324 UHD60 SDR pictures (5.4 seconds) through the actual AMD HEVC encoder in 23.3 seconds with matching audio duration.
+
+Both private camera indexes were reused. Their retained indexing baselines were 4,674 frames in 201.25 seconds and 2,945 in 150.36 seconds, approximately 23.2 and 19.6 frames/s. This run trimmed and applied a small exposure adjustment to 12 frames of each in the existing managed color path. The reduced 144 × 256 PQ exports took 9.56 and 9.47 seconds. Local decoded-picture analysis took 0.062 and 0.094 seconds. The test used an explicit square-pixel interpretation because source SAR is unspecified. It omitted unknown mastering-display values and did not publish authored delivery from those samples. All three original hashes matched before and after. The local footage, derivatives and metadata remain private.
+
+The regression ledger retains five failed supervised attempts. One used a non-unique track fixture; one exposed incomplete server validation for the export-only settings. Two revealed output-oracle problems with repeated JSON fields and FFmpeg's default rawvideo sync. One independently demonstrated the managed segment-clock defect. The focused retries passed after those corrections without lowering the acceptance criteria.
+
+The local loopback-only suite passed 156 Python tests in 50.922 seconds and 29 JavaScript tests. The supervised runs reported zero owned processes or new terminal windows at cleanup. The draft PR records the exact final Windows Actions receipt.
+
+## Remaining acceptance
+
+Before a stable HDR10+ release, qualify longer mixed timelines and actual Samsung TV playback, then separately verify an authorized YouTube transcode. Creative curves, scene grouping and calibrated mastering remain outside the descriptive algorithm. Managed HDR titles, stills, masks, artistic grades, arbitrary spatial transforms, and true adjacent-clip transitions still need verified implementations. VFR hold and ordinary speed behavior are covered in the generated fixture; independent custom freeze/retime control and broader effects combinations remain open. Long-form RAM, GPU and native playback performance are still separate milestones. 3.5.7 should prioritize HDR-safe adjacent-clip transitions and linked audio crossfades and extend the same decoded-picture and sample-level tests to those edits.

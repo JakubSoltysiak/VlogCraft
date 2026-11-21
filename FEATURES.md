@@ -2,6 +2,13 @@
 
 Tested means the specific check in VERIFICATION.md passed. Implemented means code is available with further acceptance coverage needed. Partial identifies implemented behavior with material gaps. Missing identifies an unavailable capability. A test result qualifies its fixture and environment.
 
+| 3.5.6 HDR delivery | Status | Verified scope / remaining limits |
+|---|---|---|
+| HDR10+ Edited Master | Tested subset | CPU HEVC Main10 and authored Profile A statistics from final decoded PQ. Exact compressed picture/audio and rational timestamps across insertion. Generated mixed video layers, trims, VFR holds and 2× speed. Requires known mastering metadata. |
+| Managed HDR effects | Partial | Exposure, opacity, fades and matching-aspect video layers support authored output. Titles, stills, creative grades, arbitrary spatial transforms, masks and native HDR+ monitoring remain outside the qualified set. |
+| Samsung and YouTube presets | Local file tested | Six-frame 4K60 HEVC/PQ MP4 for each. ST 2094-40 per picture for Samsung. Static HDR10 for YouTube. Television playback and YouTube transcodes remain open. |
+| Standards coverage | Partial | Version-1 single-window descriptive metadata. No creative target curve, scene grouping or certification. Preserve Original still rejects the 7,619 nonconforming camera blocks. |
+
 | 3.5.5 development capability | Status | Verified scope / remaining limits |
 |---|---|---|
 | HDR10+ source validation and export | Independently tested subset | Encoded/decoded comparison on 7,619 camera blocks, all rejected for the reserved 5% field. Installed identity remux verified on every frame and decoded audio sample of a generated 12-frame fixture. Only a matching complete source is accepted. |
