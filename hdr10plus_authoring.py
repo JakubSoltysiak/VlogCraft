@@ -69,7 +69,7 @@ def prefix_sei(data, temporal_id):
 
 
 @contextmanager
-def decoded_frames(path, width, height, cancelled):
+def decoded_frames(path, width, height, cancelled, owns_process=lambda _:None):
     """Yield exactly one reconstructed frame at a time in presentation order."""
     matrix = ('zscale=agamma=0:pin=2020:tin=smpte2084:min=2020_ncl:rin=limited:'
               'p=2020:t=smpte2084:m=gbr:r=full:filter=bilinear,format=gbrp16le')
@@ -80,9 +80,12 @@ def decoded_frames(path, width, height, cancelled):
     frame_bytes = width * height * 6
     with tempfile.TemporaryFile() as errors, subprocess.Popen(
             args, stdout=subprocess.PIPE, stderr=errors, creationflags=CREATE_FLAGS) as process:
+        owns_process(process)
         def pictures():
             while not cancelled():
                 raw = process.stdout.read(frame_bytes)
+                if cancelled():
+                    raise RuntimeError('Export cancelled')
                 if not raw:
                     break
                 if len(raw) != frame_bytes:
@@ -97,3 +100,5 @@ def decoded_frames(path, width, height, cancelled):
         finally:
             if process.poll() is None:
                 process.kill()
+                process.wait()
+            owns_process(None)

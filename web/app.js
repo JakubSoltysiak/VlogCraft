@@ -492,27 +492,29 @@ async function startExport(){
  try{
   const delivery=$('exportWorkflow').value;
   const preserving=delivery==='hdr10plus-copy';
+  const fixed=['samsung-hdr10plus','youtube-hdr'].includes(delivery);
   let renderSettings;
   if(!preserving){
   const custom=$('exportResolution').value==='custom';
-  const w=Number(custom?$('outputWidth').value:$('exportResolution').value);
-  const h=custom?Number($('outputHeight').value):w*9/16;
-  const bitrate=$('outputBitrate').valueAsNumber;
+  const w=fixed?3840:Number(custom?$('outputWidth').value:$('exportResolution').value);
+  const h=fixed?2160:custom?Number($('outputHeight').value):w*9/16;
+  const bitrate=fixed?0:$('outputBitrate').valueAsNumber;
   if(![w,h].every(v=>Number.isInteger(v)&&v>=16&&v<=16384&&v%2===0))throw Error('Choose even dimensions between 16 and 16384 pixels');
   if(!Number.isFinite(bitrate)||bitrate<0||bitrate>2000)throw Error('Invalid output bitrate');
    const color=await validatedColorFromControls();
-   renderSettings={width:w,height:h,fps:rateChoice($('exportFps').value),crf:Number($('exportCrf').value),
+   renderSettings={width:w,height:h,fps:fixed?60:rateChoice($('exportFps').value),crf:Number($('exportCrf').value),
                    preset:$('exportPreset').value,encoder:color?.output==='hdr10'?'libx265':$('encoderChoice').value,bitrate,color};
   }
   if(!$('exportPath').value.trim() && !await browseExport())return;
   const destination=await request('export/destination','POST',{path:$('exportPath').value});
   if(destination.exists && !confirm('Replace the existing MP4 at this destination?'))return;
   $('exportPath').value=destination.path;
-  if(renderSettings){
+  if(renderSettings && delivery==='render'){
    snapshot();Object.assign(state.output,renderSettings);redraw();save();
   }
   await flushSave();
-  const res=await request('export','POST',{path:destination.path,overwrite:destination.exists,delivery});
+  const res=await request('export','POST',{path:destination.path,overwrite:destination.exists,delivery,
+                                         ...(delivery!=='render'&&!preserving?{settings:renderSettings}:{})});
   if(res.cancelled)return;
   started=true;
   $('renderProgress').hidden=false;$('openExportFolder').hidden=true;
@@ -608,4 +610,8 @@ function setup(){
  window.addEventListener('dragleave',e=>{if(e.dataTransfer?.types.includes('Files')){dragCount=Math.max(0,dragCount-1);if(!dragCount)$('dropOverlay').hidden=true;}});
  window.addEventListener('drop',e=>{if(e.dataTransfer?.types.includes('Files')){e.preventDefault();e.stopPropagation();dragCount=0;$('dropOverlay').hidden=true;const lane=e.target.closest('[data-lane]');let id=lane?.dataset?.lane,p=lane?clamp((e.clientX-lane.getBoundingClientRect().left)/zoom,0,1e12):null;if(!state?.desktop)void importDropped(e.dataTransfer.files,id,p);}});
 }
-(async()=>{setup();try{state=await request('state');redraw();setupStudio();await setupNative();await recoveryInitialize();}catch(e){toast('Editor failed to initialize: '+e.message,true);}})();
+(async()=>{setup();try{
+ const [project,app]=await Promise.all([request('state'),request('app-info')]);
+ document.querySelectorAll('[data-app-version]').forEach(el=>{el.textContent=app.version;});
+ state=project;redraw();setupStudio();await setupNative();await recoveryInitialize();
+}catch(e){toast('Editor failed to initialize: '+e.message,true);}})();

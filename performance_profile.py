@@ -2,6 +2,7 @@
 import ctypes,importlib.util,json,os,subprocess,tempfile,threading,time
 from pathlib import Path
 import psutil
+from app_version import VERSION
 FIELDS={
  'cpu':('Name','NumberOfCores','NumberOfLogicalProcessors','L2CacheSize','L3CacheSize'),
  'memory':('Capacity','ConfiguredClockSpeed','SMBIOSMemoryType','DataWidth'),
@@ -94,7 +95,7 @@ class Diagnostics:
    except subprocess.TimeoutExpired:child.kill();child.wait(timeout=2)
  def _run(self,storage):
   try:
-   report={'hardware':inventory(self.bundle,self.cache,self._execute)}
+   report={'application_version':VERSION,'hardware':inventory(self.bundle,self.cache,self._execute)}
    if storage:report['storage_test']=storage_test(self.bundle,self.cache,self._execute)
    report['recommendation']=recommend(report);report['status']='complete'
    # Machine-local, sanitized, replace-only result. No project or media identity.

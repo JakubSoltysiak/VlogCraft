@@ -1,0 +1,65 @@
+{
+  "baseline": "60e233b72319607936a1afd48e7f6572f7d364da",
+  "qualification": "Scoped edited HDR10+ and local 4K60 delivery. Native playback, long export workloads and physical device playback remain open.",
+  "source_gui_profiles_before_clock_fix": {
+    "static": {
+      "seconds": 15.5,
+      "wall_seconds": 15.796999999991385,
+      "media_worker_peak_rss_mib": 1159.93,
+      "media_worker_observed_cpu_seconds": 16.609,
+      "sampled_scratch_bytes": 29922,
+      "bytes": 13097,
+      "frames": 6,
+      "video_size": [
+        3840,
+        2160
+      ],
+      "fps": 60,
+      "dynamic_metadata": false,
+      "video_audio_endpoint_seconds": 0.1
+    },
+    "samsung": {
+      "seconds": 18,
+      "wall_seconds": 18.139999999999418,
+      "media_worker_peak_rss_mib": 1159.56,
+      "media_worker_observed_cpu_seconds": 17.109,
+      "sampled_scratch_bytes": 67610,
+      "bytes": 13433,
+      "frames": 6,
+      "video_size": [
+        3840,
+        2160
+      ],
+      "fps": 60,
+      "dynamic_metadata": true,
+      "video_audio_endpoint_seconds": 0.1
+    },
+    "youtube": {
+      "seconds": 16.5,
+      "wall_seconds": 16.610000000000582,
+      "media_worker_peak_rss_mib": 1159.86,
+      "media_worker_observed_cpu_seconds": 16.609,
+      "sampled_scratch_bytes": 30346,
+      "bytes": 14046,
+      "frames": 6,
+      "video_size": [
+        3840,
+        2160
+      ],
+      "fps": 60,
+      "dynamic_metadata": false,
+      "video_audio_endpoint_seconds": 0.1
+    },
+    "static_samsung_decoded_equality": true
+  },
+  "timing_regression": {
+    "fps": "30000/1001",
+    "before_frame_duration_ticks": 1,
+    "expected_frame_duration_ticks": 4004,
+    "corrected": true
+  },
+  "source_fingerprint": "ae280fb87fa024f48f90bace2ae0dec5a24693bf71522bd358dd74fc555e6f08",
+  "fingerprint_method": "SHA256 sorted relevant relative path + NUL + LF-normalized source + NUL",
+  "benchmark_protocol_fingerprint": "6912aece682ada569fae844d94e8b3eda36f04d30b47ef70b9d74b7310fd50c9",
+  "benchmark_protocol_fingerprint_method": "SHA256 sorted benchmark driver/observer relative path + NUL + LF-normalized source + NUL"
+}
