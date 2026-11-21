@@ -147,6 +147,13 @@ function renderInspector(){let html='';if(insTab==='project'){html=renderProject
  html+=`<div class="property"><label>Color grade</label><select data-prop="grade">${['neutral','warm','cool','vivid','cinematic','mono'].map(x=>`<option value="${x}" ${c.grade===x?'selected':''}>${x.toUpperCase()}</option>`).join('')}</select></div>`;
  }
  if(kind==='title')html+='<div class="section-label">TYPOGRAPHY</div>'+`<div class="property"><label>Title text</label><textarea data-prop="text" rows="3">${esc(c.text||'')}</textarea></div>`+range('Text size','fontScale',c.fontScale,.01,.15,.005,false)+`<div class="property"><label>Color</label><select data-prop="color">${['white','yellow','cyan','black','#f5ce8a','#a6ffdf'].map(x=>`<option ${x===c.color?'selected':''} value="${x}">${x}</option>`).join('')}</select></div>`;
+ if(kind==='title'){
+   html+='<div class="prop-row"><div class="property"><label>Font</label><select data-prop="titleFont">'+
+     Object.entries({segoe:'Segoe UI',arial:'Arial',georgia:'Georgia'}).map(([id,name])=>'<option value="'+id+'" '+((c.titleFont||'segoe')===id?'selected':'')+'>'+name+'</option>').join('')+
+     '</select></div><div class="property"><label>Placement</label><select data-prop="titleAlign"><option value="center">Center</option><option value="lower" '+(c.titleAlign==='lower'?'selected':'')+'>Lower</option></select></div></div>';
+   html+=range('Opacity','opacity',c.opacity,0,1,.01)+field('Horizontal offset','x',c.x,-2,2,.01)+field('Vertical offset','y',c.y,-2,2,.01);
+   if(state.output.color)html+=range('Scale','scale',c.scale,.1,3,.05,false)+field('Rotation (degrees)','rotation',c.rotation??0,-360,360,1)+effectControls(c);
+ }
  if((a?.hasAudio||kind==='audio'))html+='<div class="section-label">AUDIO MIX</div>'+range('Source volume','volume',c.volume,0,3,.05)+(!c.audioDetached?mixerControls(c,t):'');
  if(a?.kind==='video'&&a.hasAudio){
    const audioFormat=[a.audioSampleRate?Number(a.audioSampleRate)/1000+' kHz':'',a.audioChannelLayout||''].filter(Boolean).join(' · ');
@@ -388,7 +395,7 @@ function syncPreview(force=false){if(!state)return;if(state.output.color&&$('pla
   player.wrap.style.zIndex=z++;const elapsed=Math.max(0,playhead-c.position),left=Math.max(0,endOf(c)-playhead);const fi=c.fadeIn?Math.min(1,elapsed/c.fadeIn):1,fo=c.fadeOut?Math.min(1,left/c.fadeOut):1;player.wrap.style.opacity=clamp(animated(c,'opacity')*Math.min(fi,fo),0,1);
   if(c.kind==='title'){
    player.wrap.style.transform='translate('+animated(c,'x')*100+'%,'+animated(c,'y')*100+'%)';player.wrap.textContent=c.text||'';player.wrap.style.fontSize=(Math.max(8,Math.round($('previewStage').clientWidth*c.fontScale)))+'px';
-   player.wrap.style.color=c.color;player.wrap.style.alignItems=c.titleAlign==='lower'?'flex-end':'center';
+   player.wrap.style.fontFamily=({segoe:'Segoe UI',arial:'Arial',georgia:'Georgia'})[c.titleFont||'segoe'];player.wrap.style.color=c.color;player.wrap.style.alignItems=c.titleAlign==='lower'?'flex-end':'center';
    continue;
   }
   const m=player.media;if(!m)continue;

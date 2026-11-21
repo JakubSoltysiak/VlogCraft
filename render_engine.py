@@ -152,7 +152,7 @@ def _opaque_base(video,assets,start,end,fps,width,height):
     if clip.get('fit','contain')!='cover':
         if asset.get('width',0)*height!=asset.get('height',0)*width:return False
     if any(clip.get(k,d)!=d or clip.get('keys',{}).get(k) for k,d in [('opacity',1),('scale',1),('x',0),('y',0),('rotation',0)]):return False
-    if clip.get('chroma') or clip.get('mask')=='ellipse' or clip.get('wipe','none')!='none':return False
+    if clip.get('chroma') or clip.get('mask','none')!='none' or clip.get('wipe','none')!='none':return False
     if clip.get('fadeIn',0) or clip.get('fadeOut',0):return False
     return timing.frame_at(clip['position'],fps)<=timing.frame_at(start,fps) and timing.frame_at(clip_finish(clip),fps)>=timing.frame_at(end,fps)
 
@@ -224,9 +224,11 @@ def segment_command(state, start, end, target, jobdir, quality='final', stream=N
             alpha_expr='*'.join([alpha,*alpha_terms])
             font_option=''
             if os.name=='nt':
-                font=jobdir/'title-font.ttf'
-                if not font.exists():shutil.copyfile(Path(os.environ['WINDIR'])/'Fonts'/'segoeui.ttf',font)
-                font_option='fontfile=title-font.ttf:'
+                from hdr_layers import TITLE_FONTS
+                font_name=TITLE_FONTS[c.get('titleFont','segoe')]
+                font=jobdir/font_name
+                if not font.exists():shutil.copyfile(Path(os.environ['WINDIR'])/'Fonts'/font_name,font)
+                font_option=f'fontfile={font_name}:'
             filters.append(f'[{last}]drawtext={font_option}textfile={f.name}:fontcolor={color}:'
                            f"expansion=none:fontsize={fontsize}:x='(w-text_w)/2+w*({tx})':y='{text_y}+h*({ty})':" 
                            f"alpha='{alpha_expr}':box=1:boxcolor=black@0.35:boxborderw=14"+(f":enable='{enabled}'" if continuous else '')+

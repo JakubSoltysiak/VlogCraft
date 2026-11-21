@@ -24,6 +24,7 @@ function curveValue(keys, fallback, at) {
   if (a.mode === 'hold') u = 0;
   if (a.mode === 'ease-in') u *= u;
   if (a.mode === 'ease-out') u *= 2-u;
+  if (a.mode === 'ease-in-out') u = u*u*(3-2*u);
   if (a.mode === 'bezier') {
     const [x1,y1,x2,y2] = a.handles || [.25,.1,.25,1];
     const cubic = (t,p,q) => 3*(1-t)**2*t*p + 3*(1-t)*t*t*q + t**3;
@@ -41,8 +42,10 @@ function animated(c, prop) {
   return curveValue(c.keys?.[prop], c[prop]??def[prop], sourceClock(c));
 }
 function animationControls(c) {
-  const properties=c.kind==='audio'?['volume']:c.kind==='title'?['x','y','opacity']:
-    ['x','y','scale','rotation','opacity','brightness','contrast','saturation',...(c.mask==='ellipse'?['maskRadius']:[]),...(assetById(c.assetId)?.hasAudio?['volume']:[])];
+  const managed=!!state.output.color;
+  const properties=c.kind==='audio'?['volume']:c.kind==='title'&&!managed?['x','y','opacity']:
+    ['x','y','scale','rotation','opacity',...(managed?[]:['brightness']),'contrast','saturation',
+     ...(c.mask&&c.mask!=='none'?['maskRadius']:[]),...(assetById(c.assetId)?.hasAudio?['volume']:[])];
   if (!properties.includes(animationProperty)) animationProperty=properties[0];
   const keys = c.keys?.[animationProperty] || [];
   const key = keys.find(k=>Math.abs(k.time-sourceClock(c))<.00001);
@@ -55,7 +58,7 @@ function animationControls(c) {
     <canvas id="curvePlot" width="384" height="96" title="Click to seek along the clip"></canvas>
     <div class="property"><label for="curveTime">Source time (s)</label><input id="curveTime" type="number" min="${c.start}" max="${c.end}" step="any" value="${Math.max(c.start,Math.min(c.end,sourceClock(c))).toFixed(8)}"></div>
     <div class="prop-row"><div class="property"><label>Value</label><input id="curveValue" type="number" min="${lo}" max="${hi}" step=".01" value="${key?.value??round(animated(c,animationProperty))}"></div>
-    <div class="property"><label>Interpolation</label><select id="curveMode">${['linear','hold','ease-in','ease-out','bezier'].map(v=>`<option ${v===key?.mode?'selected':''}>${v}</option>`).join('')}</select></div></div>
+    <div class="property"><label>Interpolation</label><select id="curveMode">${['linear','hold','ease-in','ease-out','ease-in-out','bezier'].map(v=>`<option ${v===key?.mode?'selected':''}>${v}</option>`).join('')}</select></div></div>
     <div class="property" id="curveHandlesRow" ${key?.mode==='bezier'?'':'hidden'}><label>Bézier handles (x1, y1, x2, y2)</label><input id="curveHandles" value="${(key?.handles||[.25,.1,.25,1]).join(', ')}"></div>
     <div class="property-actions"><button class="text-button" id="keySet">${key?'Update key':'Add key'}</button><button class="text-button" id="keyRemove">Remove key</button>
     <button class="text-button" id="curveCopy">Copy curve</button><button class="text-button" id="curvePaste">Paste</button></div></details>`;
@@ -136,9 +139,8 @@ function withoutGeneratedMotion(curves={}){
 
 function motionKeys(clip,settings,fps,managed){
   const name=settings.preset;
-  if(!motionPresets[name] || !['image','video'].includes(clip.kind) || clip.locked)return null;
+  if(!motionPresets[name] || !['image','video',...(managed?['title']:[])].includes(clip.kind) || clip.locked)return null;
   const fade=name.startsWith('fade-');
-  if(managed && (!fade || clip.kind!=='video'))return null;
   const speed=clip.speed||1;
   const endFrame=Math.round((clip.position+(clip.end-clip.start)/speed)*fps);
   const span=endFrame-Math.round(clip.position*fps)-1;
@@ -204,7 +206,7 @@ function motionPresetDialog(){
     <div class="property"><label for="motionDirection">Direction</label><select id="motionDirection">
       <option value="left">Left</option><option value="right">Right</option><option value="up">Up</option><option value="down">Down</option>
     </select></div>
-    <p class="dialog-note">Presets generate editable keys. Locked clips and properties with manual keys are skipped. Managed HDR supports opacity fades on video.</p>
+    <p class="dialog-note">Presets generate editable keys. Locked clips and properties with manual keys are skipped. Whole-project presets include nested tracks.</p>
     <div class="property-actions"><button type="button" class="button secondary">Cancel</button><button class="button primary">Apply</button></div>
   </form>`;
   document.body.appendChild(dialog);
@@ -232,16 +234,20 @@ function motionPresetDialog(){
     const selectedTrack=sel()?.track;
     const updates=[];
     let skipped=0;
-    for(const track of state.tracks){
-      if(scope.value==='track'&&track!==selectedTrack)continue;
+    function visit(track){
       for(const clip of track.clips){
         if(scope.value==='selection'&&!ids.has(clip.id))continue;
         if(track.locked||clip.locked){skipped++;continue;}
+        if(clip.kind==='sequence'){clip.children.forEach(visit);continue;}
         const keys=settings.preset==='clear'?withoutGeneratedMotion(clip.keys):
           motionKeys(clip,settings,sequenceRate(),!!state.output.color);
         if(keys&&JSON.stringify(keys)!==JSON.stringify(clip.keys||{}))updates.push([clip,keys]);
         else if(keys===null)skipped++;
       }
+    }
+    for(const track of state.tracks){
+      if(scope.value==='track'&&track!==selectedTrack)continue;
+      visit(track);
     }
     if(!updates.length){toast('No eligible clips changed'+(skipped?' · '+skipped+' skipped':''),true);return;}
     snapshot();

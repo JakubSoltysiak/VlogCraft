@@ -20,10 +20,11 @@ def filters(c,start,count,jobdir,*,alpha=True):
     if alpha:parts.append('format=rgba')
     if c.get('chroma'):
         parts.append(f"colorkey=0x{c.get('keyColor','#00ff00')[1:]}:{c.get('similarity',.16)}:{c.get('keyBlend',.08)}")
-    if c.get('mask')=='ellipse':
+    if c.get('mask') in ('ellipse','rectangle'):
         r=re.sub(r'\bt\b','T',value(c,'maskRadius',start,.5))
         feather=c.get('feather',.1)
-        dist=f'sqrt(pow((X/W-0.5)/({r}),2)+pow((Y/H-0.5)/({r}),2))'
+        x,y=f'abs((X/W-0.5)/({r}))',f'abs((Y/H-0.5)/({r}))'
+        dist=f'hypot({x},{y})' if c['mask']=='ellipse' else f'max({x},{y})'
         weight=f'clip((1-{dist})/{max(.00001,feather)},0,1)'
         parts.append(f"geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a='alpha(X,Y)*{weight}':i=nearest")
     wipe=c.get('wipe','none')

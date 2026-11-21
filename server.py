@@ -361,7 +361,7 @@ def validate_state(d, base=None):
             if src.get('wipe','none')!='none':
                 c['wipe']=src['wipe'];c['wipeDuration']=_number(src.get('wipeDuration',.5),'Wipe duration',.001,30)
             c['mask']=src.get('mask','none')
-            if c['mask'] not in ('none','ellipse'):raise ValueError('Unknown clip mask')
+            if c['mask'] not in ('none','ellipse','rectangle'):raise ValueError('Unknown clip mask')
             c['feather']=_number(src.get('feather',.1),'Mask feather',0,1)
             c['chroma']=bool(src.get('chroma',False))
             c['keyColor']=src.get('keyColor','#00ff00')
@@ -382,6 +382,10 @@ def validate_state(d, base=None):
             if c['grade'] not in engine.GRADES:raise ValueError('Invalid color grade')
             if c['fit'] not in ('contain','cover'):raise ValueError('Invalid fit')
             if kind=='title':
+                from hdr_layers import TITLE_FONTS
+                font=src.get('titleFont','segoe')
+                if not isinstance(font,str) or font not in TITLE_FONTS:raise ValueError('Unsupported title font')
+                if font!='segoe':c['titleFont']=font
                 c.update(text=str(src.get('text','Title'))[:250],
                          color=src.get('color','white') if src.get('color','white') in ('white','yellow','cyan','black','#ffffff','#f5ce8a','#a6ffdf') else 'white',
                          titleAlign=src.get('titleAlign','center') if src.get('titleAlign') in ('center','lower') else 'center',

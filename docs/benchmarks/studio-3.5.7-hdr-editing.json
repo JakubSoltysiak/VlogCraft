@@ -1,0 +1,8 @@
+{
+  "baseline": "8b7b394795f8a1b085ac789453851d3a43c3995b",
+  "qualification": "Checkpoint A. Decoded managed titles, JPEG orientation, PNG alpha and animated PQ geometry; delivery benchmark pending.",
+  "source_fingerprint": "2c1bb054a525f44a2c30e986f9307a2d6b9e6f11031162a27b921861152c5907",
+  "fingerprint_method": "SHA256 sorted relevant relative path + NUL + LF-normalized source + NUL",
+  "benchmark_protocol_fingerprint": "39375ed763da1f79b38a29c8695ecb66630a6a643a3e53e420d95001e0cb6128",
+  "benchmark_protocol_fingerprint_method": "SHA256 sorted benchmark driver/observer relative path + NUL + LF-normalized source + NUL"
+}

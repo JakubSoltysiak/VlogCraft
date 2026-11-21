@@ -54,7 +54,7 @@ class ColorContractTests(unittest.TestCase):
  def test_unknown_color_and_unsupported_effects_fail_before_encoding(self):
   with tempfile.TemporaryDirectory() as folder:
    root=Path(folder);s=project([source(root,'gates')]);c=s['tracks'][0]['clips'][0]
-   for key,value in [('mask','ellipse'),('x',.1),('grade','warm'),('rotation',1),('brightness',.1)]:
+   for key,value in [('mask','path'),('chroma',True),('grade','warm'),('wipe','left'),('brightness',.1)]:
     old=c.get(key);c[key]=value
     with self.assertRaises(ValueError):hdr_render.command(s,0,.5,root/'out.mov',root)
     if old is None:c.pop(key)

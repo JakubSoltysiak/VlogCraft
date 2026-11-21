@@ -3,7 +3,7 @@ import math
 
 LIMITS = {'x':(-2,2), 'y':(-2,2), 'volume':(0,3), 'scale':(.1,3), 'rotation':(-360,360), 'opacity':(0,1),
           'brightness':(-1,1), 'contrast':(0,2), 'saturation':(0,3), 'maskRadius':(.01,1)}
-MODES = ('linear','hold','ease-in','ease-out','bezier')
+MODES = ('linear','hold','ease-in','ease-out','ease-in-out','bezier')
 PRESETS = ('fade-in','fade-out','fade-both','zoom-in','zoom-out','pan','ken-burns','slide-in','slide-out')
 
 
@@ -79,7 +79,8 @@ def expression(clip,prop,start):
                 intervals.append((a['time']+dt*i/64,f'({base:.12g}+({delta:.12g})*{interp})'))
                 prev=value
         else:
-            weight={'linear':u,'hold':'0','ease-in':f'({u}*{u})','ease-out':f'({u}*(2-{u}))'}[a['mode']]
+            weight={'linear':u,'hold':'0','ease-in':f'({u}*{u})','ease-out':f'({u}*(2-{u}))',
+                    'ease-in-out':f'({u}*{u}*(3-2*{u}))'}[a['mode']]
             intervals.append((b['time'],f'({base:.12g}+({delta:.12g})*{weight})'))
     pieces=[(keys[0]['time'],str(keys[0]['value'])),*intervals,(math.inf,str(keys[-1]['value']))]
     def tree(items):
