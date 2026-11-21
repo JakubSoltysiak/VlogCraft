@@ -118,7 +118,7 @@ The owner authorized the independent P0 color slice while the stabilization gate
 |---|---|---|
 | Native export path and mixed stills | Tested subset | Installed Save As, Unicode path, cancellation and AMD AMF UHD60. PNG eXIf, transparency, JPEG orientation and camera audio pass generated checks. |
 | Export progress and settings | Implemented, tested subset | In-segment FFmpeg frames with audio/mux stage changes. CPU controls match selected encoder. General mixed-scene ETA remains open. |
-| HDR10+ per-frame source index | Partial | Bounded local source samples and VFR mapping pass. Full-original timing and present-day decoder coverage remain open. Nonconforming metadata is fenced from reuse. |
+| HDR10+ per-frame source index | Tested subset | Both complete PQ originals, 7,619 frames in total, plus late-metadata/VFR mapping tests pass. Nonconforming distribution values are preserved and fenced from reuse. Broader source coverage remains open. |
 | HDR10+ export | Missing | No output mode. Valid preservation and regeneration require independent decoded acceptance. |
 | Timeline precision and Project aspect ratio | Implemented, tested subset | Real trim at 600 frames, visible snap guide, undo/redo, zoom anchor, portrait preview and saved canvas settings on a 32-asset fixture. Follow and cursor zoom have narrower coverage. |
 | Batch animation, library/audio and storage UX | Open | Existing individual controls remain. Requested batch presets, accessible separation, safe asset removal, icon occupancy and storage management are tracked. |
