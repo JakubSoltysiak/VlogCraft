@@ -1,0 +1,85 @@
+{
+  "sources": [
+    {
+      "source": "Camera 1",
+      "seconds": 7.105952400001115,
+      "distinct_frame_intervals": 3,
+      "cached_reused": true,
+      "index_bytes": 229376,
+      "status": "ready",
+      "frames": 105,
+      "dynamicFrames": 105,
+      "rejectedFrames": 0,
+      "nonconformingDistributionFrames": 105,
+      "timeBase": "1/90000",
+      "formatStart": "0",
+      "schema": 2
+    },
+    {
+      "source": "Camera 2",
+      "seconds": 4.246071000001393,
+      "distinct_frame_intervals": 3,
+      "cached_reused": true,
+      "index_bytes": 217088,
+      "status": "ready",
+      "frames": 99,
+      "dynamicFrames": 99,
+      "rejectedFrames": 0,
+      "nonconformingDistributionFrames": 99,
+      "timeBase": "1/90000",
+      "formatStart": "0",
+      "schema": 2
+    }
+  ],
+  "cancelled_without_cache_publication": true,
+  "sample_seconds": 1.5,
+  "scope": "Source metadata only. Bounded derivatives, when requested, use video stream copy.",
+  "full_final": {
+    "sources": [
+      {
+        "source": "Camera 1",
+        "seconds": 201.25223800000094,
+        "distinct_frame_intervals": 25,
+        "cached_reused": true,
+        "index_bytes": 9609216,
+        "status": "ready",
+        "frames": 4674,
+        "dynamicFrames": 4674,
+        "rejectedFrames": 0,
+        "nonconformingDistributionFrames": 4674,
+        "timeBase": "1/90000",
+        "formatStart": "0",
+        "schema": 2
+      },
+      {
+        "source": "Camera 2",
+        "seconds": 150.36280120000447,
+        "distinct_frame_intervals": 33,
+        "cached_reused": true,
+        "index_bytes": 6062080,
+        "status": "ready",
+        "frames": 2945,
+        "dynamicFrames": 2945,
+        "rejectedFrames": 0,
+        "nonconformingDistributionFrames": 2945,
+        "timeBase": "1/90000",
+        "formatStart": "0",
+        "schema": 2
+      }
+    ],
+    "cancelled_without_cache_publication": true,
+    "sample_seconds": null,
+    "scope": "Source metadata only. Bounded derivatives, when requested, use video stream copy."
+  },
+  "private_integrity_after_full_index": {
+    "source_count": 3,
+    "private_folder_tracked_files": 0,
+    "private_history_path_matches": 0,
+    "private_content_objects": 0,
+    "private_text_objects": 0,
+    "private_working_text_files": 0,
+    "missing_originals": 0,
+    "original_hashes_verified": true,
+    "changed_originals": 0
+  }
+}

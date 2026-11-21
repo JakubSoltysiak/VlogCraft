@@ -1,0 +1,36 @@
+{
+  "baseline": "7d1b2b4a38f51bd5aae383512971e8fbfa1c6492",
+  "output": "3840x2160/60",
+  "encoder": "libx264",
+  "scope": "One pair on generated mixed PNG, JPEG and video with audio. Wall time includes segment drains and final mux.",
+  "runs": [
+    {
+      "arm": "baseline",
+      "seconds": 69.39041179999913,
+      "status": "passed",
+      "frames": 324,
+      "frames_per_second": 4.669232990486505,
+      "audio_duration": 5.4,
+      "video_duration": 5.4
+    },
+    {
+      "arm": "candidate",
+      "seconds": 23.180872900004033,
+      "status": "passed",
+      "frames": 324,
+      "frames_per_second": 13.97704052809606,
+      "audio_duration": 5.4,
+      "video_duration": 5.4
+    }
+  ],
+  "mean_absolute_RGB_error_8bit": 0.0,
+  "original_hashes_match": true,
+  "qualification": "Partial. One matched synthetic UHD60 renderer pair and a separate installed AMF export. HDR10+ delivery and sustained editing/playback remain open.",
+  "measurement_scope": "One matched pair with common FFmpeg 9.0.2 and source workload. Includes drain/mux; decoded RGB compared at 96\u00d754. No long-form or general encoder-throughput inference.",
+  "report": "docs/HDR10PLUS_EDITING.md",
+  "source_fingerprint": "55680984ddfd9261eece374ad65942017dccff7f49eb78c141bbb5fe8c6789d5",
+  "fingerprint_method": "SHA256 sorted relevant relative path + NUL + LF-normalized source + NUL",
+  "benchmark_protocol_fingerprint": "f72938d326d279db17e2edeb54ef7204d3b847a0cb46b7f2d1e9d2abb62f3b86",
+  "benchmark_protocol_fingerprint_method": "SHA256 sorted benchmark driver/observer relative path + NUL + LF-normalized source + NUL",
+  "measured_renderer_commit": "eb0035a380af2c384e03655636dc1c182ef3d735"
+}

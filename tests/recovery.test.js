@@ -51,13 +51,13 @@ test('native gzip history round-trips all eighty snapshots and Unicode',async()=
 
 test('recovery restores project inspector, snap and source controls consistently',async()=>{
  const tabs=['clip','project'].map(tab=>({dataset:{tab},classList:{toggle(name,value){this.active=value}}}));
- const nodes={programResolution:{value:'960',options:[{value:'960'}]},playbackEngine:{value:'live',options:[{value:'live'},{value:'rendered'}]},previewSource:{value:'auto',options:[{value:'auto'},{value:'original'}]},snapBtn:{classList:{toggle(name,value){this.active=value}}}};
+ const nodes={programResolution:{value:'960',options:[{value:'960'}]},playbackEngine:{value:'live',options:[{value:'live'},{value:'rendered'}]},previewSource:{value:'auto',options:[{value:'auto'},{value:'original'}]},snapBtn:{classList:{toggle(name,value){this.active=value}},setAttribute(name,value){this[name]=value}}};
  const c=vm.createContext({state:{desktop:true},window:{},document:{querySelectorAll:()=>tabs},$:id=>nodes[id],
   playhead:0,zoom:70,selectedId:null,selectedAssetId:null,insTab:'clip',snap:true,useProxies:true,undoStack:[],redoStack:[],
   clamp:(v,a,b)=>Math.max(a,Math.min(b,v)),duration:()=>10,redraw:()=>{},nativeQualityOptions:()=>{},positionPlayhead:()=>{},syncPreview:()=>{},toast:()=>{},
   request:async path=>path==='desktop/recovery'?{epoch:4,restore:{insTab:'project',snap:false,useProxies:false,source:'original',engine:'rendered',resolution:'960',playhead:3,undo:[{tracks:[],name:'legacy'}],redo:[]}}:{ready:true}});
  vm.runInContext(fs.readFileSync('web/recovery.js','utf8'),c);await vm.runInContext('recoveryInitialize()',c);
  assert.equal(c.insTab,'project');assert.equal(c.playhead,3);assert.equal(tabs[1].classList.active,true);
- assert.equal(nodes.snapBtn.classList.active,false);assert.equal(nodes.previewSource.value,'original');
+ assert.equal(nodes.snapBtn.classList.active,false);assert.equal(nodes.snapBtn['aria-pressed'],'false');assert.equal(nodes.previewSource.value,'original');
  assert.equal(c.undoStack[0].name,'legacy');
 });

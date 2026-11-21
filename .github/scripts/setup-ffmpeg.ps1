@@ -2,10 +2,9 @@ $ErrorActionPreference='Stop'
 $folder=Join-Path $env:RUNNER_TEMP 'vlogcraft-ffmpeg'
 New-Item -ItemType Directory -Force $folder | Out-Null
 $archive=Join-Path $folder 'ffmpeg.7z'
-$url='https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-full.7z'
+$url='https://github.com/GyanD/codexffmpeg/releases/download/9.0.2/ffmpeg-9.0.2-full_build.7z'
+$expected='f0e46253c70dfe902bac915dfb4224f0cf1b7c6eeab9da2ccc9a5581f9a71b13'
 Invoke-WebRequest $url -OutFile $archive
-Invoke-WebRequest ($url+'.sha256') -OutFile ($archive+'.sha256')
-$expected=((Get-Content -Raw ($archive+'.sha256')).Trim() -split '\s+')[0]
 $actual=(Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash
 if ($actual -ne $expected) { throw 'FFmpeg checksum verification failed' }
 & 7z x $archive ("-o"+$folder) -y | Out-Null

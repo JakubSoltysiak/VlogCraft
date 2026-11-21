@@ -62,10 +62,13 @@ def run(project):
                                          file_types=('Media (' + ';'.join('*' + x for x in sorted(server.SUPPORTED)) + ')',
                                                      'All files (*.*)')) or []
 
-    def choose_export():
-        files = window.create_file_dialog(webview.FileDialog.SAVE, save_filename=project.stem + '.mp4',
-                                          file_types=('H.264 MP4 (*.mp4)',))
+    def choose_export(suggested=''):
+        folder, name = server.export_dialog_defaults(suggested)
+        files = window.create_file_dialog(webview.FileDialog.SAVE, directory=str(folder),
+                                          save_filename=name, file_types=('MP4 video (*.mp4)',))
         return files[0] if files else None
+
+    server.EXPORT_PREFERENCES = APP_DATA / 'export-location.json'
 
     def project_action(action):
         if action == 'media':
@@ -200,6 +203,7 @@ def run(project):
         close_step('diagnostics',server.PERFORMANCE_DIAGNOSTICS.close)
         close_step('audio_cache',audio_cache.cancel)
         close_step('frame_index',server.FRAME_INDEX.close)
+        close_step('hdr10plus_index',server.HDR10PLUS_INDEX.close)
         close_step('program_preview',server.PROGRAM_PREVIEW.close)
         with server.JOB_LOCK:
             server.PROXY_QUEUE.clear()

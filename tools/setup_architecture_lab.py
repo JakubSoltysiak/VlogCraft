@@ -3,7 +3,7 @@ import argparse,hashlib,json,os,shutil,subprocess,urllib.request,zipfile
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 SPECS={
- 'ffmpeg-shared':('https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-full-shared.7z','4d2060a8b34a940aa47d785142055bb92a63053781e55f2ace4546edd519a8f5'),
+ 'ffmpeg-shared':('https://github.com/GyanD/codexffmpeg/releases/download/9.0.2/ffmpeg-9.0.2-full_build-shared.7z','4d2060a8b34a940aa47d785142055bb92a63053781e55f2ace4546edd519a8f5'),
  'zig':('https://ziglang.org/download/0.17.1/zig-x86_64-windows-0.17.1.zip','b03f477a1943673e02aca0f570e8030dffd536ce1f45cbc4d3326ec31159562e'),
  'shotcut':('https://github.com/mltframework/shotcut/releases/download/v26.9.27/shotcut-win64-26.9.27.zip','1f8c50ce7b125a2f0dcb60777b358e86baf03b8515982612b6adae10a83d93a5')
 }

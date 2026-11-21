@@ -2,11 +2,25 @@
 
 **Canonical living document for the owner, ChatGPT, and Codex.**  
 **Project:** [JakubSoltysiak/VlogCraft](https://github.com/JakubSoltysiak/VlogCraft)  
-**Last consolidated:** 2026-11-16\
+**Last consolidated:** 2026-11-21\
 **Source of requirements:** discussions about VlogCraft Studio, the Kenya travel vlog, Samsung Galaxy footage, the 3.0–3.4 development history, and GitHub PR #1.  
-**Current development state:** 3.3 verified baseline on main; **P0 HDR color foundation is a stacked development draft on codex/p0-hdr-color-foundation / PR #8**, from3.4.10 checkpoint83e6afb. PRs #1–#7 and historical tags remain untouched. The owner's independent HDR milestone does not close outstanding reliability or production-HDR gates.
+**Current development state:** 3.3 verified baseline on main. **P0 real-world editing and HDR10+ work is in draft PR #11**, based on the HDR foundation in draft PR #8. Production reliability and HDR10+ delivery remain open.
 
 > **Mission:** A free, private, offline-first, genuinely capable Windows filmmaking editor. Give one person Premiere-like creative freedom and professional picture/audio quality without cloud processing, subscriptions, arbitrary source-size limits, or unnecessary complexity. Prioritize editing actual travel/wildlife footage over collecting features. It should be delightful for a casual annual vlog yet powerful when needed.
+
+## P0 real-world editing and HDR10+ — 21 November 2026
+
+[Draft PR #11](https://github.com/JakubSoltysiak/VlogCraft/pull/11) is stacked on #8. [Acceptance and evidence](docs/HDR10PLUS_EDITING.md) covers the owner’s first-project findings from issues #9 and #10.
+
+- [x] **VC-EXPORT-001 — Windows export destination and mixed stills.** Installed native Save As, Unicode path, cancel before export, 324 decoded UHD60 AMF frames and matching audio endpoints. Explicit PNG/JPEG demux with a held decoded frame, EXIF orientation and alpha coverage. The destination and final publication protect original media.
+- [x] **VC-EXPORT-002 — Measured export progress.** In-segment FFmpeg frames, encoded time, processing FPS, live activity and distinct audio/mux stages. Reliable remaining time across mixed segments is still open.
+- [ ] **VC-EXPORT-003 — Long mixed-media throughput and proxy contention.** One short paired export improved. Repeat matching an owner-scale workload and separate proxy cost, CPU composition, encoding and temporary I/O.
+- [x] **VC-EDIT-015 — Timeline grid, live trim and canvas controls in the tested scope.** Real mouse trim, frame-aligned numeric duration, zoom anchoring, ruler seek coalescing, follow modes and Project Inspector aspect ratios. Preserve fit/transform properties and verify undo/reopen.
+- [ ] **VC-EDIT-016 — Batch animation, keyframes and accessible transitions.** Apply/clear on a clip, selection and entire project, optional defaults for new clips, and separate transition controls. Verify actual preview/export interpolation.
+- [ ] **VC-EDIT-017 — Media Library, camera audio and storage.** Sizing and list/grid, safe undoable remove, linked waveform and audio separation discoverability, regenerable cache management and safe ownership checks. Preserve project variants, backups and repaired source dependencies.
+- [ ] **VC-EDIT-018 — Taskbar icon occupancy.** Preserve the approved artwork and colors. Verify the sizing adjustment in shell, shortcut and title-bar contexts.
+- [ ] **VC-HDR-015 — HDR10+ transport and authoring qualification.** Both complete PQ originals pass versioned local PTS indexing, cache reuse and cancellation. Their decoded distribution values are fenced from reuse. Qualify conforming identity preservation and independent packet/frame validation, then author or regenerate valid metadata for changed pictures. Keep Samsung HDR10+ and YouTube HDR10 profiles separate.
+- [ ] **VC-REL-040 — Real timeline latency and active resources.** Measure interactive scrubbing, playback and proxy contention with comparable source/preview geometry. Seek coalescing alone does not close previous stall, underrun or memory blockers.
 
 ## 3.4.9 reliability acceptance — 14 November 2026
 

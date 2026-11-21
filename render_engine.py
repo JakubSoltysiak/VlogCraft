@@ -115,8 +115,14 @@ def _add_audio(filters, input_idx, track, clip, start, end, dur, label):
                    f"volume='{_num(track.get('volume',1))}*{gain}':eval=frame{afades},apad,"
                    f'atrim=duration={_num(dur)},asetpts=PTS-STARTPTS[{label}]')
 
+def _single_still(asset):
+    return asset['kind'] == 'image' and Path(asset['path']).suffix.lower() in ('.png', '.jpg', '.jpeg')
+
+
 def _media_input(cmd, path, kind, at, speed, dur, fps, media_type):
-    if kind=='image':
+    if _single_still({'kind': kind, 'path': path}):
+        cmd.extend(['-f', 'image2', '-pattern_type', 'none', '-framerate', str(fps), '-i', str(path)])
+    elif kind=='image':
         cmd.extend(['-loop','1','-framerate',str(fps),'-i',str(path)])
     else:
         # Serial decoding avoids a reproduced multi-input FFmpeg drain stall.
@@ -186,7 +192,7 @@ def segment_command(state, start, end, target, jobdir, quality='final', stream=N
         a=assets[c['assetId']]
         pos_offset=max(0,first_time(c)-float(c['position']))
         seek=float(c['start'])+pos_offset*float(c.get('speed',1))
-        key=(c['assetId'],seek,c.get('speed',1),media_type)
+        key=(c['assetId'],0,1,media_type) if _single_still(a) else (c['assetId'],seek,c.get('speed',1),media_type)
         if key not in inputs:
             _media_input(cmd,a['path'],a['kind'],seek,float(c.get('speed',1)),duration,fps,media_type)
             inputs[key]=source_index;source_index+=1
@@ -237,11 +243,15 @@ def segment_command(state, start, end, target, jobdir, quality='final', stream=N
         hdr=(a.get('hdr') is True or a.get('colorTransfer') in ('smpte2084','arib-std-b67'))
         hdr_filters=('zscale=t=linear:npl=100,format=gbrpf32le,'
                      'tonemap=hable:desat=0,zscale=t=bt709:m=bt709:p=bt709:r=tv,format=yuv420p,') if hdr else ''
-        expr=(f'[{inp}:v]setpts=PTS/{_num(c.get("speed",1))},'
-              f'fps={fps}:start_time=0:round=up,'+hdr_filters+
+        still = _single_still(a)
+        timing_filters = '' if still else f'setpts=PTS/{_num(c.get("speed",1))},fps={fps}:start_time=0:round=up,'
+        expr=(f'[{inp}:v]'+timing_filters+hdr_filters+
               f'scale={targetw}:{targeth}:force_original_aspect_ratio={scalemode}')
         if c.get('fit')=='cover':
             expr+=f',crop={targetw}:{targeth}'
+        if still:
+            # Decode and resize once. Animate the held frame at sequence rate downstream.
+            expr+=f',loop=loop={max(0,nframes-1)}:size=1:start=0,setpts=N/({fps}*TB)'
         expr+=(GRADES.get(c.get('grade','neutral'), '')+
                grading.filter_for(c,state,jobdir)+video_effects.filters(c,clip_start,count,jobdir,alpha=not opaque)
                +_fade_video(c,clip_start,clip_end-clip_start))
@@ -310,21 +320,25 @@ def segment_command(state, start, end, target, jobdir, quality='final', stream=N
           '-threads',str(workers),'-ac','2','-ar','48000','-movie_timescale','120000','-video_track_timescale','120000','-movflags','+faststart',str(target)]
     return cmd
 
-def render_range(state,start,end,target,jobdir,quality='final',runner=None):
+def render_range(state,start,end,target,jobdir,quality='final',runner=None,stage=None):
     """Drain video and audio independently before muxing complete streams."""
     runner=runner or _run
     video=jobdir/(target.stem+'_video'+target.suffix)
     audio=jobdir/(target.stem+'_audio.wav')
+    if stage:stage('video')
     runner(segment_command(state,start,end,video,jobdir,quality,'video'),str(jobdir))
+    if stage:stage('audio')
     runner(segment_command(state,start,end,audio,jobdir,quality,'audio'),str(jobdir))
     codec=['-c:a','aac','-b:a','192k'] if quality=='preview' else ['-c:a','copy']
+    if stage:stage('segment-mux')
     runner(['ffmpeg','-hide_banner','-nostdin','-loglevel','error','-y','-i',str(video),'-i',str(audio),
             '-map','0:v:0','-map','1:a:0','-c:v','copy',*codec,'-movie_timescale','120000',
             '-video_track_timescale','120000','-movflags','+faststart',str(target)],str(jobdir))
     video.unlink(missing_ok=True);audio.unlink(missing_ok=True)
 
 
-def render(state, output, work, *, review=False, on_progress=None, cancelled=lambda:False, popen=None):
+def render(state, output, work, *, review=False, on_progress=None, on_stage=None,
+           cancelled=lambda:False, popen=None, publish=os.replace):
     """Export a sequence using a bounded-memory segment renderer.
 
     popen is callback(command, cwd) that runs FFmpeg and handles cancellation.
@@ -345,7 +359,9 @@ def render(state, output, work, *, review=False, on_progress=None, cancelled=lam
         suffix='mp4' if ('av1' in state['output'].get('encoder','') and not review) else 'mov'
         target=jobdir/f'segment_{idx:05d}.{suffix}'
         if on_progress:on_progress(round(3+start/duration*91),f'Rendering scene {idx+1} / {len(segments)}')
-        render_range(state,start,end,target,jobdir,'review' if review else 'final',runner)
+        def report(stage):
+            on_stage(stage,idx+1,len(segments),start,end,fps)
+        render_range(state,start,end,target,jobdir,'review' if review else 'final',runner,report if on_stage else None)
         parts.append(target)
     files=jobdir/'concat.txt'
     entries=[]
@@ -360,10 +376,11 @@ def render(state, output, work, *, review=False, on_progress=None, cancelled=lam
     if part.exists():part.unlink()
     try:
         color_timescale=['-movie_timescale','120000','-video_track_timescale','120000'] if state['output'].get('color') else []
+        if on_stage:on_stage('final-mux',len(segments),len(segments),0,segments[-1][1],fps)
         runner(['ffmpeg','-hide_banner','-nostdin','-loglevel','error','-y',
                '-f','concat','-safe','0','-i',str(files),'-c:v','copy','-c:a','aac','-b:a','192k',*color_timescale,'-movflags','+faststart',str(part)],str(jobdir))
         if cancelled():raise RuntimeError('Export cancelled')
-        os.replace(part,target)
+        publish(part,target)
     finally:
         if part.exists():part.unlink()
     if on_progress:on_progress(100,'Export complete')

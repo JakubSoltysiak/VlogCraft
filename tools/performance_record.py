@@ -22,6 +22,9 @@ PROTOCOL_FILES=(
  'benchmarks/color_qualification.py','tests/test_hdr_color.py',
  'benchmarks/color_native_preview.py','tests/windows_color.py',
  'benchmarks/color_uhd.py',
+ 'benchmarks/mixed_still_export.py','tests/test_export_workflow.py','tests/windows_export_workflow.py',
+ 'benchmarks/hdr10plus_source_index.py','tests/test_hdr10plus_index.py',
+ 'tests/windows_timeline_editing.py',
  'tests/performance.py','tests/gpu_metrics.py')
 
 def fingerprint(files=None):
