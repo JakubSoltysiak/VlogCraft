@@ -23,3 +23,13 @@ Motion presets generate editable source-time keys for selected clips, the select
 The keyframe inspector lists keys, shows when the curve has too few keys to animate, and can add, update, move and remove numeric keys. It retains graph markers, Bézier and conditional copy/paste. The desktop source test applied a fade to both photos, verified undo/redo, assigned default zoom, moved a key numerically and reopened the saved sequence. Decoded output changed from RGB [14,18,26] at the first frame to [235,35,23] after the fade. The first local decoder invocation used an invalid leading-decimal seek argument and is retained as a failed harness attempt. Three focused JavaScript tests cover timing and manual curve preservation.
 
 Automatic transitions across clip boundaries, linked audio crossfades and transitions inside nested sequences remain open. The current opacity preset is motion within a clip.
+
+## C. Library, camera audio, storage and icon
+
+The Media Library now offers grid and list views, a thumbnail-width control, panel sizing where the window has room, vertical scrolling and multi-selection. Remove from Project hides unused items. A geometry-aware reference check rejects clips referenced on any track or in a nested sequence. The original inventory record is retained for undo and the Removed view. Restoring or undoing makes the source available in the active library again. Source files are never deleted by this command.
+
+Clip Inspector identifies embedded versus separated camera audio and exposes the existing independent, linked waveform track operation. The local desktop source test verified 33 assets, list scrolling and panel sizing, rejected removal of a used source, exercised removal/undo/redo and thumbnail regeneration, reopened the project, and showed byte-identical decoded 38,400-byte stereo PCM before and after separation. The test also verified all original fixture hashes.
+
+Project Storage reports linked source and known project/cache sizes. Its confirmation-gated cleanup is limited to app-owned thumbnails for removed library entries, excluding any active cache or linked source path. Restore can regenerate those thumbnails. General proxy/preview deletion and abandoned export recovery remain open.
+
+The approved original artwork is unchanged. The ICO now crops outside the alpha-4 artwork bounds with a 3.5% border, then uses premultiplied-alpha scaling for all seven resolutions. Only near-invisible fringe falls outside the crop. The source/ICO pixel checks pass. Actual Windows installer and shell-resource verification follow on the combined 3.5.5 build.

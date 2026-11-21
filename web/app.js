@@ -18,6 +18,7 @@ let undoStack=[],redoStack=[],saveTimer=null,saveInFlight=Promise.resolve(),modi
 let lastPreviewKey='',activePlayers=new Map(),snap=true,clipGesture=null,transferStop=false,transferId=null,toastTimeout=null;
 let renderPoll=null,proposalToken=null,proposalSnapshot=null;
 let timelineScrollManualUntil=0;
+let librarySelection=new Set();
 async function request(path,method='GET',body=null){const o={method,cache:'no-store'};if(body!==null){o.headers={'Content-Type':'application/json'};o.body=JSON.stringify(body);}const r=await fetch('/api/'+path,o);let data=await r.json().catch(()=>({error:'Unexpected response from local editor'}));if(!r.ok)throw Error(data.error||`HTTP ${r.status}`);return data;}
 function toast(message,warning=false){const box=$('toast');box.textContent=message;box.className='toast visible'+(warning?' warn':'');clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>box.className='toast',4200);}
 function setSaveStatus(txt){$('saveStatus').textContent=txt;}
@@ -34,10 +35,79 @@ function defaultTrack(kind){return [...state.tracks].reverse().find(t=>t.type===
 function clipFromAsset(a,pos=0,trackType=null){const kind=trackType==='audio'?'audio':a.kind;return {id:uid(),assetId:a.id,kind,position:round(pos),start:0,end:a.kind==='image'?5:Math.max(1/sequenceRate(),a.duration||5),speed:1,volume:1,opacity:1,scale:1,x:0,y:0,grade:'neutral',fit:'contain',fadeIn:0,fadeOut:0,locked:false};}
 function canPlace(a,track){return track&&((track.type==='audio'&&a.kind!=='image')||(track.type==='video'&&a.kind!=='audio'));}
 function addAsset(a,track,pos){if(!track)track=defaultTrack(a.kind==='audio'?'audio':'video');if(!canPlace(a,track)){toast('That file type cannot go on this track',true);return;}if(track.locked){toast('Track is locked',true);return;}snapshot();const c=clipFromAsset(a,pos??Math.max(0,...track.clips.map(endOf)),track.type);applyDefaultMotion(c);track.clips.push(c);selectedId=c.id;playhead=c.position;redraw();save();toast('Added '+a.name+' to '+track.name);}
-function renderAssets(){const filter=$('assetFilter').value;const search=$('searchAssets').value.toLowerCase().trim();const list=state.assets.filter(a=>(filter==='all'||a.kind===filter)&&a.name.toLowerCase().includes(search));$('mediaCount').textContent=state.assets.length+' ASSETS';$('assetList').innerHTML=list.length?list.map(a=>`<article class="asset-card" draggable="true" data-asset="${a.id}" title="Drag to a timeline track, or double-click to add"><div class="asset-thumb">${a.kind==='audio'?svg('music'):`<img loading="lazy" src="/thumb/${a.id}?v=${a.cacheId||a.id}" onerror="this.style.display='none'">`}<span class="asset-badge">${a.missing?'OFFLINE':a.kind.toUpperCase()}</span>${a.hdr?'<span class="hdr-badge">HDR</span>':''}${a.kind!=='image'?`<span class="asset-duration">${format(a.duration)}</span>`:''}</div><div class="asset-text"><div class="asset-name">${esc(a.name)}</div><div class="asset-sub"><span>${fileSize(a.size)}</span><button class="text-button" data-source="${a.id}" title="Source monitor">Source</button>${a.missing?`<button data-relink="${a.id}" class="text-button">RELINK</button>`:""}<button class="asset-plus" title="Add to timeline" data-add="${a.id}">+</button></div></div></article>`).join(''):'<div class="empty-media">No matching files. <br>Drop MP4, MOV, MKV, audio or images to import.</div>';
- $('assetList').querySelectorAll('[draggable="true"]').forEach(el=>{el.ondragstart=e=>{e.dataTransfer.setData('application/x-vlogcraft',el.dataset.asset);e.dataTransfer.effectAllowed='copy';};el.ondblclick=()=>{const a=assetById(el.dataset.asset);addAsset(a);};});
- $('assetList').querySelectorAll('[data-source]').forEach(b=>b.onclick=()=>sourceMonitor(assetById(b.dataset.source)));
- $('assetList').querySelectorAll('[data-add]').forEach(el=>el.onclick=e=>{e.stopPropagation();const a=assetById(el.dataset.add);addAsset(a);});}
+function renderAssets(){
+ const filter=$('assetFilter').value;
+ const search=$('searchAssets').value.toLowerCase().trim();
+ const removed=new Set(state.output.removedMedia||[]);
+ const archived=$('showRemovedMedia').checked;
+ const list=state.assets.filter(a=>removed.has(a.id)===archived &&
+   (filter==='all'||a.kind===filter) && a.name.toLowerCase().includes(search));
+ const panel=$('assetList');
+ const scroll=panel.scrollTop;
+ panel.classList.toggle('list-view',$('libraryView').value==='list');
+ $('mediaCount').textContent=(state.assets.length-removed.size)+' ASSETS';
+ panel.innerHTML=list.map(a=>{
+  const details=[a.width&&a.height?a.width+' × '+a.height:'',a.kind!=='image'?format(a.duration):'',fileSize(a.size)].filter(Boolean).join(' · ');
+  const thumb=a.kind==='audio'?svg('music'):`<img loading="lazy" src="/thumb/${a.id}?v=${a.cacheId||a.id}${archived?'':'&restore=1'}" alt="" onerror="this.style.display='none'">`;
+  return `<article class="asset-card" tabindex="0" data-asset="${a.id}" draggable="${!archived}">
+   <div class="asset-thumb">${thumb}<span class="asset-badge">${a.missing?'OFFLINE':a.kind.toUpperCase()}</span>${a.hdr?'<span class="hdr-badge">HDR</span>':''}</div>
+   <div class="asset-text"><div class="asset-name" title="${esc(a.name)}">${esc(a.name)}</div>
+   <div class="asset-description">${details}</div>
+   ${archived?'':`<div class="asset-sub"><button class="text-button" data-source="${a.id}">Source</button>
+      ${a.missing?`<button data-relink="${a.id}" class="text-button">Relink</button>`:''}
+      <button class="asset-plus" title="Add to timeline" data-add="${a.id}">+</button></div>`}</div></article>`;
+ }).join('')||'<div class="empty-media">No matching files</div>';
+ panel.scrollTop=scroll;
+ const syncSelection=()=>{
+  for(const card of panel.querySelectorAll('[data-asset]'))card.classList.toggle('selected',librarySelection.has(card.dataset.asset));
+  const button=$('libraryRemove');
+  button.disabled=!list.some(a=>librarySelection.has(a.id));
+  button.textContent=archived?'Restore selected':'Remove selected from project';
+ };
+ for(const card of panel.querySelectorAll('[data-asset]')){
+  const a=assetById(card.dataset.asset);
+  const select=event=>{
+   if(event.target.closest('button'))return;
+   if(event.ctrlKey||event.metaKey){
+    if(librarySelection.has(a.id))librarySelection.delete(a.id);else librarySelection.add(a.id);
+   }else librarySelection=new Set([a.id]);
+   syncSelection();
+  };
+  card.onclick=select;
+  card.onkeydown=event=>{if(event.code==='Space'&&event.target===card){event.preventDefault();select(event);}};
+  if(!archived){
+   card.ondragstart=event=>{event.dataTransfer.setData('application/x-vlogcraft',a.id);event.dataTransfer.effectAllowed='copy';};
+   card.ondblclick=event=>{if(!event.target.closest('button'))addAsset(a);};
+  }
+ }
+ panel.querySelectorAll('[data-source]').forEach(b=>b.onclick=()=>sourceMonitor(assetById(b.dataset.source)));
+ panel.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>addAsset(assetById(b.dataset.add)));
+ syncSelection();
+}
+function changeLibrarySelection(){
+ const removed=new Set(state.output.removedMedia||[]);
+ const entries=[...$('assetList').querySelectorAll('[data-asset]')].map(el=>el.dataset.asset)
+   .filter(id=>librarySelection.has(id));
+ if(!entries.length)return;
+ if(!$('showRemovedMedia').checked){
+  const used=[];
+  function collect(tracks){
+   for(const track of tracks)for(const c of track.clips){
+    if(entries.includes(c.assetId))used.push(track.name);
+    if(c.kind==='sequence')collect(c.children);
+   }
+  }
+  collect(state.tracks);
+  if(used.length){toast('Selection is used by '+used.length+' clip(s) on '+[...new Set(used)].join(', '),true);return;}
+ }
+ snapshot();
+ for(const id of entries){
+  if($('showRemovedMedia').checked)removed.delete(id);else removed.add(id);
+ }
+ state.output.removedMedia=[...removed].sort();
+ librarySelection.clear();
+ renderAssets();save();
+}
 function renderProjectInspector(){
  const out=state.output;
  const preset=sequenceDimensions.find(([, ,width,height])=>width===out.width&&height===out.height);
@@ -52,6 +122,7 @@ function renderProjectInspector(){
  <div class="property"><label for="sequenceHeight">Height</label><input id="sequenceHeight" type="number" min="16" max="16384" step="2" value="${out.height}"></div></div>
  <button type="button" class="button secondary" id="applySequenceSize">Apply size</button></div>
  <p class="dialog-note">Existing clip fit and transforms are preserved. Review framing after changing the canvas.</p>
+ <button type="button" class="button secondary" id="storageUsage">Storage usage</button>
  <div class="property"><label>Frames per second</label><select data-proj="fps">${rateOptions(out.fps)}</select></div>`;
 }
 const field=(label,key,value,min,max,step=.1)=>`<div class="property"><label>${label}</label><input data-prop="${key}" type="number" min="${min}" max="${max}" step="${step}" value="${round(value)}"></div>`;
@@ -77,6 +148,13 @@ function renderInspector(){let html='';if(insTab==='project'){html=renderProject
  }
  if(kind==='title')html+='<div class="section-label">TYPOGRAPHY</div>'+`<div class="property"><label>Title text</label><textarea data-prop="text" rows="3">${esc(c.text||'')}</textarea></div>`+range('Text size','fontScale',c.fontScale,.01,.15,.005,false)+`<div class="property"><label>Color</label><select data-prop="color">${['white','yellow','cyan','black','#f5ce8a','#a6ffdf'].map(x=>`<option ${x===c.color?'selected':''} value="${x}">${x}</option>`).join('')}</select></div>`;
  if((a?.hasAudio||kind==='audio'))html+='<div class="section-label">AUDIO MIX</div>'+range('Source volume','volume',c.volume,0,3,.05)+(!c.audioDetached?mixerControls(c,t):'');
+ if(a?.kind==='video'&&a.hasAudio){
+   const audioFormat=[a.audioSampleRate?Number(a.audioSampleRate)/1000+' kHz':'',a.audioChannelLayout||''].filter(Boolean).join(' · ');
+   html+='<p class="dialog-note">'+(kind==='audio'?'Camera audio track':c.audioDetached?'Camera audio on a separate track':'Embedded camera audio')+
+     (audioFormat?' · '+esc(audioFormat):'')+'</p>';
+   if(kind==='video'&&!c.audioDetached&&!c.linkId)html+='<button type="button" id="separateCameraAudio" class="button secondary">Separate and link camera audio</button>';
+   if(c.linkId&&(kind==='audio'||c.audioDetached))html+='<button type="button" id="unlinkCameraAudio" class="button secondary">Unlink camera audio</button>';
+ }
  if(t.type==='video'&&kind!=='title')html+='<button class="button secondary" id="gradeOpen">Curves, wheels &amp; LUT</button>';
  if(a || kind==='title')html+=animationControls(c);
  if(kind==='video')html+='<div class="property-actions"><button id="motionOpen" class="button secondary">TRACK / STABILIZE</button></div>';
@@ -87,6 +165,7 @@ function renderInspector(){let html='';if(insTab==='project'){html=renderProject
  }}
  $('inspectorContent').innerHTML=html;
  bindInputColor();
+ $('storageUsage')?.addEventListener('click',openProjectStorage);
  if($('gradeOpen'))$('gradeOpen').onclick=gradeDialog;
  $('inspectorContent').querySelectorAll('[data-proj]').forEach(el=>el.onchange=()=>{snapshot();const key=el.dataset.proj;if(key==='name')state.name=el.value||'Untitled';else if(key==='fps')state.output.fps=rateChoice(el.value);redraw();save();});
  if($('sequenceAspect')){
@@ -112,6 +191,8 @@ function renderInspector(){let html='';if(insTab==='project'){html=renderProject
   renderTimeline();syncPreview(true);save();
  };el.oninput=action;el.onfocus=()=>{if(!el.dataset.history){snapshot();el.dataset.history='yes';}};el.onblur=()=>{delete el.dataset.history;};});
  $('rippleDeleteBtn')?.addEventListener('click',rippleDelete);
+ $('separateCameraAudio')?.addEventListener('click',()=>commitEdit('extractAudio',{},[sel().clip.id]));
+ $('unlinkCameraAudio')?.addEventListener('click',()=>commitEdit('unlink',{},[sel().clip.id]));
  $('normalizeClip')?.addEventListener('click',()=>analyzeLevels('normalize'));
  $('duckClip')?.addEventListener('click',()=>analyzeLevels('duck'));
  bindAnimation();
@@ -475,6 +556,11 @@ function setup(){
  };
  $('linkBtn').onclick=importLinked;$('firstImport').onclick=importLinked;$('dropBtn').onclick=()=>$('fileInput').click();$('fileInput').onchange=e=>{void importDropped(e.target.files);e.target.value='';};
  $('searchAssets').oninput=renderAssets;$('assetFilter').onchange=renderAssets;
+ $('libraryView').onchange=renderAssets;
+ $('libraryThumbs').oninput=e=>$('assetList').style.setProperty('--asset-size',e.target.value+'px');
+ $('libraryWidth').oninput=e=>document.querySelector('.workspace').style.setProperty('--library-width',e.target.value+'px');
+ $('showRemovedMedia').onchange=()=>{librarySelection.clear();renderAssets();};
+ $('libraryRemove').onclick=changeLibrarySelection;
  $('performanceBtn').onclick=()=>{stopPlayback();openModal('performanceModal');};$('performanceRun').onclick=performanceTest;$('performanceApply').onclick=applyPerformancePreview;
  $('aiBtn').onclick=()=>openModal('aiModal');$('exportBtn').onclick=openExport;$('helpBtn').onclick=()=>openModal('helpModal');
  document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>closeModal(b.dataset.close));document.querySelectorAll('.modal-overlay').forEach(m=>m.onclick=e=>{if(e.target===m)m.hidden=true;});

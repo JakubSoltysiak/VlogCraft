@@ -36,6 +36,13 @@
   <section class="panel media-panel"><div class="panel-heading"><span><svg><use href="#i-folder"/></svg> MEDIA LIBRARY</span><span class="heading-tag">PROJECT</span></div>
     <div class="library-controls"><div class="library-actions"><button id="linkBtn" class="button secondary"><svg><use href="#i-link"/></svg> LINK FILES</button><button id="dropBtn" class="button small-icon" title="Choose files to copy into the project"><svg><use href="#i-plus"/></svg></button><input id="fileInput" type="file" multiple accept="video/*,audio/*,image/*,.mkv,.mts,.m2ts,.flac" hidden></div><div class="drop-hint">DROP MEDIA TO IMPORT</div>
       <div class="search-row"><input id="searchAssets" placeholder="Search footage…" autocomplete="off"><select id="assetFilter"><option value="all">ALL</option><option value="video">VIDEO</option><option value="image">IMAGE</option><option value="audio">AUDIO</option></select></div></div>
+    <div class="library-options">
+      <label>View <select id="libraryView" class="compact-select"><option value="grid">Grid</option><option value="list">List</option></select></label>
+      <label>Thumbs <input id="libraryThumbs" type="range" min="110" max="230" value="145"></label>
+      <label>Width <input id="libraryWidth" type="range" min="210" max="460" value="236"></label>
+      <label><input type="checkbox" id="showRemovedMedia"> Removed</label>
+      <button type="button" id="libraryRemove" class="text-button" disabled>Remove selected from project</button>
+    </div>
     <div class="media-list" id="assetList"><div class="empty-media">Drop your first clip to begin</div></div>
     <div class="library-footer"><span>ORIGINALS STAY UNTOUCHED</span><button class="text-button" id="stopProxy" hidden>Cancel proxy</button><span id="diskHint"></span></div>
   </section>

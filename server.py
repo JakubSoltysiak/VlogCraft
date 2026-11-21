@@ -26,7 +26,7 @@ from copy import deepcopy
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutureTimeout
 import project_store
 import animation
 import timing
@@ -46,6 +46,8 @@ PROJECT=Path(os.environ.get('VLOGCRAFT_PROJECT',WORK/'project.json'))
 FRAME_INDEX=source_frames.FrameIndex(WORK/'frame-index')
 HDR10PLUS_INDEX=HDR10PlusIndex(WORK/'hdr10plus-index')
 CACHE_WORKERS=ThreadPoolExecutor(max_workers=2,thread_name_prefix='media-cache')
+THUMB_REPLACEMENTS={}
+THUMB_LOCK=threading.RLock()
 MEDIA=WORK/'media'; THUMBS=WORK/'thumbnails'; PROXIES=WORK/'proxies'; REVIEWS=WORK/'reviews'; EXPORTS=WORK/'exports'
 AI_UNDO=WORK/'ai_undo.json'
 import preview_cache
@@ -252,11 +254,30 @@ def create_thumbnail(asset):
     if out.exists():return
     args=['ffmpeg','-hide_banner','-nostdin','-v','error','-y']
     if asset['kind']=='video':args+=['-ss',str(min(1,max(0,asset['duration']*.25)))]
+    temporary=out.with_name(out.stem+'-'+uuid.uuid4().hex+'.part.jpg')
     args+=['-i',asset['path'],'-frames:v','1','-vf',
            'scale=480:270:force_original_aspect_ratio=decrease,pad=480:270:(ow-iw)/2:(oh-ih)/2:black',
-           '-q:v','5',str(out)]
-    try:subprocess.run(args,capture_output=True,timeout=55,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
+           '-q:v','5',str(temporary)]
+    try:
+        result=subprocess.run(args,capture_output=True,timeout=55,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
+        if result.returncode==0 and temporary.is_file():
+            os.replace(temporary,out)
     except (OSError,subprocess.TimeoutExpired):pass
+    finally:temporary.unlink(missing_ok=True)
+
+
+def thumbnail_on_demand(asset):
+    key=cache_id(asset)
+    def finished(_):
+        with THUMB_LOCK:THUMB_REPLACEMENTS.pop(key,None)
+    with THUMB_LOCK:
+        future=THUMB_REPLACEMENTS.get(key)
+        if future is None:
+            future=CACHE_WORKERS.submit(create_thumbnail,asset)
+            THUMB_REPLACEMENTS[key]=future
+            future.add_done_callback(finished)
+    try:future.result(timeout=3)
+    except FutureTimeout:pass
 
 def _number(value,what,lo,hi):
     try:n=float(value)
@@ -381,6 +402,14 @@ def validate_state(d, base=None):
                       'bitrate':_number(output.get('bitrate',0),'Video bitrate',0,2000)}
     if output.get('defaultMotion') is not None:
         result['output']['defaultMotion']=animation.validate_default_motion(output['defaultMotion'])
+    removed=output.get('removedMedia',[])
+    if not isinstance(removed,list) or any(not isinstance(ident,str) or ident not in assets for ident in removed):
+        raise ValueError('Invalid removed media list')
+    if removed:
+        removed_ids=set(removed)
+        if any(c.get('assetId') in removed_ids for c in sequences.clips(new)):
+            raise ValueError('Media referenced by a timeline clip cannot be removed from the project')
+        result['output']['removedMedia']=sorted(removed_ids)
     if output.get('color') is not None:
         import color_management
         result['output']['color']=color_management.validate_output(output['color'])
@@ -658,6 +687,48 @@ def cache_id(asset):
     return asset.get('cacheId',asset['id'])
 
 
+def storage_usage(snapshot):
+    def size(path):
+        try:
+            return path.stat().st_size if path.is_file() else 0
+        except OSError:
+            return 0
+
+    def folder_size(folder):
+        if not folder.is_dir() or not folder.resolve().is_relative_to(WORK.resolve()):
+            return 0
+        return sum(size(path) for path in folder.rglob('*') if not path.is_symlink())
+
+    sources={Path(a['path']).resolve() for a in snapshot['assets']}
+    return {
+        'Source dependencies':sum(size(path) for path in sources),
+        'Project and backup':size(PROJECT)+size(project_store.backup_path(PROJECT)),
+        'Recovery':sum(size(path) for path in WORK.glob('recovery-*.json')),
+        'Thumbnails and audio caches':folder_size(THUMBS),
+        'Proxies':folder_size(PROXIES),
+        'Preview cache':folder_size(WORK/'preview-cache'),
+        'HDR10+ metadata indexes':folder_size(WORK/'hdr10plus-index'),
+    }
+
+
+def clear_removed_thumbnails(snapshot):
+    gone=set(snapshot['output'].get('removedMedia',[]))
+    if not THUMBS.is_dir() or THUMBS.resolve()!=WORK.resolve()/'thumbnails':
+        return 0
+    required={Path(a['path']).resolve() for a in snapshot['assets']}
+    active={cache_id(a) for a in snapshot['assets'] if a['id'] not in gone}
+    removed=0
+    for a in snapshot['assets']:
+        name=cache_id(a)
+        if a['id'] not in gone or name in active or not re.fullmatch(r'[a-zA-Z0-9_-]{1,64}',name):
+            continue
+        path=THUMBS/(name+'.jpg')
+        if path.is_file() and not path.is_symlink() and path.resolve() not in required:
+            path.unlink()
+            removed+=1
+    return removed
+
+
 def proxy_path(asset):
     return PROXIES/(cache_id(asset)+'.mp4')
 
@@ -869,6 +940,9 @@ class Handler(BaseHTTPRequestHandler):
             if path=='/api/source/status':
                 return self.json_response(FRAME_INDEX.status(parse_qs(parsed.query).get('assetId',[''])[0]))
             if path=='/api/encoders':return self.json_response(encoders.available())
+            if path=='/api/storage':
+                with LOCK:snapshot=deepcopy(STATE)
+                return self.json_response({'bytes':storage_usage(snapshot)})
             if path=='/api/jobs':
                 with JOB_LOCK:jobs=deepcopy(JOBS);jobs['proxy']['queued']=len(PROXY_QUEUE)
                 export = jobs['export']
@@ -921,7 +995,10 @@ class Handler(BaseHTTPRequestHandler):
                 with LOCK:asset=next((a for a in STATE['assets'] if a['id']==aid),None)
                 if not asset:return self.json_response({'error':'Unknown asset'},404)
                 if path.startswith('/wave/'):return self.file_response(THUMBS/(cache_id(asset)+'.wave.png'),'image/png')
-                return self.file_response(THUMBS/(cache_id(asset)+'.jpg'),'image/jpeg')
+                thumb=THUMBS/(cache_id(asset)+'.jpg')
+                if not thumb.is_file() and parse_qs(parsed.query).get('restore')==['1']:
+                    thumbnail_on_demand(asset)
+                return self.file_response(thumb,'image/jpeg')
             if path.startswith('/download/'):
                 name=Path(path).name
                 if not re.fullmatch(r'[\w.\-]{1,130}',name):return self.json_response({'error':'Invalid filename'},404)
@@ -969,6 +1046,11 @@ class Handler(BaseHTTPRequestHandler):
             if path=='/api/color/validate':
                 import color_management
                 return self.json_response({'color':color_management.validate_output(data.get('color'))})
+            if path=='/api/storage/clear-removed-thumbnails':
+                if data.get('confirmed') is not True:
+                    raise ValueError('Confirm removal of the removed media thumbnails')
+                with LOCK:count=clear_removed_thumbnails(STATE)
+                return self.json_response({'count':count})
             if path in ('/api/color/index/start','/api/color/index/status','/api/color/index/cancel'):
                 aid = data.get('assetId')
                 with LOCK:

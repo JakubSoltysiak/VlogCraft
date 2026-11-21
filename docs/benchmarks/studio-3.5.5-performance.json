@@ -36,9 +36,9 @@
       "field_differences": {}
     }
   ],
-  "source_fingerprint": "89d353fbe60c47bfad388f194a736eff68bf88a2c255204115c29e2b2cc9a9df",
+  "source_fingerprint": "d5f49dc2e1da589fd49e2b707198f094b5825ab45fc5d0b2ccbe785da78c3ea6",
   "fingerprint_method": "SHA256 sorted relevant relative path + NUL + LF-normalized source + NUL",
-  "benchmark_protocol_fingerprint": "52fd21ca510b1731abc65105b8ebcd3c5620613df0e38f0ecc552076f95adc81",
+  "benchmark_protocol_fingerprint": "76d358cfc70db266e3291d0cacce9292d7d951ed06a3b469823d45993d1fae94",
   "benchmark_protocol_fingerprint_method": "SHA256 sorted benchmark driver/observer relative path + NUL + LF-normalized source + NUL",
   "motion_desktop_source": {
     "batch_clips": 2,
