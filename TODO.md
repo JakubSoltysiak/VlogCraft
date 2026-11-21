@@ -4,13 +4,13 @@
 **Project:** [JakubSoltysiak/VlogCraft](https://github.com/JakubSoltysiak/VlogCraft)  
 **Last consolidated:** 2026-11-21\
 **Source of requirements:** discussions about VlogCraft Studio, the Kenya travel vlog, Samsung Galaxy footage, the 3.0–3.4 development history, and GitHub PR #1.  
-**Current development state:** 3.3 verified baseline on main. **3.5.5 development is in draft PR #12**, stacked on #11 and #8. Complete-source HDR10+ preservation is qualified on a generated fixture. Edited HDR10+ and production reliability remain open.
+**Current development state:** 3.3 verified baseline on main. **3.5.6 development is in draft PR #13**, stacked on #12, #11 and #8. A managed-video subset can author descriptive HDR10+ metadata. Full editing support, device playback and production performance remain open.
 
 > **Mission:** A free, private, offline-first, genuinely capable Windows filmmaking editor. Give one person Premiere-like creative freedom and professional picture/audio quality without cloud processing, subscriptions, arbitrary source-size limits, or unnecessary complexity. Prioritize editing actual travel/wildlife footage over collecting features. It should be delightful for a casual annual vlog yet powerful when needed.
 
 ## P0 real-world editing and HDR10+ — 21 November 2026
 
-[Draft PR #12](https://github.com/JakubSoltysiak/VlogCraft/pull/12) is stacked on #11. The earlier acceptance covers the owner’s first-project findings from issues #9 and #10. [3.5.5 qualification](docs/STUDIO_3_5_5.md), [earlier acceptance](docs/HDR10PLUS_EDITING.md).
+[Draft PR #13](https://github.com/JakubSoltysiak/VlogCraft/pull/13) is stacked on #12. The earlier acceptance covers the owner’s first-project findings from issues #9 and #10. [3.5.6 qualification](docs/STUDIO_3_5_6_HDR10PLUS.md), [3.5.5 qualification](docs/STUDIO_3_5_5.md).
 
 - [x] **VC-EXPORT-001 — Windows export destination and mixed stills.** Installed native Save As, Unicode path, cancel before export, 324 decoded UHD60 AMF frames and matching audio endpoints. Explicit PNG/JPEG demux with a held decoded frame, EXIF orientation and alpha coverage. The destination and final publication protect original media.
 - [x] **VC-EXPORT-002 — Measured export progress.** In-segment FFmpeg frames, encoded time, processing FPS, live activity and distinct audio/mux stages. Reliable remaining time across mixed segments is still open.
@@ -22,8 +22,13 @@
 - [ ] **VC-EDIT-017 — Complete storage management.** Qualify unused proxy and preview cleanup and interrupted-export recovery. Preserve project variants, backups and repaired source dependencies.
 - [x] **VC-EDIT-018 — Taskbar icon occupancy.** Approved artwork retained. Installed shell, shortcut, taskbar/title-bar resource and MSI checks passed.
 - [x] **VC-HDR-015A — Verify camera payloads and conforming complete-source export.** All 7,619 encoded blocks matched decoded values and failed the version-1 reserved entry. A generated fixture passed installed HEVC Main10 HDR10+ preservation with exact packet timing and independent decode.
-- [ ] **VC-HDR-015 — HDR10+ authoring, edited timing and profiles.** Qualify trimmed/cadence-edited frame mapping and valid metadata generation for changed pictures. Keep Samsung HDR10+ and YouTube HDR profiles separate and test actual delivery.
+- [x] **VC-HDR-015B — HDR10+ descriptive authoring for managed video.** Independently qualified short Main10/PQ exports from rendered pixels, VFR hold and 2× mapping, and fractional-rate mixed layers with audible audio. Preserve exact render packets and timestamp association through insertion.
+- [ ] **VC-HDR-015 — Complete HDR authoring and delivery acceptance.** Extend managed titles, stills, transforms, creative grades, clip-boundary transitions and cut-aware policies. Qualify longer mixed workloads and actual Samsung QN92F playback. Keep static YouTube HDR separate and check an authorized transcode.
 - [ ] **VC-REL-040 — Real timeline latency and active resources.** The matched short Live Layers pair measured 553.5 → 467.3 ms median seek. Measure repeatable scrubbing, native UHD60 with audio, proxy contention and longer memory behavior. Previous stall and underrun gates remain open.
+
+## 3.6.0 performance investigation
+
+- [ ] **Compare VlogCraft and Adobe Premiere Pro on equivalent local workloads.** Begin with published techniques and measured export and playback traces using Windows Performance Recorder and GPUView where applicable. Consider REA or Ghidra only after reviewing law, licensing, necessity and the narrow technical question. Use independently developed techniques and keep proprietary Adobe implementation material out of VlogCraft. This investigation is deferred to 3.6.0.
 
 ## 3.4.9 reliability acceptance — 14 November 2026
 

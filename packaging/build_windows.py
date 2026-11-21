@@ -13,9 +13,11 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+from app_version import VERSION
+
 BUILD = ROOT / 'build'
 RELEASE = ROOT / 'release'
-VERSION = '3.5.5'
 WIX_NS = 'http://schemas.microsoft.com/wix/2006/wi'
 UPGRADE_CODE = '09FA364C-4D7B-4B43-A1CF-7D82A0B62F02'
 ET.register_namespace('', WIX_NS)
@@ -27,6 +29,25 @@ def element(parent, tag, **attrs):
 
 def identifier(prefix, path):
     return prefix + hashlib.sha256(str(path).casefold().encode()).hexdigest()[:28]
+
+
+def executable_version():
+    file = BUILD/'studio-version.txt'
+    parts = tuple(map(int,VERSION.split('.'))) + (0,)
+    file.write_text(f"""VSVersionInfo(
+  ffi=FixedFileInfo(filevers={parts}, prodvers={parts}, mask=0x3f,
+    flags=0, OS=0x40004, fileType=1, subtype=0, date=(0,0)),
+  kids=[
+    StringFileInfo([StringTable('040904B0', [
+      StringStruct('FileDescription', 'VlogCraft Studio'),
+      StringStruct('FileVersion', '{VERSION}'),
+      StringStruct('ProductName', 'VlogCraft Studio'),
+      StringStruct('ProductVersion', '{VERSION}')
+    ])]),
+    VarFileInfo([VarStruct('Translation', [1033,1200])])
+  ]
+)\n""",encoding='utf-8')
+    return file
 
 
 def build(wix,experimental_native=False):
@@ -53,7 +74,8 @@ def build(wix,experimental_native=False):
     engine = Path(shutil.which('ffmpeg')).parent
     subprocess.run([sys.executable, '-m', 'PyInstaller', '--noconfirm', '--clean', '--noupx',
                     '--log-level', 'WARN', '--onedir', '--windowed', '--name', 'VlogCraftStudio',
-                    '--icon', str(icon), '--add-data', 'web;web', '--add-data',str(notices)+';notices',
+                    '--icon', str(icon), '--version-file', str(executable_version()),
+                    '--add-data', 'web;web', '--add-data',str(notices)+';notices',
                     '--add-data', str(engine / 'ffmpeg.exe') + ';engine',
                     '--add-data', str(engine / 'ffprobe.exe') + ';engine',
                     '--add-data', str(engine.parent / 'LICENSE') + ';engine',
@@ -118,7 +140,7 @@ def build(wix,experimental_native=False):
     obj = BUILD / 'studio.wixobj'
     subprocess.run([str(wix / 'candle.exe'), '-nologo', '-out', str(obj), str(source)], check=True)
     subprocess.run([str(wix / 'light.exe'), '-nologo', '-sval', '-spdb', '-ext', 'WixUIExtension',
-                    '-out', str(RELEASE / f'VlogCraft-Studio-{".".join(VERSION.split(".")[:2])}-x64.msi'), str(obj)], check=True)
+                    '-out', str(RELEASE / f'VlogCraft-Studio-{VERSION}-x64.msi'), str(obj)], check=True)
 
 
 if __name__ == '__main__':

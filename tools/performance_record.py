@@ -29,6 +29,9 @@ PROTOCOL_FILES=(
  'tests/windows_motion.py','tests/motion_presets.test.js',
  'tests/windows_library.py','tests/windows_icons.py',
  'benchmarks/studio355_live_flight.py',
+ 'tests/test_hdr10plus_authoring.py','tests/test_hdr10plus_master.py',
+ 'tests/windows_hdr10plus_master.py','tests/windows_hdr_profiles.py',
+ 'benchmarks/hdr10plus_camera_analysis.py',
  'tests/performance.py','tests/gpu_metrics.py')
 
 def fingerprint(files=None):

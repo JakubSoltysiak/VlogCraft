@@ -1,5 +1,11 @@
 # Architecture and continuation
 
+## 3.5.6 edited HDR10+
+
+The managed reference path still composites in float32 linear Rec.2020, then delivers HEVC Main10 PQ. Short independently encoded GOPs can have different decode delays. The final managed HDR mux validates exact CFR presentation coverage and establishes a continuous decode clock while retaining original presentation timestamps and compressed pictures. The AAC path is unchanged for standard delivery.
+
+Edited Master independently decodes the final PQ encode in presentation order, computes whole-frame linear maxRGB statistics and records compact Profile A payloads on disk. The transport matches generated single-picture MP4 fragments to original packets, uses PTS to select each payload in decode order, and remuxes with the original AAC. Exact packet timing, compressed picture bytes with the intended SEI and AAC hashes gate atomic publication. Playback and recovery structures remain unchanged. [Engineering decision, tests and scope](docs/STUDIO_3_5_6_HDR10PLUS.md).
+
 ## 3.5.5 HDR10+ preservation and project editing
 
 `hdr10plus_bitstream.py` independently reads registered SEI from original length-prefixed HEVC samples. FFprobe supplies packet offsets and rational timestamps. The local comparison matches decoded cached fields against the original integers by presentation time. `hdr10plus_export.py` gates the explicit complete-source copy path on matching video/audio/project properties, frame timestamps and conforming frame-associated metadata. It probes the temporary remux and compares compressed packet hashes, PTS/DTS/durations and stream configuration before publishing. The existing renderer remains responsible for configured SDR and HDR10 delivery. Edited HDR10+ needs output-picture analysis and validation.

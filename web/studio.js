@@ -133,8 +133,10 @@ function sizeMonitor(){
 }
 async function openExport(){
   openModal('exportModal');
-  initColorControls();
   $('exportWorkflow').value='render';
+  delete $('exportWorkflow').dataset.previousColor;
+  delete $('exportWorkflow').dataset.previousEncoder;
+  initColorControls();
   $('exportWorkflow').onchange=updateExportWorkflow;
   updateExportWorkflow();
   const out=state.output;
@@ -164,18 +166,49 @@ async function openExport(){
   try{
     const available=await request('encoders');
     choice.replaceChildren(...Object.entries(available).map(([id,label])=>new Option(label,id)));
+    for(const option of $('exportWorkflow').options){
+      if(['hdr10plus-master','samsung-hdr10plus','youtube-hdr'].includes(option.value))option.disabled=!available.libx265;
+    }
     choice.value=available[out.encoder]?out.encoder:'libx264';
     if(!choice.value)choice.selectedIndex=0;
     if(state.output.color?.output==='hdr10')choice.value='libx265';
     $('startRender').disabled=!choice.value || (await request('jobs')).export.status==='rendering';
   }catch(error){toast('Encoder check failed: '+error.message,true);}
-  finally{choice.disabled=false;updateEncoderControls();}
+  finally{updateExportWorkflow();}
 }
 
 function updateExportWorkflow(){
-  const preserving=$('exportWorkflow').value==='hdr10plus-copy';
+  const workflow=$('exportWorkflow'),mode=workflow.value;
+  const preserving=mode==='hdr10plus-copy',samsung=mode==='samsung-hdr10plus',youtube=mode==='youtube-hdr';
+  const master=mode==='hdr10plus-master'||samsung;
+  const profile=samsung||youtube,managed=master||youtube;
   $('exportRenderSettings').hidden=preserving;
   $('exportCopyRequirements').hidden=!preserving;
+  $('exportMasterRequirements').hidden=!master;
+  $('exportProfileNote').hidden=!profile;
+  $('exportProfileNote').textContent=samsung
+    ? '3840 × 2160 at 60 fps · HEVC Main10 HDR10+ · CRF 17 · Samsung device playback is pending.'
+    : youtube ? '3840 × 2160 at 60 fps · HEVC Main10 HDR10 · 75 Mb/s target · AAC stereo. YouTube processes its own HDR versions.' : '';
+  $('exportResolution').closest('label').hidden=profile;
+  $('exportFps').closest('label').hidden=profile;
+  $('outputBitrate').closest('label').hidden=profile;
+  $('customDimensions').hidden=profile||$('exportResolution').value!=='custom';
+  $('applyColorSetup').hidden=managed;
+  $('colorOutput').disabled=managed;
+  $('encoderChoice').disabled=managed;
+  if(managed){
+    if(workflow.dataset.previousColor===undefined){
+      workflow.dataset.previousColor=$('colorOutput').value;
+      workflow.dataset.previousEncoder=$('encoderChoice').value;
+    }
+    $('colorOutput').value='hdr10';
+  }else if(workflow.dataset.previousColor!==undefined){
+    $('colorOutput').value=workflow.dataset.previousColor;
+    if(workflow.dataset.previousEncoder)$('encoderChoice').value=workflow.dataset.previousEncoder;
+    delete workflow.dataset.previousColor;
+    delete workflow.dataset.previousEncoder;
+  }
+  $('colorOutput').onchange();
 }
 
 function openProjectStorage(){
@@ -217,7 +250,9 @@ function updateEncoderControls(){
   const hdr=$('colorOutput').value==='hdr10';
   const cpu=hdr || ['libx264','libx265','libsvtav1'].includes($('encoderChoice').value);
   $('cpuExportPreset').hidden=!cpu;
-  $('cpuExportQuality').hidden=!cpu || (!hdr && $('outputBitrate').valueAsNumber>0);
+  const fixed=['samsung-hdr10plus','youtube-hdr'].includes($('exportWorkflow').value);
+  $('cpuExportQuality').hidden=fixed || !cpu || (!hdr && $('outputBitrate').valueAsNumber>0);
+  $('exportBitrateNote').hidden=fixed;
   $('exportBitrateNote').textContent=hdr
     ? 'HDR10 uses the HEVC CPU encoder. CRF controls quality. A nonzero bitrate also sets an encoder target.'
     : cpu ? 'Set 0 to use CRF quality mode. A nonzero value sets the target bitrate instead.'

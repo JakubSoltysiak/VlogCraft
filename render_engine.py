@@ -338,7 +338,7 @@ def render_range(state,start,end,target,jobdir,quality='final',runner=None,stage
 
 
 def render(state, output, work, *, review=False, on_progress=None, on_stage=None,
-           cancelled=lambda:False, popen=None, publish=os.replace):
+           cancelled=lambda:False, popen=None, publish=os.replace, audio_bitrate='192k'):
     """Export a sequence using a bounded-memory segment renderer.
 
     popen is callback(command, cwd) that runs FFmpeg and handles cancellation.
@@ -376,9 +376,14 @@ def render(state, output, work, *, review=False, on_progress=None, on_stage=None
     if part.exists():part.unlink()
     try:
         color_timescale=['-movie_timescale','120000','-video_track_timescale','120000'] if state['output'].get('color') else []
+        clocks=[]
+        if not review and (state['output'].get('color') or {}).get('output')=='hdr10':
+            import hdr_render
+            clocks=hdr_render.final_clock(files,fps,timing.frame_at(segments[-1][1],fps),cancelled)
         if on_stage:on_stage('final-mux',len(segments),len(segments),0,segments[-1][1],fps)
         runner(['ffmpeg','-hide_banner','-nostdin','-loglevel','error','-y',
-               '-f','concat','-safe','0','-i',str(files),'-c:v','copy','-c:a','aac','-b:a','192k',*color_timescale,'-movflags','+faststart',str(part)],str(jobdir))
+               '-f','concat','-safe','0','-i',str(files),'-c:v','copy',*clocks,'-c:a','aac','-b:a',audio_bitrate,
+               *color_timescale,'-movflags','+faststart',str(part)],str(jobdir))
         if cancelled():raise RuntimeError('Export cancelled')
         publish(part,target)
     finally:

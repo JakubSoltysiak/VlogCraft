@@ -1,0 +1,406 @@
+{
+  "baseline": "60e233b72319607936a1afd48e7f6572f7d364da",
+  "qualification": "Scoped edited HDR10+ and local 4K60 delivery. Native playback, long export workloads and physical device playback remain open.",
+  "source_gui_profiles_before_clock_fix": {
+    "static": {
+      "seconds": 15.5,
+      "wall_seconds": 15.796999999991385,
+      "media_worker_peak_rss_mib": 1159.93,
+      "media_worker_observed_cpu_seconds": 16.609,
+      "sampled_scratch_bytes": 29922,
+      "bytes": 13097,
+      "frames": 6,
+      "video_size": [
+        3840,
+        2160
+      ],
+      "fps": 60,
+      "dynamic_metadata": false,
+      "video_audio_endpoint_seconds": 0.1
+    },
+    "samsung": {
+      "seconds": 18,
+      "wall_seconds": 18.139999999999418,
+      "media_worker_peak_rss_mib": 1159.56,
+      "media_worker_observed_cpu_seconds": 17.109,
+      "sampled_scratch_bytes": 67610,
+      "bytes": 13433,
+      "frames": 6,
+      "video_size": [
+        3840,
+        2160
+      ],
+      "fps": 60,
+      "dynamic_metadata": true,
+      "video_audio_endpoint_seconds": 0.1
+    },
+    "youtube": {
+      "seconds": 16.5,
+      "wall_seconds": 16.610000000000582,
+      "media_worker_peak_rss_mib": 1159.86,
+      "media_worker_observed_cpu_seconds": 16.609,
+      "sampled_scratch_bytes": 30346,
+      "bytes": 14046,
+      "frames": 6,
+      "video_size": [
+        3840,
+        2160
+      ],
+      "fps": 60,
+      "dynamic_metadata": false,
+      "video_audio_endpoint_seconds": 0.1
+    },
+    "static_samsung_decoded_equality": true
+  },
+  "timing_regression": {
+    "fps": "30000/1001",
+    "before_frame_duration_ticks": 1,
+    "expected_frame_duration_ticks": 4004,
+    "corrected": true
+  },
+  "source_fingerprint": "ae280fb87fa024f48f90bace2ae0dec5a24693bf71522bd358dd74fc555e6f08",
+  "fingerprint_method": "SHA256 sorted relevant relative path + NUL + LF-normalized source + NUL",
+  "benchmark_protocol_fingerprint": "c4697e08c048c31e73f497b528bc70abdfe3d5460affb71d4c437f1623991787",
+  "benchmark_protocol_fingerprint_method": "SHA256 sorted benchmark driver/observer relative path + NUL + LF-normalized source + NUL",
+  "production_checkpoint": "df1a61eecd169c389bf2f1a95f258601f2605714",
+  "installer": {
+    "msi": "3.5.6",
+    "executable_file": "3.5.6",
+    "executable_product": "3.5.6",
+    "sha256": "e31ba92f50dd7830ee002f983632e84bdd9e45a8b7b9b654a92f25a93d00a49c"
+  },
+  "installed_profiles": {
+    "static": {
+      "seconds": 16.6,
+      "wall_seconds": 16.75,
+      "media_worker_peak_rss_mib": 1172.32,
+      "sampled_process_tree_peak_rss_mib": 2683.75,
+      "media_worker_observed_cpu_seconds": 17.5,
+      "sampled_scratch_bytes": 30410,
+      "bytes": 13097,
+      "first_observed_authoring_stages_seconds": {},
+      "frames": 6,
+      "video_size": [
+        3840,
+        2160
+      ],
+      "fps": 60,
+      "dynamic_metadata": false,
+      "video_audio_endpoint_seconds": 0.1
+    },
+    "samsung": {
+      "seconds": 17.4,
+      "wall_seconds": 17.594000000011874,
+      "media_worker_peak_rss_mib": 1159.57,
+      "sampled_process_tree_peak_rss_mib": 2419.85,
+      "media_worker_observed_cpu_seconds": 16.266,
+      "sampled_scratch_bytes": 67610,
+      "bytes": 13433,
+      "first_observed_authoring_stages_seconds": {
+        "Analyzing final PQ pictures for HDR10+ metadata": 15.90700000000652,
+        "Attaching metadata in HEVC decode order": 17.203000000008615,
+        "Verifying HDR10+ pictures, audio and timestamps": 17.344000000011874,
+        "Verified edited HDR10+ master completed": 17.594000000011874
+      },
+      "frames": 6,
+      "video_size": [
+        3840,
+        2160
+      ],
+      "fps": 60,
+      "dynamic_metadata": true,
+      "video_audio_endpoint_seconds": 0.1
+    },
+    "youtube": {
+      "seconds": 15.2,
+      "wall_seconds": 15.264999999999418,
+      "media_worker_peak_rss_mib": 1159.84,
+      "sampled_process_tree_peak_rss_mib": 2444.87,
+      "media_worker_observed_cpu_seconds": 15.219,
+      "sampled_scratch_bytes": 30346,
+      "bytes": 14046,
+      "first_observed_authoring_stages_seconds": {},
+      "frames": 6,
+      "video_size": [
+        3840,
+        2160
+      ],
+      "fps": 60,
+      "dynamic_metadata": false,
+      "video_audio_endpoint_seconds": 0.1
+    },
+    "static_samsung_decoded_equality": true
+  },
+  "private_camera_analysis": [
+    {
+      "camera": 1,
+      "trimmed_frames_analyzed": 12,
+      "analysis_seconds": 0.062000000005355105,
+      "render_seconds": 9.562999999994645,
+      "width": 144,
+      "height": 256,
+      "fps": 60,
+      "authored_delivery": false,
+      "source_hdr10plus_copied": false
+    },
+    {
+      "camera": 2,
+      "trimmed_frames_analyzed": 12,
+      "analysis_seconds": 0.09399999999732245,
+      "render_seconds": 9.469000000011874,
+      "width": 144,
+      "height": 256,
+      "fps": 60,
+      "authored_delivery": false,
+      "source_hdr10plus_copied": false
+    }
+  ],
+  "private_media_before": {
+    "source_count": 3,
+    "private_folder_tracked_files": 0,
+    "private_history_path_matches": 0,
+    "private_content_objects": 0,
+    "private_text_objects": 0,
+    "private_working_text_files": 0,
+    "missing_originals": 0,
+    "original_hashes_verified": true,
+    "changed_originals": 0
+  },
+  "private_media_after": {
+    "source_count": 3,
+    "private_folder_tracked_files": 0,
+    "private_history_path_matches": 0,
+    "private_content_objects": 0,
+    "private_text_objects": 0,
+    "private_working_text_files": 0,
+    "missing_originals": 0,
+    "original_hashes_verified": true,
+    "changed_originals": 0
+  },
+  "install_lifecycle": {
+    "upgrade_exit": 0,
+    "upgrade_preserved_projects_settings": true,
+    "uninstall_exit": 0,
+    "uninstall_preserved_projects_settings": true,
+    "removed_executable_shortcuts": true,
+    "reinstall_exit": 0,
+    "reinstall_preserved_projects_settings": true,
+    "protected_file_count": 7,
+    "msi_sha256": "e31ba92f50dd7830ee002f983632e84bdd9e45a8b7b9b654a92f25a93d00a49c"
+  },
+  "installed_color_and_recovery": [
+    {
+      "installed_HDR10_export": true,
+      "color_UI_apply": true,
+      "technical_input_overrides_UI": true,
+      "input_bit_depth": 10,
+      "undo_redo_exposure": true,
+      "SDR_monitor_label": true,
+      "monitor_vs_tonemapped_delivery_MAE_8bit": 0.4066840277777778,
+      "decoded_frames": 12
+    },
+    {
+      "fault": "renderer",
+      "exact_80_history_and_project_color": true,
+      "source_metadata_exact": true,
+      "draft_exact": true,
+      "paused": true
+    },
+    {
+      "fault": "browser",
+      "exact_80_history_and_project_color": true,
+      "source_metadata_exact": true,
+      "draft_exact": true,
+      "paused": true
+    }
+  ],
+  "installed_preservation": {
+    "frames": 12,
+    "exact_decoded_video_and_audio": true,
+    "metadata_per_frame": true,
+    "seconds": 0.5,
+    "source_unchanged": true,
+    "project_settings_unchanged": true
+  },
+  "installed_icons": {
+    "approved_source_preserved": true,
+    "sizes": [
+      16,
+      24,
+      32,
+      48,
+      64,
+      128,
+      256
+    ],
+    "msi_icon_exact": true,
+    "exe_seven_resources_exact": true,
+    "shortcut_icon_bytes_exact": true,
+    "shortcut_app_id": true,
+    "shell_icon_mean_errors_255": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "live_icon_mean_errors_255": {
+      "taskbar_big": {
+        "native_size": 48,
+        "mean_error_255": 0.0
+      },
+      "window_small": {
+        "native_size": 24,
+        "mean_error_255": 0.0
+      }
+    },
+    "web_branding": true,
+    "old_installed_icon_files": 0
+  },
+  "installed_amf": {
+    "output": "3840x2160/60",
+    "actual_encoder": "hevc_amf",
+    "requested_encoder": "hevc_amf",
+    "frames": 324,
+    "audio_duration": 5.4,
+    "video_duration": 5.4,
+    "pixel_format": "yuv420p",
+    "codec": "hevc",
+    "seconds": 23.3,
+    "unicode_save": true,
+    "cancel_no_job": true,
+    "source_hashes_match": true
+  },
+  "local_cases": {
+    "authoring-core": {
+      "exit_code": 0,
+      "seconds": 0.40599999998812564,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "build-356": {
+      "exit_code": 0,
+      "seconds": 116.01600000000326,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "core-suite": {
+      "exit_code": 0,
+      "seconds": 11.375,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "installed-amf": {
+      "exit_code": 0,
+      "seconds": 35.34399999999732,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "installed-color": {
+      "exit_code": 0,
+      "seconds": 11.389999999999418,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "installed-edited": {
+      "exit_code": 0,
+      "seconds": 11.046000000002095,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "installed-icons": {
+      "exit_code": 0,
+      "seconds": 7.062000000005355,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "installed-preserve": {
+      "exit_code": 0,
+      "seconds": 8.219000000011874,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "installed-profiles": {
+      "exit_code": 0,
+      "seconds": 60.14099999998871,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "lifecycle": {
+      "exit_code": 0,
+      "seconds": 30.077999999994063,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "master-gui-source": {
+      "exit_code": 1,
+      "seconds": 23.78200000000652,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "master-gui-source-2": {
+      "exit_code": 1,
+      "seconds": 41.45299999999406,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "master-gui-source-3": {
+      "exit_code": 0,
+      "seconds": 7.875,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "mux-clock": {
+      "exit_code": 0,
+      "seconds": 4.219000000011874,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "mux-final": {
+      "exit_code": 1,
+      "seconds": 4.172000000005937,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "mux-first": {
+      "exit_code": 1,
+      "seconds": 2.437000000005355,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "mux-presentation": {
+      "exit_code": 1,
+      "seconds": 4.389999999999418,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "mux-xml": {
+      "exit_code": 0,
+      "seconds": 2.437000000005355,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "private-analysis": {
+      "exit_code": 0,
+      "seconds": 20.110000000000582,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "profiles-source": {
+      "exit_code": 0,
+      "seconds": 59.04700000000594,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    },
+    "offline-final": {
+      "exit_code": 0,
+      "seconds": 51.51600000000326,
+      "remaining_owned_processes": 0,
+      "new_visible_terminal_windows_after": 0
+    }
+  },
+  "local_regression": {
+    "loopback_python_tests": 156,
+    "loopback_python_seconds": 50.922,
+    "javascript_tests": 29
+  }
+}

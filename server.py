@@ -27,6 +27,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutureTimeout
+from app_version import VERSION
 import project_store
 import animation
 import timing
@@ -575,6 +576,11 @@ EXPORT_STAGES = {
     'segment-mux': ('Joining segment streams', .98, .02),
     'final-mux': ('Muxing final MP4', 0, 1),
 }
+AUTHORED_DELIVERIES = {'hdr10plus-master','samsung-hdr10plus'}
+HDR_DELIVERY_PROFILES = {
+    'samsung-hdr10plus': {'width':3840,'height':2160,'fps':60,'crf':17,'bitrate':0},
+    'youtube-hdr': {'width':3840,'height':2160,'fps':60,'crf':20,'bitrate':75},
+}
 
 
 def update_export_progress(fields):
@@ -602,6 +608,8 @@ def update_export_progress(fields):
         pct = 96 + 3 * fraction if stage == 'final-mux' else 2 + 94 * (
             job['_start'] + segment_length * (offset + weight * fraction)
         ) / job['duration']
+        if job.get('delivery') in AUTHORED_DELIVERIES:
+            pct*=.92
         job.update(percent=max(job['percent'], min(99, int(pct))),stageFraction=fraction)
         if stage == 'video':
             job['frames'] = job['_first'] + round(job['_frames'] * fraction)
@@ -619,7 +627,7 @@ def publish_export(part, dest, assets, overwrite):
         os.link(part,dest)  # Atomic no-clobber publication on POSIX.
 
 
-def run_export(snapshot,path,review=False,overwrite=False):
+def run_export(snapshot,path,review=False,overwrite=False,delivery='render',authored_frames=0):
     dest=Path(path)
     temp=None
     try:
@@ -636,10 +644,32 @@ def run_export(snapshot,path,review=False,overwrite=False):
             job_status('export',stage=name,message=EXPORT_STAGES[name][0],segment=index,segments=count,
                        _start=start,_end=end,_first=first,_frames=last-first,_activity=time.monotonic(),
                        stageFraction=0,fps=None,encoder='libx264' if review else snapshot['output'].get('encoder','libx264'))
+        def publish(part,target):
+            if delivery in AUTHORED_DELIVERIES:
+                import hdr10plus_master
+
+                def authoring_stage(message,percent):
+                    job_status('export',stage='hdr10plus-authoring',message=message,percent=percent,
+                               segment=None,segments=None,fps=None,_activity=time.monotonic())
+
+                def own_analysis(process):
+                    with JOB_LOCK:
+                        CURRENT_PROCESS['export']=process
+                        if process and CANCEL['export'].is_set() and process.poll() is None:
+                            process.terminate()
+
+                authored=temp/'master.partial.mp4'
+                hdr10plus_master.author(part,authored,temp,snapshot['output']['fps'],authored_frames,
+                                        lambda c,d:exec_process(c,d,'export'),authoring_stage,
+                                        CANCEL['export'].is_set,own_analysis)
+                if CANCEL['export'].is_set():raise RuntimeError('Export cancelled')
+                part=authored
+            publish_export(part,target,snapshot['assets'],overwrite)
         def deliver():
             return engine.render(snapshot,dest,temp,review=review,cancelled=CANCEL['export'].is_set,
+                                 audio_bitrate='384k' if delivery=='youtube-hdr' else '192k',
                                  popen=lambda c,d:exec_process(c,d,'export'),
-                                 on_stage=stage,publish=lambda part,target:publish_export(part,target,snapshot['assets'],overwrite))
+                                 on_stage=stage,publish=publish)
         try:
             deliver()
         except Exception:
@@ -651,7 +681,8 @@ def run_export(snapshot,path,review=False,overwrite=False):
             job_status('export',percent=1,stage='preparing',frames=0,encodedSeconds=0,
                        fallback=fallback.strip(' ·'),message='Hardware encoder failed. Retrying with '+encoders.NAMES[replacement])
             deliver()
-        job_status('export',status='done',percent=100,path=str(dest),message='Export completed'+fallback,_finished=time.monotonic())
+        message='Verified edited HDR10+ master completed' if authored_frames else 'Export completed'+fallback
+        job_status('export',status='done',percent=100,path=str(dest),message=message,_finished=time.monotonic())
     except Exception as ex:
         job_status('export',status='cancelled' if CANCEL['export'].is_set() else 'error',error=str(ex),message='Export stopped',_finished=time.monotonic())
     finally:
@@ -855,7 +886,7 @@ def prepare_proposal(proposal,base):
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version='VlogCraftStudio/3.4'
+    server_version='VlogCraftStudio/'+VERSION
     protocol_version='HTTP/1.1'
     def handle(self):
         try:super().handle()
@@ -918,6 +949,8 @@ class Handler(BaseHTTPRequestHandler):
         try:
             if path=='/api/state':
                 return self.json_response(client_state())
+            if path=='/api/app-info':
+                return self.json_response({'version':VERSION})
             if path=='/api/performance/status':return self.json_response(PERFORMANCE_DIAGNOSTICS.status() if PERFORMANCE_DIAGNOSTICS else {'status':'unavailable'})
             if path=='/api/native/capabilities':return self.json_response(NATIVE_PLAYBACK.capabilities() if NATIVE_PLAYBACK else {'available':False,'experimental':True})
             if path=='/api/desktop/recovery':return self.json_response(DESKTOP_RECOVERY.model.status() if DESKTOP_RECOVERY else {'epoch':0,'phase':'browser','restore':None})
@@ -1235,8 +1268,25 @@ class Handler(BaseHTTPRequestHandler):
                 if engine.sequence_duration(snap)<=0:raise ValueError('Timeline empty')
                 review=path=='/api/review/video'
                 delivery=data.get('delivery','render')
-                if delivery not in ('render','hdr10plus-copy') or (review and delivery!='render'):
+                if (not isinstance(delivery,str) or
+                    delivery not in {'render','hdr10plus-copy',*AUTHORED_DELIVERIES,*HDR_DELIVERY_PROFILES} or
+                    (review and delivery!='render')):
                     raise ValueError('Unknown export delivery mode')
+                authored_frames=0
+                if delivery in AUTHORED_DELIVERIES or delivery in HDR_DELIVERY_PROFILES:
+                    import hdr10plus_master
+                    settings=data.get('settings',{})
+                    allowed={'width','height','fps','crf','preset','encoder','bitrate','color'}
+                    if not isinstance(settings,dict) or set(settings)-allowed:
+                        raise ValueError('Invalid HDR10+ export settings')
+                    profile=HDR_DELIVERY_PROFILES.get(delivery,{})
+                    snap['output']=validate_state({'tracks':snap['tracks'],
+                                                   'output':{**snap['output'],**settings,**profile}},snap)['output']
+                    authored=delivery in AUTHORED_DELIVERIES
+                    frame_count=hdr10plus_master.preflight(snap,require_mastering=authored)
+                    if 'libx265' not in encoders.available():
+                        raise ValueError('The required HEVC CPU encoder is unavailable')
+                    if authored:authored_frames=frame_count
                 if review:
                     snap['output'].update(width=1280,height=720,fps=24,crf=27,preset='veryfast')
                     dest=REVIEWS/f'Kenya_Review_{uuid.uuid4().hex[:10]}.mp4'
@@ -1252,11 +1302,11 @@ class Handler(BaseHTTPRequestHandler):
                     if JOBS['export']['status']=='rendering':raise ValueError('Another export is active')
                     CANCEL['export'].clear()
                     JOBS['export'] = dict(status='rendering',percent=0,path=None,error=None,message='Preparing export',
-                                          stage='preparing',frames=0,encodedSeconds=0,_started=time.monotonic())
+                                          stage='preparing',frames=0,encodedSeconds=0,delivery=delivery,_started=time.monotonic())
                     if delivery=='hdr10plus-copy':
                         target,args=run_hdr10plus_copy,(snap,str(dest),overwrite)
                     else:
-                        target,args=run_export,(snap,str(dest),review,overwrite)
+                        target,args=run_export,(snap,str(dest),review,overwrite,delivery,authored_frames)
                     threading.Thread(target=target,args=args,daemon=True).start()
                 if not review:remember_export_folder(dest)
                 return self.json_response({'started':True,'url':'/download/'+dest.name if review else None})

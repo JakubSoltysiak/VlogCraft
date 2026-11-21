@@ -40,7 +40,7 @@ function initColorControls(){
   if($('hdrMetadataNote'))$('hdrMetadataNote').hidden=!hdr;
   const white=$('sdrWhiteNits').closest?.('label');if(white)white.hidden=$('colorOutput').value==='legacy';
   if(typeof updateEncoderControls==='function')updateEncoderControls();
-  $('colorDeliveryNote').textContent=$('colorOutput').value==='hdr10'?'HDR10: float32 linear Rec.2020 → 10-bit HEVC PQ. Supported: matching-aspect video, trims/speed, full-frame resize, opacity/fades, linear exposure and nested tracks. Other effects/transforms fail explicitly. HDR10+ is not authored.':'SDR output. Managed monitoring uses an explicit tone map; legacy projects retain the existing SDR compositor.';
+  $('colorDeliveryNote').textContent=$('colorOutput').value==='hdr10'?'Managed PQ uses float32 linear Rec.2020 and 10-bit HEVC output. Render timeline delivers static HDR10. Edited Master authors dynamic metadata at export.':'SDR output. Managed monitoring uses an explicit tone map; legacy projects retain the existing SDR compositor.';
  };
  $('colorOutput').onchange();
 }

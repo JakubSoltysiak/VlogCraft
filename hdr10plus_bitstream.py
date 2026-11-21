@@ -166,10 +166,10 @@ def length_size(stream):
 
 
 @contextmanager
-def packet_records(path, stream, *, hashes=False):
+def packet_records(path, stream, *, hashes=False, input_options=()):
     fields = 'pts,dts,duration,size,pos,flags,data_hash' if hashes else 'pts,dts,duration,size,pos,flags'
     command = ['ffprobe','-v','error','-select_streams',stream,'-show_packets',
-               '-show_entries','packet='+fields,'-of','compact=p=0',str(path)]
+               '-show_entries','packet='+fields,'-of','compact=p=0',*input_options,str(path)]
     if hashes:
         command[1:1] = ['-show_data_hash','sha256']
     with tempfile.TemporaryFile() as errors:
