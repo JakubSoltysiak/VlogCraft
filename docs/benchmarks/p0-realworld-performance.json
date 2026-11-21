@@ -30,7 +30,7 @@
   "report": "docs/HDR10PLUS_EDITING.md",
   "source_fingerprint": "55680984ddfd9261eece374ad65942017dccff7f49eb78c141bbb5fe8c6789d5",
   "fingerprint_method": "SHA256 sorted relevant relative path + NUL + LF-normalized source + NUL",
-  "benchmark_protocol_fingerprint": "6806d924a3a6f15262640f49d803a6fa5fae627151618a5cee7902dc8ee0dad3",
+  "benchmark_protocol_fingerprint": "f72938d326d279db17e2edeb54ef7204d3b847a0cb46b7f2d1e9d2abb62f3b86",
   "benchmark_protocol_fingerprint_method": "SHA256 sorted benchmark driver/observer relative path + NUL + LF-normalized source + NUL",
   "measured_renderer_commit": "eb0035a380af2c384e03655636dc1c182ef3d735"
 }

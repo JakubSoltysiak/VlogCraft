@@ -1,0 +1,350 @@
+{
+  "production": "20eaaf307b93b323241ca2df56aee59891d04abb",
+  "installer_version": "3.5.4",
+  "installer": {
+    "upgrade_exit": 0,
+    "upgrade_preserved_projects_settings": true,
+    "uninstall_exit": 0,
+    "uninstall_preserved_projects_settings": true,
+    "removed_executable_shortcuts": true,
+    "reinstall_exit": 0,
+    "reinstall_preserved_projects_settings": true,
+    "protected_file_count": 7,
+    "msi_sha256": "2371a0ce72a6aca7a7e1e75feb7bb79d427e43825e5b0bbcf7aa6cb002d0ab80"
+  },
+  "installed_bundle": {
+    "qa_modules_excluded": true,
+    "approved_brand_assets": true,
+    "approved_exe_icon": true,
+    "server": true,
+    "render_engine": true,
+    "color_management": true,
+    "hdr_render": true,
+    "hdr10plus_index": true,
+    "preview_cache": true,
+    "preview_dependencies": true,
+    "source_frames": true,
+    "timing": true,
+    "project_store": true,
+    "animation": true,
+    "sequences": true,
+    "video_effects": true,
+    "grading": true,
+    "audio_cache": true,
+    "audio_edit": true,
+    "waveform": true,
+    "motion": true,
+    "review_packet": true,
+    "timeline_proposal": true,
+    "ai_bridge": true,
+    "encoders": true,
+    "native_plan": true,
+    "native_playback": true,
+    "performance_profile": true,
+    "desktop_recovery": true,
+    "desktop": true,
+    "web": true,
+    "native_runtime": true,
+    "installed_native_runtime": true,
+    "installed_icon": true,
+    "installed_executable": true,
+    "installed_web": true
+  },
+  "installed_UHD60": {
+    "output": "3840x2160/60",
+    "actual_encoder": "hevc_amf",
+    "requested_encoder": "hevc_amf",
+    "frames": 324,
+    "audio_duration": 5.4,
+    "video_duration": 5.4,
+    "pixel_format": "yuv420p",
+    "codec": "hevc",
+    "seconds": 26.1,
+    "unicode_save": true,
+    "cancel_no_job": true,
+    "source_hashes_match": true
+  },
+  "installed_HDR10_and_recovery": [
+    {
+      "installed_HDR10_export": true,
+      "color_UI_apply": true,
+      "technical_input_overrides_UI": true,
+      "input_bit_depth": 10,
+      "undo_redo_exposure": true,
+      "SDR_monitor_label": true,
+      "monitor_vs_tonemapped_delivery_MAE_8bit": 0.4066840277777778,
+      "decoded_frames": 12
+    },
+    {
+      "fault": "renderer",
+      "exact_80_history_and_project_color": true,
+      "source_metadata_exact": true,
+      "draft_exact": true,
+      "paused": true
+    },
+    {
+      "fault": "browser",
+      "exact_80_history_and_project_color": true,
+      "source_metadata_exact": true,
+      "draft_exact": true,
+      "paused": true
+    }
+  ],
+  "installed_timeline": {
+    "linked_asset_count": 32,
+    "mouse_trim_frames": 600,
+    "live_guide": true,
+    "undo_redo": true,
+    "playhead_zoom_delta_pixels": 0.1428375244140625,
+    "portrait_and_custom_reopen": true,
+    "transforms_preserved": true
+  },
+  "source_integrity": {
+    "source_count": 3,
+    "private_folder_tracked_files": 0,
+    "private_history_path_matches": 0,
+    "private_content_objects": 0,
+    "private_text_objects": 0,
+    "private_working_text_files": 0,
+    "missing_originals": 0,
+    "original_hashes_verified": true,
+    "changed_originals": 0
+  },
+  "local_attempts": [
+    {
+      "case": "early-regression",
+      "attempts": [
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 53.11261510848999
+        }
+      ]
+    },
+    {
+      "case": "export-focused",
+      "attempts": [
+        {
+          "status": "failed",
+          "exit_code": 1,
+          "elapsed_seconds": 1.9877088069915771
+        },
+        {
+          "status": "failed",
+          "exit_code": 1,
+          "elapsed_seconds": 2.48643159866333
+        },
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 3.4772722721099854
+        }
+      ]
+    },
+    {
+      "case": "build-A",
+      "attempts": [
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 118.3940863609314
+        },
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 121.4280915260315
+        }
+      ]
+    },
+    {
+      "case": "installed-baseline",
+      "attempts": [
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 14.08156967163086
+        }
+      ]
+    },
+    {
+      "case": "export-pair",
+      "attempts": [
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 98.35639595985413
+        }
+      ]
+    },
+    {
+      "case": "lifecycle-A",
+      "attempts": [
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 36.14278841018677
+        },
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 31.10405921936035
+        }
+      ]
+    },
+    {
+      "case": "installed-A",
+      "attempts": [
+        {
+          "status": "failed",
+          "exit_code": 1,
+          "elapsed_seconds": 8.278917789459229
+        },
+        {
+          "status": "failed",
+          "exit_code": 1,
+          "elapsed_seconds": 210.11444234848022
+        },
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 39.88320326805115
+        }
+      ]
+    },
+    {
+      "case": "offline-A",
+      "attempts": [
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 62.41005778312683
+        }
+      ]
+    },
+    {
+      "case": "hdr-index-tests",
+      "attempts": [
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 0.46362805366516113
+        },
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 0.38305044174194336
+        }
+      ]
+    },
+    {
+      "case": "hdr-index-real",
+      "attempts": [
+        {
+          "status": "failed",
+          "exit_code": 1,
+          "elapsed_seconds": 210.63449144363403
+        }
+      ]
+    },
+    {
+      "case": "hdr-index-conformance",
+      "attempts": [
+        {
+          "status": "failed",
+          "exit_code": 1,
+          "elapsed_seconds": 210.69994354248047
+        }
+      ]
+    },
+    {
+      "case": "hdr-index-bounded",
+      "attempts": [
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 13.333853244781494
+        }
+      ]
+    },
+    {
+      "case": "timeline",
+      "attempts": [
+        {
+          "status": "failed",
+          "exit_code": 1,
+          "elapsed_seconds": 7.872467517852783
+        },
+        {
+          "status": "failed",
+          "exit_code": 1,
+          "elapsed_seconds": 7.368147611618042
+        },
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 12.3862943649292
+        }
+      ]
+    },
+    {
+      "case": "build-C",
+      "attempts": [
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 96.86464858055115
+        }
+      ]
+    },
+    {
+      "case": "lifecycle-C",
+      "attempts": [
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 29.49726915359497
+        }
+      ]
+    },
+    {
+      "case": "timeline-installed",
+      "attempts": [
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 15.057409763336182
+        }
+      ]
+    },
+    {
+      "case": "hdr-installed",
+      "attempts": [
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 12.182823181152344
+        }
+      ]
+    },
+    {
+      "case": "export-installed-final",
+      "attempts": [
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 39.41992235183716
+        }
+      ]
+    },
+    {
+      "case": "final-focused",
+      "attempts": [
+        {
+          "status": "passed",
+          "exit_code": 0,
+          "elapsed_seconds": 2.0012412071228027
+        }
+      ]
+    }
+  ]
+}

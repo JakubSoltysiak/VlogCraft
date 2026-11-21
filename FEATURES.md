@@ -111,3 +111,17 @@ The owner authorized the independent P0 color slice while the stabilization gate
 | Full production adoption | Blocked | Historical playback/audio/memory gates, HDR parity, gamut/clipping/nits scopes, calibrated external monitoring, long-form sync, hardware/device breadth and release obligations remain open. |
 
 [Detailed results, retained failures and references](docs/HDR_COLOR_FOUNDATION.md).
+
+## P0 real-world editing
+
+| Capability | Status | Verified scope or limit |
+|---|---|---|
+| Native export path and mixed stills | Tested subset | Installed Save As, Unicode path, cancellation and AMD AMF UHD60. PNG eXIf, transparency, JPEG orientation and camera audio pass generated checks. |
+| Export progress and settings | Implemented, tested subset | In-segment FFmpeg frames with audio/mux stage changes. CPU controls match selected encoder. General mixed-scene ETA remains open. |
+| HDR10+ per-frame source index | Partial | Bounded local source samples and VFR mapping pass. Full-original timing and present-day decoder coverage remain open. Nonconforming metadata is fenced from reuse. |
+| HDR10+ export | Missing | No output mode. Valid preservation and regeneration require independent decoded acceptance. |
+| Timeline precision and Project aspect ratio | Implemented, tested subset | Real trim at 600 frames, visible snap guide, undo/redo, zoom anchor, portrait preview and saved canvas settings on a 32-asset fixture. Follow and cursor zoom have narrower coverage. |
+| Batch animation, library/audio and storage UX | Open | Existing individual controls remain. Requested batch presets, accessible separation, safe asset removal, icon occupancy and storage management are tracked. |
+| Long-form performance and memory | Open | Short export and edit runs do not close the historical playback, audio and active-memory issues. |
+
+[Report and retained attempts](docs/HDR10PLUS_EDITING.md).

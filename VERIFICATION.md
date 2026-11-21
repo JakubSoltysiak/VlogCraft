@@ -1,5 +1,15 @@
 # VlogCraft Studio development qualification
 
+## P0 export, HDR10+ source indexing and editing — 21 November 2026
+
+[Draft PR #11](https://github.com/JakubSoltysiak/VlogCraft/pull/11) is stacked on PR #8. The combined development installer is 3.5.4, built from production checkpoint `20eaaf3`. The [qualification report](docs/HDR10PLUS_EDITING.md) records scope, failures and open requirements.
+
+- The frozen installed filter error reproduced. The installed candidate passed native cancellation and Unicode Save As, confirmed actual HEVC AMD AMF, and decoded all 324 UHD60 frames with 5.4s matching video/audio endpoints. Final installed elapsed time was 26.1s. The source hashes matched and FFmpeg reported intra-segment progress.
+- One frozen/candidate 4K60 libx264 still-heavy pair took 69.390s and 23.181s. Both decoded 324 frames with matching audio/video endpoints and identical downscaled decoded RGB. Long mixed-project export and general throughput remain unverified.
+- The installed HDR10 workflow passed output decode, tone-mapped monitoring, exposure undo/redo and both renderer/browser recoveries preserving exact 80-state history, metadata and draft. A generated PQ source correctly reported no supported HDR10+ metadata. Actual camera samples retained 204 decoded metadata blocks; all 204 were fenced from reuse. HDR10+ export and whole-camera timing remain open.
+- The installed desktop test linked 32 generated imports and verified live 600-frame snap trim, undo/redo, a zoom anchor within 0.15 CSS px, portrait preview and custom canvas reopen with framing properties preserved.
+- The local MSI passed upgrade, uninstall, reinstall, retained-data and native/app/icon bundle identity. All three private originals passed before/after integrity checks. The draft PR records the final-commit Windows CI result separately.
+
 ## P0 HDR foundation — 16 November 2026
 
 Development branch codex/p0-hdr-color-foundation, stacked [draft PR #8](https://github.com/JakubSoltysiak/VlogCraft/pull/8) on PR #7. Production/bundle checkpoint3487af7 retains the3.4.10 PCM lock, worklet disposal, checkpoint compression and memory-management changes. **First HDR10 subset verified; full production/color/performance acceptance remains incomplete.** [Color report](docs/HDR_COLOR_FOUNDATION.md), [selected evidence and every local QA attempt](docs/benchmarks/p0-color/qualification.json).

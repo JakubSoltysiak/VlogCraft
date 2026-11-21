@@ -95,7 +95,7 @@ class ExportWorkflowTests(unittest.TestCase):
             source = root/'source.mp4'
             source.write_bytes(b'original')
             assets = [{'path':str(source)}]
-            self.assertEqual(server.export_destination(str(dest.with_suffix('')),assets),dest)
+            self.assertEqual(server.export_destination(str(dest.with_suffix('')),assets),dest.resolve())
             with self.assertRaisesRegex(ValueError,'original'):
                 server.export_destination(str(source),assets)
             alias = root/'alias.mp4'
