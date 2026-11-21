@@ -217,6 +217,7 @@ function openProjectStorage(){
   dialog.innerHTML='<h2>Project storage</h2><dl id="storageCategories"></dl>'+
     '<p class="dialog-note">Original sources, backups and recovery data stay available. Temporary exports are handled by the export job.</p>'+
     '<div class="property-actions"><button type="button" id="clearRemovedThumbs" class="button secondary">Clear thumbnails of removed media</button>'+
+    '<button type="button" id="clearAbandonedExports" class="button secondary">Clear abandoned export scratch</button>'+
     '<button type="button" id="closeStorage" class="button primary">Close</button></div>';
   document.body.appendChild(dialog);
   async function refresh(){
@@ -237,6 +238,14 @@ function openProjectStorage(){
     try{
       const result=await request('storage/clear-removed-thumbnails','POST',{confirmed:true});
       toast('Cleared '+result.count+' cached thumbnail(s)');
+      await refresh();
+    }catch(error){toast(error.message,true);}
+  };
+  $('clearAbandonedExports').onclick=async()=>{
+    if(!confirm('Remove registered inactive export intermediates? Linked sources and active render jobs are protected.'))return;
+    try{
+      const result=await request('storage/clear-export-scratch','POST',{confirmed:true});
+      toast('Cleared '+result.count+' abandoned export job(s)');
       await refresh();
     }catch(error){toast(error.message,true);}
   };

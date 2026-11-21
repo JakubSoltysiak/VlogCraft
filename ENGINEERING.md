@@ -1,5 +1,13 @@
 # Architecture and continuation
 
+## 3.5.7 HDR creative layers and cuts
+
+`hdr_layers.py` decodes sRGB color separately from coverage, then combines float32 planes. Premultiplied geometry keeps RGB and coverage aligned. Direct plane extraction avoids the RGB format conversion that clipped linear values above reference white. Existing compatible opaque video uses the prior path. Title glyphs are an app-owned temporary raster. Existing project clip keys and an optional title font drive the same Reference, Composited and export paths.
+
+`timeline_transitions.py` validates adjacent cut IDs, frame counts, actual source handles and conflicts before deriving temporary playback ranges. Managed dissolves blend whole composited alternatives in linear light. PCM envelopes use absolute 48 kHz sample positions mapped from the sequence frame clock. Boundary state stays in the project and undo snapshots. Preview uses the same geometry and envelopes and subdivides video composition at transition limits. Native and Live Layers use Composited fallback when required.
+
+`export_scratch.py` records a scratch folder identity and takes an exclusive OS lease before a render starts. Known artifacts are removed on normal completion, cancellation or failure. The manual Storage action requires a valid stale ownership record and checks source references, path identity, contents and live media workers. [Development report](docs/STUDIO_3_5_7_HDR_EDITING.md).
+
 ## 3.5.6 edited HDR10+
 
 The managed reference path still composites in float32 linear Rec.2020, then delivers HEVC Main10 PQ. Short independently encoded GOPs can have different decode delays. The final managed HDR mux validates exact CFR presentation coverage and establishes a continuous decode clock while retaining original presentation timestamps and compressed pictures. The AAC path is unchanged for standard delivery.

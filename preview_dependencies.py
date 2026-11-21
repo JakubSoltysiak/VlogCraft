@@ -7,8 +7,9 @@ from pathlib import Path
 import render_engine
 import sequences
 import timing
+import timeline_transitions
 
-FORMAT='program-preview/3.4.6/1'
+FORMAT='program-preview/3.5.7/2'
 
 
 def file_identity(path):
@@ -25,10 +26,14 @@ def project(state,first,last,width,proxy_paths=None):
     flat=sequences.playback(state)
     video,audio=render_engine.active_clips(flat,float(first/fps),float(last/fps))
     wanted={clip['id'] for _,clip in video+audio}
+    if timeline_transitions.present(flat):
+        pictures,sounds=timeline_transitions.plan(flat)
+        for pair in pictures+sounds:
+            wanted.update((pair.left['id'],pair.right['id']))
     tracks=[]
     for track in flat['tracks']:
         # Retain empty solo tracks: global solo semantics still affect this range.
-        item={k:deepcopy(track[k]) for k in ('type','hidden','muted','solo','volume') if k in track}
+        item={k:deepcopy(track[k]) for k in ('id','type','hidden','muted','solo','volume') if k in track}
         item['clips']=[deepcopy(c) for c in track['clips'] if c['id'] in wanted]
         tracks.append(item)
     used={c['assetId'] for t in tracks for c in t['clips'] if c.get('assetId')}

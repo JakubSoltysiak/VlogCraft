@@ -23,7 +23,7 @@ test('project motion preserves manual curves and does not touch unsupported HDR'
   const keyed={...clip,keys:{scale:manual}};
   assert.equal(ctx.motionKeys(keyed,settings('zoom-in'),60,false),null);
   assert.deepEqual(plain(ctx.motionKeys(keyed,settings('fade-in'),60,false)).scale,manual);
-  assert.equal(ctx.motionKeys({...clip,kind:'video'},settings('ken-burns'),60,true),null);
+  assert.equal(ctx.motionKeys({...clip,kind:'video'},settings('ken-burns'),60,true).scale.length,2);
   assert.equal(ctx.motionKeys({...clip,kind:'video'},settings('fade-in'),60,true).opacity.length,2);
 });
 

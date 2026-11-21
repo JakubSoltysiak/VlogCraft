@@ -12,6 +12,7 @@ import video_effects
 import grading
 import sequences
 import timing
+import timeline_transitions
 import encoders
 import os
 import psutil
@@ -78,6 +79,10 @@ def frame_spans(state, fps):
         for clip in track['clips']:
             marks.add(timing.frame_at(clip['position'],fps))
             marks.add(timing.frame_at(clip_finish(clip),fps))
+    if timeline_transitions.present(state):
+        pictures,sounds=timeline_transitions.plan(state)
+        for pair in pictures+sounds:
+            marks.update((pair.start,pair.end))
     points=sorted(marks)
     return list(zip(points,points[1:]))
 
@@ -102,13 +107,19 @@ def _atempo(speed):
 def _gain(track,clip):
     return max(0,min(3,float(track.get('volume',1))*float(clip.get('volume',1))))
 
-def _add_audio(filters, input_idx, track, clip, start, end, dur, label):
+def _add_audio(filters, input_idx, track, clip, start, end, dur, label, fps):
     offset=max(0,start-float(clip['position']))
     fi,fo=clip.get('fadeIn',0),clip.get('fadeOut',0)
     afades=f',asetpts=PTS+{_num(offset)}/TB'
     if fi:afades+=f',afade=t=in:d={_num(fi)}'
     if fo:afades+=f',afade=t=out:st={_num(max(0,clip_length(clip)-fo))}:d={_num(fo)}'
     afades+=',asetpts=PTS-STARTPTS'
+    if clip.get('_crossfades'):
+        origin=timing.sample_at(timing.frame_at(start,fps),fps)
+        afades+=f',asettb=1/48000,asetpts=PTS+{origin}'
+        for direction,first,count,curve in clip['_crossfades']:
+            afades+=f',afade=t={direction}:ss={first}:ns={count}:curve={curve}'
+        afades+=',asetpts=PTS-STARTPTS'
     gain=animation.expression(clip,'volume',start)
     filters.append(f'[{input_idx}:a]atrim=start=0,aresample=48000:first_pts=0,aformat=channel_layouts=stereo,'
                    f'asetpts=PTS-STARTPTS,{_atempo(float(clip.get("speed",1)) )}{audio_edit.filters(clip)},'
@@ -152,7 +163,7 @@ def _opaque_base(video,assets,start,end,fps,width,height):
     if clip.get('fit','contain')!='cover':
         if asset.get('width',0)*height!=asset.get('height',0)*width:return False
     if any(clip.get(k,d)!=d or clip.get('keys',{}).get(k) for k,d in [('opacity',1),('scale',1),('x',0),('y',0),('rotation',0)]):return False
-    if clip.get('chroma') or clip.get('mask')=='ellipse' or clip.get('wipe','none')!='none':return False
+    if clip.get('chroma') or clip.get('mask','none')!='none' or clip.get('wipe','none')!='none':return False
     if clip.get('fadeIn',0) or clip.get('fadeOut',0):return False
     return timing.frame_at(clip['position'],fps)<=timing.frame_at(start,fps) and timing.frame_at(clip_finish(clip),fps)>=timing.frame_at(end,fps)
 
@@ -165,8 +176,14 @@ def segment_command(state, start, end, target, jobdir, quality='final', stream=N
         import hdr_render
         return hdr_render.command(state,start,end,target,jobdir,quality)
     state=sequences.playback(state)
+    fps=timing.rate(state['output']['fps'])
+    if timeline_transitions.present(state):
+        if stream!='audio' and timeline_transitions.plan(state)[0]:
+            raise ValueError('Clip-boundary video transitions require managed color')
+        if stream!='video' and quality!='frame':
+            state=timeline_transitions.audio_state(state,fps)
     assets={a['id']:a for a in state['assets']}
-    w=int(state['output']['width']); h=int(state['output']['height']); fps=timing.rate(state['output']['fps'])
+    w=int(state['output']['width']); h=int(state['output']['height'])
     duration=end-start
     nframes=timing.frame_at(end,fps)-timing.frame_at(start,fps)
     samples=timing.sample_at(timing.frame_at(end,fps),fps)-timing.sample_at(timing.frame_at(start,fps),fps)
@@ -224,9 +241,11 @@ def segment_command(state, start, end, target, jobdir, quality='final', stream=N
             alpha_expr='*'.join([alpha,*alpha_terms])
             font_option=''
             if os.name=='nt':
-                font=jobdir/'title-font.ttf'
-                if not font.exists():shutil.copyfile(Path(os.environ['WINDIR'])/'Fonts'/'segoeui.ttf',font)
-                font_option='fontfile=title-font.ttf:'
+                from hdr_layers import TITLE_FONTS
+                font_name=TITLE_FONTS[c.get('titleFont','segoe')]
+                font=jobdir/font_name
+                if not font.exists():shutil.copyfile(Path(os.environ['WINDIR'])/'Fonts'/font_name,font)
+                font_option=f'fontfile={font_name}:'
             filters.append(f'[{last}]drawtext={font_option}textfile={f.name}:fontcolor={color}:'
                            f"expansion=none:fontsize={fontsize}:x='(w-text_w)/2+w*({tx})':y='{text_y}+h*({ty})':" 
                            f"alpha='{alpha_expr}':box=1:boxcolor=black@0.35:boxborderw=14"+(f":enable='{enabled}'" if continuous else '')+
@@ -282,10 +301,10 @@ def segment_command(state, start, end, target, jobdir, quality='final', stream=N
         if continuous:
             clip_start=first_time(c);clip_end=last_time(c)
             raw=label+'_source'
-            _add_audio(filters,inp,t,c,clip_start,clip_end,clip_end-clip_start,raw)
+            _add_audio(filters,inp,t,c,clip_start,clip_end,clip_end-clip_start,raw,fps)
             delay_samples=timing.sample_at(timing.frame_at(clip_start,fps),fps)-timing.sample_at(timing.frame_at(start,fps),fps)
             filters.append(f'[{raw}]adelay={delay_samples}S:all=1,apad,atrim=end_sample={samples}[{label}]')
-        else:_add_audio(filters,inp,t,c,start,end,duration,label)
+        else:_add_audio(filters,inp,t,c,start,end,duration,label,fps)
         audio_labels.append(label);audio_seen.add(c['id'])
 
     if len(audio_labels)>1:
@@ -326,7 +345,26 @@ def render_range(state,start,end,target,jobdir,quality='final',runner=None,stage
     video=jobdir/(target.stem+'_video'+target.suffix)
     audio=jobdir/(target.stem+'_audio.wav')
     if stage:stage('video')
-    runner(segment_command(state,start,end,video,jobdir,quality,'video'),str(jobdir))
+    spans=[]
+    if quality=='preview' and state['output'].get('color'):
+        flat=sequences.playback(state)
+        fps=timing.rate(state['output']['fps'])
+        first,last=timing.frame_at(start,fps),timing.frame_at(end,fps)
+        spans=timeline_transitions.intervals(flat,first,last)
+    if spans:
+        entries=[]
+        points=[first,*spans,last]
+        for index,(a,b) in enumerate(zip(points,points[1:])):
+            part=jobdir/f'{target.stem}_preview_{index:04d}.mp4'
+            runner(segment_command(flat,float(a/fps),float(b/fps),part,jobdir,quality,'video'),str(jobdir))
+            elapsed=round(float(b/fps)*1e6)-round(float(a/fps)*1e6)
+            entries.append(f"file '{part.name}'\nduration {elapsed/1e6:.6f}\n")
+        playlist=jobdir/(target.stem+'_preview.txt')
+        playlist.write_text(''.join(entries),encoding='utf-8')
+        runner(['ffmpeg','-nostdin','-v','error','-y','-f','concat','-safe','0','-i',str(playlist),
+                '-map','0:v','-c','copy','-video_track_timescale','120000',str(video)],str(jobdir))
+    else:
+        runner(segment_command(state,start,end,video,jobdir,quality,'video'),str(jobdir))
     if stage:stage('audio')
     runner(segment_command(state,start,end,audio,jobdir,quality,'audio'),str(jobdir))
     codec=['-c:a','aac','-b:a','192k'] if quality=='preview' else ['-c:a','copy']

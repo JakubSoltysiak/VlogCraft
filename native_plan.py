@@ -3,10 +3,12 @@ from fractions import Fraction
 from pathlib import Path
 import math,re
 import animation,sequences,timing,render_engine
+import timeline_transitions
 VIDEO_KEYS={'x','y','scale','rotation','opacity'}
 class Unsupported(ValueError):pass
 def compile_plan(state,width=960):
  state=sequences.playback(state);fps=timing.rate(state['output']['fps'])
+ if timeline_transitions.present(state):raise Unsupported('Boundary transitions require Composited playback')
  if (state['output'].get('color') or {}).get('output')=='sdr':raise Unsupported('Managed SDR monitoring requires the reference tone map')
  width=int(width)
  if width not in (640,960,1280,1920,2560,3840):raise Unsupported('Choose a supported native monitor size')
@@ -25,7 +27,7 @@ def compile_plan(state,width=960):
    if c.get('chroma') or c.get('mask','none')!='none' or c.get('wipe','none')!='none':raise Unsupported('Masks, chroma and wipes require the reference compositor')
    if any(c.get(k,d)!=d for k,d in [('brightness',0),('contrast',1),('saturation',1)]):raise Unsupported('Color effects require the reference compositor')
    if any(p not in VIDEO_KEYS|{'volume'} for p in c.get('keys',{})):raise Unsupported('This effect animation requires the reference compositor')
-   if any(k.get('mode')=='bezier' for p,keys in c.get('keys',{}).items() if p in VIDEO_KEYS for k in keys):raise Unsupported('Bezier transform keys require the reference compositor')
+   if any(k.get('mode') in ('bezier','ease-in-out') for p,keys in c.get('keys',{}).items() if p in VIDEO_KEYS for k in keys):raise Unsupported('This transform interpolation requires the reference compositor')
    if a.get('colorPrimaries')=='bt2020' and a.get('colorTransfer')!='smpte2084':raise Unsupported('This wide-gamut transfer is not qualified in native mode')
    if a.get('colorTransfer')=='arib-std-b67':raise Unsupported('HLG display transforms are not qualified in native mode')
    if c.get('fit')=='cover' and (c.get('rotation',0) or c.get('keys',{}).get('rotation')):raise Unsupported('Rotated cropped clips require the reference compositor')

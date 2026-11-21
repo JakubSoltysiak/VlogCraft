@@ -45,3 +45,5 @@
 .media-list.list-view .asset-thumb{height:100%;min-height:58px}
 .asset-card.selected,.asset-card:focus-visible{outline:2px solid #80c7e0;outline-offset:-2px}
 .asset-description{font-size:10px;color:#a8b8c7;margin-top:4px}
+
+.boundary-badge{position:absolute;bottom:4px;z-index:4;height:19px;min-width:16px;padding:0;border:1px solid #c3b0fd;border-radius:4px;background:#523d75;color:#fff;font-size:13px;line-height:1;box-shadow:0 1px 4px #0009}.boundary-badge:hover{background:#7253a1}.audio-row .boundary-badge{border-color:#79d9c6;background:#235c56}

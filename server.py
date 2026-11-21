@@ -23,11 +23,13 @@ import uuid
 import webbrowser
 import zipfile
 from copy import deepcopy
+from contextlib import ExitStack
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutureTimeout
 from app_version import VERSION
+import export_scratch
 import project_store
 import animation
 import timing
@@ -361,7 +363,7 @@ def validate_state(d, base=None):
             if src.get('wipe','none')!='none':
                 c['wipe']=src['wipe'];c['wipeDuration']=_number(src.get('wipeDuration',.5),'Wipe duration',.001,30)
             c['mask']=src.get('mask','none')
-            if c['mask'] not in ('none','ellipse'):raise ValueError('Unknown clip mask')
+            if c['mask'] not in ('none','ellipse','rectangle'):raise ValueError('Unknown clip mask')
             c['feather']=_number(src.get('feather',.1),'Mask feather',0,1)
             c['chroma']=bool(src.get('chroma',False))
             c['keyColor']=src.get('keyColor','#00ff00')
@@ -379,9 +381,16 @@ def validate_state(d, base=None):
                 if src['lutId'] not in base.get('luts',{}):raise ValueError('Missing project LUT')
                 c['lutId']=src['lutId']
             if 'keys' in src:c['keys']=animation.validate(src['keys'])
+            if src.get('transitionIn'):
+                import timeline_transitions
+                c['transitionIn']=timeline_transitions.spec(src['transitionIn'],t['type'])
             if c['grade'] not in engine.GRADES:raise ValueError('Invalid color grade')
             if c['fit'] not in ('contain','cover'):raise ValueError('Invalid fit')
             if kind=='title':
+                from hdr_layers import TITLE_FONTS
+                font=src.get('titleFont','segoe')
+                if not isinstance(font,str) or font not in TITLE_FONTS:raise ValueError('Unsupported title font')
+                if font!='segoe':c['titleFont']=font
                 c.update(text=str(src.get('text','Title'))[:250],
                          color=src.get('color','white') if src.get('color','white') in ('white','yellow','cyan','black','#ffffff','#f5ce8a','#a6ffdf') else 'white',
                          titleAlign=src.get('titleAlign','center') if src.get('titleAlign') in ('center','lower') else 'center',
@@ -403,6 +412,13 @@ def validate_state(d, base=None):
                       'bitrate':_number(output.get('bitrate',0),'Video bitrate',0,2000)}
     if output.get('defaultMotion') is not None:
         result['output']['defaultMotion']=animation.validate_default_motion(output['defaultMotion'])
+    for key,track_type in (('defaultVideoTransition','video'),('defaultAudioTransition','audio')):
+        if key in output:
+            import timeline_transitions
+            raw=output[key]
+            if not isinstance(raw,dict) or 'from' in raw:raise ValueError('Invalid default transition')
+            resolved=timeline_transitions.spec({**raw,'from':'template'},track_type)
+            result['output'][key]={name:value for name,value in resolved.items() if name!='from'}
     removed=output.get('removedMedia',[])
     if not isinstance(removed,list) or any(not isinstance(ident,str) or ident not in assets for ident in removed):
         raise ValueError('Invalid removed media list')
@@ -629,9 +645,9 @@ def publish_export(part, dest, assets, overwrite):
 
 def run_export(snapshot,path,review=False,overwrite=False,delivery='render',authored_frames=0):
     dest=Path(path)
-    temp=None
+    owned=ExitStack()
     try:
-        temp=Path(tempfile.mkdtemp(prefix='.vlogcraft_',dir=str(dest.parent)))
+        temp=owned.enter_context(export_scratch.create(WORK,dest))
         encoder=snapshot['output'].get('encoder','libx264')
         fallback=''
         if not review and encoder.split('_')[-1] in encoders.BACKENDS and encoder not in encoders.available():
@@ -686,7 +702,7 @@ def run_export(snapshot,path,review=False,overwrite=False,delivery='render',auth
     except Exception as ex:
         job_status('export',status='cancelled' if CANCEL['export'].is_set() else 'error',error=str(ex),message='Export stopped',_finished=time.monotonic())
     finally:
-        if temp:shutil.rmtree(temp,ignore_errors=True)
+        owned.close()
 
 
 def run_hdr10plus_copy(snapshot,path,overwrite):
@@ -701,8 +717,8 @@ def run_hdr10plus_copy(snapshot,path,overwrite):
 
     try:
         stage('Checking original HDR10+ pictures and metadata',1)
-        with tempfile.TemporaryDirectory(prefix='.vlogcraft_',dir=dest.parent) as scratch:
-            part = Path(scratch)/'preserved.mp4'
+        with export_scratch.create(WORK,dest) as scratch:
+            part = scratch/'preserved.mp4'
             frames = hdr10plus_export.render(snapshot,part,lambda c,d:exec_process(c,d,'export'),stage,cancelled)
             if cancelled():
                 raise RuntimeError('Export cancelled')
@@ -739,6 +755,7 @@ def storage_usage(snapshot):
         'Proxies':folder_size(PROXIES),
         'Preview cache':folder_size(WORK/'preview-cache'),
         'HDR10+ metadata indexes':folder_size(WORK/'hdr10plus-index'),
+        'Registered export scratch':export_scratch.usage(WORK),
     }
 
 
@@ -1041,7 +1058,7 @@ class Handler(BaseHTTPRequestHandler):
             if path=='/' or path=='/index.html':return self.file_response(WEB/'index.html','text/html; charset=utf-8')
             if path in ('/branding/vlogcraft-approved.ico',*(f'/branding/vlogcraft-{n}.png' for n in (16,24,32,48,64,128,256))):
                 return self.file_response(WEB/path.lstrip('/'))
-            if path in ('/app.js','/color.js','/studio.js','/animation.js','/motion.js','/timeline.js','/timebase.js','/edit_ops.js','/edit_commands.js','/monitor.js','/rendered_preview.js','/native_preview.js','/native_audio_worklet.js','/recovery.js','/performance.js','/playback_cache.js','/effects.js','/grade.js','/audio.js','/nesting.js','/source_frames.js','/style.css'):
+            if path in ('/app.js','/color.js','/studio.js','/animation.js','/transitions.js','/motion.js','/timeline.js','/timebase.js','/edit_ops.js','/edit_commands.js','/monitor.js','/rendered_preview.js','/native_preview.js','/native_audio_worklet.js','/recovery.js','/performance.js','/playback_cache.js','/effects.js','/grade.js','/audio.js','/nesting.js','/source_frames.js','/style.css'):
                 return self.file_response(WEB/path.lstrip('/'))
             return self.json_response({'error':'Not found'},404)
         except (BrokenPipeError,ConnectionAbortedError,ConnectionResetError):return
@@ -1084,6 +1101,10 @@ class Handler(BaseHTTPRequestHandler):
                     raise ValueError('Confirm removal of the removed media thumbnails')
                 with LOCK:count=clear_removed_thumbnails(STATE)
                 return self.json_response({'count':count})
+            if path=='/api/storage/clear-export-scratch':
+                if data.get('confirmed') is not True:raise ValueError('Confirm abandoned export scratch cleanup')
+                with LOCK:required=[PROJECT,*(a['path'] for a in STATE['assets'])]
+                return self.json_response({'count':export_scratch.clear(WORK,required)})
             if path in ('/api/color/index/start','/api/color/index/status','/api/color/index/cancel'):
                 aid = data.get('assetId')
                 with LOCK:
@@ -1182,6 +1203,35 @@ class Handler(BaseHTTPRequestHandler):
                     engine._run(cmd,str(jobdir))
                     import base64
                     return self.json_response({'frame':frame,'image':'data:image/png;base64,'+base64.b64encode(dest.read_bytes()).decode('ascii')})
+            if path=='/api/transition/check':
+                import timeline_transitions
+                edits=data.get('edits')
+                if not isinstance(edits,list) or not edits:raise ValueError('Choose at least one clip boundary')
+                with LOCK:trial=deepcopy(STATE)
+                by_id={t['id']:t for t in trial['tracks']}
+                accepted,skipped=[],[]
+                for edit in edits:
+                    if not isinstance(edit,dict):raise ValueError('Invalid transition edit')
+                    track=by_id.get(edit.get('track'))
+                    clip=next((c for c in track['clips'] if c['id']==edit.get('clip')),None) if track else None
+                    if not clip or track.get('locked') or clip.get('locked'):
+                        skipped.append('Boundary is locked or missing')
+                        continue
+                    previous=clip.pop('transitionIn',None)
+                    try:
+                        if edit.get('transition'):
+                            if track['type']=='video' and not trial['output'].get('color'):
+                                raise ValueError('Apply managed color before adding video transitions')
+                            clip['transitionIn']=timeline_transitions.spec(edit['transition'],track['type'])
+                            left=next((c for c in track['clips'] if c['id']==clip['transitionIn']['from']),None)
+                            if left and left.get('locked'):raise ValueError('The outgoing clip is locked')
+                            timeline_transitions.plan(sequences.playback(trial))
+                        accepted.append({'track':track['id'],'clip':clip['id'],'transition':clip.get('transitionIn')})
+                    except ValueError as error:
+                        clip.pop('transitionIn',None)
+                        if previous:clip['transitionIn']=previous
+                        skipped.append(str(error))
+                return self.json_response({'accepted':accepted,'skipped':skipped})
             if path=='/api/source/cancel':
                 FRAME_INDEX.cancel(str(data.get('assetId','')))
                 return self.json_response({'cancelled':True})

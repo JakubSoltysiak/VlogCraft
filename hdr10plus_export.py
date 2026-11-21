@@ -31,7 +31,7 @@ def timeline_source(state):
     if any(t.get('solo') for t in state['tracks']) and not track.get('solo'):
         raise ValueError('HDR10+ preservation requires audible original audio')
     if any(clip.get(key,value)!=value for key,value in NEUTRAL.items()) or any(
-        clip.get(key) for key in ('inputColor','keys','look','lutId')
+        clip.get(key) for key in ('inputColor','keys','look','lutId','transitionIn')
     ):
         raise ValueError('HDR10+ preservation cannot apply effects, trims, retiming or audio edits')
     asset = next(a for a in state['assets'] if a['id']==clip['assetId'])

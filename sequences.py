@@ -13,7 +13,13 @@ def flatten(tracks,offset=0,prefix='',gain=1,muted=False,hidden=False):
         track={**t,'id':prefix+t['id'],'volume':gain*t.get('volume',1),
                'hidden':hidden or t.get('hidden',False),'muted':muted or t.get('muted',False) or (has_solo and not t.get('solo')),
                'solo':False}
-        def projected(c):return {**c,'id':prefix+c['id'],'position':offset+c['position']}
+        def projected(c):
+            item={**c,'id':prefix+c['id'],'position':offset+c['position']}
+            if c.get('transitionIn'):
+                item['transitionIn']={**c['transitionIn'],'from':prefix+c['transitionIn']['from']}
+            if c.get('linkId'):
+                item['linkId']=prefix+c['linkId']
+            return item
         if not any(c.get('kind')=='sequence' for c in t['clips']):
             out.append({**track,'clips':[projected(c) for c in t['clips']]});continue
         for c in reversed(sorted(t['clips'],key=lambda x:x['position'])):

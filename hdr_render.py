@@ -1,9 +1,10 @@
 """First managed reference slice: full-canvas float32 linear blends -> HDR10 or SDR monitor."""
-import re
 from fractions import Fraction
 from pathlib import Path
 import animation,color_management as color,sequences,timing
 from hdr10plus_bitstream import packet_records
+import hdr_layers
+import timeline_transitions
 
 
 def final_clock(files, fps, frames, cancelled):
@@ -24,18 +25,29 @@ def final_clock(files, fps, frames, cancelled):
  return ['-bsf:v',f'setts=pts=PTS:dts=N*{ticks}-{offset}:duration={ticks}:time_base=1/120000']
 
 def layer_contract(assets,c,w,h):
- if c.get('kind')!='video':raise ValueError('Managed HDR currently supports video layers; titles/stills require a qualified HDR implementation')
+ if c.get('grade','neutral')!='neutral' or c.get('look') or c.get('lutId') or c.get('chroma') or c.get('wipe','none')!='none':
+  raise ValueError('Managed HDR does not support this grade, LUT, chroma key or clip wipe')
+ if c.get('brightness',0)!=0 or set(c.get('keys',{}))-{'opacity','volume','scale','rotation','x','y','maskRadius','contrast','saturation'}:
+  raise ValueError('Unsupported HDR creative adjustment; use linear exposure')
+ if c.get('mask','none') not in ('none','ellipse','rectangle'):
+  raise ValueError('Unsupported managed HDR mask')
+ kind=c.get('kind')
+ if kind=='title':
+  return None,(w,h),'',hdr_layers.SRGB
  a=assets[c['assetId']]
- if any(c.get(k,d)!=d or c.get('keys',{}).get(k) for k,d in [('x',0),('y',0),('scale',1),('rotation',0)]):raise ValueError('Spatial HDR transforms are not yet qualified in the reference compositor')
+ if kind=='image':
+  if c.get('inputColor') or Path(a['path']).suffix.lower() not in hdr_layers.STILL_SUFFIXES:
+   raise ValueError('Managed HDR photographs use sRGB PNG or JPEG')
+  aw,ah,orientation=hdr_layers.photo_info(a['path'])
+  return a,(aw,ah),orientation,hdr_layers.SRGB
+ if kind!='video':raise ValueError('Unsupported layer in managed HDR')
  angle=(-float(a.get('rotation',0)))%360
- if angle not in (0,90,180,270):raise ValueError('Only exact right-angle source orientation is qualified in managed HDR')
+ if angle not in hdr_layers.VIDEO_ORIENTATION:raise ValueError('Only exact right-angle source orientation is qualified in managed HDR')
  aw,ah=a.get('width',0),a.get('height',0)
  if angle in (90,270):aw,ah=ah,aw
  square=a.get('sampleAspectRatio') in ('1:1','1/1') or c.get('inputColor',{}).get('pixelAspect')=='square'
- if aw*h!=ah*w or not square:raise ValueError('Managed HDR requires matching oriented aspect and known square pixels; an explicit pixel-aspect override is available')
- if c.get('grade','neutral')!='neutral' or c.get('look') or c.get('lutId') or c.get('chroma') or c.get('mask','none')!='none' or c.get('wipe','none')!='none':raise ValueError('SDR LUTs, masks, keys and wipes cannot be silently applied to HDR')
- if any(c.get(k,d)!=d for k,d in [('brightness',0),('contrast',1),('saturation',1)]) or set(c.get('keys',{}))-{'opacity','volume'}:raise ValueError('Unsupported HDR creative adjustment; use linear exposure')
- return a,angle,color.interpretation(a,c)
+ if min(aw,ah)<=0 or not square:raise ValueError('Managed HDR requires known square source pixels; an explicit pixel-aspect override is available')
+ return a,(aw,ah),hdr_layers.VIDEO_ORIENTATION[angle],color.interpretation(a,c)
 
 def command(state,start,end,target,jobdir,quality='final'):
  import render_engine as engine
@@ -46,22 +58,81 @@ def command(state,start,end,target,jobdir,quality='final'):
       '-f','lavfi','-i',f'color=black:s={w}x{h}:r={fps}:d={engine._num(end-start)}']
  linear='zscale=agamma=0:pin=709:tin=709:min=709:rin=limited:p=2020:t=linear:m=gbr:r=full:npl=100,format=gbrpf32le'
  filters=['[0:v]'+linear+'[base0]'];back='base0'
- for n,(_,c) in enumerate(video,1):
-  a,angle,(p,t,m,r,profile)=layer_contract(assets,c,w,h)
+ input_count=0
+ def append_layer(back,c):
+  nonlocal input_count
+  input_count+=1
+  n=input_count
+  a,source,orientation,(p,t,m,r,profile)=layer_contract(assets,c,w,h)
   at=max(start,float(timing.frame_at(c['position'],fps)/fps));until=min(end,float(timing.frame_at(engine.clip_finish(c),fps)/fps));delay=at-start
   seek=float(c['start'])+max(0,at-float(c['position']))*float(c.get('speed',1))
-  cmd+=['-noautorotate'];engine._media_input(cmd,a['path'],'video',seek,c.get('speed',1),end-start,fps,'video')
-  orientation={0:'',90:'transpose=clock,',180:'hflip,vflip,',270:'transpose=cclock,'}[angle]
-  filters.append(f'[{n}:v]setpts=PTS/{engine._num(c.get("speed",1))},fps={fps}:start_time=0:round=up,'
-    f'zscale=agamma=0:pin={p}:tin={t}:min={m}:rin={r}:p=2020:t=linear:m=gbr:r=full:npl=100,format=gbrpf32le,'
-    f'{orientation}setsar=1,zscale=agamma=0:w={w}:h={h}:filter=bilinear,format=gbrpf32le,'
-    f'trim=end_frame={timing.frame_at(until,fps)-timing.frame_at(at,fps)},setpts=PTS+{engine._num(delay)}/TB[lay{n}]')
-  alpha=re.sub(r'\bt\b','T',animation.expression(c,'opacity',start));off=start-c['position']
+  still=c.get('kind') in ('image','title')
+  path=hdr_layers.title_image(c,w,h,jobdir) if a is None else a['path']
+  cmd.append('-noautorotate');engine._media_input(cmd,path,'image' if still else 'video',seek,c.get('speed',1),end-start,fps,'video')
+  transform=hdr_layers.uses_geometry(c)
+  has_mask=c.get('mask','none')!='none'
+  adjusted=any(c.get(key,1)!=1 or c.get('keys',{}).get(key) for key in ('contrast','saturation'))
+  spatial=still or transform or has_mask or adjusted or source[0]*h!=source[1]*w
+  local_first,local_last=timing.frame_at(at,fps),timing.frame_at(until,fps)
+  count=local_last-local_first
+  alpha_start=at if spatial else start
+  alpha=hdr_layers.parameter(c,'opacity',1,alpha_start);off=alpha_start-c['position']
   if c.get('fadeIn',0):alpha+=f'*min(1,max(0,(T+{engine._num(off)})/{engine._num(c["fadeIn"])}))'
   if c.get('fadeOut',0):alpha+=f'*min(1,max(0,({engine._num(engine.clip_length(c)-off)}-T)/{engine._num(c["fadeOut"])}))'
-  gain=2**color.number(c.get('hdrExposure',0),-8,8)*(contract['sdrWhiteNits']/100 if profile=='rec709' else 1)
-  filters.append(f"[{back}][lay{n}]blend=all_expr='A*(1-({alpha}))+B*{gain:.12g}*({alpha})':eof_action=pass:repeatlast=0:enable='gte(t,{engine._num(delay)})*lt(t,{engine._num(until-start)})'[base{n}]")
-  back=f'base{n}'
+  gain=2**color.number(c.get('hdrExposure',0),-8,8)*(contract['sdrWhiteNits']/100 if profile in ('rec709','srgb') else 1)
+  cadence=f'setpts=PTS/{engine._num(c.get("speed",1))},fps={fps}:start_time=0:round=up,'
+  convert=hdr_layers.luma_linear(p,t,m,r)
+  oriented=(orientation+',' if orientation else '')+'setsar=1'
+  if spatial:
+   input_chain=(hdr_layers.linear_still(filters,n,convert) if still else
+                f'[{n}:v]{cadence}{convert},format=gbrapf32le')
+   chain=input_chain+f',{oriented},premultiply=inplace=1'
+   chain=hdr_layers.canvas_fit(filters,chain,f'fit{n}',source=source,canvas=(w,h),fit=c.get('fit','contain'),fps=fps)
+   if still:
+    chain+=f',loop=loop={max(0,count-1)}:size=1:start=0,setpts=N/({fps}*TB)'
+   if has_mask:chain+=','+hdr_layers.soft_mask(c,at)
+   if transform:chain+=','+hdr_layers.transform(c,at)
+   chain+=',unpremultiply=inplace=1,'+hdr_layers.matte_expression(c,at,alpha,gain)
+   chain+=f',trim=end_frame={count},setpts=PTS-STARTPTS'
+   if local_first>first or local_last<last:
+    chain+=f',tpad=start={local_first-first}:start_mode=clone:stop={last-local_last}:stop_mode=clone'
+   hdr_layers.picture_alpha(filters,chain+f'[raw{n}];[raw{n}]',f'lay{n}',n)
+   filters.append(f"[{back}][lay{n}][lay{n}mask]maskedmerge=enable='gte(n,{local_first-first})*lt(n,{local_last-first})'[base{n}]")
+  else:
+   filters.append(f'[{n}:v]{cadence}{convert},format=gbrpf32le,'
+    f'{oriented},zscale=agamma=0:w={w}:h={h}:filter=bilinear,format=gbrpf32le,'
+    f'trim=end_frame={count},setpts=PTS+{engine._num(delay)}/TB[lay{n}]')
+   filters.append(f"[{back}][lay{n}]blend=all_expr='A*(1-({alpha}))+B*{gain:.12g}*({alpha})':eof_action=pass:repeatlast=0:enable='gte(t,{engine._num(delay)})*lt(t,{engine._num(until-start)})'[base{n}]")
+  return f'base{n}'
+ pictures=timeline_transitions.plan(state)[0] if timeline_transitions.present(state) else []
+ pairs={}
+ for pair in pictures:
+  if pair.end<=first or pair.start>=last:continue
+  if first<pair.start or last>pair.end:
+   raise ValueError('Managed transition ranges must stop on boundary frames')
+  pairs[id(pair.track)]=pair
+ for track in reversed(state['tracks']):
+  pair=pairs.get(id(track))
+  if pair:
+   left,right=pair.virtual(fps)
+   tag='transition'+str(input_count)
+   filters.append(f'[{back}]split=2[{tag}left][{tag}right]')
+   a=append_layer(tag+'left',left)
+   b=append_layer(tag+'right',right)
+   seconds=float((pair.end-pair.start-1)/fps)
+   elapsed=float((first-pair.start)/fps)
+   weight=f'clip((T+{elapsed:.12g})/{seconds:.12g},0,1)'
+   if pair.ease=='smooth':weight=f'({weight})^2*(3-2*({weight}))'
+   if pair.kind=='dissolve':
+    expression=f'A*(1-({weight}))+B*({weight})'
+   else:
+    level=contract['sdrWhiteNits']/100 if pair.kind=='dip-white' else 0
+    expression=f'if(lt(({weight}),.5),A*(1-2*({weight}))+{level:.12g}*2*({weight}),B*(2*({weight})-1)+{level:.12g}*(2-2*({weight})))'
+   filters.append(f"[{a}][{b}]blend=all_expr='{expression}'[{tag}]")
+   back=tag
+  else:
+   for t,clip in video:
+    if t is track:back=append_layer(back,clip)
  # Picture-dependent/source-master metadata is deliberately removed before fresh signalling.
  tail=',sidedata=mode=delete'
  hdr=contract['output']=='hdr10' and quality=='final'

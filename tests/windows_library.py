@@ -14,13 +14,13 @@ from windows_hdr10plus import wait_export
 from test_export_workflow import ffmpeg
 
 
-def main(executable,results):
+def main(executable,results,asset_count=33):
     results=results.resolve()
     results.mkdir(parents=True,exist_ok=True)
     paths=[]
-    for number in range(32):
+    for number in range(asset_count-1):
         path=results/f'media-{number:02d}.png'
-        Image.new('RGB',(160,90),(20,80,100+number)).save(path)
+        Image.new('RGB',(160,90),(20,80,100+number%156)).save(path)
         paths.append(path)
     video=results/'camera.mp4'
     ffmpeg('-f','lavfi','-i','testsrc2=s=160x90:r=60:d=0.2','-f','lavfi','-i',
@@ -31,7 +31,7 @@ def main(executable,results):
     project=results/'library.vlogcraft'
     with session(executable,results,offline=True,project_path=project) as (page,_,__,errors):
         response=page.evaluate("paths=>request('import','POST',{paths,autoProxy:false})",[str(p) for p in paths])
-        assert len(response['assets'])==33 and not response['errors']
+        assert len(response['assets'])==asset_count and not response['errors']
         camera=response['assets'][-1]['id']
         removed=response['assets'][0]['id']
         page.evaluate("""async id=>{
@@ -95,9 +95,9 @@ def main(executable,results):
     assert [hashlib.sha256(p.read_bytes()).digest() for p in paths]==original
     with session(executable,results/'reopen',offline=True,project_path=project) as (page,_,__,errors):
         assert page.evaluate("state.tracks.flatMap(t=>t.clips).filter(c=>c.linkId).length") == 2
-        assert page.locator('[data-asset]').count()==33
+        assert page.locator('[data-asset]').count()==asset_count
         assert not errors,errors
-    print(json.dumps({'assets':33,'linked_clip_persistence':True,'decoded_PCM_bytes':len(first),
+    print(json.dumps({'assets':asset_count,'linked_clip_persistence':True,'decoded_PCM_bytes':len(first),
                       'separation_PCM_equal':True,'removed_and_restored_thumbnail':True,'all_sources_unchanged':True}))
 
 
@@ -105,5 +105,6 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser()
     parser.add_argument('executable',type=Path)
     parser.add_argument('results',type=Path)
+    parser.add_argument('--assets',type=int,default=33)
     args=parser.parse_args()
-    main(args.executable,args.results)
+    main(args.executable,args.results,args.assets)

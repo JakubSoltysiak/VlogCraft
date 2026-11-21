@@ -1,11 +1,14 @@
 function effectControls(c){
-  return '<details class="fx-panel"><summary>Color, mask and chroma key</summary>'+
-    range('Brightness','brightness',c.brightness??0,-1,1,.01,false)+range('Contrast','contrast',c.contrast??1,0,2,.01,false)+range('Saturation','saturation',c.saturation??1,0,3,.01,false)+
-    '<div class="property"><label>Mask</label><select data-prop="mask"><option value="none">None</option><option value="ellipse" '+(c.mask==='ellipse'?'selected':'')+'>Ellipse</option></select></div>'+
-    range('Mask radius','maskRadius',c.maskRadius??.5,.01,1,.01)+range('Edge feather','feather',c.feather??.1,0,1,.01)+
+  const managed=!!state.output.color;
+  const sdr=range('Brightness','brightness',c.brightness??0,-1,1,.01,false)+
     '<div class="property"><label><input type="checkbox" data-prop="chroma" '+(c.chroma?'checked':'')+'> Chroma key</label></div>'+
     '<div class="property"><label>Key color</label><input type="color" data-prop="keyColor" value="'+(c.keyColor||'#00ff00')+'"></div>'+
-    range('Similarity','similarity',c.similarity??.16,.01,1,.01)+range('Key blend','keyBlend',c.keyBlend??.08,0,1,.01)+'</details>';
+    range('Similarity','similarity',c.similarity??.16,.01,1,.01)+range('Key blend','keyBlend',c.keyBlend??.08,0,1,.01);
+  return '<details class="fx-panel"><summary>Color and mask</summary>'+
+    range(managed?'Linear contrast':'Contrast','contrast',c.contrast??1,0,2,.01,false)+range('Saturation','saturation',c.saturation??1,0,3,.01,false)+
+    '<div class="property"><label>Mask</label><select data-prop="mask"><option value="none">None</option><option value="ellipse" '+(c.mask==='ellipse'?'selected':'')+'>Ellipse</option><option value="rectangle" '+(c.mask==='rectangle'?'selected':'')+'>Rectangle</option></select></div>'+
+    range('Mask radius','maskRadius',c.maskRadius??.5,.01,1,.01)+range('Edge feather','feather',c.feather??.1,0,1,.01)+
+    (!managed || c.chroma || c.brightness ? sdr : '')+'</details>';
 }
 function liveEffects(player,c){
   const m=player.media;
@@ -42,5 +45,13 @@ function liveEffects(player,c){
   const edges={right:'0 '+remaining+' 0 0',left:'0 0 0 '+remaining,down:'0 0 '+remaining+' 0',up:remaining+' 0 0 0'};
   surface.style.clipPath=edges[c.wipe]?'inset('+edges[c.wipe]+')':'none';
   const radius=animated(c,'maskRadius')*100;
-  surface.style.maskImage=c.mask==='ellipse'?'radial-gradient(ellipse '+radius+'% '+radius+'% at center,#000 '+(100*(1-(c.feather??.1)))+'%,transparent 100%)':'none';
+  const feather=c.feather??.1;
+  if(c.mask==='rectangle'){
+    const gradient=axis=>'linear-gradient(to '+axis+',transparent '+(50-radius)+'%,black '+(50-radius*(1-feather))+'%,black '+(50+radius*(1-feather))+'%,transparent '+(50+radius)+'%)';
+    surface.style.maskImage=gradient('right')+', '+gradient('bottom');
+    surface.style.maskComposite='intersect';
+  }else{
+    surface.style.maskComposite='add';
+    surface.style.maskImage=c.mask==='ellipse'?'radial-gradient(ellipse '+radius+'% '+radius+'% at center,#000 '+(100*(1-feather))+'%,transparent 100%)':'none';
+  }
 }

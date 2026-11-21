@@ -109,7 +109,11 @@ function sourceMonitor(a) {
     const at=placement==='append'?Math.max(0,...t.clips.map(c=>frameIndex(endOf(c)))):frameIndex(playhead);
     clip.position=atFrame(at);
     applyDefaultMotion(clip);
-    if(commitEdit(placement==='append'?'insert':placement,{trackId:t.id,at,clip},[]))dlg.close();
+    if(commitEdit(placement==='append'?'insert':placement,{trackId:t.id,at,clip},[])){
+      const current=trackById(t.id), inserted=current?.clips.find(c=>c.id===clip.id);
+      if(inserted){applyDefaultBoundary(current,inserted);redraw();save();}
+      dlg.close();
+    }
   };
   if(a.kind==='video')preciseSource(dlg,a,media);
   dlg.showModal();
