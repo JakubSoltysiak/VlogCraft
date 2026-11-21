@@ -1,0 +1,17 @@
+# VlogCraft Studio 3.5.6 HDR10+ authoring
+
+The development branch starts at PR #12 head `60e233b72319607936a1afd48e7f6572f7d364da`. Retain the verified complete-source preservation path, existing HDR10/SDR rendering and project compatibility. Qualify generated sources before bounded, read-only private-camera checks. Publish evidence in separate feasibility, metadata, export and delivery checkpoints.
+
+## Feasibility policy
+
+Reuse the 3.5.5 encoded/decoded audit. The 7,619 readable camera blocks have a nonzero value in the reserved 5% entry for the paired 5%/10% positions. Retain the version-1 preservation rejection. Keep malformed, unsupported and implementation-limited cases distinct from readable nonconforming blocks. Playback compatibility requires a separate device test. The source files and cached indexes remain unchanged. [SMPTE ST 2094-40:2020, §8.5.4](https://pub.smpte.org/pub/st2094-40/st2094-40-2020.pdf).
+
+Complete-source stream copying preserves the original creative metadata only when the existing identity and conformity checks pass. A rendered master needs fresh statistics across all final pictures, including unchanged areas in an edited timeline. A hybrid path would additionally need a proven picture-identity and creative-intent policy at each boundary, so it stays outside this checkpoint.
+
+## Proposed authoring and verification
+
+Analyze the independently decoded final Main10/PQ Rec.2020 encode. Use one whole-frame processing window and a one-frame analysis interval. Generate maximum linear RGB by component, average maxRGB and exact nearest-rank percentiles at the defined positions, including the version-1 99.98% substitution and reserved values. A per-frame histogram and bounded decoding avoid a raw video intermediate. Optional creative Bézier tone mapping and unmeasured mastering information are outside the algorithm. Retain only explicit mastering declarations supplied for the managed output. [SMPTE ST 2094-40:2020, §§4, 8–10](https://pub.smpte.org/pub/st2094-40/st2094-40-2020.pdf).
+
+Transport is a separate stage. Test metadata insertion after the existing CPU libx265 encode to preserve the same pictures, HEVC compression, audio and rational timestamps. Use FFprobe decoded frame side data and independently computed picture statistics before making Edited Master selectable. Require timestamp and picture/audio preservation across insertion, verify HEVC signaling and keep failure atomic. Additional decode and compressed I/O will cost export time. Record that cost on matched output and keep the SDR/static paths unchanged.
+
+x265 accepts supplied dynamic metadata when built with the applicable support. `hdr10plus_tool` extracts or inserts existing metadata. Neither tool generates the final-picture statistics on its own. The published AMF HEVC interface documents HDR static metadata. Arbitrary ST 2094-40 authoring via this build of AMF remains unverified. The existing FFmpeg/x265 build and NumPy provide the intended implementation dependencies. No installer distribution or certification is implied by local testing. [x265 documentation](https://x265.readthedocs.io/en/latest/cli.html), [hdr10plus_tool upstream](https://github.com/quietvoid/hdr10plus_tool), [AMF HEVC API](https://github.com/GPUOpen-LibrariesAndSDKs/AMF/blob/master/amf/doc/AMF_Video_Encode_HEVC_API.md), [dependency and distribution notes](../THIRD_PARTY.md).
