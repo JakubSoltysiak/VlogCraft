@@ -23,11 +23,13 @@ import uuid
 import webbrowser
 import zipfile
 from copy import deepcopy
+from contextlib import ExitStack
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutureTimeout
 from app_version import VERSION
+import export_scratch
 import project_store
 import animation
 import timing
@@ -643,9 +645,9 @@ def publish_export(part, dest, assets, overwrite):
 
 def run_export(snapshot,path,review=False,overwrite=False,delivery='render',authored_frames=0):
     dest=Path(path)
-    temp=None
+    owned=ExitStack()
     try:
-        temp=Path(tempfile.mkdtemp(prefix='.vlogcraft_',dir=str(dest.parent)))
+        temp=owned.enter_context(export_scratch.create(WORK,dest))
         encoder=snapshot['output'].get('encoder','libx264')
         fallback=''
         if not review and encoder.split('_')[-1] in encoders.BACKENDS and encoder not in encoders.available():
@@ -700,7 +702,7 @@ def run_export(snapshot,path,review=False,overwrite=False,delivery='render',auth
     except Exception as ex:
         job_status('export',status='cancelled' if CANCEL['export'].is_set() else 'error',error=str(ex),message='Export stopped',_finished=time.monotonic())
     finally:
-        if temp:shutil.rmtree(temp,ignore_errors=True)
+        owned.close()
 
 
 def run_hdr10plus_copy(snapshot,path,overwrite):
@@ -715,8 +717,8 @@ def run_hdr10plus_copy(snapshot,path,overwrite):
 
     try:
         stage('Checking original HDR10+ pictures and metadata',1)
-        with tempfile.TemporaryDirectory(prefix='.vlogcraft_',dir=dest.parent) as scratch:
-            part = Path(scratch)/'preserved.mp4'
+        with export_scratch.create(WORK,dest) as scratch:
+            part = scratch/'preserved.mp4'
             frames = hdr10plus_export.render(snapshot,part,lambda c,d:exec_process(c,d,'export'),stage,cancelled)
             if cancelled():
                 raise RuntimeError('Export cancelled')
@@ -753,6 +755,7 @@ def storage_usage(snapshot):
         'Proxies':folder_size(PROXIES),
         'Preview cache':folder_size(WORK/'preview-cache'),
         'HDR10+ metadata indexes':folder_size(WORK/'hdr10plus-index'),
+        'Registered export scratch':export_scratch.usage(WORK),
     }
 
 
@@ -1098,6 +1101,10 @@ class Handler(BaseHTTPRequestHandler):
                     raise ValueError('Confirm removal of the removed media thumbnails')
                 with LOCK:count=clear_removed_thumbnails(STATE)
                 return self.json_response({'count':count})
+            if path=='/api/storage/clear-export-scratch':
+                if data.get('confirmed') is not True:raise ValueError('Confirm abandoned export scratch cleanup')
+                with LOCK:required=[PROJECT,*(a['path'] for a in STATE['assets'])]
+                return self.json_response({'count':export_scratch.clear(WORK,required)})
             if path in ('/api/color/index/start','/api/color/index/status','/api/color/index/cancel'):
                 aid = data.get('assetId')
                 with LOCK:
