@@ -1,0 +1,285 @@
+{
+  "phase2b_checkpoint": "899ad995fc6ffd013e1eac2c25339459887fedc6",
+  "profile120": {
+    "width": 3840,
+    "height": 2160,
+    "pictures": 120,
+    "prepared_seconds": 8.19731629997841,
+    "isolated_wall_seconds": {
+      "hevc_decode_to_null": 0.704226000001654,
+      "decode_and_pq_reconstruction_to_null": 1.0697119999967981,
+      "decode_reconstruct_and_drain_pipe": 19.788867900002515
+    },
+    "author_wall_seconds": 27.10712259999127,
+    "operations": {
+      "statistics_and_payload": {
+        "wall_seconds": 5.306019099953119,
+        "host_cpu_seconds": 5.3125,
+        "calls": 120
+      },
+      "analysis_interval": {
+        "wall_seconds": 26.53550479997648,
+        "host_cpu_seconds": 0.0,
+        "calls": 0
+      },
+      "prepare_fragments": {
+        "wall_seconds": 0.09088900001370348,
+        "host_cpu_seconds": 0.03125,
+        "calls": 1
+      },
+      "insert_sei": {
+        "wall_seconds": 0.0948428999981843,
+        "host_cpu_seconds": 0.015625,
+        "calls": 1
+      },
+      "remux": {
+        "wall_seconds": 0.11325150000629947,
+        "host_cpu_seconds": 0.046875,
+        "calls": 1
+      },
+      "verify_all_packets": {
+        "wall_seconds": 0.2692228000087198,
+        "host_cpu_seconds": 0.109375,
+        "calls": 1
+      }
+    },
+    "resources": {
+      "duration_seconds": 27.125,
+      "gpu": null,
+      "average_cpu_machine_percent": 5.19,
+      "peak_summed_working_set_MiB": 1140.2,
+      "sampled_cpu_seconds": 33.77,
+      "process_read_MiB": 5698.1,
+      "process_write_MiB": 5666.4
+    },
+    "ac_at_finish": true
+  },
+  "author120": {
+    "pictures": 120,
+    "arms": [
+      {
+        "mode": "pipe",
+        "repeat": 1,
+        "wall_seconds": 9.770646499993745,
+        "frames": 120,
+        "exact_file": true,
+        "stage_start_seconds": {
+          "93": 0.0576932999829296,
+          "95": 9.375474100001156,
+          "98": 9.58563309998135
+        },
+        "resources": {
+          "duration_seconds": 9.797,
+          "gpu": null,
+          "average_cpu_machine_percent": 7.02,
+          "peak_summed_working_set_MiB": 1133.0,
+          "sampled_cpu_seconds": 16.52,
+          "process_read_MiB": 5699.6,
+          "process_write_MiB": 5652.0
+        }
+      },
+      {
+        "mode": "native1",
+        "repeat": 1,
+        "wall_seconds": 4.590431999997236,
+        "frames": 120,
+        "exact_file": true,
+        "stage_start_seconds": {
+          "93": 0.05312269998830743,
+          "95": 4.216100999998162,
+          "98": 4.411190199985867
+        },
+        "resources": {
+          "duration_seconds": 4.625,
+          "gpu": null,
+          "average_cpu_machine_percent": 9.57,
+          "peak_summed_working_set_MiB": 1134.6,
+          "sampled_cpu_seconds": 10.62,
+          "process_read_MiB": 5698.6,
+          "process_write_MiB": 5565.6
+        }
+      },
+      {
+        "mode": "native3",
+        "repeat": 1,
+        "wall_seconds": 3.8203459000214934,
+        "frames": 120,
+        "exact_file": true,
+        "stage_start_seconds": {
+          "93": 0.053283500019460917,
+          "95": 3.4483721000142395,
+          "98": 3.638038000004599
+        },
+        "resources": {
+          "duration_seconds": 3.844,
+          "gpu": null,
+          "average_cpu_machine_percent": 12.79,
+          "peak_summed_working_set_MiB": 1136.6,
+          "sampled_cpu_seconds": 11.8,
+          "process_read_MiB": 5700.2,
+          "process_write_MiB": 5548.5
+        }
+      }
+    ],
+    "power": {
+      "samples": [
+        {
+          "seconds": 0.0,
+          "ac_power": true,
+          "battery_percent": 93,
+          "available_memory_MiB": 9071,
+          "system_cpu_percent": 0.0
+        },
+        {
+          "seconds": 1.0,
+          "ac_power": true,
+          "battery_percent": 93,
+          "available_memory_MiB": 8053,
+          "system_cpu_percent": 39.6
+        },
+        {
+          "seconds": 2.016,
+          "ac_power": true,
+          "battery_percent": 93,
+          "available_memory_MiB": 8089,
+          "system_cpu_percent": 24.8
+        },
+        {
+          "seconds": 3.016,
+          "ac_power": true,
+          "battery_percent": 93,
+          "available_memory_MiB": 8062,
+          "system_cpu_percent": 28.9
+        },
+        {
+          "seconds": 4.016,
+          "ac_power": true,
+          "battery_percent": 93,
+          "available_memory_MiB": 8031,
+          "system_cpu_percent": 27.7
+        },
+        {
+          "seconds": 5.031,
+          "ac_power": true,
+          "battery_percent": 93,
+          "available_memory_MiB": 8056,
+          "system_cpu_percent": 28.1
+        },
+        {
+          "seconds": 6.031,
+          "ac_power": true,
+          "battery_percent": 93,
+          "available_memory_MiB": 8034,
+          "system_cpu_percent": 31.1
+        },
+        {
+          "seconds": 7.031,
+          "ac_power": true,
+          "battery_percent": 93,
+          "available_memory_MiB": 8046,
+          "system_cpu_percent": 29.9
+        },
+        {
+          "seconds": 8.047,
+          "ac_power": true,
+          "battery_percent": 93,
+          "available_memory_MiB": 8010,
+          "system_cpu_percent": 25.9
+        },
+        {
+          "seconds": 9.047,
+          "ac_power": true,
+          "battery_percent": 93,
+          "available_memory_MiB": 8508,
+          "system_cpu_percent": 24.9
+        },
+        {
+          "seconds": 10.047,
+          "ac_power": true,
+          "battery_percent": 93,
+          "available_memory_MiB": 8621,
+          "system_cpu_percent": 29.3
+        },
+        {
+          "seconds": 11.063,
+          "ac_power": true,
+          "battery_percent": 93,
+          "available_memory_MiB": 8024,
+          "system_cpu_percent": 41.9
+        },
+        {
+          "seconds": 12.078,
+          "ac_power": true,
+          "battery_percent": 93,
+          "available_memory_MiB": 7972,
+          "system_cpu_percent": 31.9
+        },
+        {
+          "seconds": 13.094,
+          "ac_power": true,
+          "battery_percent": 93,
+          "available_memory_MiB": 8022,
+          "system_cpu_percent": 31.4
+        },
+        {
+          "seconds": 14.094,
+          "ac_power": true,
+          "battery_percent": 93,
+          "available_memory_MiB": 9040,
+          "system_cpu_percent": 25.6
+        },
+        {
+          "seconds": 15.094,
+          "ac_power": true,
+          "battery_percent": 93,
+          "available_memory_MiB": 7972,
+          "system_cpu_percent": 38.6
+        },
+        {
+          "seconds": 16.11,
+          "ac_power": true,
+          "battery_percent": 93,
+          "available_memory_MiB": 7955,
+          "system_cpu_percent": 37.7
+        },
+        {
+          "seconds": 17.11,
+          "ac_power": true,
+          "battery_percent": 93,
+          "available_memory_MiB": 7956,
+          "system_cpu_percent": 32.6
+        },
+        {
+          "seconds": 18.125,
+          "ac_power": true,
+          "battery_percent": 93,
+          "available_memory_MiB": 9033,
+          "system_cpu_percent": 29.9
+        }
+      ],
+      "mixed_power": false,
+      "thermal_throttling": "not observable with available public sensors"
+    }
+  },
+  "author120_initial_failure": {
+    "exit_code": 1,
+    "reason": null,
+    "seconds": 9.25,
+    "restored_standard_environment_keys": [],
+    "process_ownership": {
+      "Windows_job": true,
+      "job_members_at_cleanup": 0,
+      "remaining_owned_processes": 0,
+      "unrelated_processes_targeted": 0,
+      "forced_member_roles": {},
+      "visible_terminal_windows_before": 0,
+      "owned_visible_terminal_windows_at_cleanup": 0,
+      "visible_terminal_windows_after": 0,
+      "new_visible_terminal_windows_after": 0,
+      "diagnostic_failure_type": null,
+      "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+    },
+    "progress_error": null
+  },
+  "author120_failure_reason": "Benchmark final output name collided with the fragment input"
+}

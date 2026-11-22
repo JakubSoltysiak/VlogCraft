@@ -104,7 +104,8 @@ class ProjectConverter:
         self.completed += 1
 
 
-def export_project(state, destination, *, backend="reference", workers=3, timeout=180, progress=print):
+def export_project(state, destination, *, backend="reference", workers=3, timeout=180, progress=print,
+                   authoring=None):
     """Render a saved document via the normal timeline, audio, authoring and clock machinery."""
     destination = destination.resolve()
     if destination.exists():
@@ -123,23 +124,45 @@ def export_project(state, destination, *, backend="reference", workers=3, timeou
 
         render_engine.render(state,static,work/"render",popen=converter if backend=="parallel" else None,
                              on_progress=report)
-        hdr10plus_master.author(static,master,work,fps,count,render_engine._run,
-                                lambda message,value:progress(f"{value}% {message}"),lambda:False)
+        def write_master(folder, options):
+            hdr10plus_master.author(static,master,folder,fps,count,render_engine._run,
+                                    lambda message,value:progress(f"{value}% {message}"),
+                                    lambda:False,**options)
+
+        author_fallback = False
+        if authoring:
+            with tempfile.TemporaryDirectory(prefix="author-",dir=work) as folder:
+                try:
+                    write_master(Path(folder),authoring)
+                except (ValueError, RuntimeError, OSError) as error:
+                    master.unlink(missing_ok=True)
+                    author_fallback = True
+                    progress(f"Reference authoring fallback ({type(error).__name__})")
+        if not authoring or author_fallback:
+            write_master(work,{})
         os.link(master,destination)
         progress("100% Verified HDR10+ master published")
-    return {"frames":count,"parallel_segments":converter.completed,"fallback_segments":converter.fallbacks}
+    return {"frames":count,"parallel_segments":converter.completed,"fallback_segments":converter.fallbacks,
+            "author_fallback":author_fallback}
 
 
 if __name__ == "__main__":
     import server
+    from phase2c_author import author_options
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("project",type=Path)
     parser.add_argument("destination",type=Path)
     parser.add_argument("--backend",choices=("reference","parallel"),default="reference")
     parser.add_argument("--workers",type=int,choices=range(2,5),default=3)
+    parser.add_argument("--fast-author",action="store_true")
+    parser.add_argument("--author-dll",type=Path)
+    parser.add_argument("--author-workers",type=int,choices=range(1,5),default=1)
     args = parser.parse_args()
+    if args.author_dll and not args.fast_author:
+        parser.error("Native analysis requires the explicit fast-authoring option")
     state,recovered = project_store.load(args.project,server.validate_document)
     if state is None or recovered:
         raise SystemExit("A valid primary saved project is required")
-    print(export_project(state,args.destination,backend=args.backend,workers=args.workers))
+    options = author_options(args.author_dll,args.author_workers) if args.fast_author else None
+    print(export_project(state,args.destination,backend=args.backend,workers=args.workers,authoring=options))

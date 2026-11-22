@@ -81,7 +81,7 @@ def decoded(path, stream, muxer):
     return call([*command,'-f',muxer,'-'],180).stdout
 
 
-def delivery(stage, static, master, fps, count, seconds):
+def delivery(stage, static, master, fps, count, seconds, *, authoring=None):
     from hdr10plus_export import media, static_metadata
     from hdr10plus_index import SIDE_DATA
     from hdr10plus_master import author
@@ -91,7 +91,7 @@ def delivery(stage, static, master, fps, count, seconds):
     work=stage/(master.stem+'-authoring')
     work.mkdir()
     started=time.perf_counter()
-    authored=author(static,master,work,fps,count,_run,lambda *_:None,lambda:False)
+    authored=author(static,master,work,fps,count,_run,lambda *_:None,lambda:False,**(authoring or {}))
     author_seconds=time.perf_counter()-started
     video,audio=media(master)
     if video['time_base']!='1/120000' or int(video['duration_ts'])*fps!=count*120000:

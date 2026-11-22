@@ -184,6 +184,7 @@ def experiment(args):
     sys.path[:0]=[str(ROOT),str(ROOT/'tests')]
     from performance import Resources
     from test_hdr_color import CONTRACT
+    from phase2c_author import author_options
 
     require_ac=not (args.quick and args.backend=='warp32')
     if require_ac and not power():
@@ -200,6 +201,7 @@ def experiment(args):
     conditions=Conditions()
     initial=technical_conditions()
     report={}
+    authoring=author_options(args.author_dll,args.author_workers) if args.fast_author else {}
     try:
         with tempfile.TemporaryDirectory(prefix='bounded-',dir=results) as directory:
             stage=Path(directory)
@@ -260,7 +262,7 @@ def experiment(args):
                 mux(video,audio,static,scenario,count)
                 mux_seconds=time.perf_counter()-mux_started
                 verify_start=time.perf_counter()
-                rendered=delivery(stage,static,master,scenario.fps,count,verify_start-started)
+                rendered=delivery(stage,static,master,scenario.fps,count,verify_start-started,authoring=authoring)
                 verification_seconds=time.perf_counter()-verify_start-rendered['author_seconds']
             finally:
                 metrics=monitor.finish()
@@ -287,6 +289,8 @@ def experiment(args):
                 os.replace(master,results/'verified-hdr10plus.mp4')
             report.update(source_commit=revision,
                           reference=BASELINE,backend=args.backend,conversion=args.conversion,
+                          fast_authoring=bool(authoring),native_authoring=bool(args.author_dll),
+                          analysis_workers=args.author_workers if args.author_dll else 0,
                           dimensions=[scenario.width,scenario.height],
                           frames=count,fps=scenario.fps,loops=args.loops,source_clip_hashes=identities,
                           source_preparation_seconds=prep,independent_verification_seconds=verification_seconds,
@@ -326,6 +330,9 @@ def main():
     parser.add_argument('--compare-master',type=Path,help='Independently compare a frozen master made from identical inputs')
     parser.add_argument('--conversion',choices=('reference','parallel','gpu'),default='reference')
     parser.add_argument('--workers',type=int,choices=range(2,5),default=3)
+    parser.add_argument('--fast-author',action='store_true',help='Use a bounded large analysis pipe')
+    parser.add_argument('--author-dll',type=Path,help='Use the exact native MaxRGB histogram')
+    parser.add_argument('--author-workers',type=int,choices=range(1,5),default=1)
     parser.add_argument('--simulate-device-removal',action='store_true',help='Inject D3D11 device removal during a quick test')
     parser.add_argument('--backend',choices=('gpu32','warp32'),default='gpu32')
     args=parser.parse_args()
@@ -336,6 +343,8 @@ def main():
         parser.error('Invalid live source or fixture combination')
     if args.conversion!='reference' and not args.compare_master:
         parser.error('An independently verified reference master is required for candidate publication')
+    if args.author_dll and not args.fast_author:
+        parser.error('Native analysis requires the explicit fast-authoring option')
     if args.simulate_device_removal and (not args.quick or args.frames<3):
         parser.error('Fault injection requires a quick fixture with at least three pictures')
     experiment(args)

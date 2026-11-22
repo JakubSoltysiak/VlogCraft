@@ -74,6 +74,13 @@ class Phase2BExportTests(unittest.TestCase):
             self.assertEqual(saved.read_bytes(),original)
             self.assertEqual(decoded(outputs[0]),decoded(outputs[1]))
             self.assertEqual(decoded(outputs[0]),decoded(outputs[2]))
+            def broken_records(_):
+                raise ValueError("injected HDR analysis failure")
+            author_fallback = folder/"author-fallback.mp4"
+            report = export_project(restored,author_fallback,authoring={"picture_records":broken_records},
+                                    progress=lambda _:None)
+            self.assertTrue(report["author_fallback"])
+            self.assertEqual(decoded(outputs[0]),decoded(author_fallback))
             info = probe(outputs[1])
             frames = [frame for frame in info["frames"] if frame["media_type"]=="video"]
             self.assertEqual([int(frame["pts"]) for frame in frames],[4004*index for index in range(6)])
