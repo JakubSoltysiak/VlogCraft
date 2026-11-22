@@ -2,6 +2,11 @@
 
 Tested means the specific check in VERIFICATION.md passed. Implemented means code is available with further acceptance coverage needed. Partial identifies implemented behavior with material gaps. Missing identifies an unavailable capability. A test result qualifies its fixture and environment.
 
+| 3.6.0 rendering capability | Status | Verified scope / remaining limits |
+|---|---|---|
+| Faster managed CPU HDR compositing | Tested subset | Frozen 360p and 720p spatial and UHD opacity outputs match picture, PCM, time and metadata. Short UHD spatial output passed independent checks. The longer 48-frame UHD control rendered at 0.281 FPS. The 60-second project remains open. |
+| AMD HDR10+ encoding | Experimental | Main10 encoding and post-encode dynamic metadata are diagnostic only. Production uses the verified CPU path. |
+
 | 3.5.7 editing capability | Status | Verified scope / remaining limits |
 |---|---|---|
 | Managed photographs, titles and spatial layers | Tested subset | sRGB PNG alpha/JPEG orientation, title typography and motion, fit/fill, scale, position, rotation and exposure. Decoded PQ and SDR composite checks. Other photo profiles and unrestricted crop are open. |

@@ -1,2 +1,2 @@
 """The editor, local diagnostics and Windows packaging share this version."""
-VERSION = '3.5.7'
+VERSION = '3.6.0'

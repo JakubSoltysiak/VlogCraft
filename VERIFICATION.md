@@ -1,5 +1,13 @@
 # VlogCraft Studio development qualification
 
+## 3.6.0 rendering performance Phase 1 — 22 November 2026
+
+Production checkpoint `c91509b9c40e25a36a43552ffdbecbab3663f6ac` produced the development MSI with SHA-256 `62e286702ab5b4fe077a46723ac1e8de377b188a76a3da8bcdbbb6401b5f355d`. The installed bundle and approved icon matched the project. Windows upgrade from 3.5.7, uninstall and reinstall all exited successfully, preserving seven protected files. The prior 3.5.7 MSI checksum remains verified. [Draft PR #15](https://github.com/JakubSoltysiak/VlogCraft/pull/15) is stacked on #14. [Report and matched data](docs/STUDIO_3_6_0_RENDERING.md).
+
+- The final 120-frame 720p spatial render completed in 47.406 s against 158.859 s for the fresh 3.5.7 control. The historical timeout remains in the record. The 24-frame UHD opacity control improved from 137.125 s to 65.671 s and 5.16 GiB to 4.42 GiB peak summed working set. Both preserved exact independently decoded pictures and PCM, timestamps and per-picture HDR10+ metadata.
+- The 24-frame UHD spatial run completed in 98.468 s after the frozen renderer timed out at 250.344 s. The 18 frames of completed frozen scenes matched exactly and the complete optimized export passed independent validation. The 60-second workload remains unqualified.
+- Local loopback-only Python passed 166 tests. JavaScript passed the existing 29-test suite. Hosted job receipts and the completed installed export and preview checks are recorded in the draft and the Phase 1 report.
+
 ## 3.5.7 managed HDR editing and boundaries
 
 The development MSI was built from production checkpoint `9eb1160bf8569a277febafc27b01d411eb21c971`, SHA-256 `c6963b94160c796b4650c2a1ecb4e7d8af7ae844c4f27d6540203e98e538f90d`. Upgrade, uninstall/reinstall, version labeling, installed bundle identity and approved icon resources passed. [Draft PR #14](https://github.com/JakubSoltysiak/VlogCraft/pull/14) is stacked on #13. [Qualification report](docs/STUDIO_3_5_7_HDR_EDITING.md).

@@ -1,0 +1,1205 @@
+{
+  "baseline": "05f74e7095d77b46b80f0530ab9293871dbace14",
+  "qualification": "Verified bounded CPU HDR rendering and Windows development build. Sustained preview and 60-second mixed UHD remain open.",
+  "archive": "studio-3.5.7-hdr-editing.json",
+  "source_fingerprint": "f43aed10a6c41f42825f1799410214690563bd529276512585ac72eccdf610f8",
+  "fingerprint_method": "SHA256 sorted relevant relative path + NUL + LF-normalized source + NUL",
+  "benchmark_protocol_fingerprint": "460fe7815856d7bae642983e3434306ee0fdb095d0bb8465c189c3e8aecf86d0",
+  "benchmark_protocol_fingerprint_method": "SHA256 sorted benchmark driver/observer relative path + NUL + LF-normalized source + NUL",
+  "production_checkpoint": "c91509b9c40e25a36a43552ffdbecbab3663f6ac",
+  "workstation": {
+    "processor": "AMD Ryzen AI 9 HX 370",
+    "logical_processors": 24,
+    "graphics": "Radeon 890M",
+    "power": "battery at sampled checks",
+    "ffmpeg": "9.0.2-full_build-www.gyan.dev"
+  },
+  "matched_controls": {
+    "360": {
+      "frozen_3_5_7": {
+        "canvas": [
+          640,
+          360
+        ],
+        "input_video_size": "640x360",
+        "frames": 48,
+        "fps": 60,
+        "audio_rate": 48000,
+        "encoder": "libx265 Main 10",
+        "photograph_spatial_motion": true,
+        "static_seconds": 17.75,
+        "author_seconds": 0.75,
+        "edited_total_seconds": 18.5,
+        "process_tree_peak_rss_bytes": 293208064,
+        "scratch_peak_bytes": 274560,
+        "observed_child_cpu_seconds": 17.188,
+        "effective_output_fps": 2.594595,
+        "independent_decoded_picture_pcm_equality": true,
+        "all_frames_have_metadata": true,
+        "distinct_metadata_average_values": 19,
+        "audio_endpoint_samples": 38400,
+        "source_hashes_match": true,
+        "sampled_cpu_average_percent_of_24_logical_processors": 3.87,
+        "authoring_phase_offsets_seconds": {
+          "Analyzing final PQ pictures for HDR10+ metadata": 0.063,
+          "Attaching metadata in HEVC decode order": 0.297,
+          "Verifying HDR10+ pictures, audio and timestamps": 0.563
+        }
+      },
+      "qualified_phase1": {
+        "canvas": [
+          640,
+          360
+        ],
+        "input_video_size": "640x360",
+        "frames": 48,
+        "fps": 60,
+        "audio_rate": 48000,
+        "encoder": "libx265 Main 10",
+        "photograph_spatial_motion": true,
+        "static_seconds": 6.984,
+        "author_seconds": 0.719,
+        "edited_total_seconds": 7.703,
+        "process_tree_peak_rss_bytes": 279343104,
+        "scratch_peak_bytes": 273444,
+        "observed_child_cpu_seconds": 11.625,
+        "effective_output_fps": 6.231338,
+        "independent_decoded_picture_pcm_equality": true,
+        "all_frames_have_metadata": true,
+        "distinct_metadata_average_values": 19,
+        "audio_endpoint_samples": 38400,
+        "source_hashes_match": true,
+        "sampled_cpu_average_percent_of_24_logical_processors": 6.29,
+        "authoring_phase_offsets_seconds": {
+          "Analyzing final PQ pictures for HDR10+ metadata": 0.063,
+          "Attaching metadata in HEVC decode order": 0.266,
+          "Verifying HDR10+ pictures, audio and timestamps": 0.531
+        }
+      },
+      "independent_comparison": {
+        "decoded_picture_pcm_and_timestamps_equal": true,
+        "dynamic_metadata_equal_at_each_pts": true
+      }
+    },
+    "720": {
+      "frozen_3_5_7": {
+        "canvas": [
+          1280,
+          720
+        ],
+        "input_video_size": "1280x720",
+        "frames": 120,
+        "fps": 60,
+        "audio_rate": 48000,
+        "encoder": "libx265 Main 10",
+        "photograph_spatial_motion": true,
+        "static_seconds": 157.203,
+        "author_seconds": 1.656,
+        "edited_total_seconds": 158.859,
+        "process_tree_peak_rss_bytes": 893685760,
+        "scratch_peak_bytes": 565612,
+        "observed_child_cpu_seconds": 167.922,
+        "effective_output_fps": 0.755387,
+        "independent_decoded_picture_pcm_equality": true,
+        "all_frames_have_metadata": true,
+        "distinct_metadata_average_values": 33,
+        "audio_endpoint_samples": 96000,
+        "source_hashes_match": true,
+        "sampled_cpu_average_percent_of_24_logical_processors": 4.4,
+        "authoring_phase_offsets_seconds": {
+          "Analyzing final PQ pictures for HDR10+ metadata": 0.063,
+          "Analyzing final PQ pictures \u00b7 60 / 120": 0.656,
+          "Analyzing final PQ pictures \u00b7 120 / 120": 1.219,
+          "Attaching metadata in HEVC decode order": 1.219,
+          "Verifying HDR10+ pictures, audio and timestamps": 1.453
+        }
+      },
+      "qualified_phase1": {
+        "canvas": [
+          1280,
+          720
+        ],
+        "input_video_size": "1280x720",
+        "frames": 120,
+        "fps": 60,
+        "audio_rate": 48000,
+        "encoder": "libx265 Main 10",
+        "photograph_spatial_motion": true,
+        "static_seconds": 45.656,
+        "author_seconds": 1.75,
+        "edited_total_seconds": 47.406,
+        "process_tree_peak_rss_bytes": 809091072,
+        "scratch_peak_bytes": 607065,
+        "observed_child_cpu_seconds": 114.812,
+        "effective_output_fps": 2.531325,
+        "independent_decoded_picture_pcm_equality": true,
+        "all_frames_have_metadata": true,
+        "distinct_metadata_average_values": 33,
+        "audio_endpoint_samples": 96000,
+        "source_hashes_match": true,
+        "sampled_cpu_average_percent_of_24_logical_processors": 10.09,
+        "authoring_phase_offsets_seconds": {
+          "Analyzing final PQ pictures for HDR10+ metadata": 0.125,
+          "Analyzing final PQ pictures \u00b7 60 / 120": 0.766,
+          "Analyzing final PQ pictures \u00b7 120 / 120": 1.312,
+          "Attaching metadata in HEVC decode order": 1.344,
+          "Verifying HDR10+ pictures, audio and timestamps": 1.547
+        }
+      },
+      "independent_comparison": {
+        "decoded_picture_pcm_and_timestamps_equal": true,
+        "dynamic_metadata_equal_at_each_pts": true
+      }
+    },
+    "uhd-opacity": {
+      "frozen_3_5_7": {
+        "canvas": [
+          3840,
+          2160
+        ],
+        "input_video_size": "3840x2160",
+        "frames": 24,
+        "fps": 60,
+        "audio_rate": 48000,
+        "encoder": "libx265 Main 10",
+        "photograph_spatial_motion": false,
+        "static_seconds": 131.719,
+        "author_seconds": 5.406,
+        "edited_total_seconds": 137.125,
+        "process_tree_peak_rss_bytes": 5540335616,
+        "scratch_peak_bytes": 297081,
+        "observed_child_cpu_seconds": 148.031,
+        "effective_output_fps": 0.175023,
+        "independent_decoded_picture_pcm_equality": true,
+        "all_frames_have_metadata": true,
+        "distinct_metadata_average_values": 14,
+        "audio_endpoint_samples": 19200,
+        "source_hashes_match": true,
+        "sampled_cpu_average_percent_of_24_logical_processors": 4.5,
+        "authoring_phase_offsets_seconds": {
+          "Analyzing final PQ pictures for HDR10+ metadata": 0.047,
+          "Attaching metadata in HEVC decode order": 4.984,
+          "Verifying HDR10+ pictures, audio and timestamps": 5.219
+        }
+      },
+      "qualified_phase1": {
+        "canvas": [
+          3840,
+          2160
+        ],
+        "input_video_size": "3840x2160",
+        "frames": 24,
+        "fps": 60,
+        "audio_rate": 48000,
+        "encoder": "libx265 Main 10",
+        "photograph_spatial_motion": false,
+        "static_seconds": 59.984,
+        "author_seconds": 5.687,
+        "edited_total_seconds": 65.671,
+        "process_tree_peak_rss_bytes": 4750491648,
+        "scratch_peak_bytes": 297829,
+        "observed_child_cpu_seconds": 120.141,
+        "effective_output_fps": 0.365458,
+        "independent_decoded_picture_pcm_equality": true,
+        "all_frames_have_metadata": true,
+        "distinct_metadata_average_values": 14,
+        "audio_endpoint_samples": 19200,
+        "source_hashes_match": true,
+        "sampled_cpu_average_percent_of_24_logical_processors": 7.62,
+        "authoring_phase_offsets_seconds": {
+          "Analyzing final PQ pictures for HDR10+ metadata": 0.078,
+          "Attaching metadata in HEVC decode order": 5.219,
+          "Verifying HDR10+ pictures, audio and timestamps": 5.469
+        }
+      },
+      "independent_comparison": {
+        "decoded_picture_pcm_and_timestamps_equal": true,
+        "dynamic_metadata_equal_at_each_pts": true
+      }
+    },
+    "uhd-spatial": {
+      "frozen_3_5_7": {
+        "canvas": [
+          3840,
+          2160
+        ],
+        "input_video_size": "3840x2160",
+        "frames_requested": 24,
+        "fps": 60,
+        "timeout_seconds": 250.344,
+        "last_observed_scene": 7,
+        "total_scenes": 7,
+        "remaining_owned_processes": 0
+      },
+      "qualified_phase1": {
+        "canvas": [
+          3840,
+          2160
+        ],
+        "input_video_size": "3840x2160",
+        "frames": 24,
+        "fps": 60,
+        "audio_rate": 48000,
+        "encoder": "libx265 Main 10",
+        "photograph_spatial_motion": true,
+        "static_seconds": 92.859,
+        "author_seconds": 5.609,
+        "edited_total_seconds": 98.468,
+        "process_tree_peak_rss_bytes": 5020332032,
+        "scratch_peak_bytes": 299338,
+        "observed_child_cpu_seconds": 247.0,
+        "effective_output_fps": 0.243734,
+        "independent_decoded_picture_pcm_equality": true,
+        "all_frames_have_metadata": true,
+        "distinct_metadata_average_values": 14,
+        "audio_endpoint_samples": 19200,
+        "source_hashes_match": true,
+        "sampled_cpu_average_percent_of_24_logical_processors": 10.45,
+        "authoring_phase_offsets_seconds": {
+          "Analyzing final PQ pictures for HDR10+ metadata": 0.063,
+          "Attaching metadata in HEVC decode order": 5.188,
+          "Verifying HDR10+ pictures, audio and timestamps": 5.422
+        }
+      },
+      "independent_comparison": {
+        "completed_frozen_scenes": 6,
+        "verified_frames": 18,
+        "scenes": [
+          {
+            "scene": 1,
+            "frames": 6,
+            "decoded_clock_picture_pcm_equal": true
+          },
+          {
+            "scene": 2,
+            "frames": 2,
+            "decoded_clock_picture_pcm_equal": true
+          },
+          {
+            "scene": 3,
+            "frames": 2,
+            "decoded_clock_picture_pcm_equal": true
+          },
+          {
+            "scene": 4,
+            "frames": 4,
+            "decoded_clock_picture_pcm_equal": true
+          },
+          {
+            "scene": 5,
+            "frames": 2,
+            "decoded_clock_picture_pcm_equal": true
+          },
+          {
+            "scene": 6,
+            "frames": 2,
+            "decoded_clock_picture_pcm_equal": true
+          }
+        ],
+        "final_full_duration_matches_prior_corrected_3_6_0": true
+      }
+    }
+  },
+  "archived_720p_spatial_timeout_seconds": 190.109,
+  "unqualified_whole_graph_slicing": {
+    "720p": {
+      "wall_seconds": 36.093,
+      "decoded_samples_changed": 7386095,
+      "decoded_samples_checked": 165888000,
+      "maximum_code_difference": 49,
+      "pcm_equal": true
+    },
+    "uhd_opacity": {
+      "wall_seconds": 46.5,
+      "decoded_samples_changed": 1255908,
+      "decoded_samples_checked": 298598400,
+      "maximum_code_difference": 52,
+      "pcm_equal": true
+    }
+  },
+  "rejected_diagnostics": [
+    "Invalid FFmpeg stats period on two first attempts",
+    "Unclosed mask filter expression caught at focused-suite import",
+    "Gray alpha negotiation before explicit RGB/full tagging"
+  ],
+  "benchmark_60_seconds_attempted": false,
+  "profiling": {
+    "frozen_720p": [
+      {
+        "stage": "source-probe",
+        "seconds": 0.109
+      },
+      {
+        "stage": "source-probe",
+        "seconds": 0.109
+      },
+      {
+        "stage": "source-probe",
+        "seconds": 0.063
+      },
+      {
+        "stage": "source-probe",
+        "seconds": 0.047
+      },
+      {
+        "stage": "source-probe",
+        "seconds": 0.062
+      },
+      {
+        "stage": "generate-and-probe-inputs",
+        "seconds": 1.125
+      },
+      {
+        "stage": "startup",
+        "seconds": 0.079,
+        "frames": 1,
+        "ffmpeg_cpu_seconds": 0.0,
+        "sampled_peak_rss_bytes": 2244608,
+        "process_read_bytes": 0,
+        "process_write_bytes": 0,
+        "job_directory_sample_peak_bytes": 109566
+      },
+      {
+        "stage": "source-decode",
+        "seconds": 0.093,
+        "frames": 10,
+        "ffmpeg_cpu_seconds": 0.094,
+        "sampled_peak_rss_bytes": 2289664,
+        "process_read_bytes": 0,
+        "process_write_bytes": 0,
+        "job_directory_sample_peak_bytes": 112915
+      },
+      {
+        "stage": "still-decode",
+        "seconds": 0.109,
+        "frames": 1,
+        "ffmpeg_cpu_seconds": 0.0,
+        "sampled_peak_rss_bytes": 2240512,
+        "process_read_bytes": 0,
+        "process_write_bytes": 0,
+        "job_directory_sample_peak_bytes": 117039
+      },
+      {
+        "stage": "decode-geometry-off",
+        "seconds": 5.922,
+        "frames": 10,
+        "ffmpeg_cpu_seconds": 5.625,
+        "sampled_peak_rss_bytes": 612454400,
+        "process_read_bytes": 20338,
+        "process_write_bytes": 7726,
+        "job_directory_sample_peak_bytes": 131870
+      },
+      {
+        "stage": "slice4",
+        "seconds": 9.031,
+        "frames": 10,
+        "ffmpeg_cpu_seconds": 32.062999999999995,
+        "sampled_peak_rss_bytes": 644857856,
+        "process_read_bytes": 22254,
+        "process_write_bytes": 10631,
+        "job_directory_sample_peak_bytes": 148709
+      },
+      {
+        "stage": "graph-only",
+        "seconds": 27.813,
+        "frames": 10,
+        "ffmpeg_cpu_seconds": 27.171999999999997,
+        "sampled_peak_rss_bytes": 619495424,
+        "process_read_bytes": 22254,
+        "process_write_bytes": 21709,
+        "job_directory_sample_peak_bytes": 176443
+      },
+      {
+        "stage": "full",
+        "seconds": 27.922,
+        "frames": 10,
+        "ffmpeg_cpu_seconds": 27.422,
+        "sampled_peak_rss_bytes": 671854592,
+        "process_read_bytes": 22254,
+        "process_write_bytes": 20868,
+        "job_directory_sample_peak_bytes": 203524
+      }
+    ],
+    "frozen_uhd": [
+      {
+        "stage": "source-probe",
+        "seconds": 0.141
+      },
+      {
+        "stage": "source-probe",
+        "seconds": 0.14
+      },
+      {
+        "stage": "source-probe",
+        "seconds": 0.047
+      },
+      {
+        "stage": "source-probe",
+        "seconds": 0.063
+      },
+      {
+        "stage": "source-probe",
+        "seconds": 0.062
+      },
+      {
+        "stage": "generate-and-probe-inputs",
+        "seconds": 4.25
+      },
+      {
+        "stage": "source-decode",
+        "seconds": 0.219,
+        "frames": 6,
+        "ffmpeg_cpu_seconds": 0.125,
+        "sampled_peak_rss_bytes": 2244608,
+        "process_read_bytes": 0,
+        "process_write_bytes": 0,
+        "job_directory_sample_peak_bytes": 141501
+      },
+      {
+        "stage": "still-decode",
+        "seconds": 0.078,
+        "frames": 1,
+        "ffmpeg_cpu_seconds": 0.0,
+        "sampled_peak_rss_bytes": 2281472,
+        "process_read_bytes": 0,
+        "process_write_bytes": 0,
+        "job_directory_sample_peak_bytes": 145630
+      },
+      {
+        "stage": "no-matte",
+        "seconds": 6.625,
+        "frames": 6,
+        "ffmpeg_cpu_seconds": 6.343,
+        "sampled_peak_rss_bytes": 4307976192,
+        "process_read_bytes": 61953,
+        "process_write_bytes": 7720,
+        "job_directory_sample_peak_bytes": 160190
+      },
+      {
+        "stage": "slice4",
+        "seconds": 13.843,
+        "frames": 6,
+        "ffmpeg_cpu_seconds": 46.985,
+        "sampled_peak_rss_bytes": 5039861760,
+        "process_read_bytes": 62320,
+        "process_write_bytes": 12463,
+        "job_directory_sample_peak_bytes": 176863
+      },
+      {
+        "stage": "graph-only",
+        "seconds": 39.969,
+        "frames": 6,
+        "ffmpeg_cpu_seconds": 38.656,
+        "sampled_peak_rss_bytes": 4809904128,
+        "process_read_bytes": 75645,
+        "process_write_bytes": 26764,
+        "job_directory_sample_peak_bytes": 207841
+      },
+      {
+        "stage": "full",
+        "seconds": 40.078,
+        "frames": 6,
+        "ffmpeg_cpu_seconds": 39.907,
+        "sampled_peak_rss_bytes": 5257068544,
+        "process_read_bytes": 62320,
+        "process_write_bytes": 25169,
+        "job_directory_sample_peak_bytes": 237406
+      }
+    ],
+    "optimized_uhd_boundary": [
+      {
+        "stage": "source-probe",
+        "seconds": 0.125
+      },
+      {
+        "stage": "source-probe",
+        "seconds": 0.125
+      },
+      {
+        "stage": "source-probe",
+        "seconds": 0.062
+      },
+      {
+        "stage": "source-probe",
+        "seconds": 0.047
+      },
+      {
+        "stage": "source-probe",
+        "seconds": 0.047
+      },
+      {
+        "stage": "generate-and-probe-inputs",
+        "seconds": 4.078
+      },
+      {
+        "stage": "source-demux",
+        "seconds": 0.094,
+        "frames": 2,
+        "ffmpeg_cpu_seconds": 0.0,
+        "sampled_peak_rss_bytes": 2244608,
+        "process_read_bytes": 0,
+        "process_write_bytes": 0,
+        "job_directory_sample_peak_bytes": 142381
+      },
+      {
+        "stage": "source-decode",
+        "seconds": 0.203,
+        "frames": 2,
+        "ffmpeg_cpu_seconds": 0.078,
+        "sampled_peak_rss_bytes": 2244608,
+        "process_read_bytes": 0,
+        "process_write_bytes": 0,
+        "job_directory_sample_peak_bytes": 146497
+      },
+      {
+        "stage": "video-to-linear",
+        "seconds": 1.86,
+        "frames": 2,
+        "ffmpeg_cpu_seconds": 1.781,
+        "sampled_peak_rss_bytes": 538963968,
+        "process_read_bytes": 20344,
+        "process_write_bytes": 3998,
+        "job_directory_sample_peak_bytes": 154627
+      },
+      {
+        "stage": "still-decode",
+        "seconds": 0.093,
+        "frames": 1,
+        "ffmpeg_cpu_seconds": 0.0,
+        "sampled_peak_rss_bytes": 2244608,
+        "process_read_bytes": 0,
+        "process_write_bytes": 0,
+        "job_directory_sample_peak_bytes": 155113
+      },
+      {
+        "stage": "still-linear",
+        "seconds": 0.11,
+        "frames": 1,
+        "ffmpeg_cpu_seconds": 0.016,
+        "sampled_peak_rss_bytes": 2281472,
+        "process_read_bytes": 0,
+        "process_write_bytes": 0,
+        "job_directory_sample_peak_bytes": 158604
+      },
+      {
+        "stage": "still-fit",
+        "seconds": 0.156,
+        "frames": 1,
+        "ffmpeg_cpu_seconds": 0.047,
+        "sampled_peak_rss_bytes": 2281472,
+        "process_read_bytes": 0,
+        "process_write_bytes": 0,
+        "job_directory_sample_peak_bytes": 162769
+      },
+      {
+        "stage": "no-pq-tail",
+        "seconds": 6.719,
+        "frames": 2,
+        "ffmpeg_cpu_seconds": 16.703,
+        "sampled_peak_rss_bytes": 4483739648,
+        "process_read_bytes": 83385,
+        "process_write_bytes": 7445,
+        "job_directory_sample_peak_bytes": 178806
+      },
+      {
+        "stage": "no-transition-arithmetic",
+        "seconds": 6.844,
+        "frames": 2,
+        "ffmpeg_cpu_seconds": 12.235,
+        "sampled_peak_rss_bytes": 4738592768,
+        "process_read_bytes": 96808,
+        "process_write_bytes": 7278,
+        "job_directory_sample_peak_bytes": 191098
+      },
+      {
+        "stage": "graph-only",
+        "seconds": 7.875,
+        "frames": 2,
+        "ffmpeg_cpu_seconds": 17.969,
+        "sampled_peak_rss_bytes": 4638228480,
+        "process_read_bytes": 96885,
+        "process_write_bytes": 7828,
+        "job_directory_sample_peak_bytes": 204017
+      }
+    ],
+    "encoder_and_mask_extra_stages": [
+      {
+        "stage": "looped-cpu",
+        "seconds": 9.704,
+        "frames": 120,
+        "ffmpeg_cpu_seconds": 19.656000000000002,
+        "sampled_peak_rss_bytes": 1928650752,
+        "process_read_bytes": 2985984000,
+        "process_write_bytes": 11208,
+        "job_directory_sample_peak_bytes": 24269,
+        "gpu": {
+          "observer_cost": {
+            "sample_calls": 54,
+            "total_wall_seconds": 0.12440800001786556,
+            "maximum_sample_wall_ms": 3.610100000514649,
+            "mean_sample_wall_ms": 2.3038518521826954,
+            "maximum_engine_instances": 699,
+            "maximum_memory_instances": {
+              "Dedicated Usage": 70,
+              "Shared Usage": 70
+            }
+          },
+          "peak_process_gpu_memory_MiB": {
+            "Dedicated Usage": 0.0,
+            "Shared Usage": 0.0
+          },
+          "memory_counter_errors": {},
+          "samples": 54,
+          "unavailable": null,
+          "peak_engine_percent": {},
+          "mean_engine_percent": {}
+        }
+      },
+      {
+        "stage": "looped-amf",
+        "seconds": 1.641,
+        "frames": 120,
+        "ffmpeg_cpu_seconds": 3.313,
+        "sampled_peak_rss_bytes": 360726528,
+        "process_read_bytes": 2911388064,
+        "process_write_bytes": 4151,
+        "job_directory_sample_peak_bytes": 31684,
+        "gpu": {
+          "observer_cost": {
+            "sample_calls": 9,
+            "total_wall_seconds": 0.023009000025922433,
+            "maximum_sample_wall_ms": 3.8924999971641228,
+            "mean_sample_wall_ms": 2.556555558435826,
+            "maximum_engine_instances": 707,
+            "maximum_memory_instances": {
+              "Dedicated Usage": 71,
+              "Shared Usage": 71
+            }
+          },
+          "peak_process_gpu_memory_MiB": {
+            "Dedicated Usage": 5.18,
+            "Shared Usage": 151.63
+          },
+          "memory_counter_errors": {},
+          "samples": 9,
+          "unavailable": null,
+          "peak_engine_percent": {
+            "3D": 0,
+            "Copy": 0,
+            "Compute 0": 0,
+            "Timer 0": 0,
+            "Security 1": 0,
+            "Video JPEG 0": 0,
+            "Video Processor": 0,
+            "Video Codec Engine": 0
+          },
+          "mean_engine_percent": {
+            "3D": 0.0,
+            "Copy": 0.0,
+            "Compute 0": 0.0,
+            "Timer 0": 0.0,
+            "Security 1": 0.0,
+            "Video JPEG 0": 0.0,
+            "Video Processor": 0.0,
+            "Video Codec Engine": 0.0
+          }
+        }
+      },
+      {
+        "stage": "float-control",
+        "seconds": 0.234,
+        "frames": 2,
+        "ffmpeg_cpu_seconds": 0.20299999999999999,
+        "sampled_peak_rss_bytes": 2273280,
+        "process_read_bytes": 0,
+        "process_write_bytes": 0,
+        "job_directory_sample_peak_bytes": 33586
+      },
+      {
+        "stage": "float-mask",
+        "seconds": 6.938,
+        "frames": 2,
+        "ffmpeg_cpu_seconds": 25.859,
+        "sampled_peak_rss_bytes": 495333376,
+        "process_read_bytes": 0,
+        "process_write_bytes": 4324,
+        "job_directory_sample_peak_bytes": 45407
+      }
+    ],
+    "wpr_error": "0xc5585011"
+  },
+  "encoder": {
+    "configuration": {
+      "cpu": "libx265 ultrafast CRF 15",
+      "hardware": "hevc_amf quality CQP 20",
+      "raw": "yuv420p10le limited-range BT.2020 PQ"
+    },
+    "initial_untagged_cpu_validation_failed": true,
+    "raw_capture": {
+      "stage": "write-pq",
+      "seconds": 14.5,
+      "frames": 10,
+      "ffmpeg_cpu_seconds": 26.953,
+      "sampled_peak_rss_bytes": 3794595840,
+      "process_read_bytes": 62519,
+      "process_write_bytes": 248788126,
+      "job_directory_sample_peak_bytes": 248959690,
+      "gpu": {
+        "observer_cost": {
+          "sample_calls": 12,
+          "total_wall_seconds": 0.028449399993405677,
+          "maximum_sample_wall_ms": 2.7891000063391402,
+          "mean_sample_wall_ms": 2.3707833327838066,
+          "maximum_engine_instances": 682,
+          "maximum_memory_instances": {
+            "Dedicated Usage": 69,
+            "Shared Usage": 69
+          }
+        },
+        "peak_process_gpu_memory_MiB": {
+          "Dedicated Usage": 0.0,
+          "Shared Usage": 0.0
+        },
+        "memory_counter_errors": {},
+        "samples": 12,
+        "unavailable": null,
+        "peak_engine_percent": {},
+        "mean_engine_percent": {}
+      }
+    },
+    "tagged_encode_timing": [
+      {
+        "stage": "cpu-encode",
+        "seconds": 1.547,
+        "frames": 10,
+        "ffmpeg_cpu_seconds": 1.8279999999999998,
+        "sampled_peak_rss_bytes": 1180172288,
+        "process_read_bytes": 248832000,
+        "process_write_bytes": 4940,
+        "job_directory_sample_peak_bytes": 172584,
+        "gpu": {
+          "observer_cost": {
+            "sample_calls": 7,
+            "total_wall_seconds": 0.01768470002571121,
+            "maximum_sample_wall_ms": 3.6439999967115,
+            "mean_sample_wall_ms": 2.526385717958744,
+            "maximum_engine_instances": 699,
+            "maximum_memory_instances": {
+              "Dedicated Usage": 70,
+              "Shared Usage": 70
+            }
+          },
+          "peak_process_gpu_memory_MiB": {
+            "Dedicated Usage": 0.0,
+            "Shared Usage": 0.0
+          },
+          "memory_counter_errors": {},
+          "samples": 7,
+          "unavailable": null,
+          "peak_engine_percent": {},
+          "mean_engine_percent": {}
+        }
+      },
+      {
+        "stage": "amf-encode",
+        "seconds": 0.5,
+        "frames": 10,
+        "ffmpeg_cpu_seconds": 0.532,
+        "sampled_peak_rss_bytes": 358952960,
+        "process_read_bytes": 174236064,
+        "process_write_bytes": 3375,
+        "job_directory_sample_peak_bytes": 200348,
+        "gpu": {
+          "observer_cost": {
+            "sample_calls": 3,
+            "total_wall_seconds": 0.008315500017488375,
+            "maximum_sample_wall_ms": 2.97580000187736,
+            "mean_sample_wall_ms": 2.7718333391627916,
+            "maximum_engine_instances": 707,
+            "maximum_memory_instances": {
+              "Dedicated Usage": 71,
+              "Shared Usage": 71
+            }
+          },
+          "peak_process_gpu_memory_MiB": {
+            "Dedicated Usage": 5.18,
+            "Shared Usage": 151.63
+          },
+          "memory_counter_errors": {},
+          "samples": 3,
+          "unavailable": null,
+          "peak_engine_percent": {
+            "3D": 0,
+            "Copy": 0,
+            "Compute 0": 0,
+            "Timer 0": 0,
+            "Security 1": 0,
+            "Video JPEG 0": 0,
+            "Video Processor": 0,
+            "Video Codec Engine": 0
+          },
+          "mean_engine_percent": {
+            "3D": 0.0,
+            "Copy": 0.0,
+            "Compute 0": 0.0,
+            "Timer 0": 0.0,
+            "Security 1": 0.0,
+            "Video JPEG 0": 0.0,
+            "Video Processor": 0.0,
+            "Video Codec Engine": 0.0
+          }
+        }
+      }
+    ],
+    "tagged_decode_verification": {
+      "cpu-encode": {
+        "codec_name": "hevc",
+        "profile": "Main 10",
+        "width": 3840,
+        "height": 2160,
+        "pix_fmt": "yuv420p10le",
+        "sample_aspect_ratio": "1:1",
+        "color_range": "tv",
+        "color_space": "bt2020nc",
+        "color_transfer": "smpte2084",
+        "color_primaries": "bt2020",
+        "nb_frames": "10",
+        "time_base": "1/120000",
+        "duration_ts": 20000,
+        "avg_frame_rate": "60/1",
+        "static_metadata": [],
+        "picture_static_metadata": [
+          "Content light level metadata",
+          "Mastering display metadata"
+        ],
+        "bytes": 23375,
+        "raw_reference_psnr_db": [
+          "61.377272",
+          "inf",
+          "inf",
+          "63.138185"
+        ],
+        "authoring_passed": true,
+        "decoded_encode_and_remux_equal": true
+      },
+      "amf-encode": {
+        "codec_name": "hevc",
+        "profile": "Main 10",
+        "width": 3840,
+        "height": 2160,
+        "pix_fmt": "yuv420p10le",
+        "sample_aspect_ratio": "1:1",
+        "color_range": "tv",
+        "color_space": "bt2020nc",
+        "color_transfer": "smpte2084",
+        "color_primaries": "bt2020",
+        "nb_frames": "10",
+        "time_base": "1/120000",
+        "duration_ts": 20000,
+        "avg_frame_rate": "60/1",
+        "static_metadata": [],
+        "picture_static_metadata": [],
+        "bytes": 19624,
+        "raw_reference_psnr_db": [
+          "64.284456",
+          "inf",
+          "inf",
+          "66.045369"
+        ],
+        "authoring_passed": true,
+        "decoded_encode_and_remux_equal": true
+      }
+    }
+  },
+  "extended_uhd_spatial": {
+    "canvas": [
+      3840,
+      2160
+    ],
+    "frames": 48,
+    "fps": 60,
+    "audio_rate": 48000,
+    "static_seconds": 160.0460000000021,
+    "edited_total_seconds": 170.6710000000021,
+    "author_seconds": 10.625,
+    "observed_child_cpu_seconds": 428.906,
+    "process_tree_peak_rss_bytes": 5595009024,
+    "scratch_peak_bytes": 421675,
+    "effective_output_fps": 0.28124285906802804,
+    "independent_decoded_picture_pcm_equality": true,
+    "all_frames_have_metadata": true,
+    "distinct_metadata_average_values": 17,
+    "audio_endpoint_samples": 38400,
+    "source_hashes_match": true,
+    "duration_seconds": 0.8
+  },
+  "windows_installer": {
+    "upgrade_exit": 0,
+    "upgrade_preserved_projects_settings": true,
+    "uninstall_exit": 0,
+    "uninstall_preserved_projects_settings": true,
+    "removed_executable_shortcuts": true,
+    "reinstall_exit": 0,
+    "reinstall_preserved_projects_settings": true,
+    "protected_file_count": 7,
+    "msi_sha256": "62e286702ab5b4fe077a46723ac1e8de377b188a76a3da8bcdbbb6401b5f355d",
+    "version": "3.6.0",
+    "matched_bundle_checks": 44,
+    "baseline_package_sha256": "c6963b94160c796b4650c2a1ecb4e7d8af7ae844c4f27d6540203e98e538f90d"
+  },
+  "windows_hdr_editing": {
+    "frames": 18,
+    "equal_decoded_static_and_hdr10plus": true,
+    "dynamic_blocks": 18,
+    "body_duration_seconds": 0.75,
+    "undo_redo_reopen": true,
+    "versions_match": true,
+    "source_hashes_match": true
+  },
+  "windows_hdr_profiles": {
+    "static": {
+      "seconds": 11.8,
+      "wall_seconds": 12.0,
+      "media_worker_peak_rss_mib": 1161.11,
+      "sampled_process_tree_peak_rss_mib": 2516.78,
+      "media_worker_observed_cpu_seconds": 17.984,
+      "sampled_scratch_bytes": 43579,
+      "bytes": 13097,
+      "first_observed_authoring_stages_seconds": {},
+      "frames": 6,
+      "video_size": [
+        3840,
+        2160
+      ],
+      "fps": 60,
+      "dynamic_metadata": false,
+      "video_audio_endpoint_seconds": 0.1
+    },
+    "samsung": {
+      "seconds": 13.1,
+      "wall_seconds": 13.281000000002678,
+      "media_worker_peak_rss_mib": 1160.14,
+      "sampled_process_tree_peak_rss_mib": 2447.76,
+      "media_worker_observed_cpu_seconds": 17.25,
+      "sampled_scratch_bytes": 67682,
+      "bytes": 13433,
+      "first_observed_authoring_stages_seconds": {
+        "Analyzing final PQ pictures for HDR10+ metadata": 11.577999999994063,
+        "Attaching metadata in HEVC decode order": 12.906000000002678,
+        "Verifying HDR10+ pictures, audio and timestamps": 13.156000000002678,
+        "Verified edited HDR10+ master completed": 13.281000000002678
+      },
+      "frames": 6,
+      "video_size": [
+        3840,
+        2160
+      ],
+      "fps": 60,
+      "dynamic_metadata": true,
+      "video_audio_endpoint_seconds": 0.1
+    },
+    "youtube": {
+      "seconds": 11.2,
+      "wall_seconds": 11.39100000000326,
+      "media_worker_peak_rss_mib": 1172.34,
+      "sampled_process_tree_peak_rss_mib": 2342.83,
+      "media_worker_observed_cpu_seconds": 15.906,
+      "sampled_scratch_bytes": 55097,
+      "bytes": 14046,
+      "first_observed_authoring_stages_seconds": {},
+      "frames": 6,
+      "video_size": [
+        3840,
+        2160
+      ],
+      "fps": 60,
+      "dynamic_metadata": false,
+      "video_audio_endpoint_seconds": 0.1
+    },
+    "static_samsung_decoded_equality": true
+  },
+  "preview": {
+    "matching_runtime_files": 11,
+    "runs": {
+      "baseline": {
+        "seek": {
+          "first_ready_ms": 1143.8518999930238,
+          "seek_p50_ms": 370.8378500014078,
+          "seek_p95_ms": 614.5108000055188
+        },
+        "native_transport": {
+          "frames_per_second_with_start_stop": 57.6711296586267,
+          "program_resolution": [
+            960,
+            540
+          ],
+          "original_resolution": [
+            3840,
+            2160
+          ],
+          "min_active_window_fps": 58.36943743371782,
+          "p99_upper_ms": 19,
+          "longest_active_gap_ms": 39.3121,
+          "skips": 2,
+          "skips_after_source_wait": 1,
+          "source_wait_iterations": 38,
+          "gpu_wait_iterations": 0,
+          "audio_underruns": 0,
+          "audio_samples": 480000,
+          "peak_rss_mib": 2653.2,
+          "condition_held": true
+        },
+        "native_repeat": {
+          "frames_per_second_with_start_stop": 56.435652939656634,
+          "program_resolution": [
+            960,
+            540
+          ],
+          "original_resolution": [
+            3840,
+            2160
+          ],
+          "min_active_window_fps": 58.053724294007715,
+          "p99_upper_ms": 19.9,
+          "longest_active_gap_ms": 50.064,
+          "skips": 3,
+          "skips_after_source_wait": 0,
+          "source_wait_iterations": 25,
+          "gpu_wait_iterations": 0,
+          "audio_underruns": 0,
+          "audio_samples": 480000,
+          "peak_rss_mib": 2754.3,
+          "condition_held": true
+        },
+        "live_idle": {
+          "callbackCount": 181,
+          "spanSeconds": 4.05,
+          "maxCallbackGapMs": 499.89999999999964,
+          "decodedFrames": 219,
+          "droppedFrames": 30,
+          "proxy_active_samples": 0,
+          "failed": false,
+          "webview_peak_rss_mib": 1233.75,
+          "sampled_rows": 14,
+          "condition_held": true
+        },
+        "live_short_proxy": {
+          "callbackCount": 205,
+          "spanSeconds": 4.400156000000001,
+          "maxCallbackGapMs": 416.75599999999986,
+          "decodedFrames": 247,
+          "droppedFrames": 33,
+          "proxy_active_samples": 0,
+          "failed": true,
+          "webview_peak_rss_mib": 1180.0,
+          "sampled_rows": 14,
+          "condition_held": true
+        },
+        "live_long_proxy": {
+          "callbackCount": 207,
+          "spanSeconds": 3.9337,
+          "maxCallbackGapMs": 516.9000000000001,
+          "decodedFrames": 212,
+          "droppedFrames": 0,
+          "proxy_active_samples": 13,
+          "failed": false,
+          "webview_peak_rss_mib": 1211.234375,
+          "sampled_rows": 13,
+          "condition_held": true
+        }
+      },
+      "optimized": {
+        "seek": {
+          "first_ready_ms": 857.703899993794,
+          "seek_p50_ms": 364.63424999965355,
+          "seek_p95_ms": 631.7830999905709
+        },
+        "native_transport": {
+          "frames_per_second_with_start_stop": 55.16047124743478,
+          "program_resolution": [
+            960,
+            540
+          ],
+          "original_resolution": [
+            3840,
+            2160
+          ],
+          "min_active_window_fps": 52.00077162435314,
+          "p99_upper_ms": 50.4,
+          "longest_active_gap_ms": 197.248,
+          "skips": 32,
+          "skips_after_source_wait": 23,
+          "source_wait_iterations": 67,
+          "gpu_wait_iterations": 0,
+          "audio_underruns": 0,
+          "audio_samples": 480000,
+          "peak_rss_mib": 2652.7,
+          "condition_held": true
+        },
+        "native_repeat": {
+          "frames_per_second_with_start_stop": 58.4703681576618,
+          "program_resolution": [
+            960,
+            540
+          ],
+          "original_resolution": [
+            3840,
+            2160
+          ],
+          "min_active_window_fps": 59.019683064301944,
+          "p99_upper_ms": 19.1,
+          "longest_active_gap_ms": 42.5666,
+          "skips": 2,
+          "skips_after_source_wait": 2,
+          "source_wait_iterations": 45,
+          "gpu_wait_iterations": 0,
+          "audio_underruns": 0,
+          "audio_samples": 480000,
+          "peak_rss_mib": 2651.0,
+          "condition_held": true
+        },
+        "live_idle": {
+          "callbackCount": 219,
+          "spanSeconds": 3.8500999999999994,
+          "maxCallbackGapMs": 166.5,
+          "decodedFrames": 228,
+          "droppedFrames": 0,
+          "proxy_active_samples": 0,
+          "failed": false,
+          "webview_peak_rss_mib": 1207.921875,
+          "sampled_rows": 14,
+          "condition_held": true
+        },
+        "live_short_proxy": {
+          "callbackCount": 217,
+          "spanSeconds": 4.149940000000001,
+          "maxCallbackGapMs": 266.53999999999996,
+          "decodedFrames": 241,
+          "droppedFrames": 19,
+          "proxy_active_samples": 1,
+          "failed": false,
+          "webview_peak_rss_mib": 1218.38671875,
+          "sampled_rows": 14,
+          "condition_held": true
+        },
+        "live_long_proxy": {
+          "callbackCount": 217,
+          "spanSeconds": 4.300299999999999,
+          "maxCallbackGapMs": 166.79999999999995,
+          "decodedFrames": 255,
+          "droppedFrames": 0,
+          "proxy_active_samples": 13,
+          "failed": false,
+          "webview_peak_rss_mib": 1225.26953125,
+          "sampled_rows": 13,
+          "condition_held": true
+        }
+      }
+    }
+  },
+  "local_regressions": {
+    "offline_python_passed": 166,
+    "javascript_passed": 29
+  },
+  "hosted_production_workflow": 44963907957
+}

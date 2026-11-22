@@ -35,6 +35,8 @@ PROTOCOL_FILES=(
  'tests/test_hdr_editing.py',
  'tests/test_timeline_transitions.py','tests/windows_hdr_editing.py',
  'tests/test_export_scratch.py','benchmarks/studio357_hdr_sequence.py',
+ 'benchmarks/profile_hdr_render.py','benchmarks/profile_preview_proxy.py',
+ 'tests/test_hdr_render_reuse.py',
  'tests/performance.py','tests/gpu_metrics.py')
 
 def fingerprint(files=None):

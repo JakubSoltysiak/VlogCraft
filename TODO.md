@@ -2,9 +2,9 @@
 
 **Canonical living document for the owner, ChatGPT, and Codex.**  
 **Project:** [JakubSoltysiak/VlogCraft](https://github.com/JakubSoltysiak/VlogCraft)  
-**Last consolidated:** 2026-11-21\
+**Last consolidated:** 2026-11-22\
 **Source of requirements:** discussions about VlogCraft Studio, the Kenya travel vlog, Samsung Galaxy footage, the 3.0–3.4 development history, and GitHub PR #1.  
-**Current development state:** 3.3 verified baseline on main. **3.5.7 editing is in draft PR #14**, stacked on #13. Managed sRGB photographs, titles, keyframed spatial layers and centered transitions now join edited HDR10+ delivery. Advanced effects, device playback and production performance remain open.
+**Current development state:** 3.3 verified baseline on main. **3.6.0 rendering Phase 1 is in draft PR #15**, stacked on 3.5.7 editing in #14. Matched short HDR10+ exports are faster at fixed quality. Longer mixed UHD exports, device playback and sustained preview qualification remain open.
 
 > **Mission:** A free, private, offline-first, genuinely capable Windows filmmaking editor. Give one person Premiere-like creative freedom and professional picture/audio quality without cloud processing, subscriptions, arbitrary source-size limits, or unnecessary complexity. Prioritize editing actual travel/wildlife footage over collecting features. It should be delightful for a casual annual vlog yet powerful when needed.
 
@@ -31,7 +31,10 @@
 
 ## 3.6.0 performance investigation
 
-- [ ] **Compare VlogCraft and Adobe Premiere Pro on equivalent local workloads.** Begin with published techniques and measured export and playback traces using Windows Performance Recorder and GPUView where applicable. Consider REA or Ghidra only after reviewing law, licensing, necessity and the narrow technical question. Use independently developed techniques and keep proprietary Adobe implementation material out of VlogCraft. This investigation is deferred to 3.6.0.
+- [x] **VC-PERF-360-001 — Isolate the managed HDR rendering bottleneck.** Frozen scene ablations separate the affine and matte expression cost from decoding, encoding and HDR10+ authoring. Preserve the 720p and UHD spatial timeouts and decoded-quality comparisons. [Phase 1 evidence](docs/STUDIO_3_6_0_RENDERING.md).
+- [ ] **VC-PERF-360-002 — Make longer mixed UHD renders practical.** Use the independently verified 3.6.0 short runs as the comparator. Measure remaining affine sampling, float-surface ownership and bandwidth on longer, higher-entropy content. Keep the full 60-second export gate open until shorter trials support it.
+- [ ] **VC-PERF-360-003 — Qualify any HDR AV backend.** Keep the verified CPU Main10 path. A hardware path needs independently verified image quality, static mastering and content-light signalling, audio and frame clocks, dynamic metadata association and practical speed improvement.
+- [ ] **Compare VlogCraft and Adobe Premiere Pro on equivalent local workloads.** Adobe's documented GPU rendering and codec capabilities are recorded in the Phase 1 report. A same-workstation Premiere trace requires a local Premiere installation. Use equivalent sources, effects and output settings, and Windows Performance Recorder or GPUView where available.
 
 ## 3.4.9 reliability acceptance — 14 November 2026
 
