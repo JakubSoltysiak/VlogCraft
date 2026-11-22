@@ -2,6 +2,11 @@
 
 Tested means the specific check in VERIFICATION.md passed. Implemented means code is available with further acceptance coverage needed. Partial identifies implemented behavior with material gaps. Missing identifies an unavailable capability. A test result qualifies its fixture and environment.
 
+| 3.6.0 Phase 2 rendering lab | Status | Verified scope / remaining limits |
+|---|---|---|
+| Native CPU and D3D11 HDR compositing | Experimental | Standalone source-linear geometry, compositing, masks, opacity and dissolve, with hardware and WARP comparisons. Production keeps the qualified Phase 1 engine. |
+| Native output through HDR10+ authoring | Experimental | Laboratory export exercises CPU Main10 encoding, frame-clock normalization and the existing authoring verification and fallback. Production timeline decoding, device coverage and GPU-resident encode remain open. |
+
 | 3.6.0 rendering capability | Status | Verified scope / remaining limits |
 |---|---|---|
 | Faster managed CPU HDR compositing | Tested subset | Frozen 360p and 720p spatial and UHD opacity outputs match picture, PCM, time and metadata. Short UHD spatial output passed independent checks. The longer 48-frame UHD control rendered at 0.281 FPS. The 60-second project remains open. |

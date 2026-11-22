@@ -97,12 +97,14 @@ def delivery(stage, static, master, fps, count, seconds):
     if pictures!=decoded(static,'0:v:0','framemd5') or pcm!=decoded(static,'0:a:0','s16le'):
         raise AssertionError('Authored file changed decoded video or audio')
     frame_data=json.loads(call(['ffprobe','-v','error','-select_streams','v:0','-show_frames','-of','json',master]).stdout)
-    static_types=sorted({value['side_data_type'] for frame in frame_data['frames'] for value in static_metadata(frame)})
+    declared={json.dumps(value,sort_keys=True) for frame in frame_data['frames'] for value in static_metadata(frame)}
+    static_fields=[json.loads(value) for value in sorted(declared)]
+    static_types=sorted({value['side_data_type'] for value in static_fields})
     if static_types!=['Content light level metadata','Mastering display metadata']:
         raise AssertionError('Static mastering and content-light metadata are required')
     return dict(seconds=seconds+author_seconds,author_seconds=author_seconds,frames=count,
                 hdr10plus_blocks=len(blocks),audio_samples=int(audio['duration_ts']),
-                same_static_and_authored_decode=True,static_metadata=static_types,
+                same_static_and_authored_decode=True,static_metadata=static_fields,
                 audio_pcm_sha256=hashlib.sha256(pcm).hexdigest())
 
 
@@ -177,6 +179,8 @@ def experiment(results, reference, executable, frames, *, quick=False, force_fal
                              independent_linear_comparison_seconds=comparison_seconds)
             if candidate['audio_pcm_sha256']!=control['audio_pcm_sha256']:
                 raise AssertionError('The experimental export changed decoded PCM')
+            if candidate['static_metadata']!=control['static_metadata']:
+                raise AssertionError('The experimental export changed static HDR declarations')
             pq=compare_encoded(reference_master,master)
             if not pq['passed']:
                 raise ValueError('The decoded PQ tolerance was exceeded')
