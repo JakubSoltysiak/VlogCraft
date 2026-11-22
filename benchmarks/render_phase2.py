@@ -15,10 +15,18 @@ import time
 import numpy as np
 import psutil
 
+if __package__:
+    from .conditions import Conditions
+else:
+    from conditions import Conditions
+
 
 BASELINE = '045da0a6b3d8d956d07c075a6c0e73f6878a2d9f'
 ROOT = Path(__file__).resolve().parents[1]
 REFERENCE_POLICY = dict(max_rgb=.05, rmse_rgb=.002, max_alpha=.003)
+NATIVE_MODES = {'scalar','simd','gpu32','gpu16','warp32'}
+ENDURANCE_MODES = {'gpu32','gpu16'}
+QUALITY_BLOCK_PIXELS = 1 << 20
 
 
 @dataclass(frozen=True)
@@ -232,6 +240,8 @@ def reference_trial(folder, scenario, clips, frames, warmup, planar, layers, out
     result=call(command,240)
     wall=time.perf_counter()-start
     values=[1000*float(v) for v in re.findall(rb'\bt:([0-9.]+) avg:',result.stderr)]
+    if len(values)!=frames+warmup:
+        raise ValueError('FFmpeg did not report one processing sample per picture')
     match=re.search(rb'utime=([\d.]+)s stime=([\d.]+)s rtime=([\d.]+)s',result.stderr)
     memory=re.search(rb'maxrss=(\d+)KiB',result.stderr)
     return dict(wall_ms=1000*wall,frames=frames+warmup,measurement_frames=len(values[warmup:]),
@@ -262,29 +272,31 @@ def compare_pictures(path, candidate, scenario, frames, *, reference=False, half
     baseline=np.memmap(path,dtype='<f4',mode='r',shape=input_shape)
     tested=np.memmap(candidate,dtype='<f2' if half else '<f4',mode='r',shape=(frames,pixels,4))
     for n in range(frames):
-        prior=baseline[n][[2,0,1]].T if reference else baseline[n,:,:3]
-        after=tested[n,:,:3].astype('float32')
-        if not np.isfinite(prior).all() or not np.isfinite(after).all():
-            raise ValueError('Non-finite linear RGB in composed pictures')
-        delta=np.abs(after-prior)
-        max_rgb=max(max_rgb,float(delta.max()))
-        total+=float(np.sum(np.square(delta),dtype='float64'))
-        abs_total+=float(np.sum(delta,dtype='float64'))
-        highlight=prior>=1
-        shadow=np.abs(prior)<.02
-        if highlight.any():
-            max_relative_highlight=max(max_relative_highlight,float((delta[highlight]/prior[highlight]).max()))
-        if shadow.any():
-            max_shadow=max(max_shadow,float(delta[shadow].max()))
-        if not reference:
-            alpha=baseline[n,:,3]
-            delta_alpha=np.abs(tested[n,:,3].astype('float32')-alpha)
-            if not np.isfinite(delta_alpha).all():
-                raise ValueError('Non-finite alpha in composed pictures')
-            max_alpha=max(max_alpha,float(delta_alpha.max()))
-            edge=(alpha>.01)&(alpha<.99)
-            mask_edges+=np.count_nonzero(edge)
-            edge_error+=float(np.sum(delta_alpha[edge],dtype='float64'))
+        for start in range(0,pixels,QUALITY_BLOCK_PIXELS):
+            block=slice(start,start+QUALITY_BLOCK_PIXELS)
+            prior=baseline[n,:,block][[2,0,1]].T if reference else baseline[n,block,:3]
+            after=tested[n,block,:3].astype('float32')
+            if not np.isfinite(prior).all() or not np.isfinite(after).all():
+                raise ValueError('Non-finite linear RGB in composed pictures')
+            delta=np.abs(after-prior)
+            max_rgb=max(max_rgb,float(delta.max()))
+            total+=float(np.sum(np.square(delta),dtype='float64'))
+            abs_total+=float(np.sum(delta,dtype='float64'))
+            highlight=prior>=1
+            shadow=np.abs(prior)<.02
+            if highlight.any():
+                max_relative_highlight=max(max_relative_highlight,float((delta[highlight]/prior[highlight]).max()))
+            if shadow.any():
+                max_shadow=max(max_shadow,float(delta[shadow].max()))
+            if not reference:
+                alpha=baseline[n,block,3]
+                delta_alpha=np.abs(tested[n,block,3].astype('float32')-alpha)
+                if not np.isfinite(delta_alpha).all():
+                    raise ValueError('Non-finite alpha in composed pictures')
+                max_alpha=max(max_alpha,float(delta_alpha.max()))
+                edge=(alpha>.01)&(alpha<.99)
+                mask_edges+=np.count_nonzero(edge)
+                edge_error+=float(np.sum(delta_alpha[edge],dtype='float64'))
     rmse=math.sqrt(total/(frames*pixels*3))
     return dict(max_rgb=max_rgb,mean_abs_rgb=abs_total/(frames*pixels*3),rmse_rgb=rmse,
                 psnr_db=20*math.log10(10/rmse) if rmse else None,max_alpha=None if reference else max_alpha,
@@ -301,24 +313,27 @@ def trial_suite(args, scenario, layers):
         frames=3600 if scenario.name=='uhd-sustained' else args.frames
         clips=clips_for(scenario,frames)
         modes=args.modes.split(',')
+        if scenario.name=='uhd-sustained':
+            # The endurance arm consumes resident native inputs only.
+            modes=[mode for mode in modes if mode in ENDURANCE_MODES]
         sources,planar=write_sources(folder,scenario,args.camera,'ffmpeg' in modes)
         plan=folder/'plan.bin'
         write_plan(plan,scenario,clips,frames,precise_edges=args.precise_edges)
-        if scenario.name=='uhd-sustained':
-            # Full-size synthetic kernel endurance is an explicit separate mode.
-            modes=[mode for mode in modes if mode in ('gpu32','gpu16')]
         for mode in modes:
             attempts=[]
             repeat=0 if args.reference_once and mode=='ffmpeg' else args.repeat
-            for _ in range(repeat):
+            for attempt in range(1,repeat+1):
                 before=power()
                 try:
                     run=reference_trial(folder,scenario,clips,frames,args.warmup,planar,layers) if mode=='ffmpeg' else native_trial(
                         args.executable,mode,plan,sources,args.warmup,args.workers)
+                    expected=frames+args.warmup if mode=='ffmpeg' else frames
+                    if run['frames']!=expected:
+                        raise ValueError('The renderer processed a different picture count')
                 except (OSError,subprocess.SubprocessError,ValueError) as error:
                     run={'failure':type(error).__name__}
-                    if isinstance(error,subprocess.CalledProcessError):
-                        (args.results/f'{scenario.name}-{mode}-failure.log').write_bytes(error.stderr)
+                    if getattr(error,'stderr',None):
+                        (args.results/f'{scenario.name}-{mode}-attempt-{attempt}-failure.log').write_bytes(error.stderr)
                 attempts.append(dict(run,ac_before=before,ac_after=power()))
                 print(json.dumps({'scenario':scenario.name,'mode':mode,'attempt':attempts[-1]}),flush=True)
             rows[mode]=attempts
@@ -341,19 +356,42 @@ def trial_suite(args, scenario, layers):
                     else:
                         quality[mode+'_readback']=native_trial(args.executable,mode,plan,sources,0,args.workers,output)
                     outputs[mode]=output
-                except subprocess.CalledProcessError as error:
-                    quality[mode]={'failure':'output_capture'}
-                    (args.results/f'{scenario.name}-{mode}-capture.log').write_bytes(error.stderr)
+                except (OSError,subprocess.SubprocessError,ValueError) as error:
+                    quality[mode]={'failure':'output_capture','error_type':type(error).__name__}
+                    if getattr(error,'stderr',None):
+                        (args.results/f'{scenario.name}-{mode}-capture.log').write_bytes(error.stderr)
             for mode,output in outputs.items():
                 for reference in ('ffmpeg','scalar'):
                     if reference in outputs and mode not in ('ffmpeg',reference):
-                        quality[mode+'_vs_'+reference]=compare_pictures(outputs[reference],output,scenario,count,
-                                                                      reference=reference=='ffmpeg',half=mode=='gpu16')
+                        name=mode+'_vs_'+reference
+                        try:
+                            quality[name]=compare_pictures(outputs[reference],output,scenario,count,
+                                                           reference=reference=='ffmpeg',half=mode=='gpu16')
+                        except (OSError,ValueError) as error:
+                            quality[name]={'passed':False,'failure':type(error).__name__}
             if args.transfers and 'gpu32' in outputs:
                 quality['gpu32_upload_and_readback']=native_trial(args.executable,'gpu32',plan,sources,0,
                     args.workers,folder/'streamed.raw',uploads=True)
     return {'scenario':scenario.__dict__,'frames_requested':frames,'accepted_power':'AC' if args.require_ac else 'recorded',
             'runs':rows,'quality':quality}
+
+
+def validate_modes(names,modes,assert_quality,skip_quality):
+    if len(set(modes))!=len(modes) or not set(modes)<=(NATIVE_MODES|{'ffmpeg'}):
+        raise ValueError('Select distinct known rendering modes')
+    if 'uhd-sustained' in names and not ENDURANCE_MODES.intersection(modes):
+        raise ValueError('Resident endurance requires a hardware D3D11 mode')
+    if assert_quality and (skip_quality or 'uhd-sustained' in names or 'ffmpeg' not in modes or
+                           not NATIVE_MODES.intersection(modes)):
+        raise ValueError('Strict picture verification requires held pictures from FFmpeg and a native mode')
+
+
+def all_ac(report):
+    checkpoints=[report['conditions_start']['ac_power'],report.get('conditions_last',{}).get('ac_power')]
+    checkpoints.extend(row['ac_power'] for row in report['observed_conditions']['samples'])
+    checkpoints.extend(run[key] for result in report['results'] for runs in result['runs'].values()
+                       for run in runs for key in ('ac_before','ac_after'))
+    return all(value is True for value in checkpoints)
 
 
 def main():
@@ -386,6 +424,13 @@ def main():
         parser.error('Provide the native executable or compiler and the extracted Phase 1 source')
     if not 2<=args.frames<=24 or not 1<=args.repeat<=10 or not 0<=args.warmup<=5:
         parser.error('Invalid bounded trial dimensions')
+    names=args.cases.split(',')
+    if not set(names)<={case.name for case in SCENARIOS}:
+        parser.error('Unknown scenario')
+    try:
+        validate_modes(names,args.modes.split(','),args.assert_quality,args.skip_quality)
+    except ValueError as error:
+        parser.error(str(error))
     args.results=args.results.resolve()
     args.results.mkdir(parents=True,exist_ok=False)
     if args.compiler:
@@ -401,21 +446,23 @@ def main():
     revision=call(['git','rev-parse','HEAD']).stdout.decode().strip()
     report=dict(reference=BASELINE,checkout=revision,native_sha256=hashlib.sha256(args.executable.read_bytes()).hexdigest(),
                 reference_filter_sha256=hashlib.sha256(Path(layers.__file__).read_bytes()).hexdigest(),
+                benchmark_driver_sha256=hashlib.sha256(Path(__file__).read_bytes().replace(b'\r\n',b'\n')).hexdigest(),
                 policy=REFERENCE_POLICY,repeat=args.repeat,workers=args.workers,precise_edges=args.precise_edges,
                 conditions_start=technical_conditions(),results=[])
-    names=args.cases.split(',')
-    if not set(names)<={case.name for case in SCENARIOS}:
-        parser.error('Unknown scenario')
-    for name in names:
-        case=next(s for s in SCENARIOS if s.name==name)
-        if args.quick:
-            case=replace(case,width=320,height=180)
-        report['results'].append(trial_suite(args,case,layers))
-        report['conditions_last']=technical_conditions()
+    conditions=Conditions()
+    try:
+        for name in names:
+            case=next(s for s in SCENARIOS if s.name==name)
+            if args.quick:
+                case=replace(case,width=320,height=180)
+            report['results'].append(trial_suite(args,case,layers))
+            report['conditions_last']=technical_conditions()
+            (args.results/'report.json').write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
+    finally:
+        report['observed_conditions']=conditions.finish()
         (args.results/'report.json').write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
-    if args.require_ac and any(run['ac_before'] is not True or run['ac_after'] is not True
-                              for result in report['results'] for runs in result['runs'].values() for run in runs):
-        raise SystemExit('AC power changed during qualification')
+    if args.require_ac and not all_ac(report):
+        raise SystemExit('AC power was not continuous across the qualification observations')
     if args.assert_quality:
         for result in report['results']:
             for mode,runs in result['runs'].items():
