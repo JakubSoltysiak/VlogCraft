@@ -17,7 +17,8 @@ from conditions import Conditions
 from render_phase2 import (BASELINE, ROOT, SCENARIOS, call, clips_for, distribution,
                            native_trial, power, source_picture, technical_conditions, write_plan,
                            write_sources)
-from render_phase2_export import decoded, delivery, encode, mux, video_command
+from phase2b_conversion import packed_encoder, relay
+from render_phase2_export import compare_encoded, decoded, delivery, encode, mux, streams, video_command
 
 
 def normalized_loops(folder, scenario):
@@ -69,30 +70,39 @@ def collect(path):
     result=json.loads(path.read_text(encoding='utf8'))
     samples=result.pop('samples')
     result['frames']=len(samples)
-    for key in ('work_ms','gpu_ms','readback_ms','write_ms','dispatch_ms'):
-        result[key]=distribution([row[key] for row in samples if row[key] is not None])
+    for key in ('work_ms','gpu_ms','readback_ms','write_ms','dispatch_ms','color_gpu_ms'):
+        if any(key in row for row in samples):
+            result[key]=distribution([row[key] for row in samples if row.get(key) is not None])
     return result
 
 
-def stream_video(executable, plan, sources, stage, target, scenario, frames, contract, backend, timeout):
+def stream_video(executable, plan, sources, stage, target, scenario, frames, contract, backend, timeout,
+                 conversion='reference',workers=3):
     """The operating-system pipe blocks the producer when x265 falls behind."""
     native_log=stage/'native.json'
     encoder_log=stage/'encoder.log'
-    command=video_command('pipe:0',target,scenario,frames,contract)
+    reference=video_command('pipe:0',target,scenario,frames,contract)
+    command=reference.copy() if conversion=='reference' else packed_encoder(reference)
     command[2]='info'
     command[1:1]=['-benchmark','-nostats']
     flags=getattr(subprocess,'CREATE_NO_WINDOW',0)
     processes=[]
+    parallel=None
     started=time.perf_counter()
     with native_log.open('wb') as hints, encoder_log.open('wb') as errors:
         try:
-            producer=subprocess.Popen([str(executable),backend,str(plan),str(sources),'@gbr-stream','0','8','0'],
+            mode='@pq-stream' if conversion=='gpu' else '@gbr-stream'
+            producer=subprocess.Popen([str(executable),backend,str(plan),str(sources),mode,'0','8','0'],
                                       stdout=subprocess.PIPE,stderr=hints,creationflags=flags)
             processes.append(producer)
             with producer.stdout:
-                consumer=subprocess.Popen(command,stdin=producer.stdout,stdout=subprocess.DEVNULL,
+                sink=subprocess.PIPE if conversion=='parallel' else producer.stdout
+                consumer=subprocess.Popen(command,stdin=sink,stdout=subprocess.DEVNULL,
                                           stderr=errors,creationflags=flags)
                 processes.append(consumer)
+                if conversion=='parallel':
+                    parallel=relay(producer,consumer,reference,stage,frames,scenario.width,scenario.height,
+                                   workers,timeout)
             for process in (consumer,producer):
                 remaining=max(.01,timeout-(time.perf_counter()-started))
                 if process.wait(timeout=remaining):
@@ -103,6 +113,8 @@ def stream_video(executable, plan, sources, stage, target, scenario, frames, con
                     process.kill()
             for process in reversed(processes):
                 process.wait(timeout=10)
+                if process.stdin:
+                    process.stdin.close()
     elapsed=time.perf_counter()-started
     stats=collect(native_log)
     if stats['frames']!=frames:
@@ -111,7 +123,27 @@ def stream_video(executable, plan, sources, stage, target, scenario, frames, con
     stats['encoder_cpu_seconds']=sum(map(float,keys.groups()[:2])) if keys else None
     stats['parallel_compose_and_encode_seconds']=elapsed
     stats['encoder_pix_fmt']='yuv420p10le'
+    stats['renderer_pipe_bytes_per_picture']=scenario.width*scenario.height*(3 if conversion=='gpu' else 12)
+    if parallel:
+        stats['cpu_conversion_workers']=parallel['workers']
+        stats['cpu_conversion_setup_seconds']=parallel['worker_setup_seconds']
+        stats['cpu_conversion_round_trip_ms']=distribution([1000*v for v in parallel['frame_seconds']])
     return stats
+
+
+def compare_master(reference, candidate, conversion):
+    reference_streams=streams(reference)
+    candidate_streams=streams(candidate)
+    keys=('pix_fmt','width','height','time_base','duration_ts','color_space','color_transfer',
+          'color_primaries','color_range','chroma_location')
+    declaration=all(reference_streams[0].get(key)==candidate_streams[0].get(key) for key in keys)
+    exact_pcm=decoded(reference,'0:a:0','s16le')==decoded(candidate,'0:a:0','s16le')
+    quality=compare_encoded(reference,candidate)
+    exact_pictures=(decoded(reference,'0:v:0','framemd5')==decoded(candidate,'0:v:0','framemd5')
+                    if conversion!='gpu' else None)
+    return dict(decoded_pq=quality,exact_pcm=exact_pcm,exact_pictures=exact_pictures,
+                stream_declaration_matches=declaration,
+                passed=declaration and exact_pcm and quality['passed'] and exact_pictures is not False)
 
 
 def experiment(args):
@@ -161,11 +193,11 @@ def experiment(args):
                 video=stage/'pipe.video.mov'
                 try:
                     stats=stream_video(args.executable.resolve(),plan,sources,stage,video,
-                                       scenario,count,CONTRACT,args.backend,args.timeout)
+                                       scenario,count,CONTRACT,args.backend,args.timeout,args.conversion,args.workers)
                 except Exception:
-                    for log in ('native.json','encoder.log'):
-                        if (stage/log).exists():
-                            (results/log).write_bytes((stage/log).read_bytes())
+                    for log in [stage/'native.json',stage/'encoder.log',*stage.glob('converter-*.log')]:
+                        if log.exists():
+                            (results/log.name).write_bytes(log.read_bytes())
                     raise
                 static=stage/'pipe-static.mp4'
                 master=stage/'pipe-HDR10plus.mp4'
@@ -190,9 +222,14 @@ def experiment(args):
                 report['packed_disk_control']=dict(disk,native=packed_stats,
                                                    identical_decoded_picture_and_audio=True,
                                                    raw_intermediate_bytes=packed.stat().st_size)
-            os.replace(master,results/'verified-hdr10plus.mp4')
+            if args.compare_master:
+                report['independent_master_comparison']=compare_master(args.compare_master.resolve(),master,args.conversion)
+            accepted=not args.compare_master or report['independent_master_comparison']['passed']
+            if accepted:
+                os.replace(master,results/'verified-hdr10plus.mp4')
             report.update(source_commit=call(['git','rev-parse','HEAD']).stdout.decode().strip(),
-                          reference=BASELINE,backend=args.backend,dimensions=[scenario.width,scenario.height],
+                          reference=BASELINE,backend=args.backend,conversion=args.conversion,
+                          dimensions=[scenario.width,scenario.height],
                           frames=count,fps=scenario.fps,loops=args.loops,source_clip_hashes=identities,
                           source_preparation_seconds=prep,independent_verification_seconds=verification_seconds,
                           gpu_or_software=stats,resources=metrics,delivery=rendered,
@@ -208,6 +245,8 @@ def experiment(args):
     if require_ac and (observation['mixed_power'] or not observation['samples'] or
                        not all(s['ac_power'] for s in observation['samples'])):
         raise SystemExit('Mixed power. The result is retained outside the primary comparison.')
+    if not accepted:
+        raise SystemExit('The independent reference comparison rejected the candidate')
 
 
 def main():
@@ -219,10 +258,15 @@ def main():
     parser.add_argument('--quick',action='store_true')
     parser.add_argument('--loops',action='store_true',help='Use changing decoded SDR/PQ texture loops and a picture dissolve')
     parser.add_argument('--compare-disk',action='store_true',help='Verify exact equivalence with the packed disk path')
+    parser.add_argument('--compare-master',type=Path,help='Independently compare a frozen master made from identical inputs')
+    parser.add_argument('--conversion',choices=('reference','parallel','gpu'),default='reference')
+    parser.add_argument('--workers',type=int,choices=range(2,5),default=3)
     parser.add_argument('--backend',choices=('gpu32','warp32'),default='gpu32')
     args=parser.parse_args()
     if not 2<=args.frames<=3600 or (args.compare_disk and args.frames>48) or args.timeout<1:
         parser.error('Invalid bounded fixture size or timeout')
+    if args.conversion!='reference' and not args.compare_master:
+        parser.error('An independently verified reference master is required for candidate publication')
     experiment(args)
 
 

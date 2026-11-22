@@ -58,7 +58,8 @@ int wmain(int argc,wchar_t** argv) {
         if(warmup<0||warmup>120||workers<1||workers>24||(uploads!=0&&uploads!=1)||(!gpu&&uploads))
             throw std::runtime_error("Invalid trial setup");
         const std::wstring destinationMode=argv[4];
-        const bool pipe=destinationMode==L"@gbr-stream";
+        const bool pq=destinationMode==L"@pq-stream";
+        const bool pipe=pq||destinationMode==L"@gbr-stream";
         const bool save=destinationMode!=L"-";
         if(pipe && (!gpu || half))
             throw std::runtime_error("Planar pipe requires an FP32 compositor");
@@ -103,7 +104,7 @@ int wmain(int argc,wchar_t** argv) {
 
         std::vector<Pixel> result(gpu?0:count);
         std::vector<char> pixels(gpu&&save&&!pipe?count*(half?8:16):0);
-        std::vector<float> planes(pipe?count*3:0);
+        std::vector<float> planes(pipe&&!pq?count*3:0);
         std::ofstream out;
         if(save && !pipe) {
             const std::filesystem::path destination(argv[4]);
@@ -115,14 +116,14 @@ int wmain(int argc,wchar_t** argv) {
         std::unique_ptr<GpuCompositor> accelerator;
         std::unique_ptr<CpuCompositor> cpu;
         if(gpu) accelerator=std::make_unique<GpuCompositor>(input.width,input.height,input.images,
-            texture.data(),half,save,mode==L"warp32");
+            texture.data(),half,save,mode==L"warp32",pq);
         else cpu=std::make_unique<CpuCompositor>(mode==L"scalar"?0:workers);
         if(gpu && !uploads) {
             std::vector<Pixel>().swap(texture);
         }
         const double setupMs=milliseconds(setupStart);
 
-        struct Sample { double work, upload, dispatch, shading, readback, write; bool gpuValid; };
+        struct Sample { double work, upload, dispatch, shading, readback, write, color; bool gpuValid; };
         std::vector<Sample> records(input.frames);
         std::vector<RowRange> coverage(input.height*3);
         const auto render=[&](unsigned index,bool measured){
@@ -141,13 +142,17 @@ int wmain(int argc,wchar_t** argv) {
                 value.shading=accelerator->shaderMs;
                 value.gpuValid=accelerator->gpuClockValid;
                 if(save) {
-                    if(pipe) accelerator->download_gbr(planes.data());
+                    if(pq) {
+                        accelerator->stream_pq(std::cout,measured);
+                        value.color=accelerator->colorMs;
+                        value.write=accelerator->outputMs;
+                    } else if(pipe) accelerator->download_gbr(planes.data());
                     else accelerator->download(pixels.data());
                     value.readback=accelerator->mapMs;
                 }
             } else cpu->render(frame,coverage.data(),texture.data(),result.data());
-            value.work=milliseconds(began);
-            if(save && measured) {
+            value.work=milliseconds(began)-value.write;
+            if(save && measured && !pq) {
                 const auto writeStart=Clock::now();
                 if(pipe) {
                     std::cout.write(reinterpret_cast<const char*>(planes.data()),std::streamsize(planes.size()*sizeof(float)));
@@ -208,7 +213,12 @@ int wmain(int argc,wchar_t** argv) {
             stats<<"{\"work_ms\":"<<row.work<<",\"upload_ms\":"<<row.upload
                      <<",\"dispatch_ms\":"<<row.dispatch<<",\"gpu_ms\":";
             if(row.gpuValid) stats<<row.shading; else stats<<"null";
-            stats<<",\"readback_ms\":"<<row.readback<<",\"write_ms\":"<<row.write<<'}';
+            stats<<",\"readback_ms\":"<<row.readback<<",\"write_ms\":"<<row.write;
+            if(pq) {
+                stats<<",\"color_gpu_ms\":";
+                if(row.color>=0) stats<<row.color; else stats<<"null";
+            }
+            stats<<'}';
         }
         stats<<"]}\n";
     } catch(const std::exception& error) {

@@ -101,6 +101,10 @@ jobs:
           python benchmarks/render_phase2_export.py build/qa/phase2-fallback --reference $reference --executable build/qa/phase2-warp/VlogCraftRenderLab.exe --quick --frames 3 --precise-edges --force-fallback
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python benchmarks/render_phase2_stream.py build/qa/phase2-pipe --executable build/qa/phase2-warp/VlogCraftRenderLab.exe --backend warp32 --quick --frames 8 --loops --compare-disk
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python benchmarks/check_phase2b_color.py --executable build/qa/phase2-warp/VlogCraftRenderLab.exe
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python benchmarks/render_phase2_stream.py build/qa/phase2b-pipe --executable build/qa/phase2-warp/VlogCraftRenderLab.exe --backend warp32 --quick --frames 8 --loops --conversion parallel --workers 2 --compare-master build/qa/phase2-pipe/verified-hdr10plus.mp4
       # Hosted runners do not qualify hardware decode, presentation or GPU timing.
       # Local QUICK/STANDARD/FULL performance profiles are defined in benchmarks/performance_suite.py.
       # No experimental dependency binaries are uploaded.

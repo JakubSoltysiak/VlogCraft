@@ -10,10 +10,12 @@
 #include <chrono>
 #include <cstring>
 #include <memory>
+#include <ostream>
 #include <stdexcept>
 #include <string>
 
 #include "composite.h"
+#include "pq_shader.h"
 
 namespace render_phase2 {
 
@@ -95,6 +97,11 @@ void main(uint3 thread : SV_DispatchThreadID) {
 )HLSL";
 
 class GpuCompositor {
+    Com<ID3D11ComputeShader> pqShader;
+    Com<ID3D11ShaderResourceView> pqInput;
+    Com<ID3D11UnorderedAccessView> pqTarget;
+    Com<ID3D11Buffer> pqOutput,pqReadback;
+    unsigned pqBytes=0;
     Com<ID3D11Device> device;
     Com<ID3D11DeviceContext> context;
     Com<IDXGIAdapter3> memory;
@@ -124,13 +131,42 @@ class GpuCompositor {
         return value;
     }
 
+    void compile(const char* sourceCode,const char* label,Com<ID3D11ComputeShader>& targetShader) {
+        Com<ID3DBlob> binary, errors;
+        auto code=D3DCompile(sourceCode,std::strlen(sourceCode),label,nullptr,nullptr,"main","cs_5_0",
+            D3DCOMPILE_OPTIMIZATION_LEVEL3|D3DCOMPILE_IEEE_STRICTNESS,0,binary.init(),errors.init());
+        if(FAILED(code) && errors.get())
+            throw std::runtime_error(static_cast<const char*>(errors->GetBufferPointer()));
+        require(code,"Compile compute shader");
+        require(device->CreateComputeShader(binary->GetBufferPointer(),binary->GetBufferSize(),nullptr,
+                targetShader.init()),"Create compute shader");
+    }
+
+    void setup_pq() {
+        compile(pq_shader_source,"phase2b-pq",pqShader);
+        require(device->CreateShaderResourceView(output.get(),nullptr,pqInput.init()),"Create PQ input view");
+        pqBytes=3*width*height;
+        const D3D11_BUFFER_DESC packed={pqBytes,D3D11_USAGE_DEFAULT,D3D11_BIND_UNORDERED_ACCESS,
+            0,D3D11_RESOURCE_MISC_BUFFER_ALLOW_RAW_VIEWS,0};
+        require(device->CreateBuffer(&packed,nullptr,pqOutput.init()),"Allocate packed PQ surface");
+        D3D11_UNORDERED_ACCESS_VIEW_DESC viewDesc{};
+        viewDesc.Format=DXGI_FORMAT_R32_TYPELESS;
+        viewDesc.ViewDimension=D3D11_UAV_DIMENSION_BUFFER;
+        viewDesc.Buffer.NumElements=pqBytes/4;
+        viewDesc.Buffer.Flags=D3D11_BUFFER_UAV_FLAG_RAW;
+        require(device->CreateUnorderedAccessView(pqOutput.get(),&viewDesc,pqTarget.init()),"Create PQ output view");
+        const D3D11_BUFFER_DESC staging={pqBytes,D3D11_USAGE_STAGING,0,D3D11_CPU_ACCESS_READ,0,0};
+        require(device->CreateBuffer(&staging,nullptr,pqReadback.init()),"Allocate packed PQ readback");
+    }
+
 public:
-    double uploadMs=0, dispatchMs=0, shaderMs=0, mapMs=0;
+    double uploadMs=0, dispatchMs=0, shaderMs=0, mapMs=0, colorMs=0, outputMs=0;
     bool gpuClockValid=false;
     unsigned long long localBytes=0, sharedBytes=0, currentLocal=0, currentShared=0;
     std::string adapterName;
 
-    GpuCompositor(unsigned w,unsigned h,unsigned count,const Pixel* pixels,bool half,bool download,bool warp)
+    GpuCompositor(unsigned w,unsigned h,unsigned count,const Pixel* pixels,bool half,bool download,bool warp,
+                  bool pq=false)
         :width(w),height(h),sourceCount(count),outputStride(half?8:16) {
         D3D_FEATURE_LEVEL level=D3D_FEATURE_LEVEL_11_0;
         require(D3D11CreateDevice(nullptr,warp?D3D_DRIVER_TYPE_WARP:D3D_DRIVER_TYPE_HARDWARE,
@@ -146,14 +182,7 @@ public:
         WideCharToMultiByte(CP_UTF8,0,adapterInfo.Description,-1,adapterText,sizeof(adapterText),nullptr,nullptr);
         for (char c:std::string(adapterText)) if(c>=32 && c!='"' && c!='\\') adapterName+=c;
 
-        Com<ID3DBlob> binary, errors;
-        const auto code=D3DCompile(shader_source,std::char_traits<char>::length(shader_source),
-            "phase2-composite",nullptr,nullptr,"main","cs_5_0",
-            D3DCOMPILE_OPTIMIZATION_LEVEL3|D3DCOMPILE_IEEE_STRICTNESS,0,binary.init(),errors.init());
-        if(FAILED(code) && errors.get()) throw std::runtime_error(static_cast<const char*>(errors->GetBufferPointer()));
-        require(code,"Compile compute shader");
-        require(device->CreateComputeShader(binary->GetBufferPointer(),binary->GetBufferSize(),nullptr,shader.init()),
-                "Create compute shader");
+        compile(shader_source,"phase2-composite",shader);
         const D3D11_BUFFER_DESC buffer={sizeof(Frame),D3D11_USAGE_DEFAULT,D3D11_BIND_CONSTANT_BUFFER,0,0,0};
         require(device->CreateBuffer(&buffer,nullptr,constants.init()),"Create frame parameters");
         const D3D11_BUFFER_DESC ranges={UINT(3*height*sizeof(RowRange)),D3D11_USAGE_DEFAULT,
@@ -175,9 +204,15 @@ public:
         desc.ArraySize=1;
         desc.Format=half?DXGI_FORMAT_R16G16B16A16_FLOAT:DXGI_FORMAT_R32G32B32A32_FLOAT;
         desc.BindFlags=D3D11_BIND_UNORDERED_ACCESS;
+        if(pq) {
+            if(width%4 || height%2 || half)
+                throw std::runtime_error("Packed PQ needs FP32 and dimensions divisible by 4 by 2");
+            desc.BindFlags|=D3D11_BIND_SHADER_RESOURCE;
+        }
         require(device->CreateTexture2D(&desc,nullptr,output.init()),"Create output surface");
         require(device->CreateUnorderedAccessView(output.get(),nullptr,target.init()),"Create output view");
-        if(download) {
+        if(pq) setup_pq();
+        else if(download) {
             desc.BindFlags=0;
             desc.Usage=D3D11_USAGE_STAGING;
             desc.CPUAccessFlags=D3D11_CPU_ACCESS_READ;
@@ -272,6 +307,37 @@ public:
         }
         context->Unmap(readback.get(),0);
         mapMs=milliseconds(begun);
+    }
+
+    void stream_pq(std::ostream& stream,bool measured) {
+        ID3D11ShaderResourceView* sensor=pqInput.get();
+        ID3D11UnorderedAccessView* sink=pqTarget.get();
+        context->CSSetShader(pqShader.get(),nullptr,0);
+        context->CSSetShaderResources(2,1,&sensor);
+        context->CSSetUnorderedAccessViews(0,1,&sink,nullptr);
+        context->Begin(disjoint.get());
+        context->End(gpuStart.get());
+        context->Dispatch((width+31)/32,(height+15)/16,1);
+        context->End(gpuEnd.get());
+        context->End(disjoint.get());
+        sink=nullptr;
+        sensor=nullptr;
+        context->CSSetUnorderedAccessViews(0,1,&sink,nullptr);
+        context->CSSetShaderResources(2,1,&sensor);
+        context->CSSetShader(shader.get(),nullptr,0);
+        const auto transfer=Clock::now();
+        context->CopyResource(pqReadback.get(),pqOutput.get());
+        D3D11_MAPPED_SUBRESOURCE mapped{};
+        require(context->Map(pqReadback.get(),0,D3D11_MAP_READ,0,&mapped),"Map packed PQ picture");
+        mapMs=milliseconds(transfer);
+        const auto outputStart=Clock::now();
+        if(measured) stream.write(static_cast<const char*>(mapped.pData),pqBytes);
+        outputMs=milliseconds(outputStart);
+        context->Unmap(pqReadback.get(),0);
+        if(!stream) throw std::runtime_error("The packed PQ picture pipe was closed");
+        const auto clock=wait<D3D11_QUERY_DATA_TIMESTAMP_DISJOINT>(disjoint.get());
+        const auto start=wait<UINT64>(gpuStart.get()),end=wait<UINT64>(gpuEnd.get());
+        colorMs=(!clock.Disjoint && clock.Frequency)?1000.*double(end-start)/double(clock.Frequency):-1;
     }
 };
 
