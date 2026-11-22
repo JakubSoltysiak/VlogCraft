@@ -83,3 +83,9 @@ The two-frame 8K compatibility control ran three times. Median rates were 1.36 F
 ## Recovered delivery evidence
 
 Local loopback regression passed 166 Python tests and 29 JavaScript tests. The Phase 2 development MSI administrative image passed 44 bundle checks. Its SHA-256 is `f5106de11516c09651bfe0fdb6168b2f57d260753c0007d6817a34659f5784aa`. The previous Phase 1 MSI retained its recorded hash. The lab remains separate from the packaged editor. Hosted Windows regression, native and WARP checks, and MSI lifecycle passed on the recovered code checkpoint. [Windows Actions](https://github.com/JakubSoltysiak/VlogCraft/actions/runs/44972846213).
+
+## Direct readback-to-encoder pipe
+
+The standalone FP32 renderer now converts the mapped D3D11 staging surface directly to one reusable planar float output, then writes it to a bounded operating-system pipe. x265 consumes it through the verified serial zimg/Main10 path. The pipe removes the previously staged RGBA sequence and the unpacking step in Python. Source textures, the staging texture and the planar buffer are reused. The GPU completion and staging barriers remain explicit. On encoder failure or timeout, the launcher closes and joins both children before returning. Output only moves into place after the same clock, PCM and HDR10+ checks.
+
+For the progressive workload the fixture encodes and decodes two tagged three-picture SDR and PQ loops once. The compositor advances those cached pictures under animated geometry, opacity and a mask, then exercises a timed dissolve and stereo delivery. This fixture tests a changing picture and a real x265/HDR10+ pipeline. It keeps source loops resident and does not exercise live decoder scheduling or arbitrary user projects.

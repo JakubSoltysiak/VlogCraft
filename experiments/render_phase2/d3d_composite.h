@@ -242,6 +242,37 @@ public:
         context->Unmap(readback.get(),0);
         mapMs=milliseconds(begun);
     }
+
+    void download_gbr(float* destination) {
+        const auto begun=Clock::now();
+        context->CopyResource(readback.get(),output.get());
+        D3D11_MAPPED_SUBRESOURCE mapped{};
+        require(context->Map(readback.get(),0,D3D11_MAP_READ,0,&mapped),"Map planar picture");
+        const auto count=std::size_t(width)*height;
+        for(unsigned y=0;y<height;++y) {
+            const auto* row=reinterpret_cast<const Pixel*>(
+                static_cast<const char*>(mapped.pData)+y*mapped.RowPitch);
+            float* green=destination+std::size_t(y)*width;
+            float* blue=green+count;
+            float* red=blue+count;
+            unsigned x=0;
+            for(;x+4<=width;x+=4) {
+                auto a=_mm_loadu_ps(&row[x].r), b=_mm_loadu_ps(&row[x+1].r);
+                auto c=_mm_loadu_ps(&row[x+2].r), d=_mm_loadu_ps(&row[x+3].r);
+                _MM_TRANSPOSE4_PS(a,b,c,d);
+                _mm_storeu_ps(red+x,a);
+                _mm_storeu_ps(green+x,b);
+                _mm_storeu_ps(blue+x,c);
+            }
+            for(;x<width;++x) {
+                red[x]=row[x].r;
+                green[x]=row[x].g;
+                blue[x]=row[x].b;
+            }
+        }
+        context->Unmap(readback.get(),0);
+        mapMs=milliseconds(begun);
+    }
 };
 
 }

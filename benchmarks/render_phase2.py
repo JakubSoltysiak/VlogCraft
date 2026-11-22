@@ -133,15 +133,20 @@ def value_at(clip, prop, position):
     return start['value']+(end['value']-start['value'])*position
 
 
-def write_plan(path, scenario, clips, frames, indices=None, *, precise_edges=False):
+def write_plan(path, scenario, clips, frames, indices=None, *, precise_edges=False,
+               source_slots=None, dissolve_window=None):
     indices=list(range(frames)) if indices is None else indices
+    source_slots=source_slots or [(n,) for n in range(scenario.layers)]
     precise=[]
     with path.open('wb') as file:
-        images=scenario.layers|(0x80000000 if precise_edges else 0)
+        images=(max(max(slots) for slots in source_slots)+1)|(0x80000000 if precise_edges else 0)
         file.write(struct.pack('<4I',scenario.width,scenario.height,images,len(indices)))
         for i in indices:
             fraction=i/max(1,frames-1)
             amount=fraction if scenario.dissolve else -1
+            if dissolve_window:
+                first,last=dissolve_window
+                amount=min(1.,max(0.,(i-first)/max(1,last-first)))
             file.write(struct.pack('<3If',scenario.width,scenario.height,scenario.layers,amount))
             for n,clip in enumerate(clips):
                 angle=math.radians(value_at(clip,'rotation',fraction))
@@ -149,8 +154,9 @@ def write_plan(path, scenario, clips, frames, indices=None, *, precise_edges=Fal
                           value_at(clip,'x',fraction),value_at(clip,'y',fraction))
                 if precise_edges:
                     precise.append(geometry)
+                slots=source_slots[n]
                 file.write(struct.pack('<8f4I',*geometry,value_at(clip,'opacity',fraction),
-                    value_at(clip,'maskRadius',fraction),clip['feather'],n,
+                    value_at(clip,'maskRadius',fraction),clip['feather'],slots[i%len(slots)],
                     ('none','ellipse','rectangle').index(clip['mask']),0,0))
             file.write(bytes(48*(3-len(clips))))
             if precise_edges:

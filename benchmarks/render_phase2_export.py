@@ -17,14 +17,12 @@ from render_phase2 import (BASELINE, ROOT, SCENARIOS, call, clips_for, compare_p
                            write_plan, write_sources)
 
 
-def encode(source, packed, audio, target, scenario, frames, contract):
+def video_command(source, target, scenario, frames, contract):
     from color_management import x265_metadata
-    from hdr_render import final_clock
 
-    video=target.with_suffix('.video.mov')
     command=['ffmpeg','-v','error','-nostdin','-f','rawvideo','-pixel_format','gbrpf32le',
              '-video_size',f'{scenario.width}x{scenario.height}','-framerate',str(scenario.fps),
-             '-i','pipe:0' if packed else str(source)]
+             '-i',str(source)]
     command+=['-map','0:v:0','-an','-frames:v',str(frames),
               '-vf','setsar=1,zscale=threads=1:agamma=0:pin=2020:tin=linear:min=gbr:rin=full:'
                     'p=2020:t=smpte2084:m=2020_ncl:r=limited:npl=100:dither=error_diffusion,'
@@ -33,7 +31,24 @@ def encode(source, packed, audio, target, scenario, frames, contract):
               '-profile:v','main10','-x265-params',x265_metadata(contract),
               '-color_primaries','bt2020','-color_trc','smpte2084','-colorspace','bt2020nc',
               '-color_range','tv','-tag:v','hvc1','-threads','4',
-              '-video_track_timescale','120000','-movie_timescale','120000','-movflags','+faststart',str(video)]
+              '-video_track_timescale','120000','-movie_timescale','120000','-movflags','+faststart',str(target)]
+    return command
+
+
+def mux(video, audio, target, scenario, frames):
+    from hdr_render import final_clock
+
+    playlist=target.with_suffix('.txt')
+    playlist.write_text(f"file '{video.name}'\n",encoding='utf8')
+    clocks=final_clock(playlist,scenario.fps,frames,lambda:False)
+    call(['ffmpeg','-v','error','-nostdin','-f','concat','-safe','0','-i',playlist,'-i',audio,
+          '-map','0:v:0','-map','1:a:0','-c:v','copy',*clocks,'-c:a','aac','-b:a','192k',
+          '-video_track_timescale','120000','-movie_timescale','120000','-movflags','+faststart',target],120)
+
+
+def encode(source, packed, audio, target, scenario, frames, contract):
+    video=target.with_suffix('.video.mov')
+    command=video_command('pipe:0' if packed else source,video,scenario,frames,contract)
     if not packed:
         call(command,240)
     else:
@@ -52,12 +67,7 @@ def encode(source, packed, audio, target, scenario, frames, contract):
                 if process.poll() is None:
                     process.kill()
                 raise
-    playlist=target.with_suffix('.txt')
-    playlist.write_text(f"file '{video.name}'\n",encoding='utf8')
-    clocks=final_clock(playlist,scenario.fps,frames,lambda:False)
-    call(['ffmpeg','-v','error','-nostdin','-f','concat','-safe','0','-i',playlist,'-i',audio,
-          '-map','0:v:0','-map','1:a:0','-c:v','copy',*clocks,'-c:a','aac','-b:a','192k',
-          '-video_track_timescale','120000','-movie_timescale','120000','-movflags','+faststart',target],120)
+    mux(video,audio,target,scenario,frames)
 
 
 def streams(path):

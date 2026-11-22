@@ -1,6 +1,8 @@
 #include "d3d_composite.h"
 
 #include <psapi.h>
+#include <fcntl.h>
+#include <io.h>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -55,7 +57,13 @@ int wmain(int argc,wchar_t** argv) {
         const int warmup=std::stoi(argv[5]), workers=std::stoi(argv[6]), uploads=std::stoi(argv[7]);
         if(warmup<0||warmup>120||workers<1||workers>24||(uploads!=0&&uploads!=1)||(!gpu&&uploads))
             throw std::runtime_error("Invalid trial setup");
-        const bool save=std::wstring(argv[4])!=L"-";
+        const std::wstring destinationMode=argv[4];
+        const bool pipe=destinationMode==L"@gbr-stream";
+        const bool save=destinationMode!=L"-";
+        if(pipe && (!gpu || half))
+            throw std::runtime_error("Planar pipe requires an FP32 compositor");
+        if(pipe && _setmode(_fileno(stdout),_O_BINARY)==-1)
+            throw std::runtime_error("Cannot put the picture pipe into binary mode");
         std::ifstream plan(std::filesystem::path(argv[2]),std::ios::binary);
         std::ifstream source(std::filesystem::path(argv[3]),std::ios::binary);
         const auto readStart=Clock::now();
@@ -94,9 +102,10 @@ int wmain(int argc,wchar_t** argv) {
         const double inputMs=milliseconds(readStart);
 
         std::vector<Pixel> result(gpu?0:count);
-        std::vector<char> pixels(gpu&&save?count*(half?8:16):0);
+        std::vector<char> pixels(gpu&&save&&!pipe?count*(half?8:16):0);
+        std::vector<float> planes(pipe?count*3:0);
         std::ofstream out;
-        if(save) {
+        if(save && !pipe) {
             const std::filesystem::path destination(argv[4]);
             if(std::filesystem::exists(destination)) throw std::runtime_error("Refusing to replace fixture output");
             out.open(destination,std::ios::binary);
@@ -132,16 +141,22 @@ int wmain(int argc,wchar_t** argv) {
                 value.shading=accelerator->shaderMs;
                 value.gpuValid=accelerator->gpuClockValid;
                 if(save) {
-                    accelerator->download(pixels.data());
+                    if(pipe) accelerator->download_gbr(planes.data());
+                    else accelerator->download(pixels.data());
                     value.readback=accelerator->mapMs;
                 }
             } else cpu->render(frame,coverage.data(),texture.data(),result.data());
             value.work=milliseconds(began);
             if(save && measured) {
                 const auto writeStart=Clock::now();
-                if(gpu) out.write(pixels.data(),std::streamsize(pixels.size()));
-                else out.write(reinterpret_cast<const char*>(result.data()),std::streamsize(count*sizeof(Pixel)));
-                if(!out) throw std::runtime_error("Could not write the composed picture");
+                if(pipe) {
+                    std::cout.write(reinterpret_cast<const char*>(planes.data()),std::streamsize(planes.size()*sizeof(float)));
+                    if(!std::cout) throw std::runtime_error("The picture pipe was closed");
+                } else {
+                    if(gpu) out.write(pixels.data(),std::streamsize(pixels.size()));
+                    else out.write(reinterpret_cast<const char*>(result.data()),std::streamsize(count*sizeof(Pixel)));
+                    if(!out) throw std::runtime_error("Could not write the composed picture");
+                }
                 value.write=milliseconds(writeStart);
             }
             return value;
@@ -165,11 +180,13 @@ int wmain(int argc,wchar_t** argv) {
         }
         if(out.is_open()) out.close();
         if(out.fail()) throw std::runtime_error("Could not finalize composed pictures");
+        if(pipe && !std::cout.flush()) throw std::runtime_error("Could not finish the picture pipe");
         const double wall=milliseconds(began), cpuTime=process_cpu_ms()-cpuStart;
         if(gpu) accelerator->sample_memory();
         PROCESS_MEMORY_COUNTERS memory{};
         GetProcessMemoryInfo(GetCurrentProcess(),&memory,sizeof(memory));
-        std::cout<<"{\"wall_ms\":"<<wall<<",\"cpu_ms\":"<<cpuTime
+        auto& stats=pipe?std::cerr:std::cout;
+        stats<<"{\"wall_ms\":"<<wall<<",\"cpu_ms\":"<<cpuTime
                  <<",\"input_ms\":"<<inputMs<<",\"setup_ms\":"<<setupMs
                  <<",\"peak_rss_bytes\":"<<memory.PeakWorkingSetSize
                  <<",\"gpu_local_bytes\":"<<(gpu?accelerator->localBytes:0)
@@ -178,22 +195,22 @@ int wmain(int argc,wchar_t** argv) {
                  <<",\"adapter\":\""<<(gpu?accelerator->adapterName:"")<<"\",\"memory_samples\":[";
         bool memoryComma=false;
         for(const auto& row:footprints) {
-            if(memoryComma) std::cout<<',';
+            if(memoryComma) stats<<',';
             memoryComma=true;
-            std::cout<<"{\"frames\":"<<row.frames<<",\"rss_bytes\":"<<row.rss
+            stats<<"{\"frames\":"<<row.frames<<",\"rss_bytes\":"<<row.rss
                      <<",\"gpu_local_bytes\":"<<row.local<<",\"gpu_nonlocal_bytes\":"<<row.shared<<'}';
         }
-        std::cout<<"],\"samples\":[";
+        stats<<"],\"samples\":[";
         bool comma=false;
         for(const auto& row:records) {
-            if(comma) std::cout<<',';
+            if(comma) stats<<',';
             comma=true;
-            std::cout<<"{\"work_ms\":"<<row.work<<",\"upload_ms\":"<<row.upload
+            stats<<"{\"work_ms\":"<<row.work<<",\"upload_ms\":"<<row.upload
                      <<",\"dispatch_ms\":"<<row.dispatch<<",\"gpu_ms\":";
-            if(row.gpuValid) std::cout<<row.shading; else std::cout<<"null";
-            std::cout<<",\"readback_ms\":"<<row.readback<<",\"write_ms\":"<<row.write<<'}';
+            if(row.gpuValid) stats<<row.shading; else stats<<"null";
+            stats<<",\"readback_ms\":"<<row.readback<<",\"write_ms\":"<<row.write<<'}';
         }
-        std::cout<<"]}\n";
+        stats<<"]}\n";
     } catch(const std::exception& error) {
         std::cerr<<error.what()<<'\n';
         return 1;
