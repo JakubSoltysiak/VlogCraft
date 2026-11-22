@@ -84,11 +84,18 @@ The two-frame 8K compatibility control ran three times. Median rates were 1.36 F
 
 Local loopback regression passed 166 Python tests and 29 JavaScript tests. The Phase 2 development MSI administrative image passed 44 bundle checks. Its SHA-256 is `f5106de11516c09651bfe0fdb6168b2f57d260753c0007d6817a34659f5784aa`. The previous Phase 1 MSI retained its recorded hash. The lab remains separate from the packaged editor. Hosted Windows regression, native and WARP checks, and MSI lifecycle passed on the recovered code checkpoint. [Windows Actions](https://github.com/JakubSoltysiak/VlogCraft/actions/runs/44972846213).
 
+The continuation passed 167 Python tests under the loopback-only guard in 63.804 s and all 29 JavaScript tests. The Windows workflow passed regression, native compilation/WARP and packaging after the pipe and temporal plan test. The previous development MSI serves as the local installer reference for this lab-only change. [Continuation Windows Actions](https://github.com/JakubSoltysiak/VlogCraft/actions/runs/45020018104).
+
 ## Direct readback-to-encoder pipe
 
 The standalone FP32 renderer now converts the mapped D3D11 staging surface directly to one reusable planar float output, then writes it to a bounded operating-system pipe. x265 consumes it through the verified serial zimg/Main10 path. The pipe removes the previously staged RGBA sequence and the unpacking step in Python. Source textures, the staging texture and the planar buffer are reused. The GPU completion and staging barriers remain explicit. On encoder failure or timeout, the launcher closes and joins both children before returning. Output only moves into place after the same clock, PCM and HDR10+ checks.
 
 For the progressive workload the fixture encodes and decodes two tagged three-picture SDR and PQ loops once. The compositor advances those cached pictures under animated geometry, opacity and a mask, then exercises a timed dissolve and stereo delivery. This fixture tests a changing picture and a real x265/HDR10+ pipeline. It keeps source loops resident and does not exercise live decoder scheduling or arbitrary user projects.
+
+```powershell
+python benchmarks/render_phase2_stream.py build/qa/phase2-repeat-24 --executable build/qa/phase2-repeat/VlogCraftRenderLab.exe --frames 24 --loops --compare-disk
+python benchmarks/render_phase2_stream.py build/qa/phase2-repeat-300 --executable build/qa/phase2-repeat/VlogCraftRenderLab.exe --frames 300 --loops
+```
 
 ### Matched AC trials and quality
 
@@ -105,3 +112,54 @@ The four-picture median dropped by 10.4%, and the changing 24-picture trial drop
 The qualifying camera retry used a tagged PQ snapshot on AC and compared against the independently captured frozen FFmpeg picture. The maximum RGB errors were 0.002160 for scalar and SIMD, 0.001795 for FP32 and 0.007583 for FP16. All passed the same acceptance limits. The tested original's before and after hashes matched. The two earlier attempts remain in the record. WARP exact-disk controls also passed, with the first harness error and corrected retry retained.
 
 The two deliberate UHD pipe deadlines expired while the encoder and producer were supervised. Both exited with the expected timeout, left zero owned members for supervisor cleanup, and published no verified master. Real D3D11 device removal and repeated long-running device recreation remain untested.
+
+### Progressive UHD60 delivery on Radeon 890M
+
+All rows have a 3840 × 2160, 60 fps output clock. Clocks, static HDR, exact decoded PCM and picture equality before and after HDR10+ insertion, and one correctly associated dynamic metadata record per output picture passed. The long rows use the same two decoded loops, an additional overlay and two-channel audio.
+
+| Pictures | Delivery wall | Output FPS | HDR10+ authoring | PCM endpoint | Peak summed working set |
+|---:|---:|---:|---:|---:|---:|
+| 4, direct median | 4.506 s | 0.888 | 1.115 s | 3,200 samples | 1.54 GiB |
+| 24 | 20.229 s | 1.186 | 4.763 s | 19,200 samples | 4.04 GiB |
+| 48 | 38.192 s | 1.257 | 9.131 s | 38,400 samples | 4.97 GiB |
+| 120 | 90.842 s | 1.321 | 21.681 s | 96,000 samples | 4.97 GiB |
+| 300 | 228.495 s | 1.313 | 55.365 s | 240,000 samples | 4.98 GiB |
+| 600 | 474.519 s | 1.264 | 110.275 s | 480,000 samples | 4.99 GiB |
+
+The four-picture row reports each metric's median. The other rows are single observations. Exact decoded equality against a matched disk-staged route extends through 24 pictures. Longer masters passed independent self-consistency checks before and after authoring. Setup, verification, memory observations and p95/p99 tails are in the [measurement record](benchmarks/studio-3.6.0-phase2.json).
+
+The 600-picture run recorded AC in all 525 one-second samples. Source preparation took 4.918 s, the initial D3D11 upload 392 ms and independent post-render verification 49.491 s. Compose/readback/transfer and FFmpeg conversion/encoding ran together for 363.869 s. GPU kernel median and p99 were 7.523 and 11.606 ms. Readback median and p99 were 14.274 and 16.760 ms. The blocking pipe write reached 554.019 ms median and 807.554 ms p99 while the consumer drained previous pictures. The timings overlap. Process-tree CPU use averaged 5.74% of machine capacity over the monitored interval. GPU engine occupancy was unavailable. HDR10+ authoring took 23% of delivery wall time.
+
+At pictures 300 and 600, DXGI local usage stayed at approximately 2.00 GiB and the compositor working set changed by less than 1 MiB. Peak summed working set held near 5 GiB across the 48 through 600 runs. DXGI and working-set figures can overlap on the unified-memory Radeon. This covers one 10-second output from a 474.5-second delivery operation and a fixed texture bank.
+
+The 600-picture rate projects 47.5 minutes for 3,600 pictures with these same loops. The full 60-second gate remains open. Extending the loops would repeat six decoded source pictures and would leave real timeline admission, streaming decode and production cleanup unqualified. The next representative measurement should use distinct camera pictures across the length of the project and begin once the transfer and delivery costs justify the run.
+
+### Isolated color conversion and Main10 encode
+
+An additional AC diagnostic recreated the exact two encoded 24-picture input loops, geometry and dissolve. It wrote the native planar float output to a temporary file, timed the existing single-thread zimg filter with `bench` around the conversion graph, then encoded the resulting PQ 10-bit YUV separately using the same x265 settings. The accepted retry compared per-picture decoded hashes against the verified piped master and probed the isolated output's range, matrix, transfer, primaries and pixel format.
+
+| Isolated stage | Wall | Additional observation |
+|---|---:|---|
+| Load the lab bank and emit planar float | 3.529 s | 2,388,787,200 bytes of diagnostic disk output |
+| Linear Rec.2020 to limited-range PQ YUV 4:2:0, including raw I/O | 12.648 s | 526.379 ms median and 539.985 ms p99 in the conversion filter |
+| CPU x265 Main10, including raw input and video mux | 1.841 s | Exact decoded images and valid PQ signal after explicitly tagging input frames |
+
+The first isolation attempt omitted frame-level PQ interpretation after re-opening the raw YUV and failed the decoded comparison. Both attempts are retained. The isolation introduces disk I/O and omits final audio mux and authoring, so timings describe this diagnostic separately from piped delivery. The largest measured cost is the serial conversion with error diffusion. HDR10+ picture analysis and authoring are another substantial cost. The next comparison should measure a small pool of independent frame conversions that keeps diffusion within each frame and emits frames in order. Compare that path and a GPU P010 conversion against the exact decoded reference with bounded queues and both source and output buffers accounted for.
+
+## Qualified architecture comparison
+
+These kernel rates and memory figures use the mixed UHD fixture at four pictures per trial. Memory is the median of per-arm peak process working sets. Delivery includes Main10 encoding, the audio mux and HDR10+ authoring. The frozen FFmpeg delivery range uses its two short AC pairs. The FP32 four-picture median uses the three direct-pipe measurements above. Compare delivery figures within the matched pairs, since the pipe change was measured separately from the frozen-renderer change.
+
+| Implementation | Kernel FPS | Delivery FPS | Kernel arm memory | Image correctness | Status |
+|---|---:|---:|---:|---|---|
+| Frozen FFmpeg | 0.060 | 0.029–0.047, short AC pairs | 6.08 GiB | Independent reference | Qualified production basis |
+| Native scalar | 1.72 | Unavailable | 513 MiB | Passed, max RGB error 0.002158 | Experimental |
+| Native 8-worker SSE2 | 14.63 | Unavailable | 513 MiB | Passed, same as scalar in this fixture | Experimental |
+| D3D11 FP32 | 138.94 | 0.888, short direct median | 1.15 GiB | Passed, max RGB error 0.001795 and 60.79 dB decoded PQ vs frozen | Experimental export candidate |
+| D3D11 FP16 | 173.54 | Unavailable | 1.15 GiB | Passed, max RGB error 0.007813 | Experimental kernel |
+
+The frozen arm includes FFmpeg launch and raw-input/filter overhead. The native kernel arms time prepared inputs and distinct completion points. The export candidate uses FP32 source and output surfaces with the shared double-precision coverage calculation. FP16 warrants separate end-to-end and HDR-edge qualification before any selection change.
+
+The installed native preview uses a float16 surface ring and a separate presentation and audio-clock contract. Mask and transition coverage still depend on fallback for the relevant production preview cases. The lab can share layer eligibility, geometry and color rules before any kernel replacement. Qualification needs calibrated display output and equivalent rendered pixels, clock stability, resize, seek and recovery on working timelines. The installed preview and its fallback were preserved.
+
+The separate AMF diagnostic used already-composited PQ input. Its 120-picture null-output comparison took 1.641 s versus 9.704 s for CPU x265, under different compression controls. AMF's delivered Main10 output lacked the required static mastering and content-light declarations. The direct pipe keeps CPU x265. The next hardware experiment needs a resident float-to-P010 conversion, precision and range validation, and a conformant Main10 mux with exact static and dynamic declarations, frame and audio clocks, and verified cleanup. [Encoder diagnostic](STUDIO_3_6_0_RENDERING.md#encoder-and-gpu-diagnostics).

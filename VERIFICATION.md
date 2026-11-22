@@ -6,7 +6,10 @@
 
 - All five frozen workloads completed on AC with byte-identical generated inputs. The largest fresh frozen UHD spatial case took 177.750 s for 48 frames, with independently verified output timing, PCM and per-picture HDR10+.
 - Scalar, SIMD and Radeon FP32 and FP16 passed the corrected scene-linear comparisons for eleven short cases. A half-pixel regression caught the old edge error and passed after shared double-precision coverage on hardware and WARP. The experimental four-frame UHD export passed exact audio timing, PCM, static HDR declarations and dynamic metadata association. A forced-unavailable renderer selected the verified fallback.
-- The resident shader processed 3,600 UHD pictures in 26.803 s with bounded sampled memory. The cancellation test left zero owned processes. Short 8K comparison passed against the scalar reference. Sustained encoded export, preview presentation and production selection remain open.
+- The resident shader processed 3,600 UHD pictures in 26.803 s with bounded sampled memory. The cancellation test left zero owned processes. Short 8K comparison passed against the scalar reference.
+- Three AC disk-vs-pipe four-picture trials reduced median delivery from 5.031 to 4.506 s. Each matched decoded pictures, PCM and static HDR declarations. A 24-picture changing SDR/PQ control also matched. Both deliberate active-pipe timeouts left zero owned children and published no master.
+- The 600-picture AC run delivered a 10-second UHD60 master in 474.519 s at 1.264 output FPS, with 600 checked HDR10+ records, the exact 480,000-sample PCM endpoint and 4.99 GiB peak summed working set. The single tagged private camera retry passed full-size reference comparisons and its source hash matched before and after. The representative 60-second project, actual device removal, preview presentation and production selection remain open.
+- The continuation passed 167 loopback-only Python and 29 JavaScript tests. Hosted Windows regression, native compilation, WARP verification and MSI lifecycle passed on the pipe and temporal plan checkpoint. [Windows Actions](https://github.com/JakubSoltysiak/VlogCraft/actions/runs/45020018104).
 
 ## 3.6.0 rendering performance Phase 1 — 22 November 2026
 

@@ -5,7 +5,7 @@ Tested means the specific check in VERIFICATION.md passed. Implemented means cod
 | 3.6.0 Phase 2 rendering lab | Status | Verified scope / remaining limits |
 |---|---|---|
 | Native CPU and D3D11 HDR compositing | Experimental | Standalone source-linear geometry, compositing, masks, opacity and dissolve, with hardware and WARP comparisons. Production keeps the qualified Phase 1 engine. |
-| Native output through HDR10+ authoring | Experimental | Laboratory export exercises CPU Main10 encoding, frame-clock normalization and the existing authoring verification and fallback. Production timeline decoding, device coverage and GPU-resident encode remain open. |
+| Native output through HDR10+ authoring | Experimental | Bounded FP32 readback pipe feeds the CPU Main10 writer. Short disk-vs-pipe pairs match decoded pictures and PCM. A 600-picture UHD60 loop delivered at 1.264 FPS with all HDR10+ records and exact audio endpoint. Timeline integration, device-loss coverage, GPU-resident encode and the representative 60-second delivery gate remain open. |
 
 | 3.6.0 rendering capability | Status | Verified scope / remaining limits |
 |---|---|---|
