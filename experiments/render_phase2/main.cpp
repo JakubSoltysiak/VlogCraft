@@ -46,11 +46,15 @@ void finish_live() {
         throw std::runtime_error("The live source stream could not be closed");
 }
 
-void validate(const Frame& frame,const InputHeader& input) {
+void validate(const Frame& frame,const InputHeader& input,bool project) {
     if(frame.width!=input.width || frame.height!=input.height ||
-        !frame.layers || frame.layers>3 || !std::isfinite(frame.dissolve) ||
+        frame.project!=unsigned(project) || (!project && !frame.layers) ||
+        frame.layers>(project?layerBudget:legacyLayerBudget) || !std::isfinite(frame.dissolve) ||
         frame.dissolve < -1 || frame.dissolve>1 || (frame.dissolve>=0 && frame.layers<2))
         throw std::runtime_error("Invalid frame parameters");
+    bool incoming=false,complete=false;
+    if(project && (!std::isfinite(frame.white)||frame.white<0||frame.white>10))
+        throw std::runtime_error("Invalid project white level");
     for(unsigned i=0;i<frame.layers;++i) {
         const auto& layer=frame.layer[i];
         const float values[]={layer.scale,layer.cosine,layer.sine,layer.x,layer.y,
@@ -60,7 +64,19 @@ void validate(const Frame& frame,const InputHeader& input) {
             layer.opacity<0 || layer.opacity>1 || layer.radius<=0 || layer.feather<=0 ||
             layer.slice>=input.images || layer.mask>2)
             throw std::runtime_error("Invalid layer parameters");
+        if(project) {
+            float gain;
+            std::memcpy(&gain,&layer.reserved2,sizeof(gain));
+            const auto op=layer.reserved1;
+            if(!std::isfinite(gain)||gain<0||gain>4096||op>4||
+               (incoming && op<2)||(!incoming && op>=2)||(complete&&op))
+                throw std::runtime_error("Invalid project layer operation");
+            incoming=op==1;
+            complete|=op>=2;
+        }
     }
+    if(project&&(incoming||complete!=(frame.dissolve>=0)))
+        throw std::runtime_error("Incomplete project transition");
 }
 
 double process_cpu_ms() {
@@ -111,34 +127,42 @@ int wmain(int argc,wchar_t** argv) {
         InputHeader input{};
         read_exact(plan,&input,sizeof(input));
         const bool hasPreciseGeometry=(input.images&0x80000000u)!=0;
-        input.images&=0x7fffffffu;
+        const bool project=(input.images&0x40000000u)!=0;
+        input.images&=0x3fffffffu;
         if(!input.width||input.width>7680||!input.height||input.height>4320||
            !input.images||input.images>8||!input.frames||input.frames>7200)
             throw std::runtime_error("Unsupported generated fixture dimensions");
         if(fault>=int(input.frames)) throw std::runtime_error("Fault is outside the trial");
-        if(resident&&input.images!=3) throw std::runtime_error("Two video and one still source slots required");
+        if(resident&&!project&&input.images!=3) throw std::runtime_error("Two video and one still source slots required");
+        if(project&&!hasPreciseGeometry) throw std::runtime_error("Project plans require precise geometry");
         const auto count=std::size_t(input.width)*input.height;
         if(count*input.images*sizeof(Pixel)>1ull<<31)
             throw std::runtime_error("Generated fixture exceeds the test texture budget");
         std::vector<Frame> frames(input.frames);
-        read_exact(plan,frames.data(),frames.size()*sizeof(Frame));
-        std::vector<Geometry> geometry(input.frames*3);
+        const unsigned wireLayers=project?layerBudget:legacyLayerBudget;
+        for(auto& frame:frames) read_exact(plan,&frame,project?sizeof(Frame):legacyFrameSize);
+        std::vector<Geometry> geometry(input.frames*layerBudget);
         if(hasPreciseGeometry) {
-            read_exact(plan,geometry.data(),geometry.size()*sizeof(Geometry));
-            for(const auto& g:geometry)
-                if(!std::isfinite(g.scale)||!std::isfinite(g.cosine)||!std::isfinite(g.sine)||
-                   !std::isfinite(g.x)||!std::isfinite(g.y)||g.scale<.1||g.scale>3||
-                   std::abs(g.cosine)>1||std::abs(g.sine)>1||std::abs(g.x)>2||std::abs(g.y)>2)
-                    throw std::runtime_error("Invalid precise geometry");
+            for(unsigned index=0;index<input.frames;++index) {
+                auto* row=geometry.data()+index*layerBudget;
+                read_exact(plan,row,wireLayers*sizeof(Geometry));
+                for(unsigned n=0;n<wireLayers;++n) {
+                    const auto& g=row[n];
+                    if(!std::isfinite(g.scale)||!std::isfinite(g.cosine)||!std::isfinite(g.sine)||
+                       !std::isfinite(g.x)||!std::isfinite(g.y)||g.scale<.1||g.scale>3||
+                       std::abs(g.cosine)>1||std::abs(g.sine)>1||std::abs(g.x)>2||std::abs(g.y)>2)
+                        throw std::runtime_error("Invalid precise geometry");
+                }
+            }
         } else {
             for(unsigned index=0;index<input.frames;++index)
-                for(unsigned n=0;n<frames[index].layers && n<3;++n) {
+                for(unsigned n=0;n<frames[index].layers && n<legacyLayerBudget;++n) {
                     const auto& p=frames[index].layer[n];
-                    geometry[index*3+n]={p.scale,p.cosine,p.sine,p.x,p.y};
+                    geometry[index*layerBudget+n]={p.scale,p.cosine,p.sine,p.x,p.y};
                 }
         }
         if(plan.peek()!=EOF) throw std::runtime_error("Unexpected extra frame parameters");
-        for(const auto& frame:frames) validate(frame,input);
+        for(const auto& frame:frames) validate(frame,input,project);
         std::vector<Pixel> texture(resident?0:count*input.images);
         if(live) read_live(texture.data(),texture.size()*sizeof(Pixel));
         else if(!resident) {
@@ -169,13 +193,13 @@ int wmain(int argc,wchar_t** argv) {
 #ifdef VLOGCRAFT_RESIDENT_DECODE
         std::unique_ptr<HardwareInputs> decoder;
         if(resident) decoder=std::make_unique<HardwareInputs>(*accelerator,sourceFile,
-            input.width,input.height,input.frames);
+            input.width,input.height,input.frames,input.images,project);
 #endif
         const double setupMs=milliseconds(setupStart);
 
         struct Sample { double work, upload, dispatch, shading, readback, write, color, normalize; bool gpuValid; };
         std::vector<Sample> records(input.frames);
-        std::vector<RowRange> coverage(input.height*3);
+        std::vector<RowRange> coverage(input.height*layerBudget);
         std::vector<Pixel> updated(live?count:0);
         const auto render=[&](unsigned index,bool measured){
             Sample value{};
@@ -195,7 +219,7 @@ int wmain(int argc,wchar_t** argv) {
             }
             const auto began=Clock::now();
             const auto& frame=frames[index];
-            prepare_ranges(frame,geometry.data()+index*3,coverage.data());
+            prepare_ranges(frame,geometry.data()+index*layerBudget,coverage.data());
             if(gpu) {
                 if(uploads) {
                     const auto start=Clock::now();

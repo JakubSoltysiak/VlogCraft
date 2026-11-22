@@ -500,6 +500,9 @@ async function startExport(){
  try{
   const delivery=$('exportWorkflow').value;
   const preserving=delivery==='hdr10plus-copy';
+  const nativeProject=!$('nativeProjectExport').hidden&&$('useNativeProjectExport').checked;
+  const comparisonMaster=nativeProject?$('comparisonMaster').value:'';
+  if(nativeProject&&!comparisonMaster)throw Error('Choose a verified comparison master for GPU rendering');
   const fixed=['samsung-hdr10plus','youtube-hdr'].includes(delivery);
   let renderSettings;
   if(!preserving){
@@ -522,6 +525,7 @@ async function startExport(){
   }
   await flushSave();
   const res=await request('export','POST',{path:destination.path,overwrite:destination.exists,delivery,
+                                         ...(nativeProject?{comparisonMaster}:{}),
                                          ...(delivery!=='render'&&!preserving?{settings:renderSettings}:{})});
   if(res.cancelled)return;
   started=true;

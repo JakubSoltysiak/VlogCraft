@@ -1,5 +1,15 @@
 # VlogCraft Studio development qualification
 
+## 3.6.0 Phase 2D saved-project GPU rendering
+
+[Architecture, effects and timing](docs/STUDIO_3_6_0_RENDERING_PHASE2D.md) and [measurement record](docs/benchmarks/studio-3.6.0-phase2d.json).
+
+- The unchanged 24-frame Phase 2C UHD60 project passed Radeon delivery in **18.731 s** through independent comparison, versus **113.253 s** frozen. The 120-frame extension passed in **36.092 s** versus **412.983 s**.
+- Both pairs matched video PTS, static HDR, decoded PCM and audio endpoints of 19,200 and 96,000 samples. Decoded PQ passed overall and per-picture 50 dB gates. Independent FFprobe inspection found one HDR10+ block on all 24 and 120 candidate pictures. The author separately validated each final decoded picture's payload.
+- The local loopback-only Windows suite passed **175 Python tests**, including six adapter/fallback tests and the WARP 29.97 fps saved-project case with simulated D3D11 removal. JavaScript passed **29 tests**. An isolated development MSI administrative image passed **47 identity/runtime/icon checks**. Its packaged editor passed both the 24-picture GPU opt-in and the ordinary 12-picture HDR10+ dialog export offline. The GPU test cancelled a second export without a published file, preserved project and media bytes and left no owned processes.
+- The three protected camera originals match the earlier recorded SHA-256 checks. Private folder, history paths, content objects and worktree text checks found zero matches. Only sanitized results are tracked.
+- General production qualification remains open. The opt-in requires a matching reference master. Physical device loss, broad native effect coverage, installed preview parity and the complete 60-second project require further evidence.
+
 ## 3.6.0 Phase 2C HDR10+ and resident source input
 
 [Draft PR #18](https://github.com/JakubSoltysiak/VlogCraft/pull/18) is stacked on Phase 2B at `899ad995fc6ffd013e1eac2c25339459887fedc6`. [Report](docs/STUDIO_3_6_0_RENDERING_PHASE2C.md) and [measurements](docs/benchmarks/studio-3.6.0-phase2c.json).

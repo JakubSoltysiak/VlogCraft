@@ -4,7 +4,7 @@
 **Project:** [JakubSoltysiak/VlogCraft](https://github.com/JakubSoltysiak/VlogCraft)  
 **Last consolidated:** 2026-11-22\
 **Source of requirements:** discussions about VlogCraft Studio, the Kenya travel vlog, Samsung Galaxy footage, the 3.0–3.4 development history, and GitHub PR #1.  
-**Current development state:** 3.3 verified baseline on main. **3.6.0 rendering Phase 2C is in draft PR #18**, stacked on #17. Exact accelerated authoring and resident decoder trials materially improve UHD delivery. Broader project admission, physical device recovery and native preview qualification remain open.
+**Current development state:** 3.3 verified baseline on main. **3.6.0 Phase 2D** is stacked on Phase 2C draft #18. The 24- and 120-picture saved projects pass the scoped native export comparison. Broader project admission, physical device recovery, production preview and the complete 60-second export remain open.
 
 > **Mission:** A free, private, offline-first, genuinely capable Windows filmmaking editor. Give one person Premiere-like creative freedom and professional picture/audio quality without cloud processing, subscriptions, arbitrary source-size limits, or unnecessary complexity. Prioritize editing actual travel/wildlife footage over collecting features. It should be delightful for a casual annual vlog yet powerful when needed.
 
@@ -31,6 +31,8 @@
 
 ## 3.6.0 performance investigation
 
+- [x] **VC-PERF-360-014 — Integrate saved-project native GPU export, scoped.** Exact Phase 2C 24-picture and changing 120-picture project pairs passed on Radeon 890M. Keep the independent picture and audio gate, reference default, whole-project fallback and optional development runtime. [Phase 2D results](docs/STUDIO_3_6_0_RENDERING_PHASE2D.md).
+- [ ] **VC-PERF-360-015 — Qualify general project GPU export without a prior master.** Verify a larger effect, profile, codec and timeline matrix. Keep fallback, atomic publication, physical device recovery, calibrated preview parity and sustained resource tests. GPU output still requires an independently verified reference master.
 - [x] **VC-PERF-360-004 — Compare native compositing in an experimental HDR export.** Scalar and SIMD CPU, D3D11 FP32/FP16, independently decoded frozen controls and automated FFmpeg fallback. FP32 is the measured candidate for a hybrid path. [Phase 2](docs/STUDIO_3_6_0_RENDERING_PHASE2.md).
 - [ ] **VC-PERF-360-005 — Stream eligible decoded surfaces into the native compositor.** Admit complete supported project ranges and fall back at the project boundary when effects or formats are unsupported. Verify equivalent output on sustained camera timelines, device loss, teardown and restart. Measure sustained delivery and preview clocks separately.
 - [x] **VC-PERF-360-006 — Remove raw output staging from the FP32 lab.** Three matched four-picture trials improved median delivery by 10.4%. The changing 24-picture pair passed exact decoded picture, audio and HDR checks. Two UHD deadline tests left no owned children or published output. [Measurements](docs/benchmarks/studio-3.6.0-phase2.json).
@@ -46,6 +48,25 @@
 - [ ] **VC-PERF-360-008 — Qualify a representative 60-second UHD60 project.** The fixed-loop lab verified 600 pictures at 1.264 delivered FPS with 4.99 GiB peak summed working set. Use live decoded camera sources, the full timeline graph, matched reference output and exact audio/HDR checks after the next transfer and delivery improvements.
 - [ ] **VC-PERF-360-003 — Qualify any HDR AV backend.** Keep the verified CPU Main10 path. A hardware path needs independently verified image quality, static mastering and content-light signalling, audio and frame clocks, dynamic metadata association and practical speed improvement.
 - [ ] **Compare VlogCraft and Adobe Premiere Pro on equivalent local workloads.** Adobe's documented GPU rendering and codec capabilities are recorded in the Phase 1 report. A same-workstation Premiere trace requires a local Premiere installation. Use equivalent sources, effects and output settings, and Windows Performance Recorder or GPUView where available.
+
+## Milestone roadmap
+
+The completed rows identify development checkpoints. Release readiness is assessed separately.
+
+| Milestone | Completed functionality | Remaining work and blockers | Verification and next step |
+|---|---|---|---|
+| 3.3 foundation | Verified offline Windows editor baseline, editing, linked originals, project recovery and MSI. | Broader professional editing effects and long UHD projects belong to later milestones. | Retain the verified tag, project migration and installer regression coverage. |
+| 3.4 native playback | Native preview development, frame-clock and audio work, workload profiling, WebView recovery and resource cleanup. | Sustained stalls, audio tails, device recovery and some memory acceptance gates remain open. | Retain all measured outliers and compare matched visible and occluded runs in Phase 3. |
+| 3.5 HDR editing | Managed FP32 Rec.2020, PQ Main10, final-picture HDR10+ authoring, managed creative layers and transitions, and exact audio crossfades in tested scopes. | Wider creative grading, HLG/Log calibration, physical HDR display and long delivery remain open. | Expand camera-profile and installed display checks after the export path is stable. |
+| 3.6 Phase 1 CPU rendering | Reduced the cost of managed still, matte and affine work while retaining the reference graph. | Long multi-effect CPU work stays expensive. | Keep frozen decoded controls and managed fallback for later GPU comparisons. |
+| 3.6 Phase 2 native architecture | Compared scalar, SSE2, D3D11 FP32/FP16, readback pipes and half-pixel geometry. | Standalone lab benchmark coverage does not establish arbitrary timeline parity. | Preserve kernel/WARP comparisons and use FP32 on edited timelines. |
+| 3.6 Phase 2B HDR conversion | Validated parallel exact zimg and bounded GPU packed Main10 on selected controls. | Alternative HDR encoders and broader color coverage remain open. | Keep x265 and verify static, dynamic and decoded 10-bit delivery on real projects. |
+| 3.6 Phase 2C HDR10+ and input | Accelerated byte-identical final-picture metadata and verified resident D3D11VA on mixed SDR/PQ test sources. | Saved-project routing and broad decoder coverage were pending at the checkpoint. | Preserve final-decoded-picture authority and its archived receipts. |
+| 3.6 Phase 2D project integration | Native provider supplies actual saved-project video spans. Exact 24-picture project and 120-picture extension passed paired comparisons. | Requires a matching reference master. Broader effect admission, recovery and long export remain open. | Keep reference default and expand matched project/effect coverage before changing policy. |
+| 3.6 Phase 3 memory, cache and stability | Baselines and failure cases are available from 3.4 stability work and the 3.6 rendering trials. | Need sustained memory, bounded cache ownership, stable playback, precise audio and responsive seeking. | Run paired private 4K60 editing endurance, monitor WebView/worker/GPU memory and preserve every stall and underrun. |
+| Phase 3 qualification | Existing test tooling covers process ownership, crash recovery and installer isolation. | Physical device removal/restoration, exhausted resources, interrupted jobs, long memory behavior and calibrated preview parity remain blockers. | Verify real recovery and repeated exports on multiple Windows configurations with unchanged originals. |
+| 3.6 Final | Scoped benchmarks and reference delivery are established. | Full matched 60-second 4K60 HDR10+ project, stable playback, actual HDR display acceptance and distribution review remain open. | Run complete project, calibrated display and release regressions before a production tag or binary. |
+| Future advanced editing, AI and high frame rates | Existing offline proposals and editing foundations provide starting points. | Additional effects and color tools, offline AI expansion, 4K120 and 8K60 require separate performance and quality budgets. | Prioritize editor reliability, then measure real workloads under explicit opt-in and preserve reference exports. |
 
 ## 3.4.9 reliability acceptance — 14 November 2026
 

@@ -50,7 +50,7 @@ def executable_version():
     return file
 
 
-def build(wix,experimental_native=False):
+def build(wix,experimental_native=False,experimental_project_export=False):
     os.chdir(ROOT)
     RELEASE.mkdir(exist_ok=True)
     BUILD.mkdir(exist_ok=True)
@@ -83,16 +83,19 @@ def build(wix,experimental_native=False):
                     '--exclude-module', 'sitecustomize', '--exclude-module', 'benchmarks',
                     '--exclude-module', 'tkinter', 'desktop.py'], check=True)
     bundle = ROOT / 'dist' / 'VlogCraftStudio'
-    if experimental_native:
+    if experimental_native or experimental_project_export:
         import json
         runtime=ROOT/'build/tools/architecture'
         sdk=runtime/'ffmpeg-shared/ffmpeg-9.0.2-full_build-shared'
-        executable=runtime/'VlogCraftNative.exe'
-        if not executable.is_file() or not (sdk/'bin').is_dir():
-            raise RuntimeError('Build the optional native runtime with tools/setup_architecture_lab.py first')
+        binaries=[]
+        if experimental_native:
+            binaries.extend(('VlogCraftNative.exe','VlogCraftProbe.exe','VlogCraftStorageProbe.exe'))
+        if experimental_project_export:
+            binaries.extend(('VlogCraftProject.exe','hdr-statistics.dll'))
+        if not all((runtime/name).is_file() for name in binaries) or not (sdk/'bin').is_dir():
+            raise RuntimeError('Build the selected optional native runtime with tools/setup_architecture_lab.py first')
         target=bundle/'_internal/engine/native';target.mkdir(parents=True,exist_ok=True)
-        shutil.copy2(executable,target/executable.name)
-        for name in ('VlogCraftProbe.exe','VlogCraftStorageProbe.exe'):shutil.copy2(runtime/name,target/name)
+        for name in binaries:shutil.copy2(runtime/name,target/name)
         for library in (sdk/'bin').glob('*.dll'):shutil.copy2(library,target/library.name)
         for license_file in sdk.glob('LICENSE*'):shutil.copy2(license_file,target/license_file.name)
         manifest={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in target.iterdir() if p.is_file()}
@@ -147,4 +150,5 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--wix', type=Path, default=BUILD / 'tools' / 'wix')
     parser.add_argument('--experimental-native',action='store_true',help='Bundle the already compiled local native runtime; keep the default renderer')
-    options=parser.parse_args();build(options.wix,options.experimental_native)
+    parser.add_argument('--experimental-project-export',action='store_true',help='Bundle the opt-in project renderer for development qualification')
+    options=parser.parse_args();build(options.wix,options.experimental_native,options.experimental_project_export)

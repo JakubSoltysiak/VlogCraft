@@ -110,6 +110,14 @@ def run(project):
 
     server.choose_files = select_media
     server.choose_save_path = choose_export
+    runtime = BUNDLE / 'engine/native'
+    if all((runtime/name).is_file() for name in ('VlogCraftProject.exe','hdr-statistics.dll')):
+        server.NATIVE_PROJECT_RUNTIME = runtime
+        def choose_comparison_master():
+            files=window.create_file_dialog(webview.FileDialog.OPEN,allow_multiple=False,
+                                            file_types=('MP4 video (*.mp4)',))
+            return files[0] if files else None
+        server.CHOOSE_COMPARISON_MASTER = choose_comparison_master
     server.DESKTOP_ACTION = project_action
     import native_playback
     server.NATIVE_PLAYBACK=native_playback.Controller(window,cache,BUNDLE)
@@ -211,6 +219,8 @@ def run(project):
                 server.CANCEL[key].set()
                 if process and process.poll() is None:
                     process.terminate()
+        if server.NATIVE_EXPORT_THREAD:
+            close_step('native_project_export',lambda:server.NATIVE_EXPORT_THREAD.join(timeout=10))
         close_step('http_listener',http.shutdown)
         close_step('http_connections',http.server_close)
         close_step('cache_workers',lambda:server.CACHE_WORKERS.shutdown(wait=True,cancel_futures=True))
