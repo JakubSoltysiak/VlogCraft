@@ -10,7 +10,7 @@ from windows_session import session
 from window_visibility import WindowVisibility
 
 
-def trial(executable, media, output, proxy):
+def trial(executable, media, output, proxy, proxy_source=None):
     with session(executable, output, offline=True) as (page, process, _, errors):
         assets = page.evaluate("""async paths=>{
           const result=await request('import','POST',{paths,autoProxy:false});
@@ -20,11 +20,12 @@ def trial(executable, media, output, proxy):
           $('playbackEngine').value='interactive';$('previewSource').value='original';
           useProxies=false;addAsset(result.assets[0]);await flushSave();
           return result.assets.map(a=>a.id);
-        }""", [str((media/f'h264-4k60-{n}.mp4').resolve()) for n in range(2)])
+        }""", [str((media/'h264-4k60-0.mp4').resolve()),
+               str((proxy_source or media/'h264-4k60-1.mp4').resolve())])
         page.wait_for_function("document.querySelector('#previewLayers video')?.readyState>=2")
         initial = resources(process)
         with WindowVisibility(process, 'visible') as visibility:
-            if proxy:
+            if proxy and not proxy_source:
                 page.evaluate("assetId=>request('proxy','POST',{assetId})",assets[1])
             page.evaluate("""()=>{
               const v=document.querySelector('#previewLayers video');
@@ -35,6 +36,8 @@ def trial(executable, media, output, proxy):
             }""")
             page.click('#playBtn')
             page.wait_for_function('isPlaying')
+            if proxy_source:
+                page.evaluate("assetId=>request('proxy','POST',{assetId})",assets[1])
             deadline = time.monotonic()+4
             samples = []
             while time.monotonic() < deadline:
@@ -53,6 +56,9 @@ def trial(executable, media, output, proxy):
                 source:[v.videoWidth,v.videoHeight]};
             }""")
             condition = visibility.finish()
+            if proxy and page.evaluate("async()=>(await request('jobs')).proxy.status==='rendering'"):
+                page.evaluate("request('job/cancel','POST',{job:'proxy'})")
+                page.wait_for_function("async()=>(await request('jobs')).proxy.status!=='rendering'",timeout=15000)
         result.update(proxy_requested=proxy, proxy_active_samples=sum(s['status']=='rendering' for s in samples),
                       initial=initial, samples=samples, stopped=resources(process), window=condition,
                       failed=bool(errors or not condition['condition_held']), browser_errors=errors)
@@ -66,8 +72,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ('executable','media','results'):
         parser.add_argument(name,type=Path)
+    parser.add_argument('--proxy-source',type=Path,help='Run only the contention arm with a longer generated source')
     args = parser.parse_args()
-    outcomes = [trial(args.executable,args.media,args.results/label,proxy)
-                for label,proxy in (('idle',False),('proxy',True))]
+    arms = (('proxy',True),) if args.proxy_source else (('idle',False),('proxy',True))
+    outcomes = [trial(args.executable,args.media,args.results/label,proxy,args.proxy_source)
+                for label,proxy in arms]
     print(json.dumps(outcomes),flush=True)
     sys.exit(any(result['failed'] for result in outcomes))

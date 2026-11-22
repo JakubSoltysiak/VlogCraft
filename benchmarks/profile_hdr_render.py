@@ -65,11 +65,11 @@ def process_runner(log, gpu=False):
                               frames=progress_frames(progress), **sample)
                     if monitor and time.monotonic() >= next_gpu_sample:
                         monitor.sample({child.pid})
-                        next_gpu_sample = time.monotonic()+1
+                        next_gpu_sample = time.monotonic()+.15
                 except (psutil.NoSuchProcess, FileNotFoundError):
                     pass
                 try:
-                    child.wait(timeout=.4)
+                    child.wait(timeout=.15 if monitor else .4)
                 except subprocess.TimeoutExpired:
                     continue
         details = stem.with_suffix('.ffmpeg.log').read_text(encoding='utf-8', errors='replace')
@@ -117,7 +117,7 @@ def compare_delivery(fixture, baseline, candidate):
             'frames': len(left)}
 
 
-def verify_encoders(fixture, folder, count):
+def verify_encoders(fixture, folder, raw, count):
     results = {}
     for label in ('cpu-encode', 'amf-encode'):
         source, marked = folder/(label+'.mp4'), folder/(label+'-authored.mp4')
@@ -129,11 +129,15 @@ def verify_encoders(fixture, folder, count):
         row = {key: video.get(key) for key in (*fixture.hdr10plus_master.VIDEO_FIELDS,
                                               'nb_frames','time_base','duration_ts','avg_frame_rate')}
         row['static_metadata'] = [v['side_data_type'] for v in fixture.hdr10plus_master.static_metadata(video)]
+        frames = json.loads(fixture.ff('ffprobe','-v','error','-select_streams','v:0',
+                                       '-show_frames','-of','json',str(source)))['frames']
+        row['picture_static_metadata'] = sorted({v['side_data_type'] for frame in frames
+            for v in fixture.hdr10plus_master.static_metadata(frame)})
         row['bytes'] = source.stat().st_size
         quality = subprocess.run(['ffmpeg','-v','info','-threads','2','-i',str(source),
                                   '-f','rawvideo','-pixel_format','yuv420p10le',
                                   '-video_size',f"{video['width']}x{video['height']}",
-                                  '-framerate','60','-i',str(folder/'same-input.yuv'),
+                                  '-framerate','60','-i',str(raw),
                                   '-lavfi','psnr','-an','-f','null','-'], capture_output=True,
                                  creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0),check=True,timeout=90)
         psnr = re.search(rb'PSNR y:([\d.]+|inf) u:([\d.]+|inf) v:([\d.]+|inf) average:([\d.]+|inf)',quality.stderr)
@@ -169,11 +173,12 @@ def main(args):
         print(json.dumps(comparison), flush=True)
         return 0 if all(comparison.values()) else 1
     width, height = map(int, args.size.split('x'))
+    raw = args.raw_input.resolve() if args.raw_input else result/'same-input.yuv'
     if args.verify_encoders:
-        count, remainder = divmod((result/'same-input.yuv').stat().st_size,width*height*3)
+        count, remainder = divmod(raw.stat().st_size,width*height*3)
         if not count or remainder:
             raise ValueError('The raw diagnostic does not contain complete 10-bit 4:2:0 pictures')
-        verify_encoders(fixture, result, count)
+        verify_encoders(fixture, result, raw, count)
         return
     log = result.with_suffix('.profile.jsonl')
     if log.exists() or result.exists():
@@ -210,7 +215,6 @@ def main(args):
     graph = graph_path.read_text(encoding='utf-8')
     encoder = command.index('-c:v')
     null_picture = ['-c:v', 'wrapped_avframe', '-f', 'null', '-']
-    raw = result/'same-input.yuv'
     for label in args.variant:
         selected = command[:]
         input_graph = graph
@@ -263,10 +267,13 @@ def main(args):
                 selected[1:1] = ['-noauto_conversion_filters','-filter_complex_threads','1']
                 selected[-len(null_picture):-len(null_picture)] = ['-filter_complex',';'.join(picture_filters),'-map','[picture]']
         if label == 'write-pq':
+            if args.raw_input:
+                raise ValueError('Use a separate output directory for raw picture capture')
             selected = selected[:encoder]+['-c:v','rawvideo','-threads:v','1','-f','rawvideo',str(raw)]
         if label in ('cpu-encode', 'amf-encode'):
+            signaling = 'setsar=1,setparams=range=limited:color_primaries=bt2020:color_trc=smpte2084:colorspace=bt2020nc'
             selected = ['ffmpeg','-v','error','-nostdin','-y','-f','rawvideo','-pixel_format','yuv420p10le',
-                        '-video_size',args.size,'-framerate','60','-i',str(raw),'-vf','setsar=1',
+                        '-video_size',args.size,'-framerate','60','-i',str(raw),'-vf',signaling,
                         *command[encoder:-1],str(result/(label+'.mp4'))]
             if label == 'amf-encode':
                 quality_options = ['-c:v','hevc_amf','-profile','main10','-bitdepth','10','-pix_fmt','p010le',
@@ -289,6 +296,7 @@ if __name__ == '__main__':
     parser.add_argument('--opacity-motion', action='store_true')
     parser.add_argument('--compare-to', type=Path, help='Compare two completed mixed export directories')
     parser.add_argument('--verify-encoders', action='store_true')
+    parser.add_argument('--raw-input', type=Path, help='Reuse previously captured PQ pictures for encoder diagnostics')
     parser.add_argument('--isolate-scene', type=int)
     parser.add_argument('--gpu', action='store_true', help='Separately sample Windows GPU engines for this diagnostic')
     parser.add_argument('--variant', action='append', default=[],
