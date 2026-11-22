@@ -26,6 +26,7 @@ def main():
     parser.add_argument("--runtime",type=Path)
     parser.add_argument("--author-dll",type=Path)
     parser.add_argument("--compare-master",type=Path)
+    parser.add_argument("--first-time",action="store_true",help="Use the scoped Phase 3A verification policy")
     parser.add_argument("--report",type=Path)
     parser.add_argument("--resources",action="store_true",help="Sample owned processes and Windows GPU counters")
     parser.add_argument("--diagnostics",type=Path,help="Private qualification output directory")
@@ -43,13 +44,14 @@ def main():
         resources = Resources(os.getpid(),gpu=True)
     try:
         if args.backend=="d3d11":
-            if args.worker is None or args.compare_master is None:
-                parser.error("D3D11 qualification requires a native worker and an independent reference master")
+            if args.worker is None or args.first_time==(args.compare_master is not None):
+                parser.error("D3D11 requires a worker and either a comparison master or --first-time")
             def fallback():
                 print("Native export rejected. Rendering the complete project with the reference backend.",flush=True)
                 export_project(state,args.destination,authoring=options)
             export_native(state,args.destination,args.compare_master,args.worker,args.runtime,authoring=options,
                           progress=lambda value,message:print(f"{value}% {message}",flush=True),
+                          first_time=args.first_time,
                           fallback=None if args.diagnostic_no_fallback else fallback,
                           diagnostics=args.diagnostics,record=result)
         else:

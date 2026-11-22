@@ -646,7 +646,7 @@ def publish_export(part, dest, assets, overwrite):
         os.link(part,dest)  # Atomic no-clobber publication on POSIX.
 
 
-def run_export(snapshot,path,review=False,overwrite=False,delivery='render',authored_frames=0,comparison=None):
+def run_export(snapshot,path,review=False,overwrite=False,delivery='render',authored_frames=0,comparison=None,first_time=False):
     dest=Path(path)
     owned=ExitStack()
     try:
@@ -707,12 +707,14 @@ def run_export(snapshot,path,review=False,overwrite=False,delivery='render',auth
             except (OSError,ValueError):
                 reference_fallback()
                 return
-            export_native(snapshot,dest,comparison,runtime/'VlogCraftProject.exe',runtime,
-                          authoring=authoring,cancelled=CANCEL['export'].is_set,progress=progress,timeout=1200,
-                          fallback=reference_fallback,scratch=temp,
-                          publish=lambda part,target:publish_export(part,target,snapshot['assets'],overwrite))
+            receipt=export_native(snapshot,dest,comparison,runtime/'VlogCraftProject.exe',runtime,
+                                  authoring=authoring,cancelled=CANCEL['export'].is_set,progress=progress,timeout=1200,
+                                  fallback=reference_fallback,scratch=temp,first_time=first_time,
+                                  publish=lambda part,target:publish_export(part,target,snapshot['assets'],overwrite))
+            job_status('export',deliveredBackend=receipt['delivered_backend'],
+                       verificationPolicy=receipt['verification_policy'])
         try:
-            if comparison is None:
+            if comparison is None and not first_time:
                 deliver()
             else:
                 deliver_native()
@@ -1381,6 +1383,12 @@ class Handler(BaseHTTPRequestHandler):
                 if dest.exists() and not overwrite:
                     raise ValueError('Output already exists. Confirm replacement to export.')
                 comparison=None
+                first_time=data.get('experimentalFirstExport') is True
+                if 'experimentalFirstExport' in data and (
+                    not first_time or delivery!='hdr10plus-master' or NATIVE_PROJECT_RUNTIME is None or
+                    'comparisonMaster' in data
+                ):
+                    raise ValueError('Experimental first export requires an edited HDR10+ master and its own verification mode')
                 if 'comparisonMaster' in data:
                     if delivery!='hdr10plus-master' or NATIVE_PROJECT_RUNTIME is None:
                         raise ValueError('Experimental GPU project export is unavailable for this delivery')
@@ -1403,10 +1411,11 @@ class Handler(BaseHTTPRequestHandler):
                         target,args=run_hdr10plus_copy,(snap,str(dest),overwrite)
                     else:
                         target,args=run_export,(snap,str(dest),review,overwrite,delivery,authored_frames)
-                    if comparison is not None:
-                        args=(*args,comparison)
+                    native=first_time or comparison is not None
+                    if native:
+                        args=(*args,comparison,first_time)
                     thread=threading.Thread(target=target,args=args,daemon=True)
-                    NATIVE_EXPORT_THREAD=thread if comparison is not None else None
+                    NATIVE_EXPORT_THREAD=thread if native else None
                     thread.start()
                 if not review:remember_export_folder(dest)
                 return self.json_response({'started':True,'url':'/download/'+dest.name if review else None})

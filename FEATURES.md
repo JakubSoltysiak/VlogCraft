@@ -2,6 +2,12 @@
 
 Tested means the specific check in VERIFICATION.md passed. Implemented means code is available with further acceptance coverage needed. Partial identifies implemented behavior with material gaps. Missing identifies an unavailable capability. A test result qualifies its fixture and environment.
 
+| 3.6.0 Phase 3A GPU export | Status | Verified scope and remaining limits |
+|---|---|---|
+| Full-master GPU plus bounded GOP repair | Tested subset | Isolated 300-picture dissolve repaired with the unchanged reference settings. Final candidate passed all pictures, timestamps, audio samples, and HDR10+ associations. Whole-project fallback remains available. |
+| First export with independent verification | Experimental | Short Radeon 890M UHD60 straight cuts using the qualified SDR/PQ sources and Ultrafast CRF 15. All clock and audio checks and selected visual checks. Full offline comparisons cover the tested fixtures. Other supported editing operations require full-master verification or FFmpeg. |
+| Broad first-export admission | Partial | Wider effects, profiles, drivers, and unexamined visual behavior require further acceptance. |
+
 | 3.6.0 Phase 2D saved-project export | Status | Verified scope and remaining limits |
 |---|---|---|
 | D3D11 project timeline through HDR10+ delivery | Tested subset | Exact Phase 2C 24-picture project and changing 120-picture extension passed independent picture, audio, clock and HDR checks on Radeon. Optional developer installer and a matching reference master are required. |

@@ -93,7 +93,8 @@ int wmain(int argc,wchar_t** argv) {
         if(argc!=8 && argc!=9)
             throw std::runtime_error("Use: phase2 mode plan sources output warmup workers upload [fault-frame]");
         const std::wstring mode=argv[1];
-        const bool gpu=mode==L"gpu32"||mode==L"gpu16"||mode==L"warp32";
+        const bool firstExport=mode==L"gpu32-first-export";
+        const bool gpu=firstExport||mode==L"gpu32"||mode==L"gpu16"||mode==L"warp32";
         const bool half=mode==L"gpu16";
         if(!gpu && mode!=L"scalar" && mode!=L"simd") throw std::runtime_error("Unknown compositor mode");
         const int warmup=std::stoi(argv[5]), workers=std::stoi(argv[6]), uploads=std::stoi(argv[7]);
@@ -128,6 +129,8 @@ int wmain(int argc,wchar_t** argv) {
         read_exact(plan,&input,sizeof(input));
         const bool hasPreciseGeometry=(input.images&0x80000000u)!=0;
         const bool project=(input.images&0x40000000u)!=0;
+        if(firstExport&&(!project||!resident||!pq))
+            throw std::runtime_error("First-export verification requires a resident Main10 project");
         input.images&=0x3fffffffu;
         if(!input.width||input.width>7680||!input.height||input.height>4320||
            !input.images||input.images>8||!input.frames||input.frames>7200)
@@ -187,6 +190,8 @@ int wmain(int argc,wchar_t** argv) {
         if(gpu) accelerator=std::make_unique<GpuCompositor>(input.width,input.height,input.images,
             resident?nullptr:texture.data(),half,save,mode==L"warp32",pq,resident);
         else cpu=std::make_unique<CpuCompositor>(mode==L"scalar"?0:workers);
+        if(firstExport && accelerator->adapterName!="AMD Radeon(TM) 890M Graphics")
+            throw std::runtime_error("First-export verification requires the qualified Radeon 890M adapter");
         if(gpu && !uploads) {
             std::vector<Pixel>().swap(texture);
         }

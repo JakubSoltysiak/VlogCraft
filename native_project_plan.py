@@ -222,11 +222,11 @@ def run_capture(command,timeout=90,*,cancelled=lambda:False,cwd=None):
                 process.kill()
 
 
-def append_video(output,slot,src,frame_count,cancelled):
+def append_video(output,slot,src,frame_count,cancelled,*,first_time=False):
     limit = max(src.requests.values())+2
     if limit>122:
         raise Ineligible("Source selection exceeds the qualified resident preroll window")
-    fields = ("stream=width,height,time_base,codec_name,pix_fmt,color_primaries,color_transfer,color_space,"
+    fields = ("stream=width,height,time_base,codec_name,profile,pix_fmt,color_primaries,color_transfer,color_space,"
               "color_range,field_order:frame=best_effort_timestamp:format=start_time")
     info = json.loads(run_capture(["ffprobe","-v","error","-read_intervals",f"%+{float(limit):.8f}",
                                    "-select_streams","v:0","-show_entries",fields,"-of","json",src.path],
@@ -237,6 +237,11 @@ def append_video(output,slot,src,frame_count,cancelled):
     video = streams[0]
     tags = tuple(video.get(key) for key in ("color_primaries","color_transfer","color_space"))
     pq = tags==("bt2020","smpte2084","bt2020nc")
+    if first_time and (video.get("codec_name"),video.get("pix_fmt"),pq) not in (
+            ("h264","yuv420p",False),("hevc","yuv420p10le",True)):
+        raise Ineligible("First export requires qualified H.264 SDR or HEVC Main10 PQ video")
+    if first_time and pq and video.get("profile")!="Main 10":
+        raise Ineligible("First export requires the qualified HEVC Main10 profile")
     if (video.get("codec_name") not in ("h264","hevc") or video.get("pix_fmt") not in ("yuv420p","yuv420p10le") or
             video.get("field_order") not in (None,"unknown","progressive") or
             (not pq and tags!=("bt709","bt709","bt709")) or
@@ -264,6 +269,7 @@ def append_video(output,slot,src,frame_count,cancelled):
     output.write(name)
     np.asarray(stamps[:last],dtype="<i8").tofile(output)
     np.asarray(selected,dtype="<i4").tofile(output)
+    return base,origin,stamps[:last],selected
 
 
 def append_still(output,slot,src,program,cancelled):
@@ -292,12 +298,14 @@ def append_still(output,slot,src,program,cancelled):
     rgba.tofile(output)
 
 
-def write_sources(path,program,cancelled=lambda:False):
+def write_sources(path,program,cancelled=lambda:False,*,first_time=False):
+    clocks={}
     with path.open("wb") as output:
         videos = [(n,src) for n,src in enumerate(program.sources) if src.kind=="video"]
         stills = [(n,src) for n,src in enumerate(program.sources) if src.kind!="video"]
         output.write(struct.pack("<4s2I",b"VSD2",len(videos),len(stills)))
         for slot,src in videos:
-            append_video(output,slot,src,len(program.frames),cancelled)
+            clocks[slot]=append_video(output,slot,src,len(program.frames),cancelled,first_time=first_time)
         for slot,src in stills:
             append_still(output,slot,src,program,cancelled)
+    return clocks

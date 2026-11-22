@@ -16,6 +16,7 @@ import hdr10plus_export
 from hdr10plus_index import SIDE_DATA
 import hdr10plus_master
 import render_engine
+import sequences
 
 
 CREATE_FLAGS = getattr(subprocess,"CREATE_NO_WINDOW",0)
@@ -241,20 +242,54 @@ def compare_project(reference, candidate, program, work, cancelled=lambda:False)
                 decoded_pq_psnr_db=average[1].decode(),per_frame_psnr_db=scores)
 
 
+def failed_gop(program,comparison):
+    """Allow one bounded picture-only repair after the delivery checks passed."""
+    if comparison["passed"]:
+        return None
+    scores=comparison["per_frame_psnr_db"]
+    structural=("exact_video_pts","static_hdr_matches","video_declaration_matches","exact_decoded_pcm")
+    if (not all(comparison[key] for key in structural) or
+        comparison["hdr10plus_picture_associations"]!=len(program.frames) or
+        float(comparison["decoded_pq_psnr_db"])<50 or len(scores)!=len(program.frames)):
+        return None
+    failures=[index for index,value in enumerate(scores) if float(value)<50]
+    for index,(start,end) in enumerate(program.spans):
+        if failures and all(start<=frame<end for frame in failures) and end-start<=min(16,len(scores)//4):
+            return index
+    return None
+
+
+def repair_gop(state,program,work,index,static,native,cancelled):
+    """Replace one closed GOP with managed pictures and rebuild the original clocks."""
+    flat=sequences.playback(state)
+    render_work=work/"render"
+    segments=[(float(start/program.fps),float(end/program.fps)) for start,end in program.spans]
+    parts=[render_work/f"segment_{number:05d}.mov" for number in range(len(segments))]
+    if not all(part.is_file() for part in parts):
+        raise NativeFailure("The original segment set is incomplete")
+    start,end=segments[index]
+    render_engine.render_range(flat,start,end,parts[index],render_work,runner=native.run)
+    render_engine.finish_segments(flat,static,render_work,segments,parts,cancelled=cancelled,runner=native.run)
+
+
 def export_native(state,destination,reference,executable,runtime,*,authoring=None,timeout=240,
                   cancelled=lambda:False,progress=lambda *_:None,mode="gpu32",fault=None,diagnostics=None,
-                  fallback=None,record=None,scratch=None,publish=os.link):
+                  fallback=None,record=None,scratch=None,publish=os.link,repair=True,first_time=False):
     destination = destination.resolve()
     if publish is os.link and destination.exists():
         raise FileExistsError("Choose a new output path")
     if cancelled():
         raise RuntimeError("Export cancelled")
     destination.parent.mkdir(parents=True,exist_ok=True)
-    reference = reference.resolve(strict=True)
-    if reference==destination or (destination.exists() and reference.samefile(destination)):
-        raise ValueError("Choose a destination different from the comparison master")
+    if first_time != (reference is None):
+        raise ValueError("Select either first-export verification or a comparison master")
+    if reference is not None:
+        reference=reference.resolve(strict=True)
+        if reference==destination or (destination.exists() and reference.samefile(destination)):
+            raise ValueError("Choose a destination different from the comparison master")
     result = record if record is not None else {}
     result["requested_backend"] = "d3d11"
+    result["verification_policy"] = "first-export-sampled" if first_time else "full-master"
     started = time.perf_counter()
     publishing = False
     try:
@@ -263,11 +298,19 @@ def export_native(state,destination,reference,executable,runtime,*,authoring=Non
             program = compile_project(state,work)
             if count!=len(program.frames):
                 raise NativeFailure("The planned frame count differs from the HDR10+ contract")
+            if first_time:
+                from native_project_verification import eligible, source_snapshot, verify_delivery
+                flat,contract=eligible(state,program)
+                original_sources=source_snapshot(flat)
+                if destination in original_sources or (destination.exists() and
+                    any(destination.samefile(source) for source in original_sources)):
+                    raise ValueError("Choose a destination different from source media")
             write_plan(work/"plan.bin",program)
-            write_sources(work/"sources.bin",program,cancelled)
+            clocks=write_sources(work/"sources.bin",program,cancelled,first_time=first_time)
             result.update(frames=count,prepare_seconds=time.perf_counter()-started)
             static,master = work/"static.mp4",work/"master.mp4"
-            with ProjectVideo(program,work,executable,runtime,timeout,cancelled,mode,fault) as native:
+            worker_mode="gpu32-first-export" if first_time else mode
+            with ProjectVideo(program,work,executable,runtime,timeout,cancelled,worker_mode,fault) as native:
                 render_started = time.perf_counter()
                 render_engine.render(state,static,work/"render",popen=native,cancelled=cancelled,
                                      on_progress=lambda p,m:progress(round(p*.8),m))
@@ -275,31 +318,54 @@ def export_native(state,destination,reference,executable,runtime,*,authoring=Non
                 result.update(render_seconds=time.perf_counter()-render_started,
                               encoder_feed_and_wait_seconds=native.encoder_seconds,
                               encoder_cpu_seconds=native.encoder_cpu_seconds)
-                author_started = time.perf_counter()
-                authored = hdr10plus_master.author(static,master,work,program.fps,count,native.run,
-                                                   lambda m,p:progress(p,m),cancelled,native.own_analysis,
-                                                   **(authoring or {}))
-                if authored!=count:
-                    raise NativeFailure("Unexpected number of authored HDR10+ pictures")
-                result.update(author_seconds=time.perf_counter()-author_started,authored_pictures=authored)
+                def author_master():
+                    began=time.perf_counter()
+                    authored=hdr10plus_master.author(static,master,work,program.fps,count,native.run,
+                                                      lambda m,p:progress(p,m),cancelled,native.own_analysis,
+                                                      **(authoring or {}))
+                    if authored!=count:
+                        raise NativeFailure("Unexpected number of authored HDR10+ pictures")
+                    result["authored_pictures"]=authored
+                    return time.perf_counter()-began
+
+                result["author_seconds"]=author_master()
                 result["through_master_seconds"] = time.perf_counter()-started
                 verify_started = time.perf_counter()
-                progress(99,"Comparing decoded picture, audio and HDR declarations")
-                result["comparison"] = compare_project(reference,master,program,work,cancelled)
+                if first_time:
+                    progress(99,"Checking first-export source clocks, audio, HDR and sampled pictures")
+                    result["comparison"]=verify_delivery(flat,contract,master,program,clocks,result["native"],
+                                                         work,native.run,cancelled)
+                else:
+                    progress(99,"Comparing decoded picture, audio and HDR declarations")
+                    result["comparison"]=compare_project(reference,master,program,work,cancelled)
                 result["verification_seconds"] = time.perf_counter()-verify_started
+                index=failed_gop(program,result["comparison"]) if repair and not first_time else None
+                if index is not None:
+                    result["initial_comparison"]=result["comparison"]
+                    began=time.perf_counter()
+                    progress(99,"Rebuilding one rejected picture segment with the reference engine")
+                    repair_gop(state,program,work,index,static,native,cancelled)
+                    result["repair"]={"span":program.spans[index],"render_and_join_seconds":time.perf_counter()-began,
+                                      "author_seconds":author_master()}
+                    began=time.perf_counter()
+                    result["comparison"]=compare_project(reference,master,program,work,cancelled)
+                    result["repair"]["verification_seconds"]=time.perf_counter()-began
                 if diagnostics:
                     diagnostics.mkdir(exist_ok=True)
-                    for name in ("native.log","psnr.log","master.mp4"):
+                    names=("native.log","master.mp4") if first_time else ("native.log","psnr.log","master.mp4")
+                    for name in names:
                         os.replace(work/name,diagnostics/name)
                     master = diagnostics/"master.mp4"
                 if not result["comparison"]["passed"]:
                     raise NativeFailure("The delivered candidate did not match the reference acceptance contract")
+                if first_time and source_snapshot(flat)!=original_sources:
+                    raise NativeFailure("An original media file changed during the export")
                 native.check()
                 publishing = True
                 publish(master,destination)
-                result["delivered_backend"] = "d3d11"
+                result["delivered_backend"] = "hybrid" if "repair" in result else "d3d11"
     except (OSError,ValueError,AssertionError,RuntimeError,MemoryError,subprocess.SubprocessError) as error:
-        if result.get("delivered_backend")=="d3d11":
+        if result.get("delivered_backend") in ("d3d11","hybrid"):
             result["scratch_cleanup_failure"] = type(error).__name__
         else:
             result["native_failure"] = type(error).__name__

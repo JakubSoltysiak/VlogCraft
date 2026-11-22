@@ -136,6 +136,8 @@ async function openExport(){
   $('exportWorkflow').value='render';
   $('nativeProjectExport').hidden=true;
   $('useNativeProjectExport').checked=false;
+  $('nativeProjectPolicy').value='master';
+  $('nativeProjectPolicy').onchange=updateExportWorkflow;
   $('comparisonMaster').value='';
   $('exportWorkflow').dataset.nativeProjectAvailable='';
   $('useNativeProjectExport').onchange=updateExportWorkflow;
@@ -198,7 +200,11 @@ function updateExportWorkflow(){
   $('exportCopyRequirements').hidden=!preserving;
   $('exportMasterRequirements').hidden=!master;
   $('nativeProjectExport').hidden=mode!=='hdr10plus-master'||!workflow.dataset.nativeProjectAvailable;
-  $('nativeProjectComparison').hidden=!$('useNativeProjectExport').checked;
+  const native=$('useNativeProjectExport').checked;
+  const first=$('nativeProjectPolicy').value==='first';
+  $('nativeProjectPolicyRow').hidden=!native;
+  $('nativeProjectComparison').hidden=!native||first;
+  $('nativeProjectFirstNote').hidden=!native||!first;
   $('exportProfileNote').hidden=!profile;
   $('exportProfileNote').textContent=samsung
     ? '3840 × 2160 at 60 fps · HEVC Main10 HDR10+ · CRF 17 · Samsung device playback is pending.'

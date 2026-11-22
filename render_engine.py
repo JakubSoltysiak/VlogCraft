@@ -401,9 +401,20 @@ def render(state, output, work, *, review=False, on_progress=None, on_stage=None
             on_stage(stage,idx+1,len(segments),start,end,fps)
         render_range(state,start,end,target,jobdir,'review' if review else 'final',runner,report if on_stage else None)
         parts.append(target)
+    return finish_segments(state,output,jobdir,segments,parts,review=review,on_progress=on_progress,
+                           on_stage=on_stage,cancelled=cancelled,runner=runner,publish=publish,
+                           audio_bitrate=audio_bitrate)
+
+
+def finish_segments(state, output, jobdir, segments, parts, *, review=False, on_progress=None,
+                    on_stage=None, cancelled=lambda:False, runner=None, publish=os.replace,
+                    audio_bitrate='192k'):
+    """Assemble complete segments on the original sequence and audio clocks."""
+    runner=runner or _run
+    fps=timing.rate(state['output']['fps'])
     files=jobdir/'concat.txt'
     entries=[]
-    for part,(start,end) in zip(parts,segments):
+    for part,(start,end) in zip(parts,segments,strict=True):
         us=round(end*1_000_000)-round(start*1_000_000)
         entries.append(f"file '{part.name}'\nduration {us/1e6:.6f}\n")
     files.write_text(''.join(entries),encoding='utf8')
