@@ -74,7 +74,7 @@ The first four-picture UHD HDR export pair took 85.585 s in the FFmpeg branch an
 
 The recovered repeats were 139.076 s versus 11.743 s with AC observed at both ends, and 128.968 s versus 10.039 s with AC at start and battery at finish. Both passed the same decoded checks. The mixed-power repeat is retained outside the primary AC comparison. The camera attempts also remain recorded. One lacked declared transfer and primaries and the other was rejected because AC power was disconnected.
 
-The next integration should connect decoder surfaces to the compositor with bounded reusable GPU resources and feed completed surfaces to delivery while removing raw disk staging. Keep the full 60-second encoded mixed-media gate separate from the resident kernel test. Production throughput and preview reliability must be measured on changing decoded camera frames and a representative timeline.
+The next integration should connect decoder surfaces to the compositor with bounded reusable GPU resources. The direct output pipe below removes raw disk staging from laboratory delivery. Keep the full 60-second encoded mixed-media gate separate from the resident kernel test. Production throughput and preview reliability require changing decoded camera frames and a representative timeline.
 
 The D3D11 FP32 endurance run processed 3,600 UHD pictures from reused sources in 26.803 s, or 134.31 kernel FPS. Per-frame p99 was 15.02 ms and the largest sample was 21.40 ms. DXGI local usage stayed at about 903 MiB in the observed samples. Post-warm-up process working set moved from about 932 to 948 MiB. The 60 seconds describe the fixture at 60 fps. This is a 27-second kernel and ownership observation with no temporal decode, readback, mux, or presentation.
 
@@ -89,3 +89,19 @@ Local loopback regression passed 166 Python tests and 29 JavaScript tests. The P
 The standalone FP32 renderer now converts the mapped D3D11 staging surface directly to one reusable planar float output, then writes it to a bounded operating-system pipe. x265 consumes it through the verified serial zimg/Main10 path. The pipe removes the previously staged RGBA sequence and the unpacking step in Python. Source textures, the staging texture and the planar buffer are reused. The GPU completion and staging barriers remain explicit. On encoder failure or timeout, the launcher closes and joins both children before returning. Output only moves into place after the same clock, PCM and HDR10+ checks.
 
 For the progressive workload the fixture encodes and decodes two tagged three-picture SDR and PQ loops once. The compositor advances those cached pictures under animated geometry, opacity and a mask, then exercises a timed dissolve and stereo delivery. This fixture tests a changing picture and a real x265/HDR10+ pipeline. It keeps source loops resident and does not exercise live decoder scheduling or arbitrary user projects.
+
+### Matched AC trials and quality
+
+| UHD trial | Packed disk delivery | Direct pipe delivery | Decoded comparison |
+|---|---:|---:|---|
+| Four pictures, repeat 1 | 4.990 s | 4.376 s | Exact picture and PCM |
+| Four pictures, repeat 2 | 5.114 s | 4.506 s | Exact picture and PCM |
+| Four pictures, repeat 3 | 5.031 s | 4.582 s | Exact picture and PCM |
+| Four-picture median | 5.031 s | 4.506 s | Exact in each repeat |
+| 24 pictures with changing SDR/PQ | 22.645 s | 20.229 s | Exact picture and PCM |
+
+The four-picture median dropped by 10.4%, and the changing 24-picture trial dropped by 10.7%. The packed comparator includes GPU readback, a raw RGBA file and planar packing. Both routes use the same FFmpeg/zimg and x265 settings. Static HDR declarations matched for each pair, and each file independently passed clock and per-picture dynamic metadata checks. All one-second power observations in these pairs recorded AC. Delivery includes rendering/encoding, clock normalization, muxing and HDR10+ authoring. Input preparation and independent verification are timed separately.
+
+The qualifying camera retry used a tagged PQ snapshot on AC and compared against the independently captured frozen FFmpeg picture. The maximum RGB errors were 0.002160 for scalar and SIMD, 0.001795 for FP32 and 0.007583 for FP16. All passed the same acceptance limits. The tested original's before and after hashes matched. The two earlier attempts remain in the record. WARP exact-disk controls also passed, with the first harness error and corrected retry retained.
+
+The two deliberate UHD pipe deadlines expired while the encoder and producer were supervised. Both exited with the expected timeout, left zero owned members for supervisor cleanup, and published no verified master. Real D3D11 device removal and repeated long-running device recreation remain untested.

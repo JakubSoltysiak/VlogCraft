@@ -2,7 +2,7 @@
 
 ## 3.6.0 Phase 2 rendering lab
 
-`experiments/render_phase2` implements a shared premultiplied linear float compositor for scalar C++, SSE2 with reusable worker rows, and D3D11 compute with reusable surfaces. Both processors use the same row coverage intervals to preserve hard half-pixel boundaries. The lab ingests normalized pixels and uses the existing mux and HDR10+ author for its controlled export. Renderer selection in the installed editor remains on the Phase 1 implementation. [Phase 2 report](docs/STUDIO_3_6_0_RENDERING_PHASE2.md).
+`experiments/render_phase2` implements a shared premultiplied linear float compositor for scalar C++, SSE2 with reusable worker rows, and D3D11 compute with reusable surfaces. Both processors use the same row coverage intervals to preserve hard half-pixel boundaries. In the export lab, one staged D3D11 picture is packed to planar float in a reused buffer and sent over a bounded pipe to the existing FFmpeg/zimg and x265 Main10 delivery path. Both processes are joined on failure. Clock normalization, muxing and HDR10+ authoring use existing code. Renderer selection in the installed editor remains on the Phase 1 implementation. [Phase 2 report](docs/STUDIO_3_6_0_RENDERING_PHASE2.md).
 
 ## 3.6.0 managed rendering
 
