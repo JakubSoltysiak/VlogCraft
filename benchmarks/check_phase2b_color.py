@@ -26,6 +26,7 @@ def color_tiles(width, height):
 
 
 def run(executable, backend):
+    from color_management import pq_to_nits
     from test_hdr_color import CONTRACT
 
     scenario=Scenario('pq-reference',68,34)
@@ -34,7 +35,8 @@ def run(executable, backend):
     with tempfile.TemporaryDirectory(prefix='phase2b-color-') as name:
         folder=Path(name)
         sources=folder/'rgba.bin'
-        color_tiles(width,height).tofile(sources)
+        swatches=color_tiles(width,height)
+        swatches.tofile(sources)
         plan=folder/'plan.bin'
         write_plan(plan,scenario,clips_for(scenario,count),count,precise_edges=True,
                    source_slots=((0,1),))
@@ -63,6 +65,18 @@ def run(executable, backend):
             raise AssertionError(f'{plane} differs by more than two quantized codes: {stats}')
     if actual[0,0]!=64 or not 64<actual[0,7]<120 or actual[0,39]!=940:
         raise AssertionError('Unexpected optical black, shadow or mastering peak')
+    original=swatches.reshape(count,samples,4)
+    neutral=(original[...,0]==original[...,1])&(original[...,1]==original[...,2])
+    exact=original[...,0][neutral]*100
+    reference_nits=pq_to_nits((expected[:,:samples][neutral]-64)/876)
+    candidate_nits=pq_to_nits((actual[:,:samples][neutral]-64)/876)
+    delta=candidate_nits-reference_nits
+    stats["decoded_neutral"]={
+        "max_linear_error_in_100_nit_units":float(abs(delta).max()/100),
+        "linear_rmse_in_100_nit_units":float(np.sqrt(np.mean(delta**2))/100),
+        "max_absolute_shadow_error_nits":float(abs(delta[exact<=1]).max()),
+        "max_relative_highlight_error":float(np.max(abs(delta[exact>=1000])/exact[exact>=1000])),
+    }
     return stats
 
 

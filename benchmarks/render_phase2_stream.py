@@ -155,22 +155,29 @@ def stream_video(executable, plan, sources, stage, target, scenario, frames, con
         stats['cpu_conversion_round_trip_ms']=distribution([1000*v for v in parallel['frame_seconds']])
     if input_stats:
         stats['live_decoders']=input_stats
+        stats['live_input_workers']=2 if live.parallel else 1
     return stats
 
 
-def compare_master(reference, candidate, conversion):
+def compare_master(reference, candidate, conversion, expected_static):
+    from hdr10plus_export import static_metadata
+
     reference_streams=streams(reference)
     candidate_streams=streams(candidate)
     keys=('pix_fmt','width','height','time_base','duration_ts','color_space','color_transfer',
           'color_primaries','color_range','chroma_location')
     declaration=all(reference_streams[0].get(key)==candidate_streams[0].get(key) for key in keys)
+    first_frames=json.loads(call(['ffprobe','-v','error','-select_streams','v:0','-read_intervals','%+#12',
+                                  '-show_frames','-of','json',reference]).stdout)['frames']
+    declared={json.dumps(item,sort_keys=True) for frame in first_frames for item in static_metadata(frame)}
+    same_static=declared=={json.dumps(item,sort_keys=True) for item in expected_static}
     exact_pcm=decoded(reference,'0:a:0','s16le')==decoded(candidate,'0:a:0','s16le')
     quality=compare_encoded(reference,candidate)
     exact_pictures=(decoded(reference,'0:v:0','framemd5')==decoded(candidate,'0:v:0','framemd5')
                     if conversion!='gpu' else None)
     return dict(decoded_pq=quality,exact_pcm=exact_pcm,exact_pictures=exact_pictures,
-                stream_declaration_matches=declaration,
-                passed=declaration and exact_pcm and quality['passed'] and exact_pictures is not False)
+                stream_declaration_matches=declaration,static_hdr_matches=same_static,
+                passed=declaration and same_static and exact_pcm and quality['passed'] and exact_pictures is not False)
 
 
 def experiment(args):
@@ -189,6 +196,7 @@ def experiment(args):
     count=args.frames
     results=args.results.resolve()
     results.mkdir(parents=True,exist_ok=False)
+    revision=call(['git','rev-parse','HEAD']).stdout.decode().strip()
     conditions=Conditions()
     initial=technical_conditions()
     report={}
@@ -207,7 +215,7 @@ def experiment(args):
                 source_preparation['fixture_creation_seconds']=time.perf_counter()-source_start
                 offsets=args.in_point or [Fraction(1,12),Fraction(1,20)]
                 selection_start=time.perf_counter()
-                sources=LiveInputs(paths,offsets,scenario,count)
+                sources=LiveInputs(paths,offsets,scenario,count,args.parallel_decode)
                 source_preparation['source_admission_and_index_seconds']=time.perf_counter()-selection_start
                 slots=None
             elif args.loops:
@@ -272,11 +280,12 @@ def experiment(args):
                                                    identical_decoded_picture_and_audio=True,
                                                    raw_intermediate_bytes=packed.stat().st_size)
             if args.compare_master:
-                report['independent_master_comparison']=compare_master(args.compare_master.resolve(),master,args.conversion)
+                report['independent_master_comparison']=compare_master(
+                    args.compare_master.resolve(),master,args.conversion,rendered['static_metadata'])
             accepted=not args.compare_master or report['independent_master_comparison']['passed']
             if accepted:
                 os.replace(master,results/'verified-hdr10plus.mp4')
-            report.update(source_commit=call(['git','rev-parse','HEAD']).stdout.decode().strip(),
+            report.update(source_commit=revision,
                           reference=BASELINE,backend=args.backend,conversion=args.conversion,
                           dimensions=[scenario.width,scenario.height],
                           frames=count,fps=scenario.fps,loops=args.loops,source_clip_hashes=identities,
@@ -312,6 +321,7 @@ def main():
     parser.add_argument('--live',action='store_true',help='Stream actual decoder pictures selected by original PTS')
     parser.add_argument('--source',type=Path,action='append',default=[],help='Supply one PQ source or a matched pair')
     parser.add_argument('--in-point',type=Fraction,action='append',default=[],help='Supply two exact relative in-points')
+    parser.add_argument('--parallel-decode',action='store_true',help='Read at most one picture per live decoder concurrently')
     parser.add_argument('--compare-disk',action='store_true',help='Verify exact equivalence with the packed disk path')
     parser.add_argument('--compare-master',type=Path,help='Independently compare a frozen master made from identical inputs')
     parser.add_argument('--conversion',choices=('reference','parallel','gpu'),default='reference')
@@ -321,7 +331,7 @@ def main():
     args=parser.parse_args()
     if not 2<=args.frames<=3600 or (args.compare_disk and args.frames>48) or args.timeout<1:
         parser.error('Invalid bounded fixture size or timeout')
-    if (args.live and (args.loops or args.compare_disk) or not args.live and (args.source or args.in_point)
+    if (args.live and (args.loops or args.compare_disk) or not args.live and (args.source or args.in_point or args.parallel_decode)
             or len(args.source)>2 or len(args.in_point) not in (0,2)):
         parser.error('Invalid live source or fixture combination')
     if args.conversion!='reference' and not args.compare_master:

@@ -6,7 +6,7 @@ Tested means the specific check in VERIFICATION.md passed. Implemented means cod
 |---|---|---|
 | Bounded CPU-parallel PQ conversion | Tested subset | Exact decoded picture and PCM at 24 and 120 UHD frames. Explicit saved-project tool uses the managed timeline, audio and metadata authoring. Verified segment fallback for a converter failure. |
 | D3D11 packed 10-bit HDR conversion | Experimental | Raw Main10 swatches and edges passed. The 600-picture prepared-source UHD fixture delivered at 3.816 FPS. A low-resolution WARP encode failed the independent decoded quality gate. |
-| Streaming decode into D3D11 | Experimental | Actual H.264 SDR and HEVC Main10 PQ, rational source in-points and original VFR picture selection. Arbitrary timeline admission, native preview integration and physical device-loss recovery remain open. |
+| Streaming decode into D3D11 | Experimental | Actual H.264 SDR and HEVC Main10 PQ, original VFR timestamps and matched tagged camera output. Bounded two-source reads delivered 0.906 FPS on the short camera fixture. Arbitrary timeline admission, native preview and physical device-loss recovery remain open. |
 
 | 3.6.0 Phase 2 rendering lab | Status | Verified scope / remaining limits |
 |---|---|---|

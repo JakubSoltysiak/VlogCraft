@@ -1,5 +1,7 @@
 """Finite source-clock test path for changing decoded pictures."""
 from bisect import bisect_right
+from concurrent.futures import ThreadPoolExecutor
+from contextlib import ExitStack
 from fractions import Fraction
 import json
 from pathlib import Path
@@ -100,7 +102,7 @@ class Source:
         self.process = subprocess.Popen(arguments, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
                                         stderr=log, creationflags=CREATE_FLAGS)
 
-    def write_picture(self, stream, wanted):
+    def picture(self, wanted):
         if wanted<=self.position:
             raise ValueError("Live textures only accept new decoded pictures")
         started = time.perf_counter()
@@ -119,8 +121,8 @@ class Source:
         area = picture[y:y+self.height,x:x+self.width]
         area[...,0], area[...,1], area[...,2] = red, green, blue
         self.pack_seconds += time.perf_counter() - started
-        stream.write(memoryview(picture).cast("B"))
         self.transferred_bytes += picture.nbytes
+        return picture
 
     def report(self):
         trace = self.log_path.read_bytes()
@@ -136,10 +138,11 @@ class Source:
 
 
 class LiveInputs:
-    def __init__(self, paths, offsets, scenario, frames):
+    def __init__(self, paths, offsets, scenario, frames, parallel=False):
         self.sources = [Source(path, offset, scenario, frames) for path,offset in zip(paths,offsets,strict=True)]
         self.scenario = scenario
         self.frames = frames
+        self.parallel = parallel
         self.logs = []
 
     def start(self, folder):
@@ -149,20 +152,33 @@ class LiveInputs:
             source.start(log)
 
     def write(self, stream):
-        with stream:
-            for source in self.sources:
-                source.write_picture(stream,source.selected[0])
-            stream.write(memoryview(source_picture(self.scenario,2)).cast("B"))
-            for index in range(1,self.frames):
-                mask = sum(1<<slot for slot,source in enumerate(self.sources)
-                           if source.selected[index] != source.selected[index-1])
-                stream.write(PACK_SLOT_MASK.pack(mask))
-                for slot,source in enumerate(self.sources):
-                    if mask&(1<<slot):
-                        source.write_picture(stream,source.selected[index])
-            for source in self.sources:
-                if source.process.stdout.read(1) or source.process.wait(timeout=10):
-                    raise ValueError("The decoder did not finish on the requested source range")
+        with stream, ExitStack() as resources:
+            readers = resources.enter_context(ThreadPoolExecutor(max_workers=2)) if self.parallel else None
+
+            def update(slots, index):
+                tasks = [(self.sources[slot],self.sources[slot].selected[index]) for slot in slots]
+                if readers:
+                    frames = [readers.submit(source.picture,frame) for source,frame in tasks]
+                    pictures = (pending.result() for pending in frames)
+                else:
+                    pictures = (source.picture(frame) for source,frame in tasks)
+                for picture in pictures:
+                    stream.write(memoryview(picture).cast("B"))
+
+            try:
+                update(range(len(self.sources)),0)
+                stream.write(memoryview(source_picture(self.scenario,2)).cast("B"))
+                for index in range(1,self.frames):
+                    slots = [slot for slot,source in enumerate(self.sources)
+                             if source.selected[index] != source.selected[index-1]]
+                    stream.write(PACK_SLOT_MASK.pack(sum(1<<slot for slot in slots)))
+                    update(slots,index)
+                for source in self.sources:
+                    if source.process.stdout.read(1) or source.process.wait(timeout=10):
+                        raise ValueError("The decoder did not finish on the requested source range")
+            except BaseException:
+                self.terminate()
+                raise
         return [source.report() for source in self.sources]
 
     def terminate(self):

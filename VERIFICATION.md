@@ -7,6 +7,8 @@
 - The exact CPU zimg workers passed the 24- and 120-picture UHD controls. Packed Radeon Main10 passed the 24-, 120-, 300- and 600-picture gates. The longest improved from 474.519 to 157.253 s with 57.38 dB decoded PQ PSNR, exact PCM, and 600 independently checked HDR10+ blocks.
 - WARP and Radeon packed-output swatches passed within two luma codes and one chroma code of zimg. The low-resolution WARP encoded quality rejection is retained. Injected D3D11 removal and a confirmed active deadline left no owned process or master.
 - The explicit saved-project CPU route matched reference and injected-fallback decoded output for a 29.97 fps managed timeline with a moving photograph, mixed SDR/PQ, six exact metadata associations and audio. The before/after Reference preview matched. Physical device-loss recovery and native display parity remain open.
+- A 12-picture saved UHD60 project delivered in 22.569 s versus 28.479 s for the reference with exact picture and PCM. The short live camera path verified original timestamps, 24 HDR10+ records, exact PCM and 55.33 dB decoded PQ PSNR. All three private originals matched repeated before/after hash checks.
+- AMF accepted P010 and D3D11 input. A joined mux restored its short audio endpoint, but the in-band mastering coordinates remained different. CPU x265 remains the qualified HDR10+ path.
 - Local loopback-only regression passed 169 Python tests and all 29 JavaScript tests. The earlier missing-media assertion mismatch is preserved in the measurement record.
 
 ## 3.6.0 Phase 2 native rendering lab — 22 November 2026
