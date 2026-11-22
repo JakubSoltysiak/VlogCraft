@@ -73,11 +73,34 @@ jobs:
     needs: regression
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: "3.11"
       - name: Compile isolated native experiment (no GPU execution)
         run: python tools/setup_architecture_lab.py --component zig --component ffmpeg-shared --build-native
+      - name: Install Phase 2 lab dependencies
+        shell: pwsh
+        run: |
+          python -m pip install -r packaging/requirements.txt
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          .github/scripts/setup-ffmpeg.ps1
+      - name: Verify compositor kernels and HDR fallback in software
+        shell: pwsh
+        run: |
+          $reference = 'build/qa/phase2-reference'
+          New-Item -ItemType Directory -Path $reference -Force | Out-Null
+          git archive --format=tar --output=build/qa/phase2-reference.tar 045da0a6b3d8d956d07c075a6c0e73f6878a2d9f
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          tar -xf build/qa/phase2-reference.tar -C $reference
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $zig = (Get-ChildItem build/tools/architecture/zig -Filter zig.exe -Recurse | Select-Object -First 1).FullName
+          python benchmarks/render_phase2.py build/qa/phase2-warp --reference $reference --compiler $zig --quick --frames 3 --repeat 1 --modes ffmpeg,scalar,simd,warp32 --cases uhd-mask,uhd-dissolve,edge-half --precise-edges --assert-quality
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python benchmarks/render_phase2_export.py build/qa/phase2-fallback --reference $reference --executable build/qa/phase2-warp/VlogCraftRenderLab.exe --quick --frames 3 --precise-edges --force-fallback
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python benchmarks/render_phase2_stream.py build/qa/phase2-pipe --executable build/qa/phase2-warp/VlogCraftRenderLab.exe --backend warp32 --quick --frames 8 --loops --compare-disk
       # Hosted runners do not qualify hardware decode, presentation or GPU timing.
       # Local QUICK/STANDARD/FULL performance profiles are defined in benchmarks/performance_suite.py.
       # No experimental dependency binaries are uploaded.

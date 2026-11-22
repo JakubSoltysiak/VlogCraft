@@ -1,5 +1,23 @@
 # VlogCraft Studio development qualification
 
+## 3.6.0 Phase 2 native rendering lab — 22 November 2026
+
+[Draft PR #16](https://github.com/JakubSoltysiak/VlogCraft/pull/16) is stacked on the frozen Phase 1 head. [Phase 2 report](docs/STUDIO_3_6_0_RENDERING_PHASE2.md) and [measurements](docs/benchmarks/studio-3.6.0-phase2.json).
+
+- All five frozen workloads completed on AC with byte-identical generated inputs. The largest fresh frozen UHD spatial case took 177.750 s for 48 frames, with independently verified output timing, PCM and per-picture HDR10+.
+- Scalar, SIMD and Radeon FP32 and FP16 passed the corrected scene-linear comparisons for eleven short cases. A half-pixel regression caught the old edge error and passed after shared double-precision coverage on hardware and WARP. The experimental four-frame UHD export passed exact audio timing, PCM, static HDR declarations and dynamic metadata association. A forced-unavailable renderer selected the verified fallback.
+- The resident shader processed 3,600 UHD pictures in 26.803 s with bounded sampled memory. The cancellation test left zero owned processes. Short 8K comparison passed against the scalar reference.
+- Three AC disk-vs-pipe four-picture trials reduced median delivery from 5.031 to 4.506 s. Each matched decoded pictures, PCM and static HDR declarations. A 24-picture changing SDR/PQ control also matched. Both deliberate active-pipe timeouts left zero owned children and published no master.
+- The 600-picture AC run delivered a 10-second UHD60 master in 474.519 s at 1.264 output FPS, with 600 checked HDR10+ records, the exact 480,000-sample PCM endpoint and 4.99 GiB peak summed working set. The single tagged private camera retry passed full-size reference comparisons and its source hash matched before and after. The representative 60-second project, actual device removal, preview presentation and production selection remain open.
+- The continuation passed 167 loopback-only Python and 29 JavaScript tests. Hosted Windows regression, native compilation, WARP verification and MSI lifecycle passed on the pipe and temporal plan checkpoint. [Windows Actions](https://github.com/JakubSoltysiak/VlogCraft/actions/runs/45020018104).
+
+### 23 November 2026 follow-up
+
+- Three matched generated 8K trials per engine are in the [Phase 2 report](docs/STUDIO_3_6_0_RENDERING_PHASE2.md#matched-8k60-compatibility-comparison). All four native paths passed independent picture comparison. The original FFmpeg sample-count discrepancy and corrected retry are both retained.
+- The bounded picture validator returned identical metrics on the held 8K FP32 and FFmpeg captures. Peak private commit dropped from 2,854 to 830 MiB in the validator process.
+- Passed 21 short hardware, WARP and CPU image comparisons, 173 loopback-only Python tests and 29 JavaScript tests. Each supervised follow-up ended with zero owned processes. The three private source hashes matched and the audit found no private media in tracked history.
+- The 8K result covers the compositor. Sustained project delivery, live hardware HDR preview and actual device-loss recovery remain open for production qualification.
+
 ## 3.6.0 rendering performance Phase 1 — 22 November 2026
 
 Production checkpoint `c91509b9c40e25a36a43552ffdbecbab3663f6ac` produced the development MSI with SHA-256 `62e286702ab5b4fe077a46723ac1e8de377b188a76a3da8bcdbbb6401b5f355d`. The installed bundle and approved icon matched the project. Windows upgrade from 3.5.7, uninstall and reinstall all exited successfully, preserving seven protected files. The prior 3.5.7 MSI checksum remains verified. [Draft PR #15](https://github.com/JakubSoltysiak/VlogCraft/pull/15) is stacked on #14. [Report and matched data](docs/STUDIO_3_6_0_RENDERING.md).

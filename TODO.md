@@ -4,7 +4,7 @@
 **Project:** [JakubSoltysiak/VlogCraft](https://github.com/JakubSoltysiak/VlogCraft)  
 **Last consolidated:** 2026-11-22\
 **Source of requirements:** discussions about VlogCraft Studio, the Kenya travel vlog, Samsung Galaxy footage, the 3.0–3.4 development history, and GitHub PR #1.  
-**Current development state:** 3.3 verified baseline on main. **3.6.0 rendering Phase 1 is in draft PR #15**, stacked on 3.5.7 editing in #14. Matched short HDR10+ exports are faster at fixed quality. Longer mixed UHD exports, device playback and sustained preview qualification remain open.
+**Current development state:** 3.3 verified baseline on main. **3.6.0 rendering Phase 2 is in draft PR #16**, stacked on Phase 1 in #15. The experimental FP32 compositor and bounded CPU Main10 output pipe passed controlled HDR10+ comparisons. Complete-project UHD export, device playback and sustained preview qualification remain open.
 
 > **Mission:** A free, private, offline-first, genuinely capable Windows filmmaking editor. Give one person Premiere-like creative freedom and professional picture/audio quality without cloud processing, subscriptions, arbitrary source-size limits, or unnecessary complexity. Prioritize editing actual travel/wildlife footage over collecting features. It should be delightful for a casual annual vlog yet powerful when needed.
 
@@ -31,8 +31,14 @@
 
 ## 3.6.0 performance investigation
 
+- [x] **VC-PERF-360-004 — Compare native compositing in an experimental HDR export.** Scalar and SIMD CPU, D3D11 FP32/FP16, independently decoded frozen controls and automated FFmpeg fallback. FP32 is the measured candidate for a hybrid path. [Phase 2](docs/STUDIO_3_6_0_RENDERING_PHASE2.md).
+- [ ] **VC-PERF-360-005 — Stream eligible decoded surfaces into the native compositor.** Admit complete supported project ranges and fall back at the project boundary when effects or formats are unsupported. Verify equivalent output on sustained camera timelines, device loss, teardown and restart. Measure sustained delivery and preview clocks separately.
+- [x] **VC-PERF-360-006 — Remove raw output staging from the FP32 lab.** Three matched four-picture trials improved median delivery by 10.4%. The changing 24-picture pair passed exact decoded picture, audio and HDR checks. Two UHD deadline tests left no owned children or published output. [Measurements](docs/benchmarks/studio-3.6.0-phase2.json).
+- [ ] **VC-PERF-360-007 — Reduce HDR delivery transfer and color cost.** Isolated 24-picture PQ conversion took 12.648 s versus 1.841 s for x265. Compare bounded frame-parallel zimg with in-frame error diffusion and a GPU P010 alternative against the FP32 pipe. Validate code values, HDR metadata and memory before accepting throughput changes.
+
 - [x] **VC-PERF-360-001 — Isolate the managed HDR rendering bottleneck.** Frozen scene ablations separate the affine and matte expression cost from decoding, encoding and HDR10+ authoring. Preserve the 720p and UHD spatial timeouts and decoded-quality comparisons. [Phase 1 evidence](docs/STUDIO_3_6_0_RENDERING.md).
 - [ ] **VC-PERF-360-002 — Make longer mixed UHD renders practical.** Use the independently verified 3.6.0 short runs as the comparator. Measure remaining affine sampling, float-surface ownership and bandwidth on longer, higher-entropy content. Keep the full 60-second export gate open until shorter trials support it.
+- [ ] **VC-PERF-360-008 — Qualify a representative 60-second UHD60 project.** The fixed-loop lab verified 600 pictures at 1.264 delivered FPS with 4.99 GiB peak summed working set. Use live decoded camera sources, the full timeline graph, matched reference output and exact audio/HDR checks after the next transfer and delivery improvements.
 - [ ] **VC-PERF-360-003 — Qualify any HDR AV backend.** Keep the verified CPU Main10 path. A hardware path needs independently verified image quality, static mastering and content-light signalling, audio and frame clocks, dynamic metadata association and practical speed improvement.
 - [ ] **Compare VlogCraft and Adobe Premiere Pro on equivalent local workloads.** Adobe's documented GPU rendering and codec capabilities are recorded in the Phase 1 report. A same-workstation Premiere trace requires a local Premiere installation. Use equivalent sources, effects and output settings, and Windows Performance Recorder or GPUView where available.
 

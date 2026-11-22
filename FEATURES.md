@@ -2,6 +2,12 @@
 
 Tested means the specific check in VERIFICATION.md passed. Implemented means code is available with further acceptance coverage needed. Partial identifies implemented behavior with material gaps. Missing identifies an unavailable capability. A test result qualifies its fixture and environment.
 
+| 3.6.0 Phase 2 rendering lab | Status | Verified scope / remaining limits |
+|---|---|---|
+| Native CPU and D3D11 HDR compositing | Experimental | Standalone source-linear geometry, compositing, masks, opacity and dissolve, with hardware and WARP comparisons. Production keeps the qualified Phase 1 engine. |
+| 8K60 composition | Experimental kernel | The generated 7680 × 4320 fixture passed scalar, SIMD, FP32 and FP16 comparisons to frozen FFmpeg. Decoding, timeline playback, 8K encode and sustained delivery require separate qualification. |
+| Native output through HDR10+ authoring | Experimental | Bounded FP32 readback pipe feeds the CPU Main10 writer. Short disk-vs-pipe pairs match decoded pictures and PCM. A 600-picture UHD60 loop delivered at 1.264 FPS with all HDR10+ records and exact audio endpoint. Timeline integration, device-loss coverage, GPU-resident encode and the representative 60-second delivery gate remain open. |
+
 | 3.6.0 rendering capability | Status | Verified scope / remaining limits |
 |---|---|---|
 | Faster managed CPU HDR compositing | Tested subset | Frozen 360p and 720p spatial and UHD opacity outputs match picture, PCM, time and metadata. Short UHD spatial output passed independent checks. The longer 48-frame UHD control rendered at 0.281 FPS. The 60-second project remains open. |
