@@ -231,19 +231,24 @@ def append_video(output,slot,src,frame_count,cancelled):
     info = json.loads(run_capture(["ffprobe","-v","error","-read_intervals",f"%+{float(limit):.8f}",
                                    "-select_streams","v:0","-show_entries",fields,"-of","json",src.path],
                                   cancelled=cancelled)[0])
-    video, = info["streams"]
+    streams = info.get("streams",())
+    if len(streams)!=1:
+        raise Ineligible("The resident probe found no unambiguous video stream")
+    video = streams[0]
     tags = tuple(video.get(key) for key in ("color_primaries","color_transfer","color_space"))
     pq = tags==("bt2020","smpte2084","bt2020nc")
-    if (video["codec_name"] not in ("h264","hevc") or video["pix_fmt"] not in ("yuv420p","yuv420p10le") or
+    if (video.get("codec_name") not in ("h264","hevc") or video.get("pix_fmt") not in ("yuv420p","yuv420p10le") or
             video.get("field_order") not in (None,"unknown","progressive") or
             (not pq and tags!=("bt709","bt709","bt709")) or
             video.get("color_range")!=({"limited":"tv","full":"pc"}.get(src.interpretation[3])) or
             pq!=(src.interpretation[4]=="pq2020")):
         raise Ineligible("Resident codec, range or source metadata differs from the managed color contract")
-    stamps = [int(row["best_effort_timestamp"]) for row in info["frames"]]
-    base = Fraction(video["time_base"])
+    stamps = [row.get("best_effort_timestamp") for row in info.get("frames",())]
+    if not stamps or any(type(stamp) is not int for stamp in stamps):
+        raise Ineligible("The resident probe did not return integer source presentation timestamps")
+    base = Fraction(video.get("time_base") or 0)
     origin = Fraction(info.get("format",{}).get("start_time","0"))
-    if not stamps or any(a>=b for a,b in zip(stamps,stamps[1:])) or base<=0:
+    if any(a>=b for a,b in zip(stamps,stamps[1:])) or base<=0:
         raise Ineligible("Resident source has an ambiguous presentation clock")
     selected = [-1]*frame_count
     for frame,target in src.requests.items():

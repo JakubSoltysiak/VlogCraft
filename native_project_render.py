@@ -256,6 +256,7 @@ def export_native(state,destination,reference,executable,runtime,*,authoring=Non
     result = record if record is not None else {}
     result["requested_backend"] = "d3d11"
     started = time.perf_counter()
+    publishing = False
     try:
         with temporary_work(scratch or destination.parent) as work:
             count = hdr10plus_master.preflight(state)
@@ -294,14 +295,18 @@ def export_native(state,destination,reference,executable,runtime,*,authoring=Non
                 if not result["comparison"]["passed"]:
                     raise NativeFailure("The delivered candidate did not match the reference acceptance contract")
                 native.check()
+                publishing = True
                 publish(master,destination)
-        result["delivered_backend"] = "d3d11"
-    except (OSError,ValueError,AssertionError,RuntimeError,subprocess.SubprocessError) as error:
-        result["native_failure"] = type(error).__name__
-        if not fallback or cancelled():
-            raise
-        fallback()
-        result["delivered_backend"] = "reference"
+                result["delivered_backend"] = "d3d11"
+    except (OSError,ValueError,AssertionError,RuntimeError,MemoryError,subprocess.SubprocessError) as error:
+        if result.get("delivered_backend")=="d3d11":
+            result["scratch_cleanup_failure"] = type(error).__name__
+        else:
+            result["native_failure"] = type(error).__name__
+            if publishing or not fallback or cancelled():
+                raise
+            fallback()
+            result["delivered_backend"] = "reference"
     finally:
         result["total_seconds"] = time.perf_counter()-started
     return result

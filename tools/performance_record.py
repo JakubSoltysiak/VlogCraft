@@ -42,6 +42,8 @@ PROTOCOL_FILES=(
  'benchmarks/phase2c_author.py','benchmarks/profile_phase2c_author.py','benchmarks/compare_phase2c_author.py',
  'benchmarks/check_phase2c_stats.py','benchmarks/phase2c_diagnostics.py','benchmarks/qualify_phase2c_project.py',
  'benchmarks/phase2d_project_export.py','tests/test_native_project_render.py','tests/windows_native_project_export.py',
+ 'benchmarks/check_phase2d_preview.py','benchmarks/check_phase2d_source_clock.py',
+ 'benchmarks/resume_phase2d_reference.py',
  'tests/verify_bundle.py','tools/setup_architecture_lab.py',
  'benchmarks/render_phase2.py','benchmarks/render_phase2_stream.py','benchmarks/render_phase2_export.py',
  'experiments/render_phase2/composite.h','experiments/render_phase2/d3d_composite.h',
