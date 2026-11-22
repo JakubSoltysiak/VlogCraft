@@ -1,5 +1,9 @@
 # Architecture and continuation
 
+## 3.6.0 Phase 2D saved-project GPU export
+
+`native_project_plan.py` compiles the validated saved timeline, managed span boundaries and original presentation clocks into a private D3D11 worker program. `native_project_render.py` supplies only the video spans to the existing segment exporter. Managed audio, x265 settings, output timing and final-picture HDR10+ authoring stay shared. The optional Windows development runtime verifies every delivered picture and exact decoded PCM against a prior reference master before publication. A rejected native attempt retries the entire project with the managed renderer. Project serialization, reference presets, original media and preview use their existing paths. [Phase 2D architecture and results](docs/STUDIO_3_6_0_RENDERING_PHASE2D.md).
+
 ## 3.6.0 Phase 2C HDR delivery
 
 The optional authoring path enlarges the Windows pipe and uses a native exact MaxRGB histogram with bounded, ordered workers. The existing PQ ranks, payload serializer and verification still operate on final decoded pictures. The resident decoder experiment uses the compositor device for libav D3D11VA, validates original PTS and normalizes tested NV12/P010 sources through compute into reusable linear slots. Driver or admission failure retries the software input, and delivery requires independent output validation. [Phase 2C evidence](docs/STUDIO_3_6_0_RENDERING_PHASE2C.md).

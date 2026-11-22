@@ -47,8 +47,22 @@ def build(folder):
  probe=list(cmd);probe[probe.index(str(ROOT/'experiments/native_d3d11/main.cpp'))]=str(ROOT/'native/workstation.cpp');probe[-1]=str(folder/'VlogCraftProbe.exe');probe.insert(-2,'-ldwmapi');subprocess.run(probe,cwd=ROOT,check=True)
  subprocess.run([str(zig),'c++','-std=c++17','-O2','-target','x86_64-windows-gnu','-municode',str(ROOT/'native/storage_probe.cpp'),'-o',str(folder/'VlogCraftStorageProbe.exe')],cwd=ROOT,check=True)
  print(json.dumps({'native_binary_sha256':digest(folder/'native_d3d11.exe'),'player_binary_sha256':digest(folder/'VlogCraftNative.exe')}),flush=True)
+
+def build_project_export(folder):
+ sdk=folder/'ffmpeg-shared/ffmpeg-9.0.2-full_build-shared'
+ zig=folder/'zig/zig-x86_64-windows-0.17.1/zig.exe'
+ compiler=[str(zig),'c++','-target','x86_64-windows-gnu','-std=c++17','-O3']
+ sources=ROOT/'experiments/render_phase2'
+ subprocess.run([*compiler,'-fno-vectorize','-fno-slp-vectorize','-ffp-contract=off','-municode',
+                 '-DVLOGCRAFT_RESIDENT_DECODE',str(sources/'main.cpp'),'-I'+str(sdk/'include'),'-L'+str(sdk/'lib'),
+                 '-lavformat','-lavcodec','-lavutil','-lswscale','-ld3d11','-ld3dcompiler_47','-lpsapi',
+                 '-o',str(folder/'VlogCraftProject.exe')],cwd=ROOT,check=True)
+ subprocess.run([*compiler,'-shared',str(sources/'hdr_statistics.cpp'),
+                 '-o',str(folder/'hdr-statistics.dll')],cwd=ROOT,check=True)
+
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--component',choices=list(SPECS),action='append');p.add_argument('--build-native',action='store_true')
+ p=argparse.ArgumentParser();p.add_argument('--component',choices=list(SPECS),action='append');p.add_argument('--build-native',action='store_true');p.add_argument('--build-project-export',action='store_true')
  a=p.parse_args();folder=ROOT/'build/tools/architecture';folder.mkdir(parents=True,exist_ok=True)
  for component in a.component or SPECS:setup(component,folder)
  if a.build_native:build(folder)
+ if a.build_project_export:build_project_export(folder)

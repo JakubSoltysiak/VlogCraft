@@ -44,7 +44,15 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python "$archive/tools/performance_record.py" "$archive/docs/benchmarks/studio-3.6.0-rendering.json"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          python tools/performance_record.py docs/benchmarks/studio-3.6.0-phase2c.json
+          $phase2c = 'build/qa/phase2c-evidence'
+          New-Item -ItemType Directory -Force -Path $phase2c | Out-Null
+          git archive --format=tar --output=build/qa/phase2c-evidence.tar c499f54ab2a146870b11c3fd350c8d2ab80d4f57
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          tar -xf build/qa/phase2c-evidence.tar -C $phase2c
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python "$phase2c/tools/performance_record.py" "$phase2c/docs/benchmarks/studio-3.6.0-phase2c.json"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tools/performance_record.py docs/benchmarks/studio-3.6.0-phase2d.json
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python tests/icon_assets.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
@@ -111,6 +119,10 @@ jobs:
           $sdk = (Resolve-Path 'build/tools/architecture/ffmpeg-shared/ffmpeg-9.0.2-full_build-shared').Path
           & $zig c++ -target x86_64-windows-gnu -std=c++17 -O3 -fno-vectorize -fno-slp-vectorize -ffp-contract=off -municode -DVLOGCRAFT_RESIDENT_DECODE experiments/render_phase2/main.cpp "-I$sdk/include" "-L$sdk/lib" -lavformat -lavcodec -lavutil -lswscale -ld3d11 -ld3dcompiler_47 -lpsapi -o build/qa/VlogCraftResident.exe
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $env:VLOGCRAFT_PROJECT_TEST_WORKER = (Resolve-Path build/qa/VlogCraftResident.exe).Path
+          $env:VLOGCRAFT_PROJECT_TEST_RUNTIME = "$sdk/bin"
+          python -m unittest discover -s tests -p test_native_project_render.py -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python benchmarks/render_phase2.py build/qa/phase2-warp --reference $reference --compiler $zig --quick --frames 3 --repeat 1 --modes ffmpeg,scalar,simd,warp32 --cases uhd-mask,uhd-dissolve,edge-half --precise-edges --assert-quality
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python benchmarks/render_phase2_export.py build/qa/phase2-fallback --reference $reference --executable build/qa/phase2-warp/VlogCraftRenderLab.exe --quick --frames 3 --precise-edges --force-fallback
@@ -158,9 +170,9 @@ jobs:
           Invoke-WebRequest https://github.com/wixtoolset/wix3/releases/download/wix3141rtm/wix314-binaries.zip -OutFile build/tools/wix.zip
           Expand-Archive build/tools/wix.zip build/tools/wix -Force
       - name: Build optional native runtime for packaging (no GPU execution)
-        run: python tools/setup_architecture_lab.py --component zig --component ffmpeg-shared --build-native
+        run: python tools/setup_architecture_lab.py --component zig --component ffmpeg-shared --build-native --build-project-export
       - name: Build Windows installer
-        run: python packaging/build_windows.py --experimental-native
+        run: python packaging/build_windows.py --experimental-native --experimental-project-export
       - name: Validate MSI lifecycle and retained data
         env:
           PYTHONUTF8: "1"

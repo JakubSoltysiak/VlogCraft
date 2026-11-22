@@ -2,6 +2,13 @@
 
 Tested means the specific check in VERIFICATION.md passed. Implemented means code is available with further acceptance coverage needed. Partial identifies implemented behavior with material gaps. Missing identifies an unavailable capability. A test result qualifies its fixture and environment.
 
+| 3.6.0 Phase 2D saved-project export | Status | Verified scope and remaining limits |
+|---|---|---|
+| D3D11 project timeline through HDR10+ delivery | Tested subset | Exact Phase 2C 24-picture project and changing 120-picture extension passed independent picture, audio, clock and HDR checks on Radeon. Optional developer installer and a matching reference master are required. |
+| GPU source and effects | Tested subset | Resident tagged SDR VFR and rotated PQ, two video tracks, scale keys, translucent rotated PNG, feathered ellipse, title fade, centered dissolves, linear exposure and managed audio crossfade. Broader codec, crop, keyframe, transition, profile and nested-project coverage remains partial. |
+| Whole-project fallback | Tested subset | Unsupported creative adjustment triggers the managed path. Fractional WARP control exercises simulated removal, reference fallback and cleanup. Physical driver loss remains open. |
+| 60-second UHD60 HDR10+ production export and calibrated preview parity | Missing qualification | Requires an independently matched long project, hardware recovery and sustained editing benchmarks. |
+
 | 3.6.0 Phase 2C HDR delivery | Status | Verified scope / remaining limits |
 |---|---|---|
 | Exact fast HDR10+ authoring | Tested subset | Opt-in bulk pipe and bounded native statistics. Byte-identical masters through 600 UHD60 pictures. The default author is the reference and fallback. |

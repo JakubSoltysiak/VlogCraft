@@ -134,6 +134,17 @@ function sizeMonitor(){
 async function openExport(){
   openModal('exportModal');
   $('exportWorkflow').value='render';
+  $('nativeProjectExport').hidden=true;
+  $('useNativeProjectExport').checked=false;
+  $('comparisonMaster').value='';
+  $('exportWorkflow').dataset.nativeProjectAvailable='';
+  $('useNativeProjectExport').onchange=updateExportWorkflow;
+  $('browseComparisonMaster').onclick=async ()=>{
+    try{
+      const result=await request('export/comparison-master','POST',{});
+      if(!result.cancelled)$('comparisonMaster').value=result.path;
+    }catch(error){toast(error.message,true);}
+  };
   delete $('exportWorkflow').dataset.previousColor;
   delete $('exportWorkflow').dataset.previousEncoder;
   initColorControls();
@@ -164,7 +175,8 @@ async function openExport(){
   choice.disabled=true;choice.replaceChildren(new Option('Checking local encoders…',''));
   $('startRender').disabled=true;
   try{
-    const available=await request('encoders');
+    const [available,nativeProject]=await Promise.all([request('encoders'),request('export/native-project')]);
+    $('exportWorkflow').dataset.nativeProjectAvailable=nativeProject.available&&available.libx265?'yes':'';
     choice.replaceChildren(...Object.entries(available).map(([id,label])=>new Option(label,id)));
     for(const option of $('exportWorkflow').options){
       if(['hdr10plus-master','samsung-hdr10plus','youtube-hdr'].includes(option.value))option.disabled=!available.libx265;
@@ -185,6 +197,8 @@ function updateExportWorkflow(){
   $('exportRenderSettings').hidden=preserving;
   $('exportCopyRequirements').hidden=!preserving;
   $('exportMasterRequirements').hidden=!master;
+  $('nativeProjectExport').hidden=mode!=='hdr10plus-master'||!workflow.dataset.nativeProjectAvailable;
+  $('nativeProjectComparison').hidden=!$('useNativeProjectExport').checked;
   $('exportProfileNote').hidden=!profile;
   $('exportProfileNote').textContent=samsung
     ? '3840 × 2160 at 60 fps · HEVC Main10 HDR10+ · CRF 17 · Samsung device playback is pending.'

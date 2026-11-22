@@ -6,11 +6,13 @@ namespace render_phase2 {
 
 struct SurfaceInput {
     float codedWidth,codedHeight,orientedWidth,orientedHeight;
-    unsigned fittedWidth,fittedHeight,offsetX,offsetY;
+    unsigned fittedWidth,fittedHeight;
+    int offsetX,offsetY;
     float yOffset,yScale,cOffset,cScale;
     unsigned clockwise,pq,slot,centeredChroma;
+    unsigned transparentPadding,reserved[3];
 };
-static_assert(sizeof(SurfaceInput)==64);
+static_assert(sizeof(SurfaceInput)==80);
 
 inline const char* normalize_shader=R"HLSL(
 Texture2DArray<float> sourceY : register(t2);
@@ -19,9 +21,12 @@ RWTexture2DArray<float4> normalized : register(u0);
 SamplerState linearChroma : register(s0);
 cbuffer Input : register(b1) {
     float2 codedSize, orientedSize;
-    uint2 fittedSize, placement;
+    uint2 fittedSize;
+    int2 placement;
     float4 range;
     uint clockwise, isPq, slot, centeredChroma;
+    uint transparentPadding;
+    uint3 reserved;
 };
 
 float3 inversePQ(float3 value) {
@@ -57,7 +62,8 @@ void main(uint3 at : SV_DispatchThreadID) {
     if(at.x>=width||at.y>=height) return;
     int2 p=int2(at.xy)-int2(placement);
     float3 result=0;
-    if(all(p>=0)&&all(p<int2(fittedSize))) {
+    bool inside=all(p>=0)&&all(p<int2(fittedSize));
+    if(inside) {
         float2 step=orientedSize/float2(fittedSize);
         float2 phase=(float2(p)+.5)*step-.5;
         float2 filterWidth=max(step,1);
@@ -73,7 +79,7 @@ void main(uint3 at : SV_DispatchThreadID) {
             }
         result/=sum;
     }
-    normalized[uint3(at.xy,slot)]=float4(result,1);
+    normalized[uint3(at.xy,slot)]=float4(result,inside||transparentPadding==0?1:0);
 }
 )HLSL";
 

@@ -4,6 +4,7 @@
 #include <cmath>
 #include <condition_variable>
 #include <cstdint>
+#include <cstring>
 #include <immintrin.h>
 #include <mutex>
 #include <thread>
@@ -26,10 +27,16 @@ struct Layer {
 struct Frame {
     std::uint32_t width, height, layers;
     float dissolve;
-    Layer layer[3];
+    Layer layer[8];
+    std::uint32_t project;
+    float white;
+    std::uint32_t reserved[2];
 };
 
-static_assert(sizeof(Pixel) == 16 && sizeof(Layer) == 48 && sizeof(Frame) == 160);
+constexpr unsigned layerBudget=8;
+constexpr unsigned legacyLayerBudget=3;
+constexpr unsigned legacyFrameSize=160;
+static_assert(sizeof(Pixel)==16 && sizeof(Layer)==48 && sizeof(Frame)==416);
 
 struct Geometry {
     double scale, cosine, sine, x, y;
@@ -87,8 +94,10 @@ template<> struct Math<false> {
     using Value = Pixel;
     static Value load(const Pixel* pixel) { return *pixel; }
     static Value zero() { return {}; }
+    static Value opaque(float v) { return {v,v,v,1}; }
     static Value add(Value a, Value b) { return {a.r+b.r,a.g+b.g,a.b+b.b,a.a+b.a}; }
     static Value mul(Value a, float b) { return {a.r*b,a.g*b,a.b*b,a.a*b}; }
+    static Value gain(Value a, float b) { return {a.r*b,a.g*b,a.b*b,a.a}; }
     static float alpha(Value a) { return a.a; }
     static void store(Pixel* pixel, Value a) { *pixel = a; }
 };
@@ -97,8 +106,10 @@ template<> struct Math<true> {
     using Value = __m128;
     static Value load(const Pixel* pixel) { return _mm_loadu_ps(&pixel->r); }
     static Value zero() { return _mm_setzero_ps(); }
+    static Value opaque(float v) { return _mm_set_ps(1,v,v,v); }
     static Value add(Value a, Value b) { return _mm_add_ps(a,b); }
     static Value mul(Value a, float b) { return _mm_mul_ps(a,_mm_set1_ps(b)); }
+    static Value gain(Value a, float b) { return _mm_mul_ps(a,_mm_set_ps(1,b,b,b)); }
     static float alpha(Value a) { return _mm_cvtss_f32(_mm_shuffle_ps(a,a,_MM_SHUFFLE(3,3,3,3))); }
     static void store(Pixel* pixel, Value a) { _mm_storeu_ps(&pixel->r,a); }
 };
@@ -122,13 +133,13 @@ void composite_rows(const Frame& frame,const RowRange* ranges,const Pixel* input
     const std::size_t pixels=std::size_t(width)*height;
     const float cx=(width-1)*.5f, cy=(height-1)*.5f, inverseWidth=1.f/width, inverseHeight=1.f/height;
     for (unsigned y=begin; y<end; ++y) {
-        float offsetY[3];
+        float offsetY[layerBudget];
         for (unsigned n=0; n<frame.layers; ++n) {
             const auto& layer=frame.layer[n];
             offsetY[n]=(y-cy-height*layer.y)/layer.scale;
         }
         for (int x=0; x<width; ++x) {
-            auto result=M::zero();
+            auto result=frame.project?M::opaque(0):M::zero();
             auto left=M::zero();
             for (unsigned n=0; n<frame.layers; ++n) {
                 const auto& layer=frame.layer[n];
@@ -148,7 +159,19 @@ void composite_rows(const Frame& frame,const RowRange* ranges,const Pixel* input
                     foreground=M::mul(lerp<M>(lerp<M>(fetch(x0,y0),fetch(x1,y0),u-x0),
                                                lerp<M>(fetch(x0,y1),fetch(x1,y1),u-x0),v-y0),layer.opacity);
                 }
-                if (frame.dissolve>=0 && n<2) {
+                if(frame.project) {
+                    float gain;
+                    std::memcpy(&gain,&layer.reserved2,sizeof(gain));
+                    foreground=M::gain(foreground,gain);
+                    const auto picture=M::add(M::mul(result,1-M::alpha(foreground)),foreground);
+                    if(layer.reserved1==1) left=picture;
+                    else if(layer.reserved1==2) result=lerp<M>(left,picture,frame.dissolve);
+                    else if(layer.reserved1>=3) {
+                        const auto matte=M::opaque(layer.reserved1==4?frame.white:0);
+                        const float mix=frame.dissolve*2;
+                        result=mix<1?lerp<M>(left,matte,mix):lerp<M>(matte,picture,mix-1);
+                    } else result=picture;
+                } else if (frame.dissolve>=0 && n<2) {
                     if (n==0) left=foreground;
                     else result=lerp<M>(left,foreground,frame.dissolve);
                 } else {

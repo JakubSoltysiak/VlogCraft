@@ -51,7 +51,10 @@ struct Layer {
 cbuffer Frame : register(b0) {
     uint width, height, layers;
     float dissolve;
-    Layer layer[3];
+    Layer layer[8];
+    uint project;
+    float white;
+    uint2 reserved;
 };
 Texture2DArray<float4> sources : register(t0);
 StructuredBuffer<uint2> edges : register(t1);
@@ -84,10 +87,22 @@ float4 sampleLayer(Layer p, uint n, uint2 outputPoint) {
 [numthreads(16,8,1)]
 void main(uint3 thread : SV_DispatchThreadID) {
     if (thread.x>=width || thread.y>=height) return;
-    float4 result=0, left=0;
+    float4 result=project!=0?float4(0,0,0,1):0, left=0;
     for(uint n=0;n<layers;++n) {
         float4 foreground=sampleLayer(layer[n],n,thread.xy);
-        if (dissolve>=0 && n<2) {
+        if(project!=0) {
+            foreground.rgb*=asfloat(layer[n].selection.w);
+            float4 composed=result*(1-foreground.a)+foreground;
+            uint operation=layer[n].selection.z;
+            if(operation==1) left=composed;
+            else if(operation==2) result=lerp(left,composed,dissolve);
+            else if(operation>=3) {
+                float level=operation==4?white:0;
+                float4 matte=float4(level,level,level,1);
+                float mix=dissolve*2;
+                result=mix<1?lerp(left,matte,mix):lerp(matte,composed,mix-1);
+            } else result=composed;
+        } else if (dissolve>=0 && n<2) {
             if (n==0) left=foreground;
             else result=left*(1-dissolve)+foreground*dissolve;
         } else result=result*(1-foreground.a)+foreground;
@@ -185,7 +200,7 @@ public:
         compile(shader_source,"phase2-composite",shader);
         const D3D11_BUFFER_DESC buffer={sizeof(Frame),D3D11_USAGE_DEFAULT,D3D11_BIND_CONSTANT_BUFFER,0,0,0};
         require(device->CreateBuffer(&buffer,nullptr,constants.init()),"Create frame parameters");
-        const D3D11_BUFFER_DESC ranges={UINT(3*height*sizeof(RowRange)),D3D11_USAGE_DEFAULT,
+        const D3D11_BUFFER_DESC ranges={UINT(layerBudget*height*sizeof(RowRange)),D3D11_USAGE_DEFAULT,
             D3D11_BIND_SHADER_RESOURCE,0,D3D11_RESOURCE_MISC_BUFFER_STRUCTURED,sizeof(RowRange)};
         require(device->CreateBuffer(&ranges,nullptr,edges.init()),"Create coverage rows");
         require(device->CreateShaderResourceView(edges.get(),nullptr,edgeView.init()),"Create coverage view");

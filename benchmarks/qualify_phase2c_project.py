@@ -32,7 +32,7 @@ def digest(path):
         return hashlib.file_digest(stream,"sha256").digest()
 
 
-def qualify(result, library, count, camera=None):
+def qualify(result, library, count, camera=None, *, exact_still_clock=False):
     if not power():
         raise RuntimeError("Connect AC before timing a saved project")
     result.mkdir(parents=True,exist_ok=False)
@@ -42,6 +42,18 @@ def qualify(result, library, count, camera=None):
     if camera:
         sources.append(camera)
     state, inputs = state_for(result,(3840,2160),"3840x2160",count,True,video_inputs=sources)
+    if exact_still_clock:
+        # The image demuxer's nominal time base does not describe the hold
+        # duration of an untimed photograph on the editing timeline.
+        for asset in state["assets"]:
+            if asset["kind"]=="image":
+                asset["timeBase"]="1/120000"
+        # Hold the transition width within the real camera's existing
+        # incoming preroll as the surrounding timeline is extended.
+        for track in state["tracks"]:
+            for clip in track["clips"]:
+                if clip.get("transitionIn"):
+                    clip["transitionIn"]["frames"]=min(16,clip["transitionIn"]["frames"])
     video_assets={asset["id"]:asset for asset in state["assets"] if asset["kind"]=="video"}
     square_overrides=0
     for track in state["tracks"]:
@@ -119,8 +131,10 @@ if __name__=="__main__":
     parser.add_argument("--library",type=Path,required=True)
     parser.add_argument("--frames",type=int,default=24)
     parser.add_argument("--camera",type=Path)
+    parser.add_argument("--exact-still-clock",action="store_true")
     args=parser.parse_args()
     if args.frames<24 or args.frames%3:
         parser.error("Use at least 24 pictures, divisible by three")
     print(json.dumps(qualify(args.result.resolve(),args.library,args.frames,
-                             args.camera.resolve() if args.camera else None),indent=2))
+                             args.camera.resolve() if args.camera else None,
+                             exact_still_clock=args.exact_still_clock),indent=2))

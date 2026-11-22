@@ -70,6 +70,9 @@ DESKTOP_RECOVERY=None
 EXPORT_PREFERENCES=WORK/'export-location.json'
 PROXY_QUEUE=collections.deque()
 CURRENT_PROCESS={'export':None,'proxy':None}
+NATIVE_PROJECT_RUNTIME=None
+NATIVE_EXPORT_THREAD=None
+CHOOSE_COMPARISON_MASTER=lambda:None
 CANCEL={'export':threading.Event(),'proxy':threading.Event()}
 AI_PREVIEW={'token':None,'digest':None,'created':0}
 
@@ -643,7 +646,7 @@ def publish_export(part, dest, assets, overwrite):
         os.link(part,dest)  # Atomic no-clobber publication on POSIX.
 
 
-def run_export(snapshot,path,review=False,overwrite=False,delivery='render',authored_frames=0):
+def run_export(snapshot,path,review=False,overwrite=False,delivery='render',authored_frames=0,comparison=None):
     dest=Path(path)
     owned=ExitStack()
     try:
@@ -686,8 +689,33 @@ def run_export(snapshot,path,review=False,overwrite=False,delivery='render',auth
                                  audio_bitrate='384k' if delivery=='youtube-hdr' else '192k',
                                  popen=lambda c,d:exec_process(c,d,'export'),
                                  on_stage=stage,publish=publish)
+        def deliver_native():
+            from hdr10plus_fast import author_options
+            from native_project_render import export_native
+
+            runtime=NATIVE_PROJECT_RUNTIME
+            def progress(percent,message):
+                job_status('export',stage='native-project',percent=percent,message=message,_activity=time.monotonic())
+            def reference_fallback():
+                job_status('export',percent=1,stage='preparing',frames=0,encodedSeconds=0,
+                           fallback='Reference fallback after GPU admission or verification',
+                           message='Rendering with the reference backend')
+                deliver()
+            progress(1,'Preparing GPU project render')
+            try:
+                authoring=author_options(runtime/'hdr-statistics.dll')
+            except (OSError,ValueError):
+                reference_fallback()
+                return
+            export_native(snapshot,dest,comparison,runtime/'VlogCraftProject.exe',runtime,
+                          authoring=authoring,cancelled=CANCEL['export'].is_set,progress=progress,timeout=1200,
+                          fallback=reference_fallback,scratch=temp,
+                          publish=lambda part,target:publish_export(part,target,snapshot['assets'],overwrite))
         try:
-            deliver()
+            if comparison is None:
+                deliver()
+            else:
+                deliver_native()
         except Exception:
             chosen=snapshot['output'].get('encoder','libx264')
             if review or CANCEL['export'].is_set() or chosen.split('_')[-1] not in encoders.BACKENDS:raise
@@ -990,6 +1018,7 @@ class Handler(BaseHTTPRequestHandler):
             if path=='/api/source/status':
                 return self.json_response(FRAME_INDEX.status(parse_qs(parsed.query).get('assetId',[''])[0]))
             if path=='/api/encoders':return self.json_response(encoders.available())
+            if path=='/api/export/native-project':return self.json_response({'available':NATIVE_PROJECT_RUNTIME is not None})
             if path=='/api/storage':
                 with LOCK:snapshot=deepcopy(STATE)
                 return self.json_response({'bytes':storage_usage(snapshot)})
@@ -1311,7 +1340,11 @@ class Handler(BaseHTTPRequestHandler):
                     raise ValueError('No completed Windows export folder to open')
                 os.startfile(Path(result).parent)
                 return self.json_response({'opened':True})
+            if path=='/api/export/comparison-master':
+                chosen=CHOOSE_COMPARISON_MASTER() if NATIVE_PROJECT_RUNTIME is not None else None
+                return self.json_response({'path':chosen,'cancelled':not chosen})
             if path=='/api/export' or path=='/api/review/video':
+                global NATIVE_EXPORT_THREAD
                 with JOB_LOCK:
                     if JOBS['export']['status']=='rendering':raise ValueError('Another export is active')
                 with LOCK:snap=deepcopy(STATE)
@@ -1347,6 +1380,19 @@ class Handler(BaseHTTPRequestHandler):
                 overwrite=not review and (data.get('overwrite') is True or not data.get('path'))
                 if dest.exists() and not overwrite:
                     raise ValueError('Output already exists. Confirm replacement to export.')
+                comparison=None
+                if 'comparisonMaster' in data:
+                    if delivery!='hdr10plus-master' or NATIVE_PROJECT_RUNTIME is None:
+                        raise ValueError('Experimental GPU project export is unavailable for this delivery')
+                    location=data['comparisonMaster']
+                    if not isinstance(location,str) or len(location)>32768:
+                        raise ValueError('Choose a verified local comparison master')
+                    comparison=Path(location)
+                    if not comparison.is_absolute() or comparison.suffix.lower()!='.mp4' or not comparison.is_file():
+                        raise ValueError('Choose a verified local MP4 comparison master')
+                    comparison=comparison.resolve()
+                    if comparison==dest.resolve() or (dest.exists() and comparison.samefile(dest)):
+                        raise ValueError('Choose a destination different from the comparison master')
                 dest.parent.mkdir(parents=True,exist_ok=True)
                 with JOB_LOCK:
                     if JOBS['export']['status']=='rendering':raise ValueError('Another export is active')
@@ -1357,7 +1403,11 @@ class Handler(BaseHTTPRequestHandler):
                         target,args=run_hdr10plus_copy,(snap,str(dest),overwrite)
                     else:
                         target,args=run_export,(snap,str(dest),review,overwrite,delivery,authored_frames)
-                    threading.Thread(target=target,args=args,daemon=True).start()
+                    if comparison is not None:
+                        args=(*args,comparison)
+                    thread=threading.Thread(target=target,args=args,daemon=True)
+                    NATIVE_EXPORT_THREAD=thread if comparison is not None else None
+                    thread.start()
                 if not review:remember_export_folder(dest)
                 return self.json_response({'started':True,'url':'/download/'+dest.name if review else None})
             if path=='/api/job/cancel':
