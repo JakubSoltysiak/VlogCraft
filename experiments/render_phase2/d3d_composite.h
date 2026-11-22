@@ -166,7 +166,7 @@ public:
     std::string adapterName;
 
     GpuCompositor(unsigned w,unsigned h,unsigned count,const Pixel* pixels,bool half,bool download,bool warp,
-                  bool pq=false)
+                  bool pq=false,bool resident=false)
         :width(w),height(h),sourceCount(count),outputStride(half?8:16) {
         D3D_FEATURE_LEVEL level=D3D_FEATURE_LEVEL_11_0;
         require(D3D11CreateDevice(nullptr,warp?D3D_DRIVER_TYPE_WARP:D3D_DRIVER_TYPE_HARDWARE,
@@ -196,9 +196,10 @@ public:
 
         D3D11_TEXTURE2D_DESC desc={width,height,1,sourceCount,DXGI_FORMAT_R32G32B32A32_FLOAT,{1,0},
                                    D3D11_USAGE_DEFAULT,D3D11_BIND_SHADER_RESOURCE,0,0};
+        if(resident) desc.BindFlags|=D3D11_BIND_UNORDERED_ACCESS;
         const auto started=Clock::now();
         require(device->CreateTexture2D(&desc,nullptr,source.init()),"Create reusable source surfaces");
-        upload(pixels);
+        if(pixels) upload(pixels);
         uploadMs=milliseconds(started);
         require(device->CreateShaderResourceView(source.get(),nullptr,view.init()),"Create source view");
         desc.ArraySize=1;
@@ -218,12 +219,25 @@ public:
             desc.CPUAccessFlags=D3D11_CPU_ACCESS_READ;
             require(device->CreateTexture2D(&desc,nullptr,readback.init()),"Create reusable download surface");
         }
-        context->CSSetShader(shader.get(),nullptr,0);
         ID3D11Buffer* parameters[]={constants.get()};
         context->CSSetConstantBuffers(0,1,parameters);
+        restore_inputs();
+        sample_memory();
+    }
+
+    ID3D11Device* d3d_device() const {return device.get();}
+    ID3D11DeviceContext* d3d_context() const {return context.get();}
+    ID3D11Texture2D* source_texture() const {return source.get();}
+
+    void restore_inputs() {
+        context->CSSetShader(shader.get(),nullptr,0);
         ID3D11ShaderResourceView* inputs[]={view.get(),edgeView.get()};
         context->CSSetShaderResources(0,2,inputs);
-        sample_memory();
+    }
+
+    void finish_source_work() {
+        context->End(completed.get());
+        wait<BOOL>(completed.get());
     }
 
     void sample_memory() {

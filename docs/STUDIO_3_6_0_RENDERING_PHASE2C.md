@@ -39,3 +39,31 @@ The saved-project export tool exposes explicit fast authoring. Its qualified def
 python benchmarks/profile_phase2c_author.py generated-120.mp4 build/qa/profile120 --frames 120
 python benchmarks/compare_phase2c_author.py build/qa/profile120 build/qa/author120 --library $statisticsDll --mode pipe --mode native1 --mode native3
 ```
+
+## Prepared-source UHD60 delivery
+
+| Pictures | Phase 2B delivery | Phase 2C delivery | Phase 2C authoring | Phase 2C output FPS |
+|---:|---:|---:|---:|---:|
+| 24 | 8.126 s | 6.780 s median | 1.219 s median | 3.540 |
+| 120 | 33.758 s | 16.012 s | 3.878 s | 7.494 |
+| 300 | 79.281 s | 32.911 s | 8.893 s | 9.115 |
+| 600 | 157.253 s | 61.121 s | 17.351 s | 9.817 |
+
+The three 24-picture runs delivered in 6.156, 6.780 and 7.609 s. Every complete master matched the corresponding archived Phase 2B master byte for byte, including its encoded pictures, PCM, static HDR, clocks and frame-associated dynamic metadata. The 600-picture arm used 3.94 GiB peak summed working set with the same 480,000-sample audio endpoint. It delivered 2.57 times as fast. These times use the unchanged delivery timer and exclude the additional independent post-delivery check.
+
+## Resident D3D11 source input
+
+The experimental worker attaches libav's D3D11VA decoder to the compositor's own device. It validates the original time base and each decoded presentation timestamp against the separately probed index. Changes in selected picture update their existing FP32 source slot. A compute pass samples the NV12 or P010 planes directly, applies the tested display-referred SDR/PQ interpretation and performs fit and right-angle orientation. It leaves the original surfaces resident. An event query protects their lifetime before reuse. The authored metadata is still derived from the final decoded x265 encode. [DXGI planar formats](https://learn.microsoft.com/en-us/windows/win32/api/dxgiformat/ne-dxgiformat-dxgi_format) · [zimg transfer functions](https://github.com/sekrit-twc/zimg/blob/master/src/zimg/colorspace/gamma.cpp).
+
+| Matched live UHD60, 24 pictures | Software input | Resident input | Resident decoded PQ PSNR | Peak summed working set, software → resident |
+|---|---:|---:|---:|---:|
+| H.264 SDR VFR and generated HEVC PQ | 39.398 s | 5.628 s | 57.95 dB | 7,785 → 2,197 MiB |
+| H.264 SDR VFR and rotated private HEVC PQ | 26.563 s | 5.398 s | 55.34 dB | 6,827 → 2,095 MiB |
+
+Both resident arms verified timestamps, static HDR, 24 dynamic records and exact 19,200-sample audio endpoints against the independent masters. The generated route decoded 23 SDR and 27 PQ pictures and selected 19 and 24 respectively. The VFR holds use the previously selected picture when the next original PTS is later than the requested picture. Resident source video incurred zero CPU frame transfers. One generated overlay still uploads once and the output remains a packed readback to CPU x265.
+
+Separate 24-picture null probes distinguish initialization and decode from the rest of the input route. H.264 demux took 0.057 s, software decode 0.089 s and D3D11 decode 0.243 s. The private HEVC arm took 0.054, 1.691 and 0.415 s respectively. Both D3D11 null paths explicitly reported a resident pixel format. The short H.264 arm demonstrates the hardware setup cost. The large end-to-end gain comes from resident normalization and avoiding bulk host frame movement as well as decode.
+
+The first small resident encode reached 49.61 dB and failed the established 50 dB gate. The UHD candidate continued to use the same gate. Early software comparison attempts lacked the shared runtime DLL path, and one native camera run logged a libav message before its JSON receipt. The corrected path validates the native receipt and preserves the DLL environment for the software retry. WARP exercised this fallback and produced exact decoded output. A production-quality failure prevents candidate publication.
+
+GPU statistics computed on the pre-encode surface would describe a different image. A matched 24-picture diagnostic reconstructed the packed pre-encode pictures using the same PQ RGB path. All 24 resulting payloads differed from their compressed and decoded counterparts. The qualified metadata authority remains the final decoded image. GPU analysis on that decoded image still needs exact reconstruction and histogram conformance.

@@ -40,7 +40,7 @@ def camera(folder,index,size,duration):
     return name
 
 
-def state_for(folder,canvas,source_canvas,count,spatial_motion):
+def state_for(folder,canvas,source_canvas,count,spatial_motion,*,video_inputs=None):
     w,h=canvas
     block=count//3; duration=block/60
     photos=[folder/'photograph.jpg',folder/'overlay.png']
@@ -50,7 +50,8 @@ def state_for(folder,canvas,source_canvas,count,spatial_motion):
     image=Image.new('RGBA',(320,180),(0,0,0,0))
     ImageDraw.Draw(image).rectangle((45,16,115,68),fill=(255,255,255,92))
     image.save(photos[1])
-    inputs=[camera(folder,n,source_canvas,2*duration+.3) for n in range(2)]+photos
+    inputs=(list(video_inputs) if video_inputs else
+            [camera(folder,n,source_canvas,2*duration+.3) for n in range(2)])+photos
     music=folder/'background.wav'
     ff('ffmpeg','-v','error','-y','-f','lavfi','-i',f'sine=f=180:r=48000:d={count/60}',str(music))
     inputs.append(music)

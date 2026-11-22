@@ -1,5 +1,9 @@
 # Architecture and continuation
 
+## 3.6.0 Phase 2C HDR delivery
+
+The optional authoring path enlarges the Windows pipe and uses a native exact MaxRGB histogram with bounded, ordered workers. The existing PQ ranks, payload serializer and verification still operate on final decoded pictures. The resident decoder experiment uses the compositor device for libav D3D11VA, validates original PTS and normalizes tested NV12/P010 sources through compute into reusable linear slots. Driver or admission failure retries the software input, and delivery requires independent output validation. [Phase 2C evidence](docs/STUDIO_3_6_0_RENDERING_PHASE2C.md).
+
 ## 3.6.0 Phase 2B HDR delivery
 
 The render lab compares the frozen zimg converter, bounded independent zimg workers and a D3D11 compute conversion from FP32 Rec.2020 to packed limited-range PQ 4:2:0. The CPU branch preserves error diffusion and emits in frame order. The GPU path uses ordered dithering and reads back one quarter of the former float payload. The live test admits H.264 SDR and HEVC PQ with verified original PTS and updates only changed texture slots. A separate opt-in saved-project tool may replace the final managed HDR stage with the exact CPU conversion. It retains the existing project graph, audio, metadata and reference fallback. [Phase 2B evidence](docs/STUDIO_3_6_0_RENDERING_PHASE2B.md).

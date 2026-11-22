@@ -8,6 +8,10 @@
 #include <iostream>
 #include <utility>
 
+#ifdef VLOGCRAFT_RESIDENT_DECODE
+#include "hardware_inputs.h"
+#endif
+
 using namespace render_phase2;
 
 namespace {
@@ -85,17 +89,24 @@ int wmain(int argc,wchar_t** argv) {
         const std::wstring destinationMode=argv[4];
         const bool pq=destinationMode==L"@pq-stream";
         const bool pipe=pq||destinationMode==L"@gbr-stream";
-        const bool live=std::wstring(argv[3])==L"@live-stdin";
+        const std::wstring sourceMode=argv[3];
+        const bool live=sourceMode==L"@live-stdin";
+        const std::wstring residentPrefix=L"@resident:";
+        const bool resident=sourceMode.rfind(residentPrefix,0)==0;
         const bool save=destinationMode!=L"-";
         if(pipe && (!gpu || half))
             throw std::runtime_error("Planar pipe requires an FP32 compositor");
         if(pipe && _setmode(_fileno(stdout),_O_BINARY)==-1)
             throw std::runtime_error("Cannot put the picture pipe into binary mode");
-        if(live && (!gpu || !pipe || uploads || warmup))
+        if((live||resident) && (!gpu || !pipe || uploads || warmup))
             throw std::runtime_error("Live uploads require a binary FP32 pipe without warmup");
+#ifndef VLOGCRAFT_RESIDENT_DECODE
+        if(resident) throw std::runtime_error("Resident decoder is unavailable in this worker build");
+#endif
         std::ifstream plan(std::filesystem::path(argv[2]),std::ios::binary);
         std::ifstream sourceFile;
-        if(!live) sourceFile.open(std::filesystem::path(argv[3]),std::ios::binary);
+        if(!live) sourceFile.open(std::filesystem::path(
+            resident?sourceMode.substr(residentPrefix.size()):sourceMode),std::ios::binary);
         const auto readStart=Clock::now();
         InputHeader input{};
         read_exact(plan,&input,sizeof(input));
@@ -105,6 +116,7 @@ int wmain(int argc,wchar_t** argv) {
            !input.images||input.images>8||!input.frames||input.frames>7200)
             throw std::runtime_error("Unsupported generated fixture dimensions");
         if(fault>=int(input.frames)) throw std::runtime_error("Fault is outside the trial");
+        if(resident&&input.images!=3) throw std::runtime_error("Two video and one still source slots required");
         const auto count=std::size_t(input.width)*input.height;
         if(count*input.images*sizeof(Pixel)>1ull<<31)
             throw std::runtime_error("Generated fixture exceeds the test texture budget");
@@ -127,9 +139,9 @@ int wmain(int argc,wchar_t** argv) {
         }
         if(plan.peek()!=EOF) throw std::runtime_error("Unexpected extra frame parameters");
         for(const auto& frame:frames) validate(frame,input);
-        std::vector<Pixel> texture(count*input.images);
+        std::vector<Pixel> texture(resident?0:count*input.images);
         if(live) read_live(texture.data(),texture.size()*sizeof(Pixel));
-        else {
+        else if(!resident) {
             read_exact(sourceFile,texture.data(),texture.size()*sizeof(Pixel));
             if(sourceFile.peek()!=EOF) throw std::runtime_error("Unexpected extra source bytes");
         }
@@ -149,19 +161,27 @@ int wmain(int argc,wchar_t** argv) {
         std::unique_ptr<GpuCompositor> accelerator;
         std::unique_ptr<CpuCompositor> cpu;
         if(gpu) accelerator=std::make_unique<GpuCompositor>(input.width,input.height,input.images,
-            texture.data(),half,save,mode==L"warp32",pq);
+            resident?nullptr:texture.data(),half,save,mode==L"warp32",pq,resident);
         else cpu=std::make_unique<CpuCompositor>(mode==L"scalar"?0:workers);
         if(gpu && !uploads) {
             std::vector<Pixel>().swap(texture);
         }
+#ifdef VLOGCRAFT_RESIDENT_DECODE
+        std::unique_ptr<HardwareInputs> decoder;
+        if(resident) decoder=std::make_unique<HardwareInputs>(*accelerator,sourceFile,
+            input.width,input.height,input.frames);
+#endif
         const double setupMs=milliseconds(setupStart);
 
-        struct Sample { double work, upload, dispatch, shading, readback, write, color; bool gpuValid; };
+        struct Sample { double work, upload, dispatch, shading, readback, write, color, normalize; bool gpuValid; };
         std::vector<Sample> records(input.frames);
         std::vector<RowRange> coverage(input.height*3);
         std::vector<Pixel> updated(live?count:0);
         const auto render=[&](unsigned index,bool measured){
             Sample value{};
+#ifdef VLOGCRAFT_RESIDENT_DECODE
+            if(resident) value.normalize=decoder->update(index);
+#endif
             if(live && index) {
                 std::uint32_t changes=0;
                 read_live(&changes,sizeof(changes));
@@ -252,7 +272,14 @@ int wmain(int argc,wchar_t** argv) {
             stats<<"{\"frames\":"<<row.frames<<",\"rss_bytes\":"<<row.rss
                      <<",\"gpu_local_bytes\":"<<row.local<<",\"gpu_nonlocal_bytes\":"<<row.shared<<'}';
         }
-        stats<<"],\"samples\":[";
+        stats<<"]";
+#ifdef VLOGCRAFT_RESIDENT_DECODE
+        if(resident) {
+            stats<<",\"resident_sources\":";
+            decoder->measurements(stats);
+        }
+#endif
+        stats<<",\"samples\":[";
         bool comma=false;
         for(const auto& row:records) {
             if(comma) stats<<',';
@@ -265,6 +292,7 @@ int wmain(int argc,wchar_t** argv) {
                 stats<<",\"color_gpu_ms\":";
                 if(row.color>=0) stats<<row.color; else stats<<"null";
             }
+            if(resident) stats<<",\"source_normalization_ms\":"<<row.normalize;
             stats<<'}';
         }
         stats<<"]}\n";
