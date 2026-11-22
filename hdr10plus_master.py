@@ -1,4 +1,5 @@
 """Attach authored metadata to the existing managed HEVC encode without re-encoding."""
+from contextlib import closing
 from fractions import Fraction
 from itertools import zip_longest
 from pathlib import Path
@@ -184,7 +185,13 @@ def verify(original, output, streams, records, width, fps, count, cancelled):
                     raise ValueError('HDR10+ export changed compressed pictures or metadata association')
 
 
-def author(original, output, work, fps, count, runner, stage, cancelled, owns_process=lambda _:None):
+def serial_records(frames):
+    for frame in frames:
+        yield payload(frame)
+
+
+def author(original, output, work, fps, count, runner, stage, cancelled, owns_process=lambda _:None, *,
+           frame_source=None, picture_records=None):
     """Author, insert and verify every picture before caller publishes output."""
     original, output, work = map(Path, (original,output,work))
     fps = timing.rate(fps)
@@ -200,16 +207,21 @@ def author(original, output, work, fps, count, runner, stage, cancelled, owns_pr
     if shutil.disk_usage(work).free < 3*original.stat().st_size + 4096*count:
         raise ValueError('Not enough free working disk space to author and verify the HDR10+ master')
     stage('Analyzing final PQ pictures for HDR10+ metadata', 93)
-    with records.open('wb') as file, decoded_frames(
+    read_frames = frame_source or decoded_frames
+    write_records = picture_records or serial_records
+    with records.open('wb') as file, read_frames(
             original,video['width'],video['height'],cancelled,owns_process) as frames:
         actual = 0
-        for frame in frames:
-            actual += 1
-            if actual > count:
-                raise ValueError('Too many decoded HDR10+ pictures')
-            file.write(payload(frame))
-            if actual % 60 == 0:
-                stage(f'Analyzing final PQ pictures · {actual} / {count}', 93)
+        with closing(iter(write_records(frames))) as records_iter:
+            for record in records_iter:
+                actual += 1
+                if actual > count:
+                    raise ValueError('Too many decoded HDR10+ pictures')
+                if len(record) != PAYLOAD_BYTES:
+                    raise ValueError('Invalid HDR10+ record size')
+                file.write(record)
+                if actual % 60 == 0:
+                    stage(f'Analyzing final PQ pictures · {actual} / {count}', 93)
         if actual != count:
             raise ValueError('Decoded HDR10+ picture count does not match the timeline')
     base = str(time_base.denominator)

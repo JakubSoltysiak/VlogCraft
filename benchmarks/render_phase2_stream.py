@@ -71,17 +71,23 @@ def normalized_loops(folder, scenario):
 
 
 def collect(path):
-    result=json.loads(path.read_text(encoding='utf8'))
+    # libav driver diagnostics may precede the worker's final report.
+    lines=path.read_text(encoding='utf8',errors='replace').splitlines()
+    reports=[line for line in lines if line.startswith('{"wall_ms":')]
+    if len(reports)!=1:
+        raise ValueError('Expected one complete native picture receipt')
+    result=json.loads(reports[0])
     samples=result.pop('samples')
     result['frames']=len(samples)
-    for key in ('work_ms','gpu_ms','upload_ms','readback_ms','write_ms','dispatch_ms','color_gpu_ms'):
+    for key in ('work_ms','gpu_ms','upload_ms','readback_ms','write_ms','dispatch_ms','color_gpu_ms',
+                'source_normalization_ms'):
         if any(key in row for row in samples):
             result[key]=distribution([row[key] for row in samples if row.get(key) is not None])
     return result
 
 
 def stream_video(executable, plan, sources, stage, target, scenario, frames, contract, backend, timeout,
-                 conversion='reference',workers=3,simulate_removal=False):
+                 conversion='reference',workers=3,simulate_removal=False,*,hardware_bin=None,libav_bin=None):
     """The operating-system pipe blocks the producer when x265 falls behind."""
     native_log=stage/'native.json'
     encoder_log=stage/'encoder.log'
@@ -92,7 +98,7 @@ def stream_video(executable, plan, sources, stage, target, scenario, frames, con
     flags=getattr(subprocess,'CREATE_NO_WINDOW',0)
     processes=[]
     parallel=None
-    live=sources if isinstance(sources,LiveInputs) else None
+    live=sources if isinstance(sources,LiveInputs) and not hardware_bin else None
     writer=None
     input_stats=None
     started=time.perf_counter()
@@ -101,13 +107,22 @@ def stream_video(executable, plan, sources, stage, target, scenario, frames, con
             if live:
                 live.start(stage)
             mode='@pq-stream' if conversion=='gpu' else '@gbr-stream'
-            source='@live-stdin' if live else str(sources)
+            if hardware_bin:
+                source='@resident:'+str(sources.manifest(stage/'resident-input.bin'))
+            else:
+                source='@live-stdin' if live else str(sources)
+            runtime=hardware_bin or libav_bin
+            if runtime:
+                native_environment=dict(os.environ)
+                native_environment['PATH']=str(runtime.resolve())+os.pathsep+os.environ.get('PATH','')
+            else:
+                native_environment=None
             native=[str(executable),backend,str(plan),source,mode,'0','8','0']
             if simulate_removal:
                 native.append('2')
             producer=subprocess.Popen(native,
                                       stdin=subprocess.PIPE if live else subprocess.DEVNULL,
-                                      stdout=subprocess.PIPE,stderr=hints,creationflags=flags)
+                                      stdout=subprocess.PIPE,stderr=hints,creationflags=flags,env=native_environment)
             processes.append(producer)
             with producer.stdout:
                 sink=subprocess.PIPE if conversion=='parallel' else producer.stdout
@@ -156,6 +171,12 @@ def stream_video(executable, plan, sources, stage, target, scenario, frames, con
     if input_stats:
         stats['live_decoders']=input_stats
         stats['live_input_workers']=2 if live.parallel else 1
+    if hardware_bin:
+        rows=stats.get('resident_sources')
+        if not rows or len(rows)!=len(sources.sources):
+            raise RuntimeError('Resident decoder did not return complete frame-clock evidence')
+        stats['live_decoders']=[dict(source.stats,**row,update_bytes=0)
+                                for source,row in zip(sources.sources,rows,strict=True)]
     return stats
 
 
@@ -184,6 +205,7 @@ def experiment(args):
     sys.path[:0]=[str(ROOT),str(ROOT/'tests')]
     from performance import Resources
     from test_hdr_color import CONTRACT
+    from phase2c_author import author_options
 
     require_ac=not (args.quick and args.backend=='warp32')
     if require_ac and not power():
@@ -200,6 +222,7 @@ def experiment(args):
     conditions=Conditions()
     initial=technical_conditions()
     report={}
+    authoring=author_options(args.author_dll,args.author_workers) if args.fast_author else {}
     try:
         with tempfile.TemporaryDirectory(prefix='bounded-',dir=results) as directory:
             stage=Path(directory)
@@ -244,10 +267,24 @@ def experiment(args):
             try:
                 started=time.perf_counter()
                 video=stage/'pipe.video.mov'
+                hardware_fallback=False
                 try:
-                    stats=stream_video(args.executable.resolve(),plan,sources,stage,video,
-                                       scenario,count,CONTRACT,args.backend,args.timeout,args.conversion,args.workers,
-                                       args.simulate_device_removal)
+                    try:
+                        stats=stream_video(args.executable.resolve(),plan,sources,stage,video,
+                                           scenario,count,CONTRACT,args.backend,args.timeout,args.conversion,args.workers,
+                                           args.simulate_device_removal,hardware_bin=args.hardware_bin,libav_bin=args.libav_bin)
+                    except (RuntimeError, OSError, ValueError, subprocess.SubprocessError):
+                        if not args.hardware_bin:
+                            raise
+                        hardware_fallback=True
+                        for name in ('native.json','encoder.log'):
+                            log=stage/name
+                            if log.exists():
+                                (results/('hardware-'+name)).write_bytes(log.read_bytes())
+                        video.unlink(missing_ok=True)
+                        stats=stream_video(args.executable.resolve(),plan,sources,stage,video,
+                                           scenario,count,CONTRACT,args.backend,args.timeout,args.conversion,args.workers,
+                                           args.simulate_device_removal,libav_bin=args.hardware_bin)
                 except Exception:
                     for log in [stage/'native.json',stage/'encoder.log',
                                 *stage.glob('converter-*.log'),*stage.glob('decoder-*.log')]:
@@ -260,7 +297,7 @@ def experiment(args):
                 mux(video,audio,static,scenario,count)
                 mux_seconds=time.perf_counter()-mux_started
                 verify_start=time.perf_counter()
-                rendered=delivery(stage,static,master,scenario.fps,count,verify_start-started)
+                rendered=delivery(stage,static,master,scenario.fps,count,verify_start-started,authoring=authoring)
                 verification_seconds=time.perf_counter()-verify_start-rendered['author_seconds']
             finally:
                 metrics=monitor.finish()
@@ -287,6 +324,9 @@ def experiment(args):
                 os.replace(master,results/'verified-hdr10plus.mp4')
             report.update(source_commit=revision,
                           reference=BASELINE,backend=args.backend,conversion=args.conversion,
+                          fast_authoring=bool(authoring),native_authoring=bool(args.author_dll),
+                          analysis_workers=args.author_workers if args.author_dll else 0,
+                          resident_input_requested=bool(args.hardware_bin),resident_input_fallback=hardware_fallback,
                           dimensions=[scenario.width,scenario.height],
                           frames=count,fps=scenario.fps,loops=args.loops,source_clip_hashes=identities,
                           source_preparation_seconds=prep,independent_verification_seconds=verification_seconds,
@@ -322,10 +362,15 @@ def main():
     parser.add_argument('--source',type=Path,action='append',default=[],help='Supply one PQ source or a matched pair')
     parser.add_argument('--in-point',type=Fraction,action='append',default=[],help='Supply two exact relative in-points')
     parser.add_argument('--parallel-decode',action='store_true',help='Read at most one picture per live decoder concurrently')
+    parser.add_argument('--hardware-bin',type=Path,help='Try the resident D3D11 source worker with this libav DLL directory')
+    parser.add_argument('--libav-bin',type=Path,help='Supply DLLs for a shared worker while retaining software input')
     parser.add_argument('--compare-disk',action='store_true',help='Verify exact equivalence with the packed disk path')
     parser.add_argument('--compare-master',type=Path,help='Independently compare a frozen master made from identical inputs')
     parser.add_argument('--conversion',choices=('reference','parallel','gpu'),default='reference')
     parser.add_argument('--workers',type=int,choices=range(2,5),default=3)
+    parser.add_argument('--fast-author',action='store_true',help='Use a bounded large analysis pipe')
+    parser.add_argument('--author-dll',type=Path,help='Use the exact native MaxRGB histogram')
+    parser.add_argument('--author-workers',type=int,choices=range(1,5),default=1)
     parser.add_argument('--simulate-device-removal',action='store_true',help='Inject D3D11 device removal during a quick test')
     parser.add_argument('--backend',choices=('gpu32','warp32'),default='gpu32')
     args=parser.parse_args()
@@ -336,6 +381,10 @@ def main():
         parser.error('Invalid live source or fixture combination')
     if args.conversion!='reference' and not args.compare_master:
         parser.error('An independently verified reference master is required for candidate publication')
+    if args.author_dll and not args.fast_author:
+        parser.error('Native analysis requires the explicit fast-authoring option')
+    if args.hardware_bin and (not args.live or not args.compare_master or not args.hardware_bin.is_dir()):
+        parser.error('Resident input requires a live comparison master and a valid libav DLL directory')
     if args.simulate_device_removal and (not args.quick or args.frames<3):
         parser.error('Fault injection requires a quick fixture with at least three pictures')
     experiment(args)

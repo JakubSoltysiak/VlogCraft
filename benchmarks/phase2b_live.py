@@ -72,6 +72,8 @@ class Source:
             raise ValueError("Only right-angle source rotation is supported")
         width, height = video["width"], video["height"]
         coded_dimensions = [width,height]
+        self.coded_dimensions = coded_dimensions
+        self.rotation = int(rotation)
         if rotation % 180:
             width, height = height, width
         self.width, self.height = fit_dimensions(width, height, scenario.width, scenario.height)
@@ -151,6 +153,21 @@ class LiveInputs:
             self.logs.append(log)
             source.start(log)
 
+    def manifest(self, path):
+        """Supply original ticks and verified source selection to the native decoder."""
+        with path.open("wb") as file:
+            file.write(b"VSD1")
+            for source in self.sources:
+                name = str(source.path).encode("utf-8")
+                file.write(struct.pack("<10I",len(name),*source.coded_dimensions,source.width,source.height,
+                                       -source.rotation%360,int(source.stats["transfer"]=="smpte2084"),
+                                       len(source.expected_ticks),source.base.numerator,source.base.denominator))
+                file.write(name)
+                np.asarray(source.expected_ticks,dtype="<i8").tofile(file)
+                np.asarray(source.selected,dtype="<u4").tofile(file)
+            source_picture(self.scenario,2).tofile(file)
+        return path
+
     def write(self, stream):
         with stream, ExitStack() as resources:
             readers = resources.enter_context(ThreadPoolExecutor(max_workers=2)) if self.parallel else None
@@ -195,9 +212,9 @@ class LiveInputs:
             log.close()
 
 
-def generated_sources(stage, scenario, frames, *, only_sdr=False):
+def generated_sources(stage, scenario, frames, *, only_sdr=False, extra_frames=24):
     """Make changing H.264 SDR VFR and HEVC PQ source files with separate audio."""
-    duration = (frames+24)/scenario.fps
+    duration = (frames+extra_frames)/scenario.fps
     paths = []
     for index in range(1 if only_sdr else 2):
         width = scenario.width if index else scenario.width//2

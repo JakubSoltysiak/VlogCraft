@@ -2,6 +2,11 @@
 
 Tested means the specific check in VERIFICATION.md passed. Implemented means code is available with further acceptance coverage needed. Partial identifies implemented behavior with material gaps. Missing identifies an unavailable capability. A test result qualifies its fixture and environment.
 
+| 3.6.0 Phase 2C HDR delivery | Status | Verified scope / remaining limits |
+|---|---|---|
+| Exact fast HDR10+ authoring | Tested subset | Opt-in bulk pipe and bounded native statistics. Byte-identical masters through 600 UHD60 pictures. The default author is the reference and fallback. |
+| Resident D3D11 source decoding | Experimental | H.264 SDR and HEVC Main10 PQ with original PTS, including a rotated camera clip. Independent UHD comparisons and WARP software fallback. Wider color, codec, project and physical device coverage remain open. |
+
 | 3.6.0 Phase 2B HDR delivery | Status | Verified scope / remaining limits |
 |---|---|---|
 | Bounded CPU-parallel PQ conversion | Tested subset | Exact decoded picture and PCM at 24 and 120 UHD frames. Explicit saved-project tool uses the managed timeline, audio and metadata authoring. Verified segment fallback for a converter failure. |

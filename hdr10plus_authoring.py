@@ -1,5 +1,5 @@
 """Whole-picture ST 2094-40 version-1 statistics for a decoded PQ master."""
-from contextlib import contextmanager
+from contextlib import ExitStack, contextmanager
 import subprocess
 import tempfile
 
@@ -21,7 +21,11 @@ def statistics(frame):
     for start in range(0, height, 128):
         tile = frame[:, start:start+128, :]
         histogram += np.bincount(np.max(tile, axis=0).ravel(), minlength=65536)
-    count = frame.shape[1] * frame.shape[2]
+    return summarize(histogram, frame.max(axis=(1, 2)), frame.shape[1] * frame.shape[2])
+
+
+def summarize(histogram, channel_maxima, count):
+    """Use the same rank, PQ lookup and rounding for any exact histogram."""
     cdf = np.cumsum(histogram)
     levels = []
     for percentage in PERCENTILES:
@@ -32,14 +36,18 @@ def statistics(frame):
             numerator = 9998 if percentage == 99 else percentage * 100
             rank = (count*numerator + 9999)//10000
             levels.append(round(LINEAR[cdf.searchsorted(rank)]*100000))
-    g, b, r = frame.max(axis=(1, 2))
+    g, b, r = channel_maxima
     maximum = tuple(round(LINEAR[code]*100000) for code in (r, g, b))
     average = round(float(np.sum(histogram*LINEAR))*100000/count)
     return maximum, average, tuple(zip(PERCENTILES, levels))
 
 
 def payload(frame):
-    maximum, average, distribution = statistics(frame)
+    return serialize(statistics(frame))
+
+
+def serialize(values):
+    maximum, average, distribution = values
     # Profile A: no target-display curve or peak matrices. FractionBrightPixels
     # is explicitly uncalculated as permitted by ST 2094-40 §8.6.
     fields = [(1,8), (1,2), (0,27), (0,1)]
@@ -69,7 +77,7 @@ def prefix_sei(data, temporal_id):
 
 
 @contextmanager
-def decoded_frames(path, width, height, cancelled, owns_process=lambda _:None):
+def decoded_frames(path, width, height, cancelled, owns_process=lambda _:None, *, output_pipe=None):
     """Yield exactly one reconstructed frame at a time in presentation order."""
     matrix = ('zscale=agamma=0:pin=2020:tin=smpte2084:min=2020_ncl:rin=limited:'
               'p=2020:t=smpte2084:m=gbr:r=full:filter=bilinear,format=gbrp16le')
@@ -78,12 +86,19 @@ def decoded_frames(path, width, height, cancelled, owns_process=lambda _:None):
             '-fps_mode','passthrough','-c:v','rawvideo','-threads','1',
             '-pix_fmt','gbrp16le','-f','rawvideo','pipe:1']
     frame_bytes = width * height * 6
-    with tempfile.TemporaryFile() as errors, subprocess.Popen(
-            args, stdout=subprocess.PIPE, stderr=errors, creationflags=CREATE_FLAGS) as process:
+    with ExitStack() as stack:
+        errors = stack.enter_context(tempfile.TemporaryFile())
+        reader, writer = stack.enter_context(output_pipe()) if output_pipe else (None, subprocess.PIPE)
+        process = stack.enter_context(subprocess.Popen(
+            args, stdout=writer, stderr=errors, creationflags=CREATE_FLAGS))
+        if reader is None:
+            reader = process.stdout
+        else:
+            writer.close()
         owns_process(process)
         def pictures():
             while not cancelled():
-                raw = process.stdout.read(frame_bytes)
+                raw = reader.read(frame_bytes)
                 if cancelled():
                     raise RuntimeError('Export cancelled')
                 if not raw:

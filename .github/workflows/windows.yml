@@ -36,7 +36,15 @@ jobs:
         run: |
           python tools/audit_repository.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          python tools/performance_record.py docs/benchmarks/studio-3.6.0-rendering.json
+          $archive = 'build/qa/phase2b-evidence'
+          New-Item -ItemType Directory -Force -Path $archive | Out-Null
+          git archive --format=tar --output=build/qa/phase2b-evidence.tar 899ad995fc6ffd013e1eac2c25339459887fedc6
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          tar -xf build/qa/phase2b-evidence.tar -C $archive
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python "$archive/tools/performance_record.py" "$archive/docs/benchmarks/studio-3.6.0-rendering.json"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tools/performance_record.py docs/benchmarks/studio-3.6.0-phase2c.json
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python tests/icon_assets.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
@@ -96,6 +104,13 @@ jobs:
           tar -xf build/qa/phase2-reference.tar -C $reference
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           $zig = (Get-ChildItem build/tools/architecture/zig -Filter zig.exe -Recurse | Select-Object -First 1).FullName
+          & $zig c++ -target x86_64-windows-gnu -std=c++17 -O3 -shared experiments/render_phase2/hdr_statistics.cpp -o build/qa/hdr-statistics.dll
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python benchmarks/check_phase2c_stats.py build/qa/hdr-statistics.dll
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $sdk = (Resolve-Path 'build/tools/architecture/ffmpeg-shared/ffmpeg-9.0.2-full_build-shared').Path
+          & $zig c++ -target x86_64-windows-gnu -std=c++17 -O3 -fno-vectorize -fno-slp-vectorize -ffp-contract=off -municode -DVLOGCRAFT_RESIDENT_DECODE experiments/render_phase2/main.cpp "-I$sdk/include" "-L$sdk/lib" -lavformat -lavcodec -lavutil -lswscale -ld3d11 -ld3dcompiler_47 -lpsapi -o build/qa/VlogCraftResident.exe
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python benchmarks/render_phase2.py build/qa/phase2-warp --reference $reference --compiler $zig --quick --frames 3 --repeat 1 --modes ffmpeg,scalar,simd,warp32 --cases uhd-mask,uhd-dissolve,edge-half --precise-edges --assert-quality
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python benchmarks/render_phase2_export.py build/qa/phase2-fallback --reference $reference --executable build/qa/phase2-warp/VlogCraftRenderLab.exe --quick --frames 3 --precise-edges --force-fallback
@@ -110,6 +125,10 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python benchmarks/render_phase2_stream.py build/qa/phase2b-live --executable build/qa/phase2-warp/VlogCraftRenderLab.exe --backend warp32 --quick --frames 8 --live --parallel-decode --conversion parallel --workers 2 --compare-master build/qa/phase2b-live-reference/verified-hdr10plus.mp4
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python benchmarks/run_qa.py --results build/qa/phase2c-fallback-supervisor --timeout 90 -- python benchmarks/render_phase2_stream.py build/qa/phase2c-fallback --executable build/qa/VlogCraftResident.exe --backend warp32 --quick --frames 8 --live --parallel-decode --hardware-bin "$sdk/bin" --fast-author --author-dll build/qa/hdr-statistics.dll --author-workers 3 --compare-master build/qa/phase2b-live-reference/verified-hdr10plus.mp4
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $fallback = Get-Content build/qa/phase2c-fallback/report.json -Raw | ConvertFrom-Json
+          if (!$fallback.resident_input_fallback -or !$fallback.independent_master_comparison.passed) { exit 1 }
           python benchmarks/run_qa.py --results build/qa/phase2b-fault-supervisor --timeout 90 -- python benchmarks/render_phase2_stream.py build/qa/phase2b-fault --executable build/qa/phase2-warp/VlogCraftRenderLab.exe --backend warp32 --quick --frames 8 --live --parallel-decode --simulate-device-removal
           if ($LASTEXITCODE -ne 1) { exit 1 }
           $receipt = Get-Content build/qa/phase2b-fault-supervisor/supervisor.json -Raw | ConvertFrom-Json
