@@ -31,6 +31,9 @@
 
 ## 3.6.0 performance investigation
 
+- [x] **VC-PERF-360-004 — Compare native compositing in an experimental HDR export.** Scalar and SIMD CPU, D3D11 FP32/FP16, independently decoded frozen controls and automated FFmpeg fallback. FP32 is the measured candidate for a hybrid path. [Phase 2](docs/STUDIO_3_6_0_RENDERING_PHASE2.md).
+- [ ] **VC-PERF-360-005 — Stream eligible decoded surfaces into the native compositor.** Measure the complete project graph, GPU residency, downstream output transfers, audio and preview clocks. Keep the production renderer and the full 60-second delivery gate.
+
 - [x] **VC-PERF-360-001 — Isolate the managed HDR rendering bottleneck.** Frozen scene ablations separate the affine and matte expression cost from decoding, encoding and HDR10+ authoring. Preserve the 720p and UHD spatial timeouts and decoded-quality comparisons. [Phase 1 evidence](docs/STUDIO_3_6_0_RENDERING.md).
 - [ ] **VC-PERF-360-002 — Make longer mixed UHD renders practical.** Use the independently verified 3.6.0 short runs as the comparator. Measure remaining affine sampling, float-surface ownership and bandwidth on longer, higher-entropy content. Keep the full 60-second export gate open until shorter trials support it.
 - [ ] **VC-PERF-360-003 — Qualify any HDR AV backend.** Keep the verified CPU Main10 path. A hardware path needs independently verified image quality, static mastering and content-light signalling, audio and frame clocks, dynamic metadata association and practical speed improvement.
