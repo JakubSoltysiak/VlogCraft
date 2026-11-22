@@ -241,9 +241,13 @@ public:
 
     void upload(const Pixel* pixels) {
         for(unsigned i=0;i<sourceCount;++i)
-            context->UpdateSubresource(source.get(),i,nullptr,pixels+std::size_t(i)*width*height,width*sizeof(Pixel),0);
+            upload_slice(i,pixels+std::size_t(i)*width*height);
         context->End(completed.get());
         wait<BOOL>(completed.get());
+    }
+
+    void upload_slice(unsigned slice,const Pixel* pixels) {
+        context->UpdateSubresource(source.get(),slice,nullptr,pixels,width*sizeof(Pixel),0);
     }
 
     void render(const Frame& frame,const RowRange* coverage) {

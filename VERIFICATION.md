@@ -1,5 +1,14 @@
 # VlogCraft Studio development qualification
 
+## 3.6.0 Phase 2B HDR delivery
+
+[Draft PR #17](https://github.com/JakubSoltysiak/VlogCraft/pull/17) is stacked on Phase 2 at `ef829c1c6c97c9915140dd16b81efd9ec8482b46`. [Report](docs/STUDIO_3_6_0_RENDERING_PHASE2B.md) and [measurements](docs/benchmarks/studio-3.6.0-phase2b.json).
+
+- The exact CPU zimg workers passed the 24- and 120-picture UHD controls. Packed Radeon Main10 passed the 24-, 120-, 300- and 600-picture gates. The longest improved from 474.519 to 157.253 s with 57.38 dB decoded PQ PSNR, exact PCM, and 600 independently checked HDR10+ blocks.
+- WARP and Radeon packed-output swatches passed within two luma codes and one chroma code of zimg. The low-resolution WARP encoded quality rejection is retained. Injected D3D11 removal and a confirmed active deadline left no owned process or master.
+- The explicit saved-project CPU route matched reference and injected-fallback decoded output for a 29.97 fps managed timeline with a moving photograph, mixed SDR/PQ, six exact metadata associations and audio. The before/after Reference preview matched. Physical device-loss recovery and native display parity remain open.
+- Local loopback-only regression passed 169 Python tests and all 29 JavaScript tests. The earlier missing-media assertion mismatch is preserved in the measurement record.
+
 ## 3.6.0 Phase 2 native rendering lab — 22 November 2026
 
 [Draft PR #16](https://github.com/JakubSoltysiak/VlogCraft/pull/16) is stacked on the frozen Phase 1 head. [Phase 2 report](docs/STUDIO_3_6_0_RENDERING_PHASE2.md) and [measurements](docs/benchmarks/studio-3.6.0-phase2.json).

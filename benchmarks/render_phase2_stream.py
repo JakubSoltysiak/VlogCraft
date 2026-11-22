@@ -1,6 +1,9 @@
 """Experimental FP32 video pipe using the qualified CPU HDR10+ delivery stages."""
 import argparse
+from concurrent.futures import ThreadPoolExecutor
+from contextlib import suppress
 from dataclasses import replace
+from fractions import Fraction
 import hashlib
 import json
 import os
@@ -18,6 +21,7 @@ from render_phase2 import (BASELINE, ROOT, SCENARIOS, call, clips_for, distribut
                            native_trial, power, source_picture, technical_conditions, write_plan,
                            write_sources)
 from phase2b_conversion import packed_encoder, relay
+from phase2b_live import LiveInputs, generated_sources, mixed_audio
 from render_phase2_export import compare_encoded, decoded, delivery, encode, mux, streams, video_command
 
 
@@ -70,14 +74,14 @@ def collect(path):
     result=json.loads(path.read_text(encoding='utf8'))
     samples=result.pop('samples')
     result['frames']=len(samples)
-    for key in ('work_ms','gpu_ms','readback_ms','write_ms','dispatch_ms','color_gpu_ms'):
+    for key in ('work_ms','gpu_ms','upload_ms','readback_ms','write_ms','dispatch_ms','color_gpu_ms'):
         if any(key in row for row in samples):
             result[key]=distribution([row[key] for row in samples if row.get(key) is not None])
     return result
 
 
 def stream_video(executable, plan, sources, stage, target, scenario, frames, contract, backend, timeout,
-                 conversion='reference',workers=3):
+                 conversion='reference',workers=3,simulate_removal=False):
     """The operating-system pipe blocks the producer when x265 falls behind."""
     native_log=stage/'native.json'
     encoder_log=stage/'encoder.log'
@@ -88,11 +92,21 @@ def stream_video(executable, plan, sources, stage, target, scenario, frames, con
     flags=getattr(subprocess,'CREATE_NO_WINDOW',0)
     processes=[]
     parallel=None
+    live=sources if isinstance(sources,LiveInputs) else None
+    writer=None
+    input_stats=None
     started=time.perf_counter()
     with native_log.open('wb') as hints, encoder_log.open('wb') as errors:
         try:
+            if live:
+                live.start(stage)
             mode='@pq-stream' if conversion=='gpu' else '@gbr-stream'
-            producer=subprocess.Popen([str(executable),backend,str(plan),str(sources),mode,'0','8','0'],
+            source='@live-stdin' if live else str(sources)
+            native=[str(executable),backend,str(plan),source,mode,'0','8','0']
+            if simulate_removal:
+                native.append('2')
+            producer=subprocess.Popen(native,
+                                      stdin=subprocess.PIPE if live else subprocess.DEVNULL,
                                       stdout=subprocess.PIPE,stderr=hints,creationflags=flags)
             processes.append(producer)
             with producer.stdout:
@@ -100,6 +114,9 @@ def stream_video(executable, plan, sources, stage, target, scenario, frames, con
                 consumer=subprocess.Popen(command,stdin=sink,stdout=subprocess.DEVNULL,
                                           stderr=errors,creationflags=flags)
                 processes.append(consumer)
+                if live:
+                    writer=ThreadPoolExecutor(max_workers=1)
+                    future=writer.submit(live.write,producer.stdin)
                 if conversion=='parallel':
                     parallel=relay(producer,consumer,reference,stage,frames,scenario.width,scenario.height,
                                    workers,timeout)
@@ -107,14 +124,22 @@ def stream_video(executable, plan, sources, stage, target, scenario, frames, con
                 remaining=max(.01,timeout-(time.perf_counter()-started))
                 if process.wait(timeout=remaining):
                     raise RuntimeError('The native producer or the delivery encoder failed')
+            if live:
+                input_stats=future.result(timeout=max(.01,timeout-(time.perf_counter()-started)))
         finally:
             for process in reversed(processes):
                 if process.poll() is None:
                     process.kill()
+            if live:
+                live.terminate()
+                if writer:
+                    writer.shutdown()
+                live.close()
             for process in reversed(processes):
                 process.wait(timeout=10)
                 if process.stdin:
-                    process.stdin.close()
+                    with suppress(BrokenPipeError):
+                        process.stdin.close()
     elapsed=time.perf_counter()-started
     stats=collect(native_log)
     if stats['frames']!=frames:
@@ -128,6 +153,8 @@ def stream_video(executable, plan, sources, stage, target, scenario, frames, con
         stats['cpu_conversion_workers']=parallel['workers']
         stats['cpu_conversion_setup_seconds']=parallel['worker_setup_seconds']
         stats['cpu_conversion_round_trip_ms']=distribution([1000*v for v in parallel['frame_seconds']])
+    if input_stats:
+        stats['live_decoders']=input_stats
     return stats
 
 
@@ -155,7 +182,7 @@ def experiment(args):
     if require_ac and not power():
         raise RuntimeError('AC power is required before starting this qualification')
     scenario=next(item for item in SCENARIOS if item.name=='uhd-mixed')
-    if args.loops:
+    if args.loops or args.live:
         scenario=replace(scenario,dissolve=True)
     if args.quick:
         scenario=replace(scenario,width=320,height=180)
@@ -170,22 +197,40 @@ def experiment(args):
             stage=Path(directory)
             began=time.perf_counter()
             identities=[]
-            if args.loops:
+            source_preparation={}
+            if args.live:
+                source_start=time.perf_counter()
+                paths=args.source
+                if len(paths)<2:
+                    generated=generated_sources(stage,scenario,count,only_sdr=bool(paths))
+                    paths=generated+paths
+                source_preparation['fixture_creation_seconds']=time.perf_counter()-source_start
+                offsets=args.in_point or [Fraction(1,12),Fraction(1,20)]
+                selection_start=time.perf_counter()
+                sources=LiveInputs(paths,offsets,scenario,count)
+                source_preparation['source_admission_and_index_seconds']=time.perf_counter()-selection_start
+                slots=None
+            elif args.loops:
                 sources,slots,identities=normalized_loops(stage,scenario)
             else:
                 sources,_=write_sources(stage,scenario,None,False)
                 slots=None
             plan=stage/'plan.bin'
             clips=clips_for(scenario,count)
-            window=(count//3, count//3+max(1,count//6)) if args.loops else None
+            window=(count//3, count//3+max(1,count//6)) if args.loops or args.live else None
             write_plan(plan,scenario,clips,count,precise_edges=True,source_slots=slots,dissolve_window=window)
             audio=stage/'common.wav'
             samples=count*48000//scenario.fps
             duration=count/scenario.fps
-            call(['ffmpeg','-v','error','-nostdin','-f','lavfi','-i',f'sine=frequency=577:sample_rate=48000:d={duration:.12f}',
-                  '-f','lavfi','-i',f'sine=frequency=863:sample_rate=48000:d={duration:.12f}',
-                  '-filter_complex','[0:a][1:a]amerge=inputs=2,'
-                       f'atrim=end_sample={samples}','-c:a','pcm_s16le',audio],60)
+            audio_started=time.perf_counter()
+            if args.live:
+                mixed_audio(paths,offsets,samples,audio)
+            else:
+                call(['ffmpeg','-v','error','-nostdin','-f','lavfi','-i',f'sine=frequency=577:sample_rate=48000:d={duration:.12f}',
+                      '-f','lavfi','-i',f'sine=frequency=863:sample_rate=48000:d={duration:.12f}',
+                      '-filter_complex','[0:a][1:a]amerge=inputs=2,'
+                           f'atrim=end_sample={samples}','-c:a','pcm_s16le',audio],60)
+            source_preparation['audio_preparation_seconds']=time.perf_counter()-audio_started
             prep=time.perf_counter()-began
             monitor=Resources(os.getpid(),gpu=False)
             try:
@@ -193,15 +238,19 @@ def experiment(args):
                 video=stage/'pipe.video.mov'
                 try:
                     stats=stream_video(args.executable.resolve(),plan,sources,stage,video,
-                                       scenario,count,CONTRACT,args.backend,args.timeout,args.conversion,args.workers)
+                                       scenario,count,CONTRACT,args.backend,args.timeout,args.conversion,args.workers,
+                                       args.simulate_device_removal)
                 except Exception:
-                    for log in [stage/'native.json',stage/'encoder.log',*stage.glob('converter-*.log')]:
+                    for log in [stage/'native.json',stage/'encoder.log',
+                                *stage.glob('converter-*.log'),*stage.glob('decoder-*.log')]:
                         if log.exists():
                             (results/log.name).write_bytes(log.read_bytes())
                     raise
                 static=stage/'pipe-static.mp4'
                 master=stage/'pipe-HDR10plus.mp4'
+                mux_started=time.perf_counter()
                 mux(video,audio,static,scenario,count)
+                mux_seconds=time.perf_counter()-mux_started
                 verify_start=time.perf_counter()
                 rendered=delivery(stage,static,master,scenario.fps,count,verify_start-started)
                 verification_seconds=time.perf_counter()-verify_start-rendered['author_seconds']
@@ -233,9 +282,12 @@ def experiment(args):
                           frames=count,fps=scenario.fps,loops=args.loops,source_clip_hashes=identities,
                           source_preparation_seconds=prep,independent_verification_seconds=verification_seconds,
                           gpu_or_software=stats,resources=metrics,delivery=rendered,
+                          live=args.live,source_preparation=source_preparation,final_clock_and_audio_mux_seconds=mux_seconds,
                           output_fps=count/rendered['seconds'],raw_output_intermediate_bytes=0,
                           worker_sha256=hashlib.sha256(args.executable.read_bytes()).hexdigest(),
-                          measured_fixture_only=True,final_shader_input_bytes=sources.stat().st_size,
+                          measured_fixture_only=True,
+                          final_shader_input_bytes=(sum(d['update_bytes'] for d in stats['live_decoders'])+
+                                                    scenario.width*scenario.height*16 if args.live else sources.stat().st_size),
                           executable_conditions=initial)
     finally:
         observation=conditions.finish()
@@ -257,16 +309,25 @@ def main():
     parser.add_argument('--timeout',type=int,default=900)
     parser.add_argument('--quick',action='store_true')
     parser.add_argument('--loops',action='store_true',help='Use changing decoded SDR/PQ texture loops and a picture dissolve')
+    parser.add_argument('--live',action='store_true',help='Stream actual decoder pictures selected by original PTS')
+    parser.add_argument('--source',type=Path,action='append',default=[],help='Supply one PQ source or a matched pair')
+    parser.add_argument('--in-point',type=Fraction,action='append',default=[],help='Supply two exact relative in-points')
     parser.add_argument('--compare-disk',action='store_true',help='Verify exact equivalence with the packed disk path')
     parser.add_argument('--compare-master',type=Path,help='Independently compare a frozen master made from identical inputs')
     parser.add_argument('--conversion',choices=('reference','parallel','gpu'),default='reference')
     parser.add_argument('--workers',type=int,choices=range(2,5),default=3)
+    parser.add_argument('--simulate-device-removal',action='store_true',help='Inject D3D11 device removal during a quick test')
     parser.add_argument('--backend',choices=('gpu32','warp32'),default='gpu32')
     args=parser.parse_args()
     if not 2<=args.frames<=3600 or (args.compare_disk and args.frames>48) or args.timeout<1:
         parser.error('Invalid bounded fixture size or timeout')
+    if (args.live and (args.loops or args.compare_disk) or not args.live and (args.source or args.in_point)
+            or len(args.source)>2 or len(args.in_point) not in (0,2)):
+        parser.error('Invalid live source or fixture combination')
     if args.conversion!='reference' and not args.compare_master:
         parser.error('An independently verified reference master is required for candidate publication')
+    if args.simulate_device_removal and (not args.quick or args.frames<3):
+        parser.error('Fault injection requires a quick fixture with at least three pictures')
     experiment(args)
 
 

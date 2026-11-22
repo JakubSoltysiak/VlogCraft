@@ -1094,5 +1094,3591 @@
       }
     }
   },
-  "production_selection_changed": false
+  "production_selection_changed": false,
+  "long_prepared_trials": {
+    "uhd120-parallel": {
+      "independent_master_comparison": {
+        "decoded_pq": {
+          "y": "inf",
+          "u": "inf",
+          "v": "inf",
+          "average": "inf",
+          "passed": true
+        },
+        "exact_pcm": true,
+        "exact_pictures": true,
+        "stream_declaration_matches": true,
+        "passed": true
+      },
+      "source_commit": "ef829c1c6c97c9915140dd16b81efd9ec8482b46",
+      "reference": "045da0a6b3d8d956d07c075a6c0e73f6878a2d9f",
+      "backend": "gpu32",
+      "conversion": "parallel",
+      "dimensions": [
+        3840,
+        2160
+      ],
+      "frames": 120,
+      "fps": 60,
+      "loops": true,
+      "source_clip_hashes": [
+        "83c927d3f8d5babfbc251bc4a9a0f3457a171e2eab4c52f543c620e776d0cfe7",
+        "0abf80e53ec3c7d247b5343d8860fc3f60b3f279319523c8bd17ae47d6682a92"
+      ],
+      "source_preparation_seconds": 3.962506100011524,
+      "independent_verification_seconds": 10.370541700016474,
+      "gpu_or_software": {
+        "wall_ms": 36904.1,
+        "cpu_ms": 4406.25,
+        "input_ms": 710.943,
+        "setup_ms": 506.132,
+        "peak_rss_bytes": 3077226496,
+        "gpu_local_bytes": 2151620608,
+        "gpu_nonlocal_bytes": 0,
+        "initial_upload_ms": 391.153,
+        "adapter": "AMD Radeon(TM) 890M Graphics",
+        "memory_samples": [
+          {
+            "frames": 0,
+            "rss_bytes": 2148311040,
+            "gpu_local_bytes": 1884692480,
+            "gpu_nonlocal_bytes": 0
+          },
+          {
+            "frames": 120,
+            "rss_bytes": 2416951296,
+            "gpu_local_bytes": 2151620608,
+            "gpu_nonlocal_bytes": 0
+          }
+        ],
+        "frames": 120,
+        "work_ms": {
+          "median": 25.4152,
+          "p95": 27.574385,
+          "p99": 29.337521,
+          "maximum": 44.5512
+        },
+        "gpu_ms": {
+          "median": 8.4745,
+          "p95": 9.307844,
+          "p99": 10.016945,
+          "maximum": 10.4972
+        },
+        "readback_ms": {
+          "median": 15.9143,
+          "p95": 17.767045,
+          "p99": 18.52585,
+          "maximum": 23.9719
+        },
+        "write_ms": {
+          "median": 234.8835,
+          "p95": 561.1547,
+          "p99": 603.1717,
+          "maximum": 608.039
+        },
+        "dispatch_ms": {
+          "median": 9.3192,
+          "p95": 10.230185,
+          "p99": 11.306574,
+          "maximum": 20.4823
+        },
+        "encoder_cpu_seconds": 20.516000000000002,
+        "parallel_compose_and_encode_seconds": 39.76306699999259,
+        "encoder_pix_fmt": "yuv420p10le",
+        "renderer_pipe_bytes_per_picture": 99532800,
+        "cpu_conversion_workers": 3,
+        "cpu_conversion_setup_seconds": 0.019139000010909513,
+        "cpu_conversion_round_trip_ms": {
+          "median": 900.8729,
+          "p95": 1039.707185,
+          "p99": 1145.066691,
+          "maximum": 1186.6435
+        }
+      },
+      "resources": {
+        "duration_seconds": 73.266,
+        "gpu": null,
+        "average_cpu_machine_percent": 10.76,
+        "peak_summed_working_set_MiB": 4875.2,
+        "sampled_cpu_seconds": 189.14,
+        "process_read_MiB": 35068.3,
+        "process_write_MiB": 34146.2
+      },
+      "delivery": {
+        "seconds": 62.862974199990276,
+        "author_seconds": 22.82918719999725,
+        "frames": 120,
+        "hdr10plus_blocks": 120,
+        "audio_samples": 96000,
+        "same_static_and_authored_decode": true,
+        "static_metadata": [
+          {
+            "blue_x": "6550/50000",
+            "blue_y": "2300/50000",
+            "green_x": "8500/50000",
+            "green_y": "39850/50000",
+            "max_luminance": "10000000/10000",
+            "min_luminance": "50/10000",
+            "red_x": "35400/50000",
+            "red_y": "14600/50000",
+            "side_data_type": "Mastering display metadata",
+            "white_point_x": "15635/50000",
+            "white_point_y": "16450/50000"
+          },
+          {
+            "max_average": 400,
+            "max_content": 1000,
+            "side_data_type": "Content light level metadata"
+          }
+        ],
+        "audio_pcm_sha256": "7a53e63b55d8debf4f5816880d04f58d7c66e710a139964e631b6129784d12bc"
+      },
+      "output_fps": 1.9089138165533786,
+      "raw_output_intermediate_bytes": 0,
+      "worker_sha256": "500966bd605df5f2b6b8cb31e4e095a90299a97ed8f42580b886a8e927fd8663",
+      "measured_fixture_only": true,
+      "final_shader_input_bytes": 928972800,
+      "executable_conditions": {
+        "ac_power": true,
+        "logical_processors": 24,
+        "cpu_frequency_mhz": 2000.0,
+        "cpu_frequency_source": "Windows OS-reported value",
+        "board_temperature_c": null,
+        "gpu_frequency_mhz": null
+      },
+      "power_and_memory_observation": {
+        "samples": [
+          {
+            "seconds": 0.0,
+            "ac_power": true,
+            "battery_percent": 99,
+            "available_memory_MiB": 10473,
+            "system_cpu_percent": 0.0
+          },
+          {
+            "seconds": 20.141,
+            "ac_power": true,
+            "battery_percent": 99,
+            "available_memory_MiB": 5849,
+            "system_cpu_percent": 33.9
+          },
+          {
+            "seconds": 40.344,
+            "ac_power": true,
+            "battery_percent": 99,
+            "available_memory_MiB": 5938,
+            "system_cpu_percent": 22.0
+          },
+          {
+            "seconds": 60.516,
+            "ac_power": true,
+            "battery_percent": 99,
+            "available_memory_MiB": 9693,
+            "system_cpu_percent": 11.1
+          },
+          {
+            "seconds": 80.672,
+            "ac_power": true,
+            "battery_percent": 99,
+            "available_memory_MiB": 10364,
+            "system_cpu_percent": 9.4
+          },
+          {
+            "seconds": 85.704,
+            "ac_power": true,
+            "battery_percent": 99,
+            "available_memory_MiB": 10896,
+            "system_cpu_percent": 12.9
+          }
+        ],
+        "mixed_power": false,
+        "thermal_throttling": "not observable with available public sensors",
+        "samples_observed": 86,
+        "all_samples_on_ac": true,
+        "minimum_available_memory_MiB": 5599
+      },
+      "supervisor": {
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 86.18700000000536,
+        "restored_standard_environment_keys": [],
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        },
+        "progress_error": null
+      },
+      "verified_master_present": true
+    },
+    "uhd120-gpu": {
+      "independent_master_comparison": {
+        "decoded_pq": {
+          "y": "57.705423",
+          "u": "57.074740",
+          "v": "57.033481",
+          "average": "57.477274",
+          "passed": true
+        },
+        "exact_pcm": true,
+        "exact_pictures": null,
+        "stream_declaration_matches": true,
+        "passed": true
+      },
+      "source_commit": "add14252e43f7571bdc4f4bb97159cf5611c4964",
+      "reference": "045da0a6b3d8d956d07c075a6c0e73f6878a2d9f",
+      "backend": "gpu32",
+      "conversion": "gpu",
+      "dimensions": [
+        3840,
+        2160
+      ],
+      "frames": 120,
+      "fps": 60,
+      "loops": true,
+      "source_clip_hashes": [
+        "83c927d3f8d5babfbc251bc4a9a0f3457a171e2eab4c52f543c620e776d0cfe7",
+        "0abf80e53ec3c7d247b5343d8860fc3f60b3f279319523c8bd17ae47d6682a92"
+      ],
+      "source_preparation_seconds": 4.730703500012169,
+      "independent_verification_seconds": 10.485326599969994,
+      "gpu_or_software": {
+        "wall_ms": 6647.64,
+        "cpu_ms": 1203.12,
+        "input_ms": 745.304,
+        "setup_ms": 964.912,
+        "peak_rss_bytes": 2983182336,
+        "gpu_local_bytes": 2068959232,
+        "gpu_nonlocal_bytes": 0,
+        "initial_upload_ms": 395.404,
+        "adapter": "AMD Radeon(TM) 890M Graphics",
+        "memory_samples": [
+          {
+            "frames": 0,
+            "rss_bytes": 2049306624,
+            "gpu_local_bytes": 1884692480,
+            "gpu_nonlocal_bytes": 0
+          },
+          {
+            "frames": 120,
+            "rss_bytes": 2234990592,
+            "gpu_local_bytes": 2068959232,
+            "gpu_nonlocal_bytes": 0
+          }
+        ],
+        "frames": 120,
+        "work_ms": {
+          "median": 11.9931,
+          "p95": 13.539095,
+          "p99": 14.315487,
+          "maximum": 31.0732
+        },
+        "gpu_ms": {
+          "median": 7.77604,
+          "p95": 8.771252,
+          "p99": 9.110612,
+          "maximum": 9.30176
+        },
+        "readback_ms": {
+          "median": 3.21,
+          "p95": 4.145575,
+          "p99": 4.407284,
+          "maximum": 9.2203
+        },
+        "write_ms": {
+          "median": 48.81305,
+          "p95": 118.9979,
+          "p99": 151.71051,
+          "maximum": 196.887
+        },
+        "dispatch_ms": {
+          "median": 8.35375,
+          "p95": 9.4616,
+          "p99": 9.811573,
+          "maximum": 21.7236
+        },
+        "color_gpu_ms": {
+          "median": 2.14266,
+          "p95": 2.948248,
+          "p99": 3.074724,
+          "maximum": 3.2252
+        },
+        "encoder_cpu_seconds": 18.219,
+        "parallel_compose_and_encode_seconds": 10.036637500015786,
+        "encoder_pix_fmt": "yuv420p10le",
+        "renderer_pipe_bytes_per_picture": 24883200
+      },
+      "resources": {
+        "duration_seconds": 44.265,
+        "gpu": null,
+        "average_cpu_machine_percent": 6.28,
+        "peak_summed_working_set_MiB": 4011.6,
+        "sampled_cpu_seconds": 66.75,
+        "process_read_MiB": 9438.6,
+        "process_write_MiB": 8521.2
+      },
+      "delivery": {
+        "seconds": 33.75783950003097,
+        "author_seconds": 23.42322180001065,
+        "frames": 120,
+        "hdr10plus_blocks": 120,
+        "audio_samples": 96000,
+        "same_static_and_authored_decode": true,
+        "static_metadata": [
+          {
+            "blue_x": "6550/50000",
+            "blue_y": "2300/50000",
+            "green_x": "8500/50000",
+            "green_y": "39850/50000",
+            "max_luminance": "10000000/10000",
+            "min_luminance": "50/10000",
+            "red_x": "35400/50000",
+            "red_y": "14600/50000",
+            "side_data_type": "Mastering display metadata",
+            "white_point_x": "15635/50000",
+            "white_point_y": "16450/50000"
+          },
+          {
+            "max_average": 400,
+            "max_content": 1000,
+            "side_data_type": "Content light level metadata"
+          }
+        ],
+        "audio_pcm_sha256": "7a53e63b55d8debf4f5816880d04f58d7c66e710a139964e631b6129784d12bc"
+      },
+      "output_fps": 3.554729857634696,
+      "raw_output_intermediate_bytes": 0,
+      "worker_sha256": "500966bd605df5f2b6b8cb31e4e095a90299a97ed8f42580b886a8e927fd8663",
+      "measured_fixture_only": true,
+      "final_shader_input_bytes": 928972800,
+      "executable_conditions": {
+        "ac_power": true,
+        "logical_processors": 24,
+        "cpu_frequency_mhz": 2000.0,
+        "cpu_frequency_source": "Windows OS-reported value",
+        "board_temperature_c": null,
+        "gpu_frequency_mhz": null
+      },
+      "power_and_memory_observation": {
+        "samples": [
+          {
+            "seconds": 0.0,
+            "ac_power": true,
+            "battery_percent": 99,
+            "available_memory_MiB": 10913,
+            "system_cpu_percent": 0.0
+          },
+          {
+            "seconds": 20.157,
+            "ac_power": true,
+            "battery_percent": 99,
+            "available_memory_MiB": 9695,
+            "system_cpu_percent": 15.2
+          },
+          {
+            "seconds": 40.313,
+            "ac_power": true,
+            "battery_percent": 99,
+            "available_memory_MiB": 10452,
+            "system_cpu_percent": 15.4
+          },
+          {
+            "seconds": 50.391,
+            "ac_power": true,
+            "battery_percent": 99,
+            "available_memory_MiB": 10083,
+            "system_cpu_percent": 27.0
+          }
+        ],
+        "mixed_power": false,
+        "thermal_throttling": "not observable with available public sensors",
+        "samples_observed": 51,
+        "all_samples_on_ac": true,
+        "minimum_available_memory_MiB": 6790
+      },
+      "supervisor": {
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 51.09299999999348,
+        "restored_standard_environment_keys": [],
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        },
+        "progress_error": null
+      },
+      "verified_master_present": true
+    },
+    "uhd300-gpu": {
+      "independent_master_comparison": {
+        "decoded_pq": {
+          "y": "57.652047",
+          "u": "57.080912",
+          "v": "56.951616",
+          "average": "57.429439",
+          "passed": true
+        },
+        "exact_pcm": true,
+        "exact_pictures": null,
+        "stream_declaration_matches": true,
+        "passed": true
+      },
+      "source_commit": "add14252e43f7571bdc4f4bb97159cf5611c4964",
+      "reference": "045da0a6b3d8d956d07c075a6c0e73f6878a2d9f",
+      "backend": "gpu32",
+      "conversion": "gpu",
+      "dimensions": [
+        3840,
+        2160
+      ],
+      "frames": 300,
+      "fps": 60,
+      "loops": true,
+      "source_clip_hashes": [
+        "83c927d3f8d5babfbc251bc4a9a0f3457a171e2eab4c52f543c620e776d0cfe7",
+        "0abf80e53ec3c7d247b5343d8860fc3f60b3f279319523c8bd17ae47d6682a92"
+      ],
+      "source_preparation_seconds": 5.0251064999902155,
+      "independent_verification_seconds": 25.378330700012157,
+      "gpu_or_software": {
+        "wall_ms": 19225.3,
+        "cpu_ms": 3593.75,
+        "input_ms": 771.725,
+        "setup_ms": 963.807,
+        "peak_rss_bytes": 2983444480,
+        "gpu_local_bytes": 2068959232,
+        "gpu_nonlocal_bytes": 0,
+        "initial_upload_ms": 387.848,
+        "adapter": "AMD Radeon(TM) 890M Graphics",
+        "memory_samples": [
+          {
+            "frames": 0,
+            "rss_bytes": 2049433600,
+            "gpu_local_bytes": 1884692480,
+            "gpu_nonlocal_bytes": 0
+          },
+          {
+            "frames": 300,
+            "rss_bytes": 2235256832,
+            "gpu_local_bytes": 2068959232,
+            "gpu_nonlocal_bytes": 0
+          }
+        ],
+        "frames": 300,
+        "work_ms": {
+          "median": 11.9671,
+          "p95": 13.653265,
+          "p99": 14.385019,
+          "maximum": 29.8352
+        },
+        "gpu_ms": {
+          "median": 7.65394,
+          "p95": 8.732466,
+          "p99": 9.148092,
+          "maximum": 9.60748
+        },
+        "readback_ms": {
+          "median": 3.25425,
+          "p95": 4.453555,
+          "p99": 4.649805,
+          "maximum": 8.6287
+        },
+        "write_ms": {
+          "median": 56.96735,
+          "p95": 130.9162,
+          "p99": 160.82933,
+          "maximum": 302.291
+        },
+        "dispatch_ms": {
+          "median": 8.36025,
+          "p95": 9.434575,
+          "p99": 9.831974,
+          "maximum": 21.0808
+        },
+        "color_gpu_ms": {
+          "median": 2.17704,
+          "p95": 3.053258,
+          "p99": 3.188296,
+          "maximum": 3.24444
+        },
+        "encoder_cpu_seconds": 47.483999999999995,
+        "parallel_compose_and_encode_seconds": 22.75085620000027,
+        "encoder_pix_fmt": "yuv420p10le",
+        "renderer_pipe_bytes_per_picture": 24883200
+      },
+      "resources": {
+        "duration_seconds": 104.687,
+        "gpu": null,
+        "average_cpu_machine_percent": 6.51,
+        "peak_summed_working_set_MiB": 4022.6,
+        "sampled_cpu_seconds": 163.64,
+        "process_read_MiB": 22263.6,
+        "process_write_MiB": 21346.7
+      },
+      "delivery": {
+        "seconds": 79.28111329997773,
+        "author_seconds": 56.15630889998283,
+        "frames": 300,
+        "hdr10plus_blocks": 300,
+        "audio_samples": 240000,
+        "same_static_and_authored_decode": true,
+        "static_metadata": [
+          {
+            "blue_x": "6550/50000",
+            "blue_y": "2300/50000",
+            "green_x": "8500/50000",
+            "green_y": "39850/50000",
+            "max_luminance": "10000000/10000",
+            "min_luminance": "50/10000",
+            "red_x": "35400/50000",
+            "red_y": "14600/50000",
+            "side_data_type": "Mastering display metadata",
+            "white_point_x": "15635/50000",
+            "white_point_y": "16450/50000"
+          },
+          {
+            "max_average": 400,
+            "max_content": 1000,
+            "side_data_type": "Content light level metadata"
+          }
+        ],
+        "audio_pcm_sha256": "49cd3a3aaf5ee87bdd526fb97145fa26931f44082c47ee807f2fde3c54bad37b"
+      },
+      "output_fps": 3.7840033712049834,
+      "raw_output_intermediate_bytes": 0,
+      "worker_sha256": "500966bd605df5f2b6b8cb31e4e095a90299a97ed8f42580b886a8e927fd8663",
+      "measured_fixture_only": true,
+      "final_shader_input_bytes": 928972800,
+      "executable_conditions": {
+        "ac_power": true,
+        "logical_processors": 24,
+        "cpu_frequency_mhz": 2000.0,
+        "cpu_frequency_source": "Windows OS-reported value",
+        "board_temperature_c": null,
+        "gpu_frequency_mhz": null
+      },
+      "power_and_memory_observation": {
+        "samples": [
+          {
+            "seconds": 0.0,
+            "ac_power": true,
+            "battery_percent": 99,
+            "available_memory_MiB": 10562,
+            "system_cpu_percent": 0.0
+          },
+          {
+            "seconds": 20.235,
+            "ac_power": true,
+            "battery_percent": 99,
+            "available_memory_MiB": 6632,
+            "system_cpu_percent": 15.6
+          },
+          {
+            "seconds": 40.407,
+            "ac_power": true,
+            "battery_percent": 99,
+            "available_memory_MiB": 9590,
+            "system_cpu_percent": 12.0
+          },
+          {
+            "seconds": 60.563,
+            "ac_power": true,
+            "battery_percent": 99,
+            "available_memory_MiB": 9494,
+            "system_cpu_percent": 13.2
+          },
+          {
+            "seconds": 80.735,
+            "ac_power": true,
+            "battery_percent": 99,
+            "available_memory_MiB": 9497,
+            "system_cpu_percent": 13.1
+          },
+          {
+            "seconds": 100.844,
+            "ac_power": true,
+            "battery_percent": 99,
+            "available_memory_MiB": 10204,
+            "system_cpu_percent": 11.6
+          },
+          {
+            "seconds": 111.891,
+            "ac_power": true,
+            "battery_percent": 99,
+            "available_memory_MiB": 10398,
+            "system_cpu_percent": 26.2
+          }
+        ],
+        "mixed_power": false,
+        "thermal_throttling": "not observable with available public sensors",
+        "samples_observed": 112,
+        "all_samples_on_ac": true,
+        "minimum_available_memory_MiB": 6390
+      },
+      "supervisor": {
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 113.31200000000536,
+        "restored_standard_environment_keys": [],
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        },
+        "progress_error": null
+      },
+      "verified_master_present": true
+    },
+    "uhd600-gpu": {
+      "independent_master_comparison": {
+        "decoded_pq": {
+          "y": "57.637311",
+          "u": "57.000196",
+          "v": "56.805888",
+          "average": "57.378109",
+          "passed": true
+        },
+        "exact_pcm": true,
+        "exact_pictures": null,
+        "stream_declaration_matches": true,
+        "passed": true
+      },
+      "source_commit": "add14252e43f7571bdc4f4bb97159cf5611c4964",
+      "reference": "045da0a6b3d8d956d07c075a6c0e73f6878a2d9f",
+      "backend": "gpu32",
+      "conversion": "gpu",
+      "dimensions": [
+        3840,
+        2160
+      ],
+      "frames": 600,
+      "fps": 60,
+      "loops": true,
+      "source_clip_hashes": [
+        "83c927d3f8d5babfbc251bc4a9a0f3457a171e2eab4c52f543c620e776d0cfe7",
+        "0abf80e53ec3c7d247b5343d8860fc3f60b3f279319523c8bd17ae47d6682a92"
+      ],
+      "source_preparation_seconds": 4.845570100005716,
+      "independent_verification_seconds": 49.24848949999432,
+      "gpu_or_software": {
+        "wall_ms": 41412.5,
+        "cpu_ms": 7234.38,
+        "input_ms": 767.609,
+        "setup_ms": 926.298,
+        "peak_rss_bytes": 2983108608,
+        "gpu_local_bytes": 2068959232,
+        "gpu_nonlocal_bytes": 0,
+        "initial_upload_ms": 402,
+        "adapter": "AMD Radeon(TM) 890M Graphics",
+        "memory_samples": [
+          {
+            "frames": 0,
+            "rss_bytes": 2049261568,
+            "gpu_local_bytes": 1884692480,
+            "gpu_nonlocal_bytes": 0
+          },
+          {
+            "frames": 300,
+            "rss_bytes": 2234970112,
+            "gpu_local_bytes": 2068959232,
+            "gpu_nonlocal_bytes": 0
+          },
+          {
+            "frames": 600,
+            "rss_bytes": 2235052032,
+            "gpu_local_bytes": 2068959232,
+            "gpu_nonlocal_bytes": 0
+          }
+        ],
+        "frames": 600,
+        "work_ms": {
+          "median": 11.98835,
+          "p95": 13.928565,
+          "p99": 14.790275,
+          "maximum": 28.4512
+        },
+        "gpu_ms": {
+          "median": 7.57204,
+          "p95": 8.921608,
+          "p99": 9.626603,
+          "maximum": 16.0718
+        },
+        "readback_ms": {
+          "median": 3.35375,
+          "p95": 4.48338,
+          "p99": 5.154919,
+          "maximum": 9.8984
+        },
+        "write_ms": {
+          "median": 63.10475,
+          "p95": 118.88595,
+          "p99": 140.00028,
+          "maximum": 353.852
+        },
+        "dispatch_ms": {
+          "median": 8.2827,
+          "p95": 9.66759,
+          "p99": 10.691184,
+          "maximum": 19.6953
+        },
+        "color_gpu_ms": {
+          "median": 2.20138,
+          "p95": 3.115552,
+          "p99": 3.415878,
+          "maximum": 6.54784
+        },
+        "encoder_cpu_seconds": 97.75,
+        "parallel_compose_and_encode_seconds": 44.541690699988976,
+        "encoder_pix_fmt": "yuv420p10le",
+        "renderer_pipe_bytes_per_picture": 24883200
+      },
+      "resources": {
+        "duration_seconds": 206.531,
+        "gpu": null,
+        "average_cpu_machine_percent": 6.58,
+        "peak_summed_working_set_MiB": 4029.7,
+        "sampled_cpu_seconds": 326.19,
+        "process_read_MiB": 43635.5,
+        "process_write_MiB": 42682.8
+      },
+      "delivery": {
+        "seconds": 157.25272940003197,
+        "author_seconds": 112.26519440000993,
+        "frames": 600,
+        "hdr10plus_blocks": 600,
+        "audio_samples": 480000,
+        "same_static_and_authored_decode": true,
+        "static_metadata": [
+          {
+            "blue_x": "6550/50000",
+            "blue_y": "2300/50000",
+            "green_x": "8500/50000",
+            "green_y": "39850/50000",
+            "max_luminance": "10000000/10000",
+            "min_luminance": "50/10000",
+            "red_x": "35400/50000",
+            "red_y": "14600/50000",
+            "side_data_type": "Mastering display metadata",
+            "white_point_x": "15635/50000",
+            "white_point_y": "16450/50000"
+          },
+          {
+            "max_average": 400,
+            "max_content": 1000,
+            "side_data_type": "Content light level metadata"
+          }
+        ],
+        "audio_pcm_sha256": "d8088acd2bb37da255b757ba16ee28b4e1bb78b0025090c0dc5bd19c88d10c9e"
+      },
+      "output_fps": 3.8155140600051043,
+      "raw_output_intermediate_bytes": 0,
+      "worker_sha256": "500966bd605df5f2b6b8cb31e4e095a90299a97ed8f42580b886a8e927fd8663",
+      "measured_fixture_only": true,
+      "final_shader_input_bytes": 928972800,
+      "executable_conditions": {
+        "ac_power": true,
+        "logical_processors": 24,
+        "cpu_frequency_mhz": 2000.0,
+        "cpu_frequency_source": "Windows OS-reported value",
+        "board_temperature_c": null,
+        "gpu_frequency_mhz": null
+      },
+      "power_and_memory_observation": {
+        "samples": [
+          {
+            "seconds": 0.0,
+            "ac_power": true,
+            "battery_percent": 99,
+            "available_memory_MiB": 10901,
+            "system_cpu_percent": 0.0
+          },
+          {
+            "seconds": 20.156,
+            "ac_power": true,
+            "battery_percent": 99,
+            "available_memory_MiB": 6864,
+            "system_cpu_percent": 21.6
+          },
+          {
+            "seconds": 40.297,
+            "ac_power": true,
+            "battery_percent": 99,
+            "available_memory_MiB": 6791,
+            "system_cpu_percent": 21.5
+          },
+          {
+            "seconds": 60.469,
+            "ac_power": true,
+            "battery_percent": 99,
+            "available_memory_MiB": 9801,
+            "system_cpu_percent": 8.8
+          },
+          {
+            "seconds": 80.625,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 9513,
+            "system_cpu_percent": 9.7
+          },
+          {
+            "seconds": 100.75,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 9511,
+            "system_cpu_percent": 10.8
+          },
+          {
+            "seconds": 120.891,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 9501,
+            "system_cpu_percent": 8.7
+          },
+          {
+            "seconds": 141.047,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 9470,
+            "system_cpu_percent": 11.3
+          },
+          {
+            "seconds": 161.188,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 10406,
+            "system_cpu_percent": 7.9
+          },
+          {
+            "seconds": 181.328,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 10162,
+            "system_cpu_percent": 11.6
+          },
+          {
+            "seconds": 201.484,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 9912,
+            "system_cpu_percent": 14.4
+          },
+          {
+            "seconds": 216.578,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 10025,
+            "system_cpu_percent": 29.7
+          }
+        ],
+        "mixed_power": false,
+        "thermal_throttling": "not observable with available public sensors",
+        "samples_observed": 216,
+        "all_samples_on_ac": true,
+        "minimum_available_memory_MiB": 6619
+      },
+      "supervisor": {
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 217.48399999999674,
+        "restored_standard_environment_keys": [],
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        },
+        "progress_error": null
+      },
+      "verified_master_present": true
+    }
+  },
+  "live_trials": {
+    "warp-live-reference": {
+      "source_commit": "add14252e43f7571bdc4f4bb97159cf5611c4964",
+      "reference": "045da0a6b3d8d956d07c075a6c0e73f6878a2d9f",
+      "backend": "warp32",
+      "conversion": "reference",
+      "dimensions": [
+        320,
+        180
+      ],
+      "frames": 8,
+      "fps": 60,
+      "loops": false,
+      "source_clip_hashes": [],
+      "source_preparation_seconds": 0.6306250999914482,
+      "independent_verification_seconds": 0.5842432000208646,
+      "gpu_or_software": {
+        "wall_ms": 375.23,
+        "cpu_ms": 421.875,
+        "input_ms": 77.2611,
+        "setup_ms": 98.0889,
+        "peak_rss_bytes": 24735744,
+        "gpu_local_bytes": 0,
+        "gpu_nonlocal_bytes": 0,
+        "initial_upload_ms": 15.55,
+        "adapter": "Microsoft Basic Render Driver",
+        "memory_samples": [
+          {
+            "frames": 0,
+            "rss_bytes": 19451904,
+            "gpu_local_bytes": 0,
+            "gpu_nonlocal_bytes": 0
+          },
+          {
+            "frames": 8,
+            "rss_bytes": 24735744,
+            "gpu_local_bytes": 0,
+            "gpu_nonlocal_bytes": 0
+          }
+        ],
+        "frames": 8,
+        "work_ms": {
+          "median": 9.1952,
+          "p95": 15.49495,
+          "p99": 15.63971,
+          "maximum": 15.6759
+        },
+        "gpu_ms": {
+          "median": 0.92655,
+          "p95": 3.034065,
+          "p99": 3.856173,
+          "maximum": 4.0617
+        },
+        "upload_ms": {
+          "median": 0.14995,
+          "p95": 0.31523,
+          "p99": 0.349446,
+          "maximum": 0.358
+        },
+        "readback_ms": {
+          "median": 0.29195,
+          "p95": 0.47311,
+          "p99": 0.491982,
+          "maximum": 0.4967
+        },
+        "write_ms": {
+          "median": 0.1152,
+          "p95": 0.16371,
+          "p99": 0.166902,
+          "maximum": 0.1677
+        },
+        "dispatch_ms": {
+          "median": 8.90205,
+          "p95": 15.0961,
+          "p99": 15.27978,
+          "maximum": 15.3257
+        },
+        "encoder_cpu_seconds": 0.078,
+        "parallel_compose_and_encode_seconds": 0.7837157999747433,
+        "encoder_pix_fmt": "yuv420p10le",
+        "renderer_pipe_bytes_per_picture": 691200,
+        "live_decoders": [
+          {
+            "codec": "h264",
+            "pixel_format": "yuv420p",
+            "transfer": "bt709",
+            "time_base": "1/15360",
+            "variable_presentation_gaps": true,
+            "source_pictures_used": 6,
+            "source_indices": [
+              4,
+              5,
+              5,
+              6,
+              7,
+              8,
+              9,
+              9,
+              9,
+              9
+            ],
+            "source_in_seconds": "1/12",
+            "decoded_width": 320,
+            "decoded_height": 180,
+            "source_probe_seconds": 0.08165099998586811,
+            "decoded_pictures": 10,
+            "decoder_read_wait_seconds": 0.009201899985782802,
+            "rgba_pack_seconds": 0.0030360999808181077,
+            "update_bytes": 5529600
+          },
+          {
+            "codec": "hevc",
+            "pixel_format": "yuv420p10le",
+            "transfer": "smpte2084",
+            "time_base": "1/15360",
+            "variable_presentation_gaps": false,
+            "source_pictures_used": 8,
+            "source_indices": [
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              9,
+              10
+            ],
+            "source_in_seconds": "1/20",
+            "decoded_width": 320,
+            "decoded_height": 180,
+            "source_probe_seconds": 0.07536930000060238,
+            "decoded_pictures": 11,
+            "decoder_read_wait_seconds": 0.0088926000171341,
+            "rgba_pack_seconds": 0.0035813999420497566,
+            "update_bytes": 7372800
+          }
+        ]
+      },
+      "resources": {
+        "duration_seconds": 2.391,
+        "gpu": null,
+        "average_cpu_machine_percent": 3.32,
+        "peak_summed_working_set_MiB": 187.7,
+        "sampled_cpu_seconds": 1.91,
+        "process_read_MiB": 33.8,
+        "process_write_MiB": 29.0
+      },
+      "delivery": {
+        "seconds": 1.7780557999794837,
+        "author_seconds": 0.7512007000041194,
+        "frames": 8,
+        "hdr10plus_blocks": 8,
+        "audio_samples": 6400,
+        "same_static_and_authored_decode": true,
+        "static_metadata": [
+          {
+            "blue_x": "6550/50000",
+            "blue_y": "2300/50000",
+            "green_x": "8500/50000",
+            "green_y": "39850/50000",
+            "max_luminance": "10000000/10000",
+            "min_luminance": "50/10000",
+            "red_x": "35400/50000",
+            "red_y": "14600/50000",
+            "side_data_type": "Mastering display metadata",
+            "white_point_x": "15635/50000",
+            "white_point_y": "16450/50000"
+          },
+          {
+            "max_average": 400,
+            "max_content": 1000,
+            "side_data_type": "Content light level metadata"
+          }
+        ],
+        "audio_pcm_sha256": "f28a2023c6eaf2ef91117b08ab2f3b6e82e2c0a6197380851b421ece44ba5890"
+      },
+      "live": true,
+      "source_preparation": {
+        "fixture_creation_seconds": 0.24093319999519736,
+        "source_admission_and_index_seconds": 0.15813830000115559,
+        "audio_preparation_seconds": 0.23052690000622533
+      },
+      "final_clock_and_audio_mux_seconds": 0.183052599983057,
+      "output_fps": 4.499296366341433,
+      "raw_output_intermediate_bytes": 0,
+      "worker_sha256": "62f0f45a07e2d4e94cdcf519aa4dc4269d53082cf99fafaf5f6bdf1c890b6a0f",
+      "measured_fixture_only": true,
+      "final_shader_input_bytes": 13824000,
+      "executable_conditions": {
+        "ac_power": true,
+        "logical_processors": 24,
+        "cpu_frequency_mhz": 2000.0,
+        "cpu_frequency_source": "Windows OS-reported value",
+        "board_temperature_c": null,
+        "gpu_frequency_mhz": null
+      },
+      "power_and_memory_observation": {
+        "samples": [
+          {
+            "seconds": 0.0,
+            "ac_power": true,
+            "battery_percent": 99,
+            "available_memory_MiB": 6780,
+            "system_cpu_percent": 0.0
+          },
+          {
+            "seconds": 3.063,
+            "ac_power": true,
+            "battery_percent": 99,
+            "available_memory_MiB": 9359,
+            "system_cpu_percent": 25.4
+          }
+        ],
+        "mixed_power": false,
+        "thermal_throttling": "not observable with available public sensors",
+        "samples_observed": 4,
+        "all_samples_on_ac": true,
+        "minimum_available_memory_MiB": 6736
+      },
+      "supervisor": {
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 3.8910000000032596,
+        "restored_standard_environment_keys": [],
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        },
+        "progress_error": null
+      },
+      "verified_master_present": true
+    },
+    "warp-live-parallel": {
+      "independent_master_comparison": {
+        "decoded_pq": {
+          "y": "inf",
+          "u": "inf",
+          "v": "inf",
+          "average": "inf",
+          "passed": true
+        },
+        "exact_pcm": true,
+        "exact_pictures": true,
+        "stream_declaration_matches": true,
+        "passed": true
+      },
+      "source_commit": "add14252e43f7571bdc4f4bb97159cf5611c4964",
+      "reference": "045da0a6b3d8d956d07c075a6c0e73f6878a2d9f",
+      "backend": "warp32",
+      "conversion": "parallel",
+      "dimensions": [
+        320,
+        180
+      ],
+      "frames": 8,
+      "fps": 60,
+      "loops": false,
+      "source_clip_hashes": [],
+      "source_preparation_seconds": 0.5036881999985781,
+      "independent_verification_seconds": 0.4538557999767363,
+      "gpu_or_software": {
+        "wall_ms": 344.881,
+        "cpu_ms": 375,
+        "input_ms": 85.4266,
+        "setup_ms": 57.2851,
+        "peak_rss_bytes": 23453696,
+        "gpu_local_bytes": 0,
+        "gpu_nonlocal_bytes": 0,
+        "initial_upload_ms": 3.9,
+        "adapter": "Microsoft Basic Render Driver",
+        "memory_samples": [
+          {
+            "frames": 0,
+            "rss_bytes": 18882560,
+            "gpu_local_bytes": 0,
+            "gpu_nonlocal_bytes": 0
+          },
+          {
+            "frames": 8,
+            "rss_bytes": 23449600,
+            "gpu_local_bytes": 0,
+            "gpu_nonlocal_bytes": 0
+          }
+        ],
+        "frames": 8,
+        "work_ms": {
+          "median": 14.2154,
+          "p95": 16.67134,
+          "p99": 16.726108,
+          "maximum": 16.7398
+        },
+        "gpu_ms": {
+          "median": 0.94775,
+          "p95": 3.174135,
+          "p99": 4.098107,
+          "maximum": 4.3291
+        },
+        "upload_ms": {
+          "median": 0.10215,
+          "p95": 0.150355,
+          "p99": 0.161751,
+          "maximum": 0.1646
+        },
+        "readback_ms": {
+          "median": 0.25865,
+          "p95": 0.350565,
+          "p99": 0.377473,
+          "maximum": 0.3842
+        },
+        "write_ms": {
+          "median": 0.0967,
+          "p95": 0.168065,
+          "p99": 0.197773,
+          "maximum": 0.2052
+        },
+        "dispatch_ms": {
+          "median": 13.8946,
+          "p95": 16.435065,
+          "p99": 16.484933,
+          "maximum": 16.4974
+        },
+        "encoder_cpu_seconds": 0.016,
+        "parallel_compose_and_encode_seconds": 0.5827233000018168,
+        "encoder_pix_fmt": "yuv420p10le",
+        "renderer_pipe_bytes_per_picture": 691200,
+        "cpu_conversion_workers": 2,
+        "cpu_conversion_setup_seconds": 0.020203899999614805,
+        "cpu_conversion_round_trip_ms": {
+          "median": 5.8751,
+          "p95": 7.050955,
+          "p99": 7.061791,
+          "maximum": 7.0645
+        },
+        "live_decoders": [
+          {
+            "codec": "h264",
+            "pixel_format": "yuv420p",
+            "transfer": "bt709",
+            "time_base": "1/15360",
+            "variable_presentation_gaps": true,
+            "source_pictures_used": 6,
+            "source_indices": [
+              4,
+              5,
+              5,
+              6,
+              7,
+              8,
+              9,
+              9,
+              9,
+              9
+            ],
+            "source_in_seconds": "1/12",
+            "decoded_width": 320,
+            "decoded_height": 180,
+            "source_probe_seconds": 0.05355430001509376,
+            "decoded_pictures": 10,
+            "decoder_read_wait_seconds": 0.031014800042612478,
+            "rgba_pack_seconds": 0.002058900019619614,
+            "update_bytes": 5529600
+          },
+          {
+            "codec": "hevc",
+            "pixel_format": "yuv420p10le",
+            "transfer": "smpte2084",
+            "time_base": "1/15360",
+            "variable_presentation_gaps": false,
+            "source_pictures_used": 8,
+            "source_indices": [
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              9,
+              10
+            ],
+            "source_in_seconds": "1/20",
+            "decoded_width": 320,
+            "decoded_height": 180,
+            "source_probe_seconds": 0.061791000014636666,
+            "decoded_pictures": 11,
+            "decoder_read_wait_seconds": 0.0070458000409416854,
+            "rgba_pack_seconds": 0.002396500000031665,
+            "update_bytes": 7372800
+          }
+        ]
+      },
+      "resources": {
+        "duration_seconds": 1.703,
+        "gpu": null,
+        "average_cpu_machine_percent": 3.98,
+        "peak_summed_working_set_MiB": 241.3,
+        "sampled_cpu_seconds": 1.62,
+        "process_read_MiB": 41.7,
+        "process_write_MiB": 36.6
+      },
+      "delivery": {
+        "seconds": 1.2224313000333495,
+        "author_seconds": 0.47174060001270846,
+        "frames": 8,
+        "hdr10plus_blocks": 8,
+        "audio_samples": 6400,
+        "same_static_and_authored_decode": true,
+        "static_metadata": [
+          {
+            "blue_x": "6550/50000",
+            "blue_y": "2300/50000",
+            "green_x": "8500/50000",
+            "green_y": "39850/50000",
+            "max_luminance": "10000000/10000",
+            "min_luminance": "50/10000",
+            "red_x": "35400/50000",
+            "red_y": "14600/50000",
+            "side_data_type": "Mastering display metadata",
+            "white_point_x": "15635/50000",
+            "white_point_y": "16450/50000"
+          },
+          {
+            "max_average": 400,
+            "max_content": 1000,
+            "side_data_type": "Content light level metadata"
+          }
+        ],
+        "audio_pcm_sha256": "f28a2023c6eaf2ef91117b08ab2f3b6e82e2c0a6197380851b421ece44ba5890"
+      },
+      "live": true,
+      "source_preparation": {
+        "fixture_creation_seconds": 0.2354940000222996,
+        "source_admission_and_index_seconds": 0.11608440001145937,
+        "audio_preparation_seconds": 0.1511846999928821
+      },
+      "final_clock_and_audio_mux_seconds": 0.13406949999625795,
+      "output_fps": 6.544335047525165,
+      "raw_output_intermediate_bytes": 0,
+      "worker_sha256": "62f0f45a07e2d4e94cdcf519aa4dc4269d53082cf99fafaf5f6bdf1c890b6a0f",
+      "measured_fixture_only": true,
+      "final_shader_input_bytes": 13824000,
+      "executable_conditions": {
+        "ac_power": true,
+        "logical_processors": 24,
+        "cpu_frequency_mhz": 2000.0,
+        "cpu_frequency_source": "Windows OS-reported value",
+        "board_temperature_c": null,
+        "gpu_frequency_mhz": null
+      },
+      "power_and_memory_observation": {
+        "samples": [
+          {
+            "seconds": 0.0,
+            "ac_power": true,
+            "battery_percent": 99,
+            "available_memory_MiB": 10761,
+            "system_cpu_percent": 0.0
+          },
+          {
+            "seconds": 2.031,
+            "ac_power": true,
+            "battery_percent": 99,
+            "available_memory_MiB": 9738,
+            "system_cpu_percent": 18.2
+          }
+        ],
+        "mixed_power": false,
+        "thermal_throttling": "not observable with available public sensors",
+        "samples_observed": 3,
+        "all_samples_on_ac": true,
+        "minimum_available_memory_MiB": 9686
+      },
+      "supervisor": {
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 3.1559999999881256,
+        "restored_standard_environment_keys": [],
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        },
+        "progress_error": null
+      },
+      "verified_master_present": true
+    },
+    "warp-live-pts": {
+      "independent_master_comparison": {
+        "decoded_pq": {
+          "y": "inf",
+          "u": "inf",
+          "v": "inf",
+          "average": "inf",
+          "passed": true
+        },
+        "exact_pcm": true,
+        "exact_pictures": true,
+        "stream_declaration_matches": true,
+        "passed": true
+      },
+      "source_commit": "add14252e43f7571bdc4f4bb97159cf5611c4964",
+      "reference": "045da0a6b3d8d956d07c075a6c0e73f6878a2d9f",
+      "backend": "warp32",
+      "conversion": "parallel",
+      "dimensions": [
+        320,
+        180
+      ],
+      "frames": 8,
+      "fps": 60,
+      "loops": false,
+      "source_clip_hashes": [],
+      "source_preparation_seconds": 0.5697064999840222,
+      "independent_verification_seconds": 0.5450344000128098,
+      "gpu_or_software": {
+        "wall_ms": 140.393,
+        "cpu_ms": 0,
+        "input_ms": 68.2501,
+        "setup_ms": 74.2467,
+        "peak_rss_bytes": 23388160,
+        "gpu_local_bytes": 0,
+        "gpu_nonlocal_bytes": 0,
+        "initial_upload_ms": 14.6397,
+        "adapter": "Microsoft Basic Render Driver",
+        "memory_samples": [
+          {
+            "frames": 0,
+            "rss_bytes": 18862080,
+            "gpu_local_bytes": 0,
+            "gpu_nonlocal_bytes": 0
+          },
+          {
+            "frames": 8,
+            "rss_bytes": 23388160,
+            "gpu_local_bytes": 0,
+            "gpu_nonlocal_bytes": 0
+          }
+        ],
+        "frames": 8,
+        "work_ms": {
+          "median": 14.3609,
+          "p95": 15.95566,
+          "p99": 16.039772,
+          "maximum": 16.0608
+        },
+        "gpu_ms": {
+          "median": 0.75465,
+          "p95": 2.35626,
+          "p99": 3.006532,
+          "maximum": 3.1691
+        },
+        "upload_ms": {
+          "median": 0.12515,
+          "p95": 0.171755,
+          "p99": 0.185951,
+          "maximum": 0.1895
+        },
+        "readback_ms": {
+          "median": 0.2318,
+          "p95": 0.35723,
+          "p99": 0.379126,
+          "maximum": 0.3846
+        },
+        "write_ms": {
+          "median": 0.34605,
+          "p95": 9.986615,
+          "p99": 14.078843,
+          "maximum": 15.1019
+        },
+        "dispatch_ms": {
+          "median": 14.082,
+          "p95": 15.664635,
+          "p99": 15.799007,
+          "maximum": 15.8326
+        },
+        "encoder_cpu_seconds": 0.078,
+        "parallel_compose_and_encode_seconds": 0.39792499999748543,
+        "encoder_pix_fmt": "yuv420p10le",
+        "renderer_pipe_bytes_per_picture": 691200,
+        "cpu_conversion_workers": 2,
+        "cpu_conversion_setup_seconds": 0.020564000005833805,
+        "cpu_conversion_round_trip_ms": {
+          "median": 6.6559,
+          "p95": 9.717705,
+          "p99": 10.555381,
+          "maximum": 10.7648
+        },
+        "live_decoders": [
+          {
+            "codec": "h264",
+            "pixel_format": "yuv420p",
+            "transfer": "bt709",
+            "time_base": "1/15360",
+            "variable_presentation_gaps": true,
+            "source_pictures_used": 6,
+            "source_indices": [
+              4,
+              5,
+              5,
+              6,
+              7,
+              8,
+              9,
+              9
+            ],
+            "source_in_seconds": "1/12",
+            "decoded_width": 320,
+            "decoded_height": 180,
+            "coded_dimensions": [
+              160,
+              90
+            ],
+            "source_probe_seconds": 0.07095059999846853,
+            "decoded_pictures": 10,
+            "original_pts_verified": true,
+            "decoder_read_wait_seconds": 0.03578230002312921,
+            "rgba_pack_seconds": 0.002100599987898022,
+            "update_bytes": 5529600
+          },
+          {
+            "codec": "hevc",
+            "pixel_format": "yuv420p10le",
+            "transfer": "smpte2084",
+            "time_base": "1/15360",
+            "variable_presentation_gaps": false,
+            "source_pictures_used": 8,
+            "source_indices": [
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10
+            ],
+            "source_in_seconds": "1/20",
+            "decoded_width": 320,
+            "decoded_height": 180,
+            "coded_dimensions": [
+              320,
+              180
+            ],
+            "source_probe_seconds": 0.07333309997920878,
+            "decoded_pictures": 11,
+            "original_pts_verified": true,
+            "decoder_read_wait_seconds": 0.06020770000759512,
+            "rgba_pack_seconds": 0.002653099945746362,
+            "update_bytes": 7372800
+          }
+        ]
+      },
+      "resources": {
+        "duration_seconds": 1.75,
+        "gpu": null,
+        "average_cpu_machine_percent": 3.12,
+        "peak_summed_working_set_MiB": 238.1,
+        "sampled_cpu_seconds": 1.31,
+        "process_read_MiB": 30.3,
+        "process_write_MiB": 28.4
+      },
+      "delivery": {
+        "seconds": 1.172925299993949,
+        "author_seconds": 0.5398566999938339,
+        "frames": 8,
+        "hdr10plus_blocks": 8,
+        "audio_samples": 6400,
+        "same_static_and_authored_decode": true,
+        "static_metadata": [
+          {
+            "blue_x": "6550/50000",
+            "blue_y": "2300/50000",
+            "green_x": "8500/50000",
+            "green_y": "39850/50000",
+            "max_luminance": "10000000/10000",
+            "min_luminance": "50/10000",
+            "red_x": "35400/50000",
+            "red_y": "14600/50000",
+            "side_data_type": "Mastering display metadata",
+            "white_point_x": "15635/50000",
+            "white_point_y": "16450/50000"
+          },
+          {
+            "max_average": 400,
+            "max_content": 1000,
+            "side_data_type": "Content light level metadata"
+          }
+        ],
+        "audio_pcm_sha256": "f28a2023c6eaf2ef91117b08ab2f3b6e82e2c0a6197380851b421ece44ba5890"
+      },
+      "live": true,
+      "source_preparation": {
+        "fixture_creation_seconds": 0.2134049000160303,
+        "source_admission_and_index_seconds": 0.1451449999876786,
+        "audio_preparation_seconds": 0.2099181999801658
+      },
+      "final_clock_and_audio_mux_seconds": 0.2009546000044793,
+      "output_fps": 6.8205537045208855,
+      "raw_output_intermediate_bytes": 0,
+      "worker_sha256": "38a01cd69bddaa076f6a8e2af40f209b76eae49bb65e98e568edec3773ab50b1",
+      "measured_fixture_only": true,
+      "final_shader_input_bytes": 13824000,
+      "executable_conditions": {
+        "ac_power": true,
+        "logical_processors": 24,
+        "cpu_frequency_mhz": 2000.0,
+        "cpu_frequency_source": "Windows OS-reported value",
+        "board_temperature_c": null,
+        "gpu_frequency_mhz": null
+      },
+      "power_and_memory_observation": {
+        "samples": [
+          {
+            "seconds": 0.0,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 10573,
+            "system_cpu_percent": 0.0
+          },
+          {
+            "seconds": 2.031,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 10927,
+            "system_cpu_percent": 34.9
+          }
+        ],
+        "mixed_power": false,
+        "thermal_throttling": "not observable with available public sensors",
+        "samples_observed": 3,
+        "all_samples_on_ac": true,
+        "minimum_available_memory_MiB": 10573
+      },
+      "supervisor": {
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 3.5,
+        "restored_standard_environment_keys": [],
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        },
+        "progress_error": null
+      },
+      "verified_master_present": true
+    },
+    "live-uhd24-reference": {
+      "source_commit": "add14252e43f7571bdc4f4bb97159cf5611c4964",
+      "reference": "045da0a6b3d8d956d07c075a6c0e73f6878a2d9f",
+      "backend": "gpu32",
+      "conversion": "reference",
+      "dimensions": [
+        3840,
+        2160
+      ],
+      "frames": 24,
+      "fps": 60,
+      "loops": false,
+      "source_clip_hashes": [],
+      "source_preparation_seconds": 3.5523824999982025,
+      "independent_verification_seconds": 2.5778378000250086,
+      "gpu_or_software": {
+        "wall_ms": 128222,
+        "cpu_ms": 97296.9,
+        "input_ms": 16154,
+        "setup_ms": 612.18,
+        "peak_rss_bytes": 3902263296,
+        "gpu_local_bytes": 3493797888,
+        "gpu_nonlocal_bytes": 0,
+        "initial_upload_ms": 474.937,
+        "adapter": "AMD Radeon(TM) 890M Graphics",
+        "memory_samples": [
+          {
+            "frames": 0,
+            "rss_bytes": 1086459904,
+            "gpu_local_bytes": 813047808,
+            "gpu_nonlocal_bytes": 0
+          },
+          {
+            "frames": 24,
+            "rss_bytes": 3902029824,
+            "gpu_local_bytes": 3493797888,
+            "gpu_nonlocal_bytes": 0
+          }
+        ],
+        "frames": 24,
+        "work_ms": {
+          "median": 33.6179,
+          "p95": 82.02256,
+          "p99": 87.167595,
+          "maximum": 87.1868
+        },
+        "gpu_ms": {
+          "median": 8.58936,
+          "p95": 10.789735,
+          "p99": 11.95616,
+          "maximum": 12.2961
+        },
+        "upload_ms": {
+          "median": 15.25075,
+          "p95": 160.531,
+          "p99": 193.60734,
+          "maximum": 202.127
+        },
+        "readback_ms": {
+          "median": 14.95745,
+          "p95": 17.119895,
+          "p99": 24.564525,
+          "maximum": 26.7754
+        },
+        "write_ms": {
+          "median": 42.7418,
+          "p95": 71.405705,
+          "p99": 74.148431,
+          "maximum": 74.8799
+        },
+        "dispatch_ms": {
+          "median": 18.14005,
+          "p95": 64.47157,
+          "p99": 72.320589,
+          "maximum": 72.6554
+        },
+        "encoder_cpu_seconds": 18.672,
+        "parallel_compose_and_encode_seconds": 146.18237609998323,
+        "encoder_pix_fmt": "yuv420p10le",
+        "renderer_pipe_bytes_per_picture": 99532800,
+        "live_decoders": [
+          {
+            "codec": "h264",
+            "pixel_format": "yuv420p",
+            "transfer": "bt709",
+            "time_base": "1/15360",
+            "variable_presentation_gaps": true,
+            "source_pictures_used": 19,
+            "source_indices": [
+              4,
+              5,
+              5,
+              6,
+              7,
+              8,
+              9,
+              9,
+              21,
+              22
+            ],
+            "source_in_seconds": "1/12",
+            "decoded_width": 3840,
+            "decoded_height": 2160,
+            "source_probe_seconds": 0.10983659999328665,
+            "decoded_pictures": 23,
+            "decoder_read_wait_seconds": 18.818490299978293,
+            "rgba_pack_seconds": 0.8338532999623567,
+            "update_bytes": 2521497600
+          },
+          {
+            "codec": "hevc",
+            "pixel_format": "yuv420p10le",
+            "transfer": "smpte2084",
+            "time_base": "1/15360",
+            "variable_presentation_gaps": false,
+            "source_pictures_used": 24,
+            "source_indices": [
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              25,
+              26
+            ],
+            "source_in_seconds": "1/20",
+            "decoded_width": 3840,
+            "decoded_height": 2160,
+            "source_probe_seconds": 0.5337075999996159,
+            "decoded_pictures": 27,
+            "decoder_read_wait_seconds": 19.09149299998535,
+            "rgba_pack_seconds": 0.9913537000247743,
+            "update_bytes": 3185049600
+          }
+        ]
+      },
+      "resources": {
+        "duration_seconds": 153.734,
+        "gpu": null,
+        "average_cpu_machine_percent": 5.64,
+        "peak_summed_working_set_MiB": 7623.0,
+        "sampled_cpu_seconds": 208.08,
+        "process_read_MiB": 13739.4,
+        "process_write_MiB": 13694.2
+      },
+      "delivery": {
+        "seconds": 151.12319289997686,
+        "author_seconds": 4.771242599992547,
+        "frames": 24,
+        "hdr10plus_blocks": 24,
+        "audio_samples": 19200,
+        "same_static_and_authored_decode": true,
+        "static_metadata": [
+          {
+            "blue_x": "6550/50000",
+            "blue_y": "2300/50000",
+            "green_x": "8500/50000",
+            "green_y": "39850/50000",
+            "max_luminance": "10000000/10000",
+            "min_luminance": "50/10000",
+            "red_x": "35400/50000",
+            "red_y": "14600/50000",
+            "side_data_type": "Mastering display metadata",
+            "white_point_x": "15635/50000",
+            "white_point_y": "16450/50000"
+          },
+          {
+            "max_average": 400,
+            "max_content": 1000,
+            "side_data_type": "Content light level metadata"
+          }
+        ],
+        "audio_pcm_sha256": "13b22b43da393a6df701c5ce705d56d748111bb85ebc59f5a14a67b7caca1ad4"
+      },
+      "live": true,
+      "source_preparation": {
+        "fixture_creation_seconds": 2.768702800007304,
+        "source_admission_and_index_seconds": 0.6443326000007801,
+        "audio_preparation_seconds": 0.13845060000312515
+      },
+      "final_clock_and_audio_mux_seconds": 0.13863950001541525,
+      "output_fps": 0.1588108320070021,
+      "raw_output_intermediate_bytes": 0,
+      "worker_sha256": "62f0f45a07e2d4e94cdcf519aa4dc4269d53082cf99fafaf5f6bdf1c890b6a0f",
+      "measured_fixture_only": true,
+      "final_shader_input_bytes": 5839257600,
+      "executable_conditions": {
+        "ac_power": true,
+        "logical_processors": 24,
+        "cpu_frequency_mhz": 2000.0,
+        "cpu_frequency_source": "Windows OS-reported value",
+        "board_temperature_c": null,
+        "gpu_frequency_mhz": null
+      },
+      "power_and_memory_observation": {
+        "samples": [
+          {
+            "seconds": 0.0,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 10699,
+            "system_cpu_percent": 0.0
+          },
+          {
+            "seconds": 20.156,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 6696,
+            "system_cpu_percent": 10.0
+          },
+          {
+            "seconds": 40.281,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 5594,
+            "system_cpu_percent": 10.6
+          },
+          {
+            "seconds": 60.453,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 4579,
+            "system_cpu_percent": 12.5
+          },
+          {
+            "seconds": 80.609,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 3669,
+            "system_cpu_percent": 10.4
+          },
+          {
+            "seconds": 100.734,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 3615,
+            "system_cpu_percent": 14.6
+          },
+          {
+            "seconds": 120.906,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 4009,
+            "system_cpu_percent": 8.7
+          },
+          {
+            "seconds": 141.047,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 4672,
+            "system_cpu_percent": 22.0
+          },
+          {
+            "seconds": 157.156,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 11102,
+            "system_cpu_percent": 10.7
+          }
+        ],
+        "mixed_power": false,
+        "thermal_throttling": "not observable with available public sensors",
+        "samples_observed": 157,
+        "all_samples_on_ac": true,
+        "minimum_available_memory_MiB": 3189
+      },
+      "supervisor": {
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 157.78099999998813,
+        "restored_standard_environment_keys": [],
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        },
+        "progress_error": null
+      },
+      "verified_master_present": true
+    },
+    "live-uhd24-gpu": {
+      "independent_master_comparison": {
+        "decoded_pq": {
+          "y": "58.364110",
+          "u": "56.996476",
+          "v": "56.590239",
+          "average": "57.773137",
+          "passed": true
+        },
+        "exact_pcm": true,
+        "exact_pictures": null,
+        "stream_declaration_matches": true,
+        "passed": true
+      },
+      "source_commit": "add14252e43f7571bdc4f4bb97159cf5611c4964",
+      "reference": "045da0a6b3d8d956d07c075a6c0e73f6878a2d9f",
+      "backend": "gpu32",
+      "conversion": "gpu",
+      "dimensions": [
+        3840,
+        2160
+      ],
+      "frames": 24,
+      "fps": 60,
+      "loops": false,
+      "source_clip_hashes": [],
+      "source_preparation_seconds": 4.000313099997584,
+      "independent_verification_seconds": 2.5862863000074867,
+      "gpu_or_software": {
+        "wall_ms": 127002,
+        "cpu_ms": 97328.1,
+        "input_ms": 14339.5,
+        "setup_ms": 665.684,
+        "peak_rss_bytes": 3038834688,
+        "gpu_local_bytes": 2729562112,
+        "gpu_nonlocal_bytes": 0,
+        "initial_upload_ms": 176.126,
+        "adapter": "AMD Radeon(TM) 890M Graphics",
+        "memory_samples": [
+          {
+            "frames": 0,
+            "rss_bytes": 987283456,
+            "gpu_local_bytes": 813047808,
+            "gpu_nonlocal_bytes": 0
+          },
+          {
+            "frames": 24,
+            "rss_bytes": 3038830592,
+            "gpu_local_bytes": 2729562112,
+            "gpu_nonlocal_bytes": 0
+          }
+        ],
+        "frames": 24,
+        "work_ms": {
+          "median": 21.8542,
+          "p95": 31.50495,
+          "p99": 67.679934,
+          "maximum": 78.2241
+        },
+        "gpu_ms": {
+          "median": 8.13646,
+          "p95": 10.379065,
+          "p99": 10.414596,
+          "maximum": 10.4249
+        },
+        "upload_ms": {
+          "median": 14.94155,
+          "p95": 102.787355,
+          "p99": 121.7429,
+          "maximum": 127.118
+        },
+        "readback_ms": {
+          "median": 4.32825,
+          "p95": 5.97316,
+          "p99": 8.691798,
+          "maximum": 9.4709
+        },
+        "write_ms": {
+          "median": 2.606,
+          "p95": 3.354,
+          "p99": 3.602323,
+          "maximum": 3.6575
+        },
+        "dispatch_ms": {
+          "median": 17.51785,
+          "p95": 22.657665,
+          "p99": 61.338678,
+          "maximum": 72.8574
+        },
+        "color_gpu_ms": {
+          "median": 2.61482,
+          "p95": 3.525286,
+          "p99": 3.595315,
+          "maximum": 3.59756
+        },
+        "encoder_cpu_seconds": 3.75,
+        "parallel_compose_and_encode_seconds": 142.60401270000148,
+        "encoder_pix_fmt": "yuv420p10le",
+        "renderer_pipe_bytes_per_picture": 24883200,
+        "live_decoders": [
+          {
+            "codec": "h264",
+            "pixel_format": "yuv420p",
+            "transfer": "bt709",
+            "time_base": "1/15360",
+            "variable_presentation_gaps": true,
+            "source_pictures_used": 19,
+            "source_indices": [
+              4,
+              5,
+              5,
+              6,
+              7,
+              8,
+              9,
+              9,
+              21,
+              22
+            ],
+            "source_in_seconds": "1/12",
+            "decoded_width": 3840,
+            "decoded_height": 2160,
+            "source_probe_seconds": 0.13105669998913072,
+            "decoded_pictures": 23,
+            "decoder_read_wait_seconds": 17.081645600061165,
+            "rgba_pack_seconds": 0.7746256999671459,
+            "update_bytes": 2521497600
+          },
+          {
+            "codec": "hevc",
+            "pixel_format": "yuv420p10le",
+            "transfer": "smpte2084",
+            "time_base": "1/15360",
+            "variable_presentation_gaps": false,
+            "source_pictures_used": 24,
+            "source_indices": [
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              25,
+              26
+            ],
+            "source_in_seconds": "1/20",
+            "decoded_width": 3840,
+            "decoded_height": 2160,
+            "source_probe_seconds": 0.6001387999858707,
+            "decoded_pictures": 27,
+            "decoder_read_wait_seconds": 18.574040800041985,
+            "rgba_pack_seconds": 1.0118871000013314,
+            "update_bytes": 3185049600
+          }
+        ]
+      },
+      "resources": {
+        "duration_seconds": 150.157,
+        "gpu": null,
+        "average_cpu_machine_percent": 5.19,
+        "peak_summed_working_set_MiB": 6495.1,
+        "sampled_cpu_seconds": 187.16,
+        "process_read_MiB": 12030.4,
+        "process_write_MiB": 11913.6
+      },
+      "delivery": {
+        "seconds": 147.54141679999884,
+        "author_seconds": 4.79522800000268,
+        "frames": 24,
+        "hdr10plus_blocks": 24,
+        "audio_samples": 19200,
+        "same_static_and_authored_decode": true,
+        "static_metadata": [
+          {
+            "blue_x": "6550/50000",
+            "blue_y": "2300/50000",
+            "green_x": "8500/50000",
+            "green_y": "39850/50000",
+            "max_luminance": "10000000/10000",
+            "min_luminance": "50/10000",
+            "red_x": "35400/50000",
+            "red_y": "14600/50000",
+            "side_data_type": "Mastering display metadata",
+            "white_point_x": "15635/50000",
+            "white_point_y": "16450/50000"
+          },
+          {
+            "max_average": 400,
+            "max_content": 1000,
+            "side_data_type": "Content light level metadata"
+          }
+        ],
+        "audio_pcm_sha256": "13b22b43da393a6df701c5ce705d56d748111bb85ebc59f5a14a67b7caca1ad4"
+      },
+      "live": true,
+      "source_preparation": {
+        "fixture_creation_seconds": 3.0710944999882486,
+        "source_admission_and_index_seconds": 0.7322572999983095,
+        "audio_preparation_seconds": 0.1959404000081122
+      },
+      "final_clock_and_audio_mux_seconds": 0.11500639998121187,
+      "output_fps": 0.16266618906427763,
+      "raw_output_intermediate_bytes": 0,
+      "worker_sha256": "62f0f45a07e2d4e94cdcf519aa4dc4269d53082cf99fafaf5f6bdf1c890b6a0f",
+      "measured_fixture_only": true,
+      "final_shader_input_bytes": 5839257600,
+      "executable_conditions": {
+        "ac_power": true,
+        "logical_processors": 24,
+        "cpu_frequency_mhz": 2000.0,
+        "cpu_frequency_source": "Windows OS-reported value",
+        "board_temperature_c": null,
+        "gpu_frequency_mhz": null
+      },
+      "power_and_memory_observation": {
+        "samples": [
+          {
+            "seconds": 0.0,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 11290,
+            "system_cpu_percent": 0.0
+          },
+          {
+            "seconds": 20.125,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 6730,
+            "system_cpu_percent": 14.7
+          },
+          {
+            "seconds": 40.25,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 5956,
+            "system_cpu_percent": 17.5
+          },
+          {
+            "seconds": 60.375,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 5274,
+            "system_cpu_percent": 8.7
+          },
+          {
+            "seconds": 80.532,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 5244,
+            "system_cpu_percent": 14.8
+          },
+          {
+            "seconds": 100.641,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 4718,
+            "system_cpu_percent": 25.0
+          },
+          {
+            "seconds": 120.782,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 5276,
+            "system_cpu_percent": 10.2
+          },
+          {
+            "seconds": 140.922,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 5936,
+            "system_cpu_percent": 9.2
+          },
+          {
+            "seconds": 154.032,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 11011,
+            "system_cpu_percent": 11.5
+          }
+        ],
+        "mixed_power": false,
+        "thermal_throttling": "not observable with available public sensors",
+        "samples_observed": 154,
+        "all_samples_on_ac": true,
+        "minimum_available_memory_MiB": 4718
+      },
+      "supervisor": {
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 155.2029999999795,
+        "restored_standard_environment_keys": [],
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        },
+        "progress_error": null
+      },
+      "verified_master_present": true
+    },
+    "live-uhd24-parallel": {
+      "independent_master_comparison": {
+        "decoded_pq": {
+          "y": "inf",
+          "u": "inf",
+          "v": "inf",
+          "average": "inf",
+          "passed": true
+        },
+        "exact_pcm": true,
+        "exact_pictures": true,
+        "stream_declaration_matches": true,
+        "passed": true
+      },
+      "source_commit": "add14252e43f7571bdc4f4bb97159cf5611c4964",
+      "reference": "045da0a6b3d8d956d07c075a6c0e73f6878a2d9f",
+      "backend": "gpu32",
+      "conversion": "parallel",
+      "dimensions": [
+        3840,
+        2160
+      ],
+      "frames": 24,
+      "fps": 60,
+      "loops": false,
+      "source_clip_hashes": [],
+      "source_preparation_seconds": 3.6620374000049196,
+      "independent_verification_seconds": 3.356629600020824,
+      "gpu_or_software": {
+        "wall_ms": 129784,
+        "cpu_ms": 96828.1,
+        "input_ms": 14358.8,
+        "setup_ms": 366.158,
+        "peak_rss_bytes": 3879936000,
+        "gpu_local_bytes": 3481214976,
+        "gpu_nonlocal_bytes": 0,
+        "initial_upload_ms": 217.177,
+        "adapter": "AMD Radeon(TM) 890M Graphics",
+        "memory_samples": [
+          {
+            "frames": 0,
+            "rss_bytes": 1076031488,
+            "gpu_local_bytes": 813047808,
+            "gpu_nonlocal_bytes": 0
+          },
+          {
+            "frames": 24,
+            "rss_bytes": 3879931904,
+            "gpu_local_bytes": 3481214976,
+            "gpu_nonlocal_bytes": 0
+          }
+        ],
+        "frames": 24,
+        "work_ms": {
+          "median": 34.24995,
+          "p95": 69.82317,
+          "p99": 105.994036,
+          "maximum": 116.18
+        },
+        "gpu_ms": {
+          "median": 8.73496,
+          "p95": 9.372506,
+          "p99": 9.448949,
+          "maximum": 9.46576
+        },
+        "upload_ms": {
+          "median": 17.9646,
+          "p95": 121.0843,
+          "p99": 169.17555,
+          "maximum": 183.278
+        },
+        "readback_ms": {
+          "median": 15.118,
+          "p95": 23.320325,
+          "p99": 29.888232,
+          "maximum": 31.5538
+        },
+        "write_ms": {
+          "median": 11.20235,
+          "p95": 16.16612,
+          "p99": 20.594263,
+          "maximum": 21.8367
+        },
+        "dispatch_ms": {
+          "median": 18.8251,
+          "p95": 54.4886,
+          "p99": 92.483378,
+          "maximum": 102.353
+        },
+        "encoder_cpu_seconds": 4.468,
+        "parallel_compose_and_encode_seconds": 145.8094046000042,
+        "encoder_pix_fmt": "yuv420p10le",
+        "renderer_pipe_bytes_per_picture": 99532800,
+        "cpu_conversion_workers": 3,
+        "cpu_conversion_setup_seconds": 0.031104500027140602,
+        "cpu_conversion_round_trip_ms": {
+          "median": 701.41325,
+          "p95": 801.788035,
+          "p99": 818.055359,
+          "maximum": 822.3027
+        },
+        "live_decoders": [
+          {
+            "codec": "h264",
+            "pixel_format": "yuv420p",
+            "transfer": "bt709",
+            "time_base": "1/15360",
+            "variable_presentation_gaps": true,
+            "source_pictures_used": 19,
+            "source_indices": [
+              4,
+              5,
+              5,
+              6,
+              7,
+              8,
+              9,
+              9,
+              21,
+              22
+            ],
+            "source_in_seconds": "1/12",
+            "decoded_width": 3840,
+            "decoded_height": 2160,
+            "coded_dimensions": [
+              1920,
+              1080
+            ],
+            "source_probe_seconds": 0.11296910000964999,
+            "decoded_pictures": 23,
+            "decoder_read_wait_seconds": 18.988023799931398,
+            "rgba_pack_seconds": 0.8468765999714378,
+            "update_bytes": 2521497600
+          },
+          {
+            "codec": "hevc",
+            "pixel_format": "yuv420p10le",
+            "transfer": "smpte2084",
+            "time_base": "1/15360",
+            "variable_presentation_gaps": false,
+            "source_pictures_used": 24,
+            "source_indices": [
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              25,
+              26
+            ],
+            "source_in_seconds": "1/20",
+            "decoded_width": 3840,
+            "decoded_height": 2160,
+            "coded_dimensions": [
+              3840,
+              2160
+            ],
+            "source_probe_seconds": 0.569915600004606,
+            "decoded_pictures": 27,
+            "decoder_read_wait_seconds": 19.968653600051766,
+            "rgba_pack_seconds": 0.9900224999291822,
+            "update_bytes": 3185049600
+          }
+        ]
+      },
+      "resources": {
+        "duration_seconds": 155.0,
+        "gpu": null,
+        "average_cpu_machine_percent": 5.68,
+        "peak_summed_working_set_MiB": 7518.9,
+        "sampled_cpu_seconds": 211.12,
+        "process_read_MiB": 17156.1,
+        "process_write_MiB": 17033.0
+      },
+      "delivery": {
+        "seconds": 151.6093719000055,
+        "author_seconds": 5.64147740000044,
+        "frames": 24,
+        "hdr10plus_blocks": 24,
+        "audio_samples": 19200,
+        "same_static_and_authored_decode": true,
+        "static_metadata": [
+          {
+            "blue_x": "6550/50000",
+            "blue_y": "2300/50000",
+            "green_x": "8500/50000",
+            "green_y": "39850/50000",
+            "max_luminance": "10000000/10000",
+            "min_luminance": "50/10000",
+            "red_x": "35400/50000",
+            "red_y": "14600/50000",
+            "side_data_type": "Mastering display metadata",
+            "white_point_x": "15635/50000",
+            "white_point_y": "16450/50000"
+          },
+          {
+            "max_average": 400,
+            "max_content": 1000,
+            "side_data_type": "Content light level metadata"
+          }
+        ],
+        "audio_pcm_sha256": "13b22b43da393a6df701c5ce705d56d748111bb85ebc59f5a14a67b7caca1ad4"
+      },
+      "live": true,
+      "source_preparation": {
+        "fixture_creation_seconds": 2.828175900009228,
+        "source_admission_and_index_seconds": 0.6835558000020683,
+        "audio_preparation_seconds": 0.14944310000282712
+      },
+      "final_clock_and_audio_mux_seconds": 0.11852100002579391,
+      "output_fps": 0.1583015594565571,
+      "raw_output_intermediate_bytes": 0,
+      "worker_sha256": "62f0f45a07e2d4e94cdcf519aa4dc4269d53082cf99fafaf5f6bdf1c890b6a0f",
+      "measured_fixture_only": true,
+      "final_shader_input_bytes": 5839257600,
+      "executable_conditions": {
+        "ac_power": true,
+        "logical_processors": 24,
+        "cpu_frequency_mhz": 2000.0,
+        "cpu_frequency_source": "Windows OS-reported value",
+        "board_temperature_c": null,
+        "gpu_frequency_mhz": null
+      },
+      "power_and_memory_observation": {
+        "samples": [
+          {
+            "seconds": 0.0,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 11210,
+            "system_cpu_percent": 0.0
+          },
+          {
+            "seconds": 20.156,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 5996,
+            "system_cpu_percent": 11.1
+          },
+          {
+            "seconds": 40.297,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 4885,
+            "system_cpu_percent": 14.6
+          },
+          {
+            "seconds": 60.5,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 4153,
+            "system_cpu_percent": 11.7
+          },
+          {
+            "seconds": 80.656,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 3781,
+            "system_cpu_percent": 10.3
+          },
+          {
+            "seconds": 100.828,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 3842,
+            "system_cpu_percent": 22.8
+          },
+          {
+            "seconds": 120.953,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 4031,
+            "system_cpu_percent": 19.5
+          },
+          {
+            "seconds": 141.125,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 4275,
+            "system_cpu_percent": 22.8
+          },
+          {
+            "seconds": 161.281,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 10529,
+            "system_cpu_percent": 43.4
+          }
+        ],
+        "mixed_power": false,
+        "thermal_throttling": "not observable with available public sensors",
+        "samples_observed": 161,
+        "all_samples_on_ac": true,
+        "minimum_available_memory_MiB": 3403
+      },
+      "supervisor": {
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 162.0460000000021,
+        "restored_standard_environment_keys": [],
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        },
+        "progress_error": null
+      },
+      "verified_master_present": true
+    },
+    "camera-uhd24-reference": {
+      "source_commit": "add14252e43f7571bdc4f4bb97159cf5611c4964",
+      "reference": "045da0a6b3d8d956d07c075a6c0e73f6878a2d9f",
+      "backend": "gpu32",
+      "conversion": "reference",
+      "dimensions": [
+        3840,
+        2160
+      ],
+      "frames": 24,
+      "fps": 60,
+      "loops": false,
+      "source_preparation_seconds": 9.556369699974312,
+      "independent_verification_seconds": 2.672660200012615,
+      "gpu_or_software": {
+        "wall_ms": 112008,
+        "cpu_ms": 95984.4,
+        "input_ms": 11922.1,
+        "setup_ms": 281.144,
+        "peak_rss_bytes": 4297838592,
+        "gpu_local_bytes": 3898548224,
+        "gpu_nonlocal_bytes": 0,
+        "initial_upload_ms": 171.294,
+        "adapter": "AMD Radeon(TM) 890M Graphics",
+        "memory_samples": [
+          {
+            "frames": 0,
+            "rss_bytes": 1076006912,
+            "gpu_local_bytes": 813047808,
+            "gpu_nonlocal_bytes": 0
+          },
+          {
+            "frames": 24,
+            "rss_bytes": 4297752576,
+            "gpu_local_bytes": 3898548224,
+            "gpu_nonlocal_bytes": 0
+          }
+        ],
+        "frames": 24,
+        "work_ms": {
+          "median": 32.96865,
+          "p95": 68.20226,
+          "p99": 85.942321,
+          "maximum": 90.36
+        },
+        "gpu_ms": {
+          "median": 8.4407,
+          "p95": 9.290668,
+          "p99": 10.271768,
+          "maximum": 10.5631
+        },
+        "upload_ms": {
+          "median": 15.2707,
+          "p95": 101.34855,
+          "p99": 110.94351,
+          "maximum": 113.787
+        },
+        "readback_ms": {
+          "median": 15.0219,
+          "p95": 15.90967,
+          "p99": 26.055212,
+          "maximum": 29.0856
+        },
+        "write_ms": {
+          "median": 37.41955,
+          "p95": 47.144795,
+          "p99": 50.854653,
+          "maximum": 51.7123
+        },
+        "dispatch_ms": {
+          "median": 18.1178,
+          "p95": 50.78489,
+          "p99": 70.91541,
+          "maximum": 75.4264
+        },
+        "encoder_cpu_seconds": 17.39,
+        "parallel_compose_and_encode_seconds": 125.4027783999918,
+        "encoder_pix_fmt": "yuv420p10le",
+        "renderer_pipe_bytes_per_picture": 99532800,
+        "live_decoders": [
+          {
+            "codec": "h264",
+            "pixel_format": "yuv420p",
+            "transfer": "bt709",
+            "time_base": "1/15360",
+            "variable_presentation_gaps": true,
+            "source_pictures_used": 19,
+            "source_in_seconds": "1/12",
+            "decoded_width": 3840,
+            "decoded_height": 2160,
+            "coded_dimensions": [
+              1920,
+              1080
+            ],
+            "source_probe_seconds": 0.11496420000912622,
+            "decoded_pictures": 23,
+            "original_pts_verified": true,
+            "decoder_read_wait_seconds": 18.275452799978666,
+            "rgba_pack_seconds": 0.7968788000580389,
+            "update_bytes": 2521497600
+          },
+          {
+            "codec": "hevc",
+            "pixel_format": "yuv420p10le",
+            "transfer": "smpte2084",
+            "time_base": "1/90000",
+            "variable_presentation_gaps": true,
+            "source_pictures_used": 24,
+            "source_in_seconds": "1/20",
+            "decoded_width": 1214,
+            "decoded_height": 2160,
+            "coded_dimensions": [
+              3840,
+              2160
+            ],
+            "source_probe_seconds": 9.098270299989963,
+            "decoded_pictures": 27,
+            "original_pts_verified": true,
+            "decoder_read_wait_seconds": 1.6682161000499036,
+            "rgba_pack_seconds": 0.7379221000010148,
+            "update_bytes": 3185049600
+          }
+        ]
+      },
+      "resources": {
+        "duration_seconds": 133.219,
+        "gpu": null,
+        "average_cpu_machine_percent": 5.49,
+        "peak_summed_working_set_MiB": 6988.8,
+        "sampled_cpu_seconds": 175.5,
+        "process_read_MiB": 11999.1,
+        "process_write_MiB": 11921.8
+      },
+      "delivery": {
+        "seconds": 130.5061118999729,
+        "author_seconds": 4.948608799983049,
+        "frames": 24,
+        "hdr10plus_blocks": 24,
+        "audio_samples": 19200,
+        "same_static_and_authored_decode": true,
+        "static_metadata": [
+          {
+            "blue_x": "6550/50000",
+            "blue_y": "2300/50000",
+            "green_x": "8500/50000",
+            "green_y": "39850/50000",
+            "max_luminance": "10000000/10000",
+            "min_luminance": "50/10000",
+            "red_x": "35400/50000",
+            "red_y": "14600/50000",
+            "side_data_type": "Mastering display metadata",
+            "white_point_x": "15635/50000",
+            "white_point_y": "16450/50000"
+          },
+          {
+            "max_average": 400,
+            "max_content": 1000,
+            "side_data_type": "Content light level metadata"
+          }
+        ]
+      },
+      "live": true,
+      "source_preparation": {
+        "fixture_creation_seconds": 0.16814870000234805,
+        "source_admission_and_index_seconds": 9.213839000003645,
+        "audio_preparation_seconds": 0.1735497000045143
+      },
+      "final_clock_and_audio_mux_seconds": 0.1259606999810785,
+      "output_fps": 0.18389943314221888,
+      "raw_output_intermediate_bytes": 0,
+      "worker_sha256": "62f0f45a07e2d4e94cdcf519aa4dc4269d53082cf99fafaf5f6bdf1c890b6a0f",
+      "measured_fixture_only": true,
+      "final_shader_input_bytes": 5839257600,
+      "executable_conditions": {
+        "ac_power": true,
+        "logical_processors": 24,
+        "cpu_frequency_mhz": 2000.0,
+        "cpu_frequency_source": "Windows OS-reported value",
+        "board_temperature_c": null,
+        "gpu_frequency_mhz": null
+      },
+      "power_and_memory_observation": {
+        "samples": [
+          {
+            "seconds": 0.0,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 10969,
+            "system_cpu_percent": 0.0
+          },
+          {
+            "seconds": 20.156,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 8123,
+            "system_cpu_percent": 11.6
+          },
+          {
+            "seconds": 40.281,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 6212,
+            "system_cpu_percent": 10.1
+          },
+          {
+            "seconds": 60.469,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 5061,
+            "system_cpu_percent": 12.0
+          },
+          {
+            "seconds": 80.625,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 4291,
+            "system_cpu_percent": 11.3
+          },
+          {
+            "seconds": 100.766,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 4140,
+            "system_cpu_percent": 11.7
+          },
+          {
+            "seconds": 120.938,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 4338,
+            "system_cpu_percent": 14.7
+          },
+          {
+            "seconds": 141.078,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 10657,
+            "system_cpu_percent": 13.7
+          },
+          {
+            "seconds": 142.078,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 10684,
+            "system_cpu_percent": 12.1
+          }
+        ],
+        "mixed_power": false,
+        "thermal_throttling": "not observable with available public sensors",
+        "samples_observed": 142,
+        "all_samples_on_ac": true,
+        "minimum_available_memory_MiB": 3630
+      },
+      "supervisor": {
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 143.31200000000536,
+        "restored_standard_environment_keys": [],
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        },
+        "progress_error": null
+      },
+      "verified_master_present": true
+    },
+    "camera-uhd24-gpu": {
+      "independent_master_comparison": {
+        "decoded_pq": {
+          "y": "54.712935",
+          "u": "56.780677",
+          "v": "57.069066",
+          "average": "55.332349",
+          "passed": true
+        },
+        "exact_pcm": true,
+        "exact_pictures": null,
+        "stream_declaration_matches": true,
+        "passed": true
+      },
+      "source_commit": "add14252e43f7571bdc4f4bb97159cf5611c4964",
+      "reference": "045da0a6b3d8d956d07c075a6c0e73f6878a2d9f",
+      "backend": "gpu32",
+      "conversion": "gpu",
+      "dimensions": [
+        3840,
+        2160
+      ],
+      "frames": 24,
+      "fps": 60,
+      "loops": false,
+      "source_preparation_seconds": 8.732419000007212,
+      "independent_verification_seconds": 2.9757770000142045,
+      "gpu_or_software": {
+        "wall_ms": 111052,
+        "cpu_ms": 95390.6,
+        "input_ms": 11348.6,
+        "setup_ms": 675.243,
+        "peak_rss_bytes": 3303596032,
+        "gpu_local_bytes": 3006386176,
+        "gpu_nonlocal_bytes": 0,
+        "initial_upload_ms": 174.742,
+        "adapter": "AMD Radeon(TM) 890M Graphics",
+        "memory_samples": [
+          {
+            "frames": 0,
+            "rss_bytes": 974618624,
+            "gpu_local_bytes": 813047808,
+            "gpu_nonlocal_bytes": 0
+          },
+          {
+            "frames": 24,
+            "rss_bytes": 3302981632,
+            "gpu_local_bytes": 3006386176,
+            "gpu_nonlocal_bytes": 0
+          }
+        ],
+        "frames": 24,
+        "work_ms": {
+          "median": 22.62475,
+          "p95": 54.971465,
+          "p99": 62.063667,
+          "maximum": 62.8312
+        },
+        "gpu_ms": {
+          "median": 8.4852,
+          "p95": 9.865046,
+          "p99": 10.590309,
+          "maximum": 10.7839
+        },
+        "upload_ms": {
+          "median": 17.8872,
+          "p95": 84.962205,
+          "p99": 89.634719,
+          "maximum": 90.7996
+        },
+        "readback_ms": {
+          "median": 4.34555,
+          "p95": 5.710165,
+          "p99": 8.418422,
+          "maximum": 9.2139
+        },
+        "write_ms": {
+          "median": 2.79395,
+          "p95": 3.769075,
+          "p99": 3.856992,
+          "maximum": 3.8684
+        },
+        "dispatch_ms": {
+          "median": 18.00465,
+          "p95": 50.875365,
+          "p99": 57.530386,
+          "maximum": 58.0598
+        },
+        "color_gpu_ms": {
+          "median": 2.83312,
+          "p95": 3.215672,
+          "p99": 3.70169,
+          "maximum": 3.8428
+        },
+        "encoder_cpu_seconds": 4.484,
+        "parallel_compose_and_encode_seconds": 123.82436890000827,
+        "encoder_pix_fmt": "yuv420p10le",
+        "renderer_pipe_bytes_per_picture": 24883200,
+        "live_decoders": [
+          {
+            "codec": "h264",
+            "pixel_format": "yuv420p",
+            "transfer": "bt709",
+            "time_base": "1/15360",
+            "variable_presentation_gaps": true,
+            "source_pictures_used": 19,
+            "source_in_seconds": "1/12",
+            "decoded_width": 3840,
+            "decoded_height": 2160,
+            "coded_dimensions": [
+              1920,
+              1080
+            ],
+            "source_probe_seconds": 0.10893690001103096,
+            "decoded_pictures": 23,
+            "original_pts_verified": true,
+            "decoder_read_wait_seconds": 17.35054690000834,
+            "rgba_pack_seconds": 0.7730187999841291,
+            "update_bytes": 2521497600
+          },
+          {
+            "codec": "hevc",
+            "pixel_format": "yuv420p10le",
+            "transfer": "smpte2084",
+            "time_base": "1/90000",
+            "variable_presentation_gaps": true,
+            "source_pictures_used": 24,
+            "source_in_seconds": "1/20",
+            "decoded_width": 1214,
+            "decoded_height": 2160,
+            "coded_dimensions": [
+              3840,
+              2160
+            ],
+            "source_probe_seconds": 8.318995000008726,
+            "decoded_pictures": 27,
+            "original_pts_verified": true,
+            "decoder_read_wait_seconds": 1.8745697999256663,
+            "rgba_pack_seconds": 0.7234647000441328,
+            "update_bytes": 3185049600
+          }
+        ]
+      },
+      "resources": {
+        "duration_seconds": 132.828,
+        "gpu": null,
+        "average_cpu_machine_percent": 5.12,
+        "peak_summed_working_set_MiB": 5985.2,
+        "sampled_cpu_seconds": 163.09,
+        "process_read_MiB": 10290.9,
+        "process_write_MiB": 10220.8
+      },
+      "delivery": {
+        "seconds": 129.8251094999723,
+        "author_seconds": 5.830086699977983,
+        "frames": 24,
+        "hdr10plus_blocks": 24,
+        "audio_samples": 19200,
+        "same_static_and_authored_decode": true,
+        "static_metadata": [
+          {
+            "blue_x": "6550/50000",
+            "blue_y": "2300/50000",
+            "green_x": "8500/50000",
+            "green_y": "39850/50000",
+            "max_luminance": "10000000/10000",
+            "min_luminance": "50/10000",
+            "red_x": "35400/50000",
+            "red_y": "14600/50000",
+            "side_data_type": "Mastering display metadata",
+            "white_point_x": "15635/50000",
+            "white_point_y": "16450/50000"
+          },
+          {
+            "max_average": 400,
+            "max_content": 1000,
+            "side_data_type": "Content light level metadata"
+          }
+        ]
+      },
+      "live": true,
+      "source_preparation": {
+        "fixture_creation_seconds": 0.1604771999991499,
+        "source_admission_and_index_seconds": 8.428644100000383,
+        "audio_preparation_seconds": 0.1425054999999702
+      },
+      "final_clock_and_audio_mux_seconds": 0.14041759999236092,
+      "output_fps": 0.18486408440121607,
+      "raw_output_intermediate_bytes": 0,
+      "worker_sha256": "62f0f45a07e2d4e94cdcf519aa4dc4269d53082cf99fafaf5f6bdf1c890b6a0f",
+      "measured_fixture_only": true,
+      "final_shader_input_bytes": 5839257600,
+      "executable_conditions": {
+        "ac_power": true,
+        "logical_processors": 24,
+        "cpu_frequency_mhz": 2000.0,
+        "cpu_frequency_source": "Windows OS-reported value",
+        "board_temperature_c": null,
+        "gpu_frequency_mhz": null
+      },
+      "power_and_memory_observation": {
+        "samples": [
+          {
+            "seconds": 0.0,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 10993,
+            "system_cpu_percent": 0.0
+          },
+          {
+            "seconds": 20.172,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 8336,
+            "system_cpu_percent": 10.7
+          },
+          {
+            "seconds": 40.312,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 6708,
+            "system_cpu_percent": 6.5
+          },
+          {
+            "seconds": 60.468,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 6047,
+            "system_cpu_percent": 10.8
+          },
+          {
+            "seconds": 80.609,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 5147,
+            "system_cpu_percent": 12.4
+          },
+          {
+            "seconds": 100.734,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 4984,
+            "system_cpu_percent": 16.1
+          },
+          {
+            "seconds": 120.859,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 5202,
+            "system_cpu_percent": 22.2
+          },
+          {
+            "seconds": 141.015,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 10565,
+            "system_cpu_percent": 18.3
+          },
+          {
+            "seconds": 142.031,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 10256,
+            "system_cpu_percent": 19.4
+          }
+        ],
+        "mixed_power": false,
+        "thermal_throttling": "not observable with available public sensors",
+        "samples_observed": 142,
+        "all_samples_on_ac": true,
+        "minimum_available_memory_MiB": 4440
+      },
+      "supervisor": {
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 142.73399999999674,
+        "restored_standard_environment_keys": [],
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        },
+        "progress_error": null
+      },
+      "verified_master_present": true
+    }
+  },
+  "fault_trials": {
+    "fault-device": {
+      "supervisor": {
+        "exit_code": 1,
+        "reason": null,
+        "seconds": 1.297000000020489,
+        "restored_standard_environment_keys": [],
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        },
+        "progress_error": null
+      },
+      "verified_master_present": false,
+      "outcome": "Injected D3D11 removal HRESULT; no owned child or output remained"
+    },
+    "fault-timeout": {
+      "independent_master_comparison": {
+        "decoded_pq": {
+          "y": "inf",
+          "u": "inf",
+          "v": "inf",
+          "average": "inf",
+          "passed": true
+        },
+        "exact_pcm": true,
+        "exact_pictures": true,
+        "stream_declaration_matches": true,
+        "passed": true
+      },
+      "source_commit": "add14252e43f7571bdc4f4bb97159cf5611c4964",
+      "reference": "045da0a6b3d8d956d07c075a6c0e73f6878a2d9f",
+      "backend": "warp32",
+      "conversion": "parallel",
+      "dimensions": [
+        320,
+        180
+      ],
+      "frames": 8,
+      "fps": 60,
+      "loops": false,
+      "source_clip_hashes": [],
+      "source_preparation_seconds": 0.4557061999803409,
+      "independent_verification_seconds": 0.44620340000255965,
+      "gpu_or_software": {
+        "wall_ms": 142.53,
+        "cpu_ms": 0,
+        "input_ms": 35.4739,
+        "setup_ms": 66.3429,
+        "peak_rss_bytes": 23433216,
+        "gpu_local_bytes": 0,
+        "gpu_nonlocal_bytes": 0,
+        "initial_upload_ms": 3.7797,
+        "adapter": "Microsoft Basic Render Driver",
+        "memory_samples": [
+          {
+            "frames": 0,
+            "rss_bytes": 18870272,
+            "gpu_local_bytes": 0,
+            "gpu_nonlocal_bytes": 0
+          },
+          {
+            "frames": 8,
+            "rss_bytes": 23433216,
+            "gpu_local_bytes": 0,
+            "gpu_nonlocal_bytes": 0
+          }
+        ],
+        "frames": 8,
+        "work_ms": {
+          "median": 14.332,
+          "p95": 15.648795,
+          "p99": 15.856639,
+          "maximum": 15.9086
+        },
+        "gpu_ms": {
+          "median": 0.76325,
+          "p95": 2.296185,
+          "p99": 2.926437,
+          "maximum": 3.084
+        },
+        "upload_ms": {
+          "median": 0.12095,
+          "p95": 0.13606,
+          "p99": 0.139532,
+          "maximum": 0.1404
+        },
+        "readback_ms": {
+          "median": 0.27705,
+          "p95": 0.52984,
+          "p99": 0.612608,
+          "maximum": 0.6333
+        },
+        "write_ms": {
+          "median": 0.469,
+          "p95": 1.09374,
+          "p99": 1.217388,
+          "maximum": 1.2483
+        },
+        "dispatch_ms": {
+          "median": 14.04455,
+          "p95": 15.14137,
+          "p99": 15.235394,
+          "maximum": 15.2589
+        },
+        "encoder_cpu_seconds": 0.032,
+        "parallel_compose_and_encode_seconds": 0.3404992999858223,
+        "encoder_pix_fmt": "yuv420p10le",
+        "renderer_pipe_bytes_per_picture": 691200,
+        "cpu_conversion_workers": 3,
+        "cpu_conversion_setup_seconds": 0.02861860001576133,
+        "cpu_conversion_round_trip_ms": {
+          "median": 5.4536,
+          "p95": 7.499385,
+          "p99": 7.623957,
+          "maximum": 7.6551
+        },
+        "live_decoders": [
+          {
+            "codec": "h264",
+            "pixel_format": "yuv420p",
+            "transfer": "bt709",
+            "time_base": "1/15360",
+            "variable_presentation_gaps": true,
+            "source_pictures_used": 6,
+            "source_indices": [
+              4,
+              5,
+              5,
+              6,
+              7,
+              8,
+              9,
+              9
+            ],
+            "source_in_seconds": "1/12",
+            "decoded_width": 320,
+            "decoded_height": 180,
+            "coded_dimensions": [
+              160,
+              90
+            ],
+            "source_probe_seconds": 0.05416719999630004,
+            "decoded_pictures": 10,
+            "decoder_read_wait_seconds": 0.02480939999804832,
+            "rgba_pack_seconds": 0.0027056999679189175,
+            "update_bytes": 5529600
+          },
+          {
+            "codec": "hevc",
+            "pixel_format": "yuv420p10le",
+            "transfer": "smpte2084",
+            "time_base": "1/15360",
+            "variable_presentation_gaps": false,
+            "source_pictures_used": 8,
+            "source_indices": [
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10
+            ],
+            "source_in_seconds": "1/20",
+            "decoded_width": 320,
+            "decoded_height": 180,
+            "coded_dimensions": [
+              320,
+              180
+            ],
+            "source_probe_seconds": 0.052767999994102865,
+            "decoded_pictures": 11,
+            "decoder_read_wait_seconds": 0.03579829997033812,
+            "rgba_pack_seconds": 0.002829800039762631,
+            "update_bytes": 7372800
+          }
+        ]
+      },
+      "resources": {
+        "duration_seconds": 1.453,
+        "gpu": null,
+        "average_cpu_machine_percent": 3.36,
+        "peak_summed_working_set_MiB": 276.5,
+        "sampled_cpu_seconds": 1.17,
+        "process_read_MiB": 37.2,
+        "process_write_MiB": 35.0
+      },
+      "delivery": {
+        "seconds": 0.9764153999858536,
+        "author_seconds": 0.47348909999709576,
+        "frames": 8,
+        "hdr10plus_blocks": 8,
+        "audio_samples": 6400,
+        "same_static_and_authored_decode": true,
+        "static_metadata": [
+          {
+            "blue_x": "6550/50000",
+            "blue_y": "2300/50000",
+            "green_x": "8500/50000",
+            "green_y": "39850/50000",
+            "max_luminance": "10000000/10000",
+            "min_luminance": "50/10000",
+            "red_x": "35400/50000",
+            "red_y": "14600/50000",
+            "side_data_type": "Mastering display metadata",
+            "white_point_x": "15635/50000",
+            "white_point_y": "16450/50000"
+          },
+          {
+            "max_average": 400,
+            "max_content": 1000,
+            "side_data_type": "Content light level metadata"
+          }
+        ],
+        "audio_pcm_sha256": "f28a2023c6eaf2ef91117b08ab2f3b6e82e2c0a6197380851b421ece44ba5890"
+      },
+      "live": true,
+      "source_preparation": {
+        "fixture_creation_seconds": 0.19115930001134984,
+        "source_admission_and_index_seconds": 0.10783939997782,
+        "audio_preparation_seconds": 0.1558577000105288
+      },
+      "final_clock_and_audio_mux_seconds": 0.1238213999895379,
+      "output_fps": 8.193234150256034,
+      "raw_output_intermediate_bytes": 0,
+      "worker_sha256": "38a01cd69bddaa076f6a8e2af40f209b76eae49bb65e98e568edec3773ab50b1",
+      "measured_fixture_only": true,
+      "final_shader_input_bytes": 13824000,
+      "executable_conditions": {
+        "ac_power": true,
+        "logical_processors": 24,
+        "cpu_frequency_mhz": 2000.0,
+        "cpu_frequency_source": "Windows OS-reported value",
+        "board_temperature_c": null,
+        "gpu_frequency_mhz": null
+      },
+      "power_and_memory_observation": {
+        "samples": [
+          {
+            "seconds": 0.0,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 4556,
+            "system_cpu_percent": 0.0
+          },
+          {
+            "seconds": 2.016,
+            "ac_power": true,
+            "battery_percent": 100,
+            "available_memory_MiB": 4609,
+            "system_cpu_percent": 19.2
+          }
+        ],
+        "mixed_power": false,
+        "thermal_throttling": "not observable with available public sensors",
+        "samples_observed": 3,
+        "all_samples_on_ac": true,
+        "minimum_available_memory_MiB": 4556
+      },
+      "supervisor": {
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 3.062999999994645,
+        "restored_standard_environment_keys": [],
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        },
+        "progress_error": null
+      },
+      "verified_master_present": true,
+      "outcome": "Fixture finished before the deadline; this did not test cancellation"
+    },
+    "fault-timeout-retry": {
+      "supervisor": {
+        "exit_code": 1,
+        "reason": null,
+        "seconds": 2.1719999999913853,
+        "restored_standard_environment_keys": [],
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        },
+        "progress_error": null
+      },
+      "verified_master_present": false
+    },
+    "fault-timeout-labelled": {
+      "supervisor": {
+        "exit_code": 1,
+        "reason": null,
+        "seconds": 2.4070000000065193,
+        "restored_standard_environment_keys": [],
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        },
+        "progress_error": null
+      },
+      "verified_master_present": false,
+      "outcome": "Active worker deadline expired; no owned child or output remained"
+    }
+  },
+  "local_suites": {
+    "local-offline": {
+      "unittest_count": 169,
+      "unittest_seconds": 72.245,
+      "supervisor": {
+        "exit_code": 1,
+        "reason": null,
+        "seconds": 73.10899999999674,
+        "restored_standard_environment_keys": [],
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        },
+        "progress_error": null
+      }
+    },
+    "local-offline-retry": {
+      "unittest_count": 169,
+      "unittest_seconds": 71.241,
+      "supervisor": {
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 71.90600000001723,
+        "restored_standard_environment_keys": [],
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        },
+        "progress_error": null
+      }
+    }
+  }
 }

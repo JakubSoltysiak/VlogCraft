@@ -1,5 +1,9 @@
 # Architecture and continuation
 
+## 3.6.0 Phase 2B HDR delivery
+
+The render lab compares the frozen zimg converter, bounded independent zimg workers and a D3D11 compute conversion from FP32 Rec.2020 to packed limited-range PQ 4:2:0. The CPU branch preserves error diffusion and emits in frame order. The GPU path uses ordered dithering and reads back one quarter of the former float payload. The live test admits H.264 SDR and HEVC PQ with verified original PTS and updates only changed texture slots. A separate opt-in saved-project tool may replace the final managed HDR stage with the exact CPU conversion. It retains the existing project graph, audio, metadata and reference fallback. [Phase 2B evidence](docs/STUDIO_3_6_0_RENDERING_PHASE2B.md).
+
 ## 3.6.0 Phase 2 rendering lab
 
 `experiments/render_phase2` implements a shared premultiplied linear float compositor for scalar C++, SSE2 with reusable worker rows, and D3D11 compute with reusable surfaces. Both processors use the same row coverage intervals to preserve hard half-pixel boundaries. In the export lab, one staged D3D11 picture is packed to planar float in a reused buffer and sent over a bounded pipe to the existing FFmpeg/zimg and x265 Main10 delivery path. Both processes are joined on failure. Clock normalization, muxing and HDR10+ authoring use existing code. Renderer selection in the installed editor remains on the Phase 1 implementation. [Phase 2 report](docs/STUDIO_3_6_0_RENDERING_PHASE2.md).

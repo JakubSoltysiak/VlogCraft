@@ -3,7 +3,7 @@ from concurrent.futures import ThreadPoolExecutor
 from contextlib import suppress
 from pathlib import Path
 import subprocess
-from threading import Timer
+from threading import Event, Timer
 import time
 
 
@@ -51,13 +51,18 @@ def relay(producer, encoder, reference, stage: Path, frames, width, height, slot
     flags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
     workers, logs = [], []
     times = []
+    expired = Event()
 
     def stop():
         for child in (encoder, *workers, producer):
             if child.poll() is None:
                 child.kill()
 
-    timer = Timer(timeout, stop)
+    def enforce_deadline():
+        expired.set()
+        stop()
+
+    timer = Timer(timeout, enforce_deadline)
     timer.daemon = True
     timer.start()
     pool_started = time.perf_counter()
@@ -95,8 +100,10 @@ def relay(producer, encoder, reference, stage: Path, frames, width, height, slot
                 for worker in workers:
                     if worker.wait(timeout=max(.01, timeout - (time.perf_counter() - started))):
                         raise RuntimeError("A PQ conversion worker failed at end of stream")
-            except BaseException:
+            except BaseException as error:
                 stop()
+                if expired.is_set() and isinstance(error,Exception):
+                    raise subprocess.TimeoutExpired("PQ conversion pipeline",timeout) from error
                 raise
         return {"workers": slots, "worker_setup_seconds": setup_seconds, "frame_seconds": times}
     finally:

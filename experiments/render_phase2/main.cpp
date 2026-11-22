@@ -21,6 +21,27 @@ void read_exact(std::istream& stream,void* destination,std::size_t bytes) {
         throw std::runtime_error("Incomplete compositor fixture");
 }
 
+void read_live(void* destination,std::size_t bytes) {
+    auto* cursor=static_cast<char*>(destination);
+    while(bytes) {
+        DWORD received=0;
+        const DWORD requested=static_cast<DWORD>(std::min<std::size_t>(bytes,1u<<20));
+        if(!ReadFile(GetStdHandle(STD_INPUT_HANDLE),cursor,requested,&received,nullptr) || !received)
+            throw std::runtime_error("Incomplete live source picture");
+        cursor+=received;
+        bytes-=received;
+    }
+}
+
+void finish_live() {
+    char trailing=0;
+    DWORD received=0;
+    if(ReadFile(GetStdHandle(STD_INPUT_HANDLE),&trailing,1,&received,nullptr)) {
+        if(received) throw std::runtime_error("Unexpected extra live source bytes");
+    } else if(GetLastError()!=ERROR_BROKEN_PIPE)
+        throw std::runtime_error("The live source stream could not be closed");
+}
+
 void validate(const Frame& frame,const InputHeader& input) {
     if(frame.width!=input.width || frame.height!=input.height ||
         !frame.layers || frame.layers>3 || !std::isfinite(frame.dissolve) ||
@@ -49,24 +70,32 @@ double process_cpu_ms() {
 
 int wmain(int argc,wchar_t** argv) {
     try {
-        if(argc!=8) throw std::runtime_error("Use: phase2 mode plan sources output warmup workers upload");
+        if(argc!=8 && argc!=9)
+            throw std::runtime_error("Use: phase2 mode plan sources output warmup workers upload [fault-frame]");
         const std::wstring mode=argv[1];
         const bool gpu=mode==L"gpu32"||mode==L"gpu16"||mode==L"warp32";
         const bool half=mode==L"gpu16";
         if(!gpu && mode!=L"scalar" && mode!=L"simd") throw std::runtime_error("Unknown compositor mode");
         const int warmup=std::stoi(argv[5]), workers=std::stoi(argv[6]), uploads=std::stoi(argv[7]);
+        const int fault=argc==9?std::stoi(argv[8]):-1;
         if(warmup<0||warmup>120||workers<1||workers>24||(uploads!=0&&uploads!=1)||(!gpu&&uploads))
             throw std::runtime_error("Invalid trial setup");
+        if(argc==9 && (!gpu || fault<1))
+            throw std::runtime_error("Fault injection requires a GPU and an active frame");
         const std::wstring destinationMode=argv[4];
         const bool pq=destinationMode==L"@pq-stream";
         const bool pipe=pq||destinationMode==L"@gbr-stream";
+        const bool live=std::wstring(argv[3])==L"@live-stdin";
         const bool save=destinationMode!=L"-";
         if(pipe && (!gpu || half))
             throw std::runtime_error("Planar pipe requires an FP32 compositor");
         if(pipe && _setmode(_fileno(stdout),_O_BINARY)==-1)
             throw std::runtime_error("Cannot put the picture pipe into binary mode");
+        if(live && (!gpu || !pipe || uploads || warmup))
+            throw std::runtime_error("Live uploads require a binary FP32 pipe without warmup");
         std::ifstream plan(std::filesystem::path(argv[2]),std::ios::binary);
-        std::ifstream source(std::filesystem::path(argv[3]),std::ios::binary);
+        std::ifstream sourceFile;
+        if(!live) sourceFile.open(std::filesystem::path(argv[3]),std::ios::binary);
         const auto readStart=Clock::now();
         InputHeader input{};
         read_exact(plan,&input,sizeof(input));
@@ -75,6 +104,7 @@ int wmain(int argc,wchar_t** argv) {
         if(!input.width||input.width>7680||!input.height||input.height>4320||
            !input.images||input.images>8||!input.frames||input.frames>7200)
             throw std::runtime_error("Unsupported generated fixture dimensions");
+        if(fault>=int(input.frames)) throw std::runtime_error("Fault is outside the trial");
         const auto count=std::size_t(input.width)*input.height;
         if(count*input.images*sizeof(Pixel)>1ull<<31)
             throw std::runtime_error("Generated fixture exceeds the test texture budget");
@@ -98,8 +128,11 @@ int wmain(int argc,wchar_t** argv) {
         if(plan.peek()!=EOF) throw std::runtime_error("Unexpected extra frame parameters");
         for(const auto& frame:frames) validate(frame,input);
         std::vector<Pixel> texture(count*input.images);
-        read_exact(source,texture.data(),texture.size()*sizeof(Pixel));
-        if(source.peek()!=EOF) throw std::runtime_error("Unexpected extra source bytes");
+        if(live) read_live(texture.data(),texture.size()*sizeof(Pixel));
+        else {
+            read_exact(sourceFile,texture.data(),texture.size()*sizeof(Pixel));
+            if(sourceFile.peek()!=EOF) throw std::runtime_error("Unexpected extra source bytes");
+        }
         const double inputMs=milliseconds(readStart);
 
         std::vector<Pixel> result(gpu?0:count);
@@ -126,8 +159,20 @@ int wmain(int argc,wchar_t** argv) {
         struct Sample { double work, upload, dispatch, shading, readback, write, color; bool gpuValid; };
         std::vector<Sample> records(input.frames);
         std::vector<RowRange> coverage(input.height*3);
+        std::vector<Pixel> updated(live?count:0);
         const auto render=[&](unsigned index,bool measured){
             Sample value{};
+            if(live && index) {
+                std::uint32_t changes=0;
+                read_live(&changes,sizeof(changes));
+                if(changes>>input.images) throw std::runtime_error("Invalid live texture slot");
+                for(unsigned slot=0;slot<input.images;++slot) if(changes&(1u<<slot)) {
+                    read_live(updated.data(),updated.size()*sizeof(Pixel));
+                    const auto began=Clock::now();
+                    accelerator->upload_slice(slot,updated.data());
+                    value.upload+=milliseconds(began);
+                }
+            }
             const auto began=Clock::now();
             const auto& frame=frames[index];
             prepare_ranges(frame,geometry.data()+index*3,coverage.data());
@@ -180,9 +225,11 @@ int wmain(int argc,wchar_t** argv) {
         const double cpuStart=process_cpu_ms();
         const auto began=Clock::now();
         for(unsigned i=0;i<input.frames;++i) {
+            if(int(i)==fault) require(DXGI_ERROR_DEVICE_REMOVED,"Injected D3D11 device removal");
             records[i]=render(i,true);
             if((i+1)%300==0 || i+1==input.frames) footprint(i+1);
         }
+        if(live) finish_live();
         if(out.is_open()) out.close();
         if(out.fail()) throw std::runtime_error("Could not finalize composed pictures");
         if(pipe && !std::cout.flush()) throw std::runtime_error("Could not finish the picture pipe");
