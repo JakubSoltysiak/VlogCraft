@@ -4,6 +4,8 @@
 
 `experiments/render_phase2` implements a shared premultiplied linear float compositor for scalar C++, SSE2 with reusable worker rows, and D3D11 compute with reusable surfaces. Both processors use the same row coverage intervals to preserve hard half-pixel boundaries. In the export lab, one staged D3D11 picture is packed to planar float in a reused buffer and sent over a bounded pipe to the existing FFmpeg/zimg and x265 Main10 delivery path. Both processes are joined on failure. Clock normalization, muxing and HDR10+ authoring use existing code. Renderer selection in the installed editor remains on the Phase 1 implementation. [Phase 2 report](docs/STUDIO_3_6_0_RENDERING_PHASE2.md).
 
+The lab checks held pictures in bounded blocks and verifies the FFmpeg output count separately from filter timing samples. It records the benchmark driver hash, power observations, and failures per trial. The 8K follow-up uses generated pictures and the frozen Phase 1 filter source. [Matched 8K comparison](docs/STUDIO_3_6_0_RENDERING_PHASE2.md#matched-8k60-compatibility-comparison).
+
 ## 3.6.0 managed rendering
 
 The managed compositor bounds FFmpeg picture-filter slicing at four workers. zimg conversions, resizing and error diffusion keep the reference single slice. Motion expressions reuse per-row values while retaining float32 premultiplied bilinear sampling. Static still frames are prepared before repetition. Opacity keys and fades can vary the coverage independently of prepared RGB. Direct RGB and alpha maps avoid intermediate grayscale RGB copies. Source cadence, PCM, encoder settings and HDR10+ authoring keep their existing contracts. [Rendering evidence](docs/STUDIO_3_6_0_RENDERING.md).
