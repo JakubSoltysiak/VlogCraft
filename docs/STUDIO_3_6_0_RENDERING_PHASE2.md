@@ -6,6 +6,8 @@ The lab feeds the same premultiplied display-linear Rec.2020 pictures to frozen 
 
 The small mask and dissolve controls compiled and ran on Radeon 890M. An initial FFmpeg run rejected the raw input because the filter did not receive its alpha association declaration. The corrected lab tags input as premultiplied and checks the results against the frozen filters. Full-size trials use qualified AC power and retain numerical rejections as well as successful comparisons.
 
+The first UHD geometry comparison found isolated hard-edge differences of 0.504 linear units for scalar/SIMD and 0.148 for D3D11 FP32. Low average error did not qualify the outputs. Both native paths now receive per-row coverage intervals computed in double precision from the source transform. Interior taps and alpha operations still use float32. Hardware and WARP passed the small masked and dissolve checks with this change. The measured UHD retries are reported separately.
+
 ## Frozen export reruns
 
 | Workload | Archived Phase 1 on battery | Fresh Phase 1 on AC |

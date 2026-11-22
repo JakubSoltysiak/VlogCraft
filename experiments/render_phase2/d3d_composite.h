@@ -52,6 +52,7 @@ cbuffer Frame : register(b0) {
     Layer layer[3];
 };
 Texture2DArray<float4> sources : register(t0);
+StructuredBuffer<uint2> edges : register(t1);
 RWTexture2D<float4> outputPicture : register(u0);
 
 float4 fetch(Layer p, int2 at) {
@@ -62,13 +63,14 @@ float4 fetch(Layer p, int2 at) {
     return picture*saturate((1-distance)/p.matte.w);
 }
 
-float4 sampleLayer(Layer p, uint2 outputPoint) {
+float4 sampleLayer(Layer p, uint n, uint2 outputPoint) {
+    uint2 extent=edges[n*height+outputPoint.y];
+    if (outputPoint.x<extent.x || outputPoint.x>=extent.y) return 0;
     float2 size=float2(width,height);
     float2 center=(size-1)*.5;
     float2 delta=(float2(outputPoint)-center-size*float2(p.geometry.w,p.matte.x))/p.geometry.x;
     float2 pixel=center+float2(delta.x*p.geometry.y+delta.y*p.geometry.z,
                                -delta.x*p.geometry.z+delta.y*p.geometry.y);
-    if (any(pixel<-.5) || any(pixel>size-.5)) return 0;
     pixel=clamp(pixel,0,size-1);
     int2 low=int2(pixel), high=min(low+1,int2(width,height)-1);
     float2 ratio=pixel-low;
@@ -82,7 +84,7 @@ void main(uint3 thread : SV_DispatchThreadID) {
     if (thread.x>=width || thread.y>=height) return;
     float4 result=0, left=0;
     for(uint n=0;n<layers;++n) {
-        float4 foreground=sampleLayer(layer[n],thread.xy);
+        float4 foreground=sampleLayer(layer[n],n,thread.xy);
         if (dissolve>=0 && n<2) {
             if (n==0) left=foreground;
             else result=left*(1-dissolve)+foreground*dissolve;
@@ -97,9 +99,9 @@ class GpuCompositor {
     Com<ID3D11DeviceContext> context;
     Com<IDXGIAdapter3> memory;
     Com<ID3D11Texture2D> source, output, readback;
-    Com<ID3D11ShaderResourceView> view;
+    Com<ID3D11ShaderResourceView> view, edgeView;
     Com<ID3D11UnorderedAccessView> target;
-    Com<ID3D11Buffer> constants;
+    Com<ID3D11Buffer> constants, edges;
     Com<ID3D11ComputeShader> shader;
     Com<ID3D11Query> completed, disjoint, gpuStart, gpuEnd;
     unsigned width, height, sourceCount, outputStride;
@@ -154,6 +156,10 @@ public:
                 "Create compute shader");
         const D3D11_BUFFER_DESC buffer={sizeof(Frame),D3D11_USAGE_DEFAULT,D3D11_BIND_CONSTANT_BUFFER,0,0,0};
         require(device->CreateBuffer(&buffer,nullptr,constants.init()),"Create frame parameters");
+        const D3D11_BUFFER_DESC ranges={UINT(3*height*sizeof(RowRange)),D3D11_USAGE_DEFAULT,
+            D3D11_BIND_SHADER_RESOURCE,0,D3D11_RESOURCE_MISC_BUFFER_STRUCTURED,sizeof(RowRange)};
+        require(device->CreateBuffer(&ranges,nullptr,edges.init()),"Create coverage rows");
+        require(device->CreateShaderResourceView(edges.get(),nullptr,edgeView.init()),"Create coverage view");
         query(D3D11_QUERY_EVENT,completed);
         query(D3D11_QUERY_TIMESTAMP_DISJOINT,disjoint);
         query(D3D11_QUERY_TIMESTAMP,gpuStart);
@@ -180,8 +186,8 @@ public:
         context->CSSetShader(shader.get(),nullptr,0);
         ID3D11Buffer* parameters[]={constants.get()};
         context->CSSetConstantBuffers(0,1,parameters);
-        ID3D11ShaderResourceView* inputs[]={view.get()};
-        context->CSSetShaderResources(0,1,inputs);
+        ID3D11ShaderResourceView* inputs[]={view.get(),edgeView.get()};
+        context->CSSetShaderResources(0,2,inputs);
         sample_memory();
     }
 
@@ -205,9 +211,10 @@ public:
         wait<BOOL>(completed.get());
     }
 
-    void render(const Frame& frame) {
+    void render(const Frame& frame,const RowRange* coverage) {
         const auto begun=Clock::now();
         context->UpdateSubresource(constants.get(),0,nullptr,&frame,0,0);
+        context->UpdateSubresource(edges.get(),0,nullptr,coverage,0,0);
         ID3D11UnorderedAccessView* destinations[]={target.get()};
         context->CSSetUnorderedAccessViews(0,1,destinations,nullptr);
         context->Begin(disjoint.get());

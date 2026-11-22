@@ -61,6 +61,8 @@ int wmain(int argc,wchar_t** argv) {
         const auto readStart=Clock::now();
         InputHeader input{};
         read_exact(plan,&input,sizeof(input));
+        const bool hasPreciseGeometry=(input.images&0x80000000u)!=0;
+        input.images&=0x7fffffffu;
         if(!input.width||input.width>7680||!input.height||input.height>4320||
            !input.images||input.images>8||!input.frames||input.frames>7200)
             throw std::runtime_error("Unsupported generated fixture dimensions");
@@ -69,6 +71,21 @@ int wmain(int argc,wchar_t** argv) {
             throw std::runtime_error("Generated fixture exceeds the test texture budget");
         std::vector<Frame> frames(input.frames);
         read_exact(plan,frames.data(),frames.size()*sizeof(Frame));
+        std::vector<Geometry> geometry(input.frames*3);
+        if(hasPreciseGeometry) {
+            read_exact(plan,geometry.data(),geometry.size()*sizeof(Geometry));
+            for(const auto& g:geometry)
+                if(!std::isfinite(g.scale)||!std::isfinite(g.cosine)||!std::isfinite(g.sine)||
+                   !std::isfinite(g.x)||!std::isfinite(g.y)||g.scale<.1||g.scale>3||
+                   std::abs(g.cosine)>1||std::abs(g.sine)>1||std::abs(g.x)>2||std::abs(g.y)>2)
+                    throw std::runtime_error("Invalid precise geometry");
+        } else {
+            for(unsigned index=0;index<input.frames;++index)
+                for(unsigned n=0;n<frames[index].layers && n<3;++n) {
+                    const auto& p=frames[index].layer[n];
+                    geometry[index*3+n]={p.scale,p.cosine,p.sine,p.x,p.y};
+                }
+        }
         if(plan.peek()!=EOF) throw std::runtime_error("Unexpected extra frame parameters");
         for(const auto& frame:frames) validate(frame,input);
         std::vector<Pixel> texture(count*input.images);
@@ -98,16 +115,19 @@ int wmain(int argc,wchar_t** argv) {
 
         struct Sample { double work, upload, dispatch, shading, readback, write; bool gpuValid; };
         std::vector<Sample> records(input.frames);
-        const auto render=[&](const Frame& frame,bool measured){
+        std::vector<RowRange> coverage(input.height*3);
+        const auto render=[&](unsigned index,bool measured){
             Sample value{};
             const auto began=Clock::now();
+            const auto& frame=frames[index];
+            prepare_ranges(frame,geometry.data()+index*3,coverage.data());
             if(gpu) {
                 if(uploads) {
                     const auto start=Clock::now();
                     accelerator->upload(texture.data());
                     value.upload=milliseconds(start);
                 }
-                accelerator->render(frame);
+                accelerator->render(frame,coverage.data());
                 value.dispatch=accelerator->dispatchMs;
                 value.shading=accelerator->shaderMs;
                 value.gpuValid=accelerator->gpuClockValid;
@@ -115,7 +135,7 @@ int wmain(int argc,wchar_t** argv) {
                     accelerator->download(pixels.data());
                     value.readback=accelerator->mapMs;
                 }
-            } else cpu->render(frame,texture.data(),result.data());
+            } else cpu->render(frame,coverage.data(),texture.data(),result.data());
             value.work=milliseconds(began);
             if(save && measured) {
                 const auto writeStart=Clock::now();
@@ -126,7 +146,7 @@ int wmain(int argc,wchar_t** argv) {
             }
             return value;
         };
-        for(int i=0;i<warmup;++i) render(frames[i%frames.size()],false);
+        for(int i=0;i<warmup;++i) render(i%frames.size(),false);
         struct Footprint { unsigned frames; std::size_t rss; std::uint64_t local,shared; };
         std::vector<Footprint> footprints;
         const auto footprint=[&](unsigned frame) {
@@ -140,7 +160,7 @@ int wmain(int argc,wchar_t** argv) {
         const double cpuStart=process_cpu_ms();
         const auto began=Clock::now();
         for(unsigned i=0;i<input.frames;++i) {
-            records[i]=render(frames[i],true);
+            records[i]=render(i,true);
             if((i+1)%300==0 || i+1==input.frames) footprint(i+1);
         }
         if(out.is_open()) out.close();

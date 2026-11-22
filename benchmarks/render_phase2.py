@@ -48,6 +48,7 @@ SCENARIOS = (
     Scenario('uhd-sustained',3840,2160,motion=True,opacity=True,mask=True,layers=3),
     Scenario('uhd120',3840,2160,fps=120,motion=True),
     Scenario('8k60',7680,4320,motion=True),
+    Scenario('edge-half',320,180),
 )
 
 
@@ -116,6 +117,10 @@ def clips_for(scenario, frames):
         if scenario.mask and n==scenario.layers-1:
             clip.update(mask='ellipse' if n%2 else 'rectangle',maskRadius=.42)
             clip['keys']['maskRadius']=[dict(time=0,value=.42,mode='linear'),dict(time=end,value=.34,mode='linear')]
+        if scenario.name=='edge-half':
+            edge=(.5+1e-9)/scenario.width
+            clip['keys']['x']=[dict(time=0,value=edge,mode='linear'),
+                                dict(time=end,value=-edge,mode='linear')]
         clips.append(clip)
     return clips
 
@@ -128,21 +133,30 @@ def value_at(clip, prop, position):
     return start['value']+(end['value']-start['value'])*position
 
 
-def write_plan(path, scenario, clips, frames, indices=None):
+def write_plan(path, scenario, clips, frames, indices=None, *, precise_edges=False):
     indices=list(range(frames)) if indices is None else indices
+    precise=[]
     with path.open('wb') as file:
-        file.write(struct.pack('<4I',scenario.width,scenario.height,scenario.layers,len(indices)))
+        images=scenario.layers|(0x80000000 if precise_edges else 0)
+        file.write(struct.pack('<4I',scenario.width,scenario.height,images,len(indices)))
         for i in indices:
             fraction=i/max(1,frames-1)
             amount=fraction if scenario.dissolve else -1
             file.write(struct.pack('<3If',scenario.width,scenario.height,scenario.layers,amount))
             for n,clip in enumerate(clips):
                 angle=math.radians(value_at(clip,'rotation',fraction))
-                file.write(struct.pack('<8f4I',value_at(clip,'scale',fraction),math.cos(angle),math.sin(angle),
-                    value_at(clip,'x',fraction),value_at(clip,'y',fraction),value_at(clip,'opacity',fraction),
+                geometry=(value_at(clip,'scale',fraction),math.cos(angle),math.sin(angle),
+                          value_at(clip,'x',fraction),value_at(clip,'y',fraction))
+                if precise_edges:
+                    precise.append(geometry)
+                file.write(struct.pack('<8f4I',*geometry,value_at(clip,'opacity',fraction),
                     value_at(clip,'maskRadius',fraction),clip['feather'],n,
                     ('none','ellipse','rectangle').index(clip['mask']),0,0))
             file.write(bytes(48*(3-len(clips))))
+            if precise_edges:
+                precise.extend([(1.,1.,0.,0.,0.)]*(3-len(clips)))
+        for geometry in precise:
+            file.write(struct.pack('<5d',*geometry))
 
 
 def write_sources(directory, scenario, camera, reference):
@@ -233,19 +247,34 @@ def native_trial(executable, mode, plan, source, warmup, workers, output=None, u
 def compare_pictures(path, candidate, scenario, frames, *, reference=False, half=False):
     pixels=scenario.width*scenario.height
     max_rgb=max_alpha=total=abs_total=mask_edges=edge_error=0
+    max_relative_highlight=max_shadow=0
+    expected_reference=frames*pixels*(12 if reference else 16)
+    expected_candidate=frames*pixels*(8 if half else 16)
+    if path.stat().st_size!=expected_reference or candidate.stat().st_size!=expected_candidate:
+        raise ValueError('The composed picture buffer does not match the declared shape and frame count')
     input_shape=(frames,3,pixels) if reference else (frames,pixels,4)
     baseline=np.memmap(path,dtype='<f4',mode='r',shape=input_shape)
     tested=np.memmap(candidate,dtype='<f2' if half else '<f4',mode='r',shape=(frames,pixels,4))
     for n in range(frames):
         prior=baseline[n][[2,0,1]].T if reference else baseline[n,:,:3]
         after=tested[n,:,:3].astype('float32')
+        if not np.isfinite(prior).all() or not np.isfinite(after).all():
+            raise ValueError('Non-finite linear RGB in composed pictures')
         delta=np.abs(after-prior)
         max_rgb=max(max_rgb,float(delta.max()))
         total+=float(np.sum(np.square(delta),dtype='float64'))
         abs_total+=float(np.sum(delta,dtype='float64'))
+        highlight=prior>=1
+        shadow=np.abs(prior)<.02
+        if highlight.any():
+            max_relative_highlight=max(max_relative_highlight,float((delta[highlight]/prior[highlight]).max()))
+        if shadow.any():
+            max_shadow=max(max_shadow,float(delta[shadow].max()))
         if not reference:
             alpha=baseline[n,:,3]
             delta_alpha=np.abs(tested[n,:,3].astype('float32')-alpha)
+            if not np.isfinite(delta_alpha).all():
+                raise ValueError('Non-finite alpha in composed pictures')
             max_alpha=max(max_alpha,float(delta_alpha.max()))
             edge=(alpha>.01)&(alpha<.99)
             mask_edges+=np.count_nonzero(edge)
@@ -253,6 +282,7 @@ def compare_pictures(path, candidate, scenario, frames, *, reference=False, half
     rmse=math.sqrt(total/(frames*pixels*3))
     return dict(max_rgb=max_rgb,mean_abs_rgb=abs_total/(frames*pixels*3),rmse_rgb=rmse,
                 psnr_db=20*math.log10(10/rmse) if rmse else None,max_alpha=None if reference else max_alpha,
+                max_relative_highlight_error=max_relative_highlight,max_shadow_error=max_shadow,
                 mean_edge_alpha_error=edge_error/mask_edges if mask_edges else None,
                 passed=max_rgb<=REFERENCE_POLICY['max_rgb'] and rmse<=REFERENCE_POLICY['rmse_rgb']
                     and max_alpha<=REFERENCE_POLICY['max_alpha'])
@@ -267,13 +297,14 @@ def trial_suite(args, scenario, layers):
         modes=args.modes.split(',')
         sources,planar=write_sources(folder,scenario,args.camera,'ffmpeg' in modes)
         plan=folder/'plan.bin'
-        write_plan(plan,scenario,clips,frames)
+        write_plan(plan,scenario,clips,frames,precise_edges=args.precise_edges)
         if scenario.name=='uhd-sustained':
             # Full-size synthetic kernel endurance is an explicit separate mode.
             modes=[mode for mode in modes if mode in ('gpu32','gpu16')]
         for mode in modes:
             attempts=[]
-            for _ in range(args.repeat):
+            repeat=0 if args.reference_once and mode=='ffmpeg' else args.repeat
+            for _ in range(repeat):
                 before=power()
                 try:
                     run=reference_trial(folder,scenario,clips,frames,args.warmup,planar,layers) if mode=='ffmpeg' else native_trial(
@@ -293,9 +324,9 @@ def trial_suite(args, scenario, layers):
             outputs={}
             if count!=frames:
                 clips=clips_for(scenario,count)
-                write_plan(plan,scenario,clips,count)
+                write_plan(plan,scenario,clips,count,precise_edges=args.precise_edges)
             for mode in modes:
-                if not any('failure' not in run for run in rows[mode]):
+                if not any('failure' not in run for run in rows[mode]) and not (args.reference_once and mode=='ffmpeg'):
                     continue
                 output=folder/(mode+'.raw')
                 try:
@@ -336,6 +367,9 @@ def main():
     parser.add_argument('--assert-quality',action='store_true',help='Require every requested backend comparison to pass')
     parser.add_argument('--require-ac',action='store_true')
     parser.add_argument('--transfers',action='store_true')
+    parser.add_argument('--precise-edges',action='store_true')
+    parser.add_argument('--reference-once',action='store_true',
+                        help='Capture independent FFmpeg pictures and reuse previously timed FFmpeg controls')
     parser.add_argument('--camera',type=Path)
     args=parser.parse_args()
     if args.require_ac and not power():
@@ -361,7 +395,7 @@ def main():
     revision=call(['git','rev-parse','HEAD']).stdout.decode().strip()
     report=dict(reference=BASELINE,checkout=revision,native_sha256=hashlib.sha256(args.executable.read_bytes()).hexdigest(),
                 reference_filter_sha256=hashlib.sha256(Path(layers.__file__).read_bytes()).hexdigest(),
-                policy=REFERENCE_POLICY,repeat=args.repeat,workers=args.workers,
+                policy=REFERENCE_POLICY,repeat=args.repeat,workers=args.workers,precise_edges=args.precise_edges,
                 conditions_start=technical_conditions(),results=[])
     names=args.cases.split(',')
     if not set(names)<={case.name for case in SCENARIOS}:

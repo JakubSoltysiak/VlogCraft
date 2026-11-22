@@ -117,7 +117,7 @@ def compare_encoded(reference, candidate):
     return measured
 
 
-def experiment(results, reference, executable, frames, *, quick=False, force_fallback=False):
+def experiment(results, reference, executable, frames, *, quick=False, force_fallback=False, precise_edges=False):
     sys.path[:0]=[str(reference),str(ROOT),str(ROOT/'tests')]
     import hdr_layers
     from test_hdr_color import CONTRACT
@@ -136,7 +136,7 @@ def experiment(results, reference, executable, frames, *, quick=False, force_fal
         inputs,planar=write_sources(stage,scenario,None,True)
         clips=clips_for(scenario,frames)
         plan=stage/'frames.bin'
-        write_plan(plan,scenario,clips,frames)
+        write_plan(plan,scenario,clips,frames,precise_edges=precise_edges)
         audio=stage/'clock.wav'
         call(['ffmpeg','-v','error','-nostdin','-f','lavfi','-i',
               f'sine=frequency=577:sample_rate=48000:duration={frames/scenario.fps:.12f}',
@@ -190,7 +190,7 @@ def experiment(results, reference, executable, frames, *, quick=False, force_fal
                     checkout=call(['git','rev-parse','HEAD']).stdout.decode().strip(),
                     native_sha256=hashlib.sha256(executable.read_bytes()).hexdigest(),
                     ffmpeg=control,d3d11=candidate,scene_linear=compared,decoded_pq=pq,selected=selected,
-                    forced_fallback=force_fallback,fallback_reason=failure)
+                    precise_edges=precise_edges,forced_fallback=force_fallback,fallback_reason=failure)
         os.replace(reference_master if selected=='ffmpeg' else master,results/'verified-hdr10plus.mp4')
     (results/'report.json').write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
     print(json.dumps(report),flush=True)
@@ -206,11 +206,12 @@ def main():
     parser.add_argument('--frames',type=int,default=8)
     parser.add_argument('--quick',action='store_true')
     parser.add_argument('--force-fallback',action='store_true')
+    parser.add_argument('--precise-edges',action='store_true')
     args=parser.parse_args()
     if not 2<=args.frames<=12:
         parser.error('The experimental export fixture must contain 2–12 frames')
     experiment(args.results.resolve(),args.reference.resolve(),args.executable.resolve(),
-               args.frames,quick=args.quick,force_fallback=args.force_fallback)
+               args.frames,quick=args.quick,force_fallback=args.force_fallback,precise_edges=args.precise_edges)
 
 
 if __name__=='__main__':

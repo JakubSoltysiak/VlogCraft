@@ -31,6 +31,56 @@ struct Frame {
 
 static_assert(sizeof(Pixel) == 16 && sizeof(Layer) == 48 && sizeof(Frame) == 160);
 
+struct Geometry {
+    double scale, cosine, sine, x, y;
+};
+
+struct RowRange {
+    std::uint32_t start, end;
+};
+
+// Compute hard canvas coverage in double precision. Both processors keep
+// float32 bilinear taps, but they use the same inclusive/exclusive edge.
+inline void prepare_ranges(const Frame& frame,const Geometry* geometry,RowRange* ranges) {
+    const int width=frame.width,height=frame.height;
+    const double cx=(width-1)*.5,cy=(height-1)*.5;
+    for(unsigned n=0;n<frame.layers;++n) {
+        const auto& g=geometry[n];
+        for(int y=0;y<height;++y) {
+            const double dy=(y-cy-height*g.y)/g.scale;
+            const double dx=(-cx-width*g.x)/g.scale;
+            double low=0,high=width-1;
+            const auto intersect=[&](double base,double slope,double limit) {
+                if(slope==0) {
+                    if(base<-.5 || base>limit) { low=1; high=0; }
+                    return;
+                }
+                const double a=(-.5-base)/slope, b=(limit-base)/slope;
+                low=std::max(low,std::min(a,b));
+                high=std::min(high,std::max(a,b));
+            };
+            intersect(cx+dx*g.cosine+dy*g.sine,g.cosine/g.scale,width-.5);
+            intersect(cy-dx*g.sine+dy*g.cosine,-g.sine/g.scale,height-.5);
+            auto& range=ranges[n*height+y];
+            range={0,0};
+            if(low>high+1e-8) continue;
+            const auto contains=[&](int x) {
+                const double local=(x-cx-width*g.x)/g.scale;
+                const double sx=cx+local*g.cosine+dy*g.sine;
+                const double sy=cy-local*g.sine+dy*g.cosine;
+                return sx>=-.5 && sy>=-.5 && sx<=width-.5 && sy<=height-.5;
+            };
+            // Correct only the rounded boundary samples using the original
+            // expression order rather than relying on its rearrangement.
+            int first=std::clamp(int(std::ceil(low-1e-8)),0,width-1);
+            int last=std::clamp(int(std::floor(high+1e-8)),0,width-1);
+            if(first<=last && !contains(first)) ++first;
+            if(first<=last && !contains(last)) --last;
+            if(first<=last) range={unsigned(first),unsigned(last+1)};
+        }
+    }
+}
+
 template<bool Simd> struct Math;
 
 template<> struct Math<false> {
@@ -66,7 +116,8 @@ inline float coverage(const Layer& layer, int x, int y, float inverseWidth, floa
 }
 
 template<class M>
-void composite_rows(const Frame& frame, const Pixel* input, Pixel* output, unsigned begin, unsigned end) {
+void composite_rows(const Frame& frame,const RowRange* ranges,const Pixel* input,Pixel* output,
+                    unsigned begin,unsigned end) {
     const int width=frame.width, height=frame.height;
     const std::size_t pixels=std::size_t(width)*height;
     const float cx=(width-1)*.5f, cy=(height-1)*.5f, inverseWidth=1.f/width, inverseHeight=1.f/height;
@@ -85,7 +136,8 @@ void composite_rows(const Frame& frame, const Pixel* input, Pixel* output, unsig
                 const float sx=cx+dx*layer.cosine+dy*layer.sine;
                 const float sy=cy-dx*layer.sine+dy*layer.cosine;
                 auto foreground=M::zero();
-                if (sx>=-.5f && sy>=-.5f && sx<=width-.5f && sy<=height-.5f) {
+                const auto& range=ranges[n*height+y];
+                if (unsigned(x)>=range.start && unsigned(x)<range.end) {
                     const float u=std::clamp(sx,0.f,float(width-1)), v=std::clamp(sy,0.f,float(height-1));
                     const int x0=int(u), y0=int(v), x1=std::min(x0+1,width-1), y1=std::min(y0+1,height-1);
                     const Pixel* source=input+layer.slice*pixels;
@@ -115,6 +167,7 @@ class CpuCompositor {
     unsigned generation=0, active=0;
     bool stopping=false;
     Frame frame{};
+    const RowRange* ranges=nullptr;
     const Pixel* input=nullptr;
     Pixel* output=nullptr;
 
@@ -126,7 +179,7 @@ class CpuCompositor {
             if (stopping) return;
             seen=generation;
             lock.unlock();
-            composite_rows<Math<true>>(frame,input,output,frame.height*index/count,frame.height*(index+1)/count);
+            composite_rows<Math<true>>(frame,ranges,input,output,frame.height*index/count,frame.height*(index+1)/count);
             lock.lock();
             if (--active==0) completion.notify_one();
         }
@@ -151,13 +204,14 @@ public:
         }
     }
     ~CpuCompositor() { stop(); }
-    void render(const Frame& parameters, const Pixel* source, Pixel* picture) {
+    void render(const Frame& parameters,const RowRange* coverage,const Pixel* source,Pixel* picture) {
         if (workers.empty()) {
-            composite_rows<Math<false>>(parameters,source,picture,0,parameters.height);
+            composite_rows<Math<false>>(parameters,coverage,source,picture,0,parameters.height);
             return;
         }
         std::unique_lock<std::mutex> lock(mutex);
         frame=parameters;
+        ranges=coverage;
         input=source;
         output=picture;
         active=unsigned(workers.size());
