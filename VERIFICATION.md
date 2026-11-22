@@ -1,5 +1,13 @@
 # VlogCraft Studio development qualification
 
+## 3.6.0 Phase 3A GPU export
+
+- Frame 193 was reproduced in its eight-picture GOP. Repeat encodes were deterministic for each exact input and CPU zimg substitution alone still missed the 50 dB gate. The repaired 300-picture candidate reached 57.08 dB overall and 52.53 dB minimum in 137.763 s with exact clocks, PCM and 300 HDR10+ associations.
+- The 24- and 120-frame comparison paths passed on Radeon again at 19.386 s and 35.690 s. The short straight-cut first export passed in 37.561 s versus a separately rendered 64.672 s reference. The later full comparison checked every picture and reached 55.63 dB overall and 53.64 dB minimum.
+- Local loopback-only regression passed 182 Python tests, including the WARP controls. JavaScript passed 29 tests. The optional local development MSI image passed 48 identity, runtime and icon checks.
+- The independent 120-frame straight-cut comparison passed with 55.43 dB overall and 53.64 dB minimum. The packaged first export, exact PCM and bitstream inspection, active cancellation, confirmed shutdown, default export and managed fallback passed. The initial automated shutdown prompt timeout remains in the record.
+- Scope and open production gates are documented in the [Phase 3A report](docs/STUDIO_3_6_0_PHASE3A_EXPORT.md), [machine-readable measurements](docs/benchmarks/studio-3.6.0-phase3a.json) and [roadmap](TODO.md).
+
 ## 3.6.0 Phase 2D saved-project GPU rendering
 
 [Architecture, effects and timing](docs/STUDIO_3_6_0_RENDERING_PHASE2D.md) and [measurement record](docs/benchmarks/studio-3.6.0-phase2d.json).

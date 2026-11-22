@@ -501,8 +501,9 @@ async function startExport(){
   const delivery=$('exportWorkflow').value;
   const preserving=delivery==='hdr10plus-copy';
   const nativeProject=!$('nativeProjectExport').hidden&&$('useNativeProjectExport').checked;
-  const comparisonMaster=nativeProject?$('comparisonMaster').value:'';
-  if(nativeProject&&!comparisonMaster)throw Error('Choose a verified comparison master for GPU rendering');
+  const firstExport=nativeProject&&$('nativeProjectPolicy').value==='first';
+  const comparisonMaster=nativeProject&&!firstExport?$('comparisonMaster').value:'';
+  if(nativeProject&&!firstExport&&!comparisonMaster)throw Error('Choose a verified comparison master for GPU rendering');
   const fixed=['samsung-hdr10plus','youtube-hdr'].includes(delivery);
   let renderSettings;
   if(!preserving){
@@ -525,7 +526,7 @@ async function startExport(){
   }
   await flushSave();
   const res=await request('export','POST',{path:destination.path,overwrite:destination.exists,delivery,
-                                         ...(nativeProject?{comparisonMaster}:{}),
+                                         ...(firstExport?{experimentalFirstExport:true}:nativeProject?{comparisonMaster}:{}),
                                          ...(delivery!=='render'&&!preserving?{settings:renderSettings}:{})});
   if(res.cancelled)return;
   started=true;
