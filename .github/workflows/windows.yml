@@ -36,7 +36,15 @@ jobs:
         run: |
           python tools/audit_repository.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          python tools/performance_record.py docs/benchmarks/studio-3.6.0-rendering.json
+          $archive = 'build/qa/phase2b-evidence'
+          New-Item -ItemType Directory -Force -Path $archive | Out-Null
+          git archive --format=tar --output=build/qa/phase2b-evidence.tar 899ad995fc6ffd013e1eac2c25339459887fedc6
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          tar -xf build/qa/phase2b-evidence.tar -C $archive
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python "$archive/tools/performance_record.py" "$archive/docs/benchmarks/studio-3.6.0-rendering.json"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tools/performance_record.py docs/benchmarks/studio-3.6.0-phase2c.json
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python tests/icon_assets.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

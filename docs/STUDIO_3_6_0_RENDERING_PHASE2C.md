@@ -67,3 +67,33 @@ Separate 24-picture null probes distinguish initialization and decode from the r
 The first small resident encode reached 49.61 dB and failed the established 50 dB gate. The UHD candidate continued to use the same gate. Early software comparison attempts lacked the shared runtime DLL path, and one native camera run logged a libav message before its JSON receipt. The corrected path validates the native receipt and preserves the DLL environment for the software retry. WARP exercised this fallback and produced exact decoded output. A production-quality failure prevents candidate publication.
 
 GPU statistics computed on the pre-encode surface would describe a different image. A matched 24-picture diagnostic reconstructed the packed pre-encode pictures using the same PQ RGB path. All 24 resulting payloads differed from their compressed and decoded counterparts. The qualified metadata authority remains the final decoded image. GPU analysis on that decoded image still needs exact reconstruction and histogram conformance.
+
+The 120-picture progression used changing H.264 SDR and the same rotated PQ source. Its software-normalized, zimg-output reference completed in 116.931 s and the resident input plus packed GPU-output candidate completed in 15.549 s at 7.718 output FPS. The arms shared the optimized author. This comparison includes the output conversion change. Decoded PQ PSNR was 56.22 dB, PCM was exact, static signaling matched and all 120 dynamic records tracked the original output clock. The endpoint was 96,000 samples. Peak summed working set moved from 8,410 to 2,897 MiB. Both original PTS traces were validated, with zero CPU video-source frame transfers in the resident arm.
+
+## Representative saved-project gate
+
+The retained 24-picture UHD60 project reopened as an ordinary saved document. It used two video tracks, changing H.264 SDR VFR and rotated private HEVC PQ, two dissolve boundaries, an animated photograph, an ellipse mask, a title, camera crossfade and mixed music. The private PQ source's pixel aspect ratio was undeclared. The project explicitly assumed square pixels for that clip using the existing technical override. Both initial preflight rejections are retained. No media files were rewritten.
+
+The managed project rendered one shared HDR10 intermediate in 112.039 s with 7,087 MiB peak summed working set, seven parallel color segments and zero segment fallbacks. The default author took 5.940 s and the exact native author took 1.214 s. This yields 117.980 and 113.253 s respectively with the shared render time. The final authored masters were byte-identical. Independent decode recovered 24 picture timestamps, 24 metadata associations and an exact 19,200-sample audio endpoint. Source and project hashes matched before and after.
+
+Project composition now accounts for about 99% of the faster saved-project result. A linear projection of this short fixture would take about 4.7 hours for 3,600 pictures. The 60-second project gate stays open. The 120-frame live laboratory result and the prepared 600-frame result exercise different workloads, and the representative project still uses the managed compositor. Its next performance gate is safe resident admission for real project effects and timelines.
+
+## Qualification scope
+
+| Capability | Status | Evidence and remaining coverage |
+|---|---|---|
+| Managed default FFmpeg/x265 export | Production reference | Current default and packet verification preserved. |
+| Fast author on final decoded Main10 pictures | Qualified experimental subset | Exact delivery through 600 prepared frames and the saved UHD project. The explicit project tool retains the reference fallback. |
+| Resident NV12/P010 decode and source normalization | Qualified experimental subset | Two-stream UHD and rotated PQ VFR through 120 frames on Radeon 890M. Requires an independent master gate. WARP exercised runtime fallback. |
+| GPU source handling for wider formats or timelines | Unqualified | Wider chroma, interlaced material, other transfer functions, arbitrary seek and full project admission need separate verification. |
+| Final decoded GPU histogram, physical driver recovery and native preview parity | Open | Pre-encode metadata was rejected. Refactored authoring preserved Reference preview in the saved-project regression. Physical device loss and actual display parity remain open. |
+
+Injected authoring failure retried through the qualified default and matched decoded output. The simulated disk-space preflight preserved the saved project and published no master. The WARP no-hardware case fell back with exact output and no owned survivor. Phase 2C uses the same CPU x265 encoder. The earlier AMF mastering-coordinate discrepancy remains open.
+
+## Windows verification and evidence integrity
+
+The local offline suite passed 169 Python and 29 JavaScript tests. The development MSI was built from the isolated `c1bea606dc47def930698ebdd641e3fb869b71ff` archive. The administrative image and all 44 package/source/resource checks passed. The first package comparison used the Windows working checkout and found line-ending differences in seven web files. Comparing to the exact archive used for packaging resolved those mismatches. The development MSI SHA-256 is `cdaa000247f7d77bd1b5ee023951d274912cfbb7b69c9e496ae5284b83587f44`.
+
+The current default author repeated the 120-picture frozen-input control in 28.161 s and produced a byte-identical master. The packaged editor also passed the normal offline HDR10+ export dialog with 12 generated pictures. Independent decoding verified the picture/audio clock and every picture's statistics. The saved project output settings stayed intact and the supervised session left no owned processes.
+
+GitHub Actions initially rejected the earlier production performance fingerprint after the authoring refactor. The earlier record is now verified against the immutable Phase 2B tree, where its source and protocol fingerprints match. The current record is separately bound to the Phase 2C source and updated protocol. Both checks are required. The private-media audit found zero path, content or private text matches in Git and confirmed all three camera originals unchanged. [Retained fingerprint failure](https://github.com/JakubSoltysiak/VlogCraft/actions/runs/45049471631).

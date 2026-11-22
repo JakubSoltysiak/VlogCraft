@@ -37,7 +37,15 @@ PROTOCOL_FILES=(
  'tests/test_export_scratch.py','benchmarks/studio357_hdr_sequence.py',
  'benchmarks/profile_hdr_render.py','benchmarks/profile_preview_proxy.py',
  'tests/test_hdr_render_reuse.py',
- 'tests/performance.py','tests/gpu_metrics.py')
+ 'tests/performance.py','tests/gpu_metrics.py',
+ 'benchmarks/phase2b_live.py','benchmarks/phase2b_conversion.py','benchmarks/phase2b_project_export.py',
+ 'benchmarks/phase2c_author.py','benchmarks/profile_phase2c_author.py','benchmarks/compare_phase2c_author.py',
+ 'benchmarks/check_phase2c_stats.py','benchmarks/phase2c_diagnostics.py','benchmarks/qualify_phase2c_project.py',
+ 'benchmarks/render_phase2.py','benchmarks/render_phase2_stream.py','benchmarks/render_phase2_export.py',
+ 'experiments/render_phase2/composite.h','experiments/render_phase2/d3d_composite.h',
+ 'experiments/render_phase2/hardware_inputs.h','experiments/render_phase2/hdr_statistics.cpp',
+ 'experiments/render_phase2/main.cpp','experiments/render_phase2/normalize_surface.h',
+ 'experiments/render_phase2/pq_shader.h','tests/test_phase2b_export.py')
 
 def fingerprint(files=None):
  h=hashlib.sha256()

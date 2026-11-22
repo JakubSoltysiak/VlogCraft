@@ -1,5 +1,15 @@
 # VlogCraft Studio development qualification
 
+## 3.6.0 Phase 2C HDR10+ and resident source input
+
+[Draft PR #18](https://github.com/JakubSoltysiak/VlogCraft/pull/18) is stacked on Phase 2B at `899ad995fc6ffd013e1eac2c25339459887fedc6`. [Report](docs/STUDIO_3_6_0_RENDERING_PHASE2C.md) and [measurements](docs/benchmarks/studio-3.6.0-phase2c.json).
+
+- All prepared UHD control masters matched Phase 2B byte for byte. The 600-frame export improved from 157.253 to 61.121 s, with 17.351 s of exact final-picture authoring.
+- The 120-picture live VFR comparison passed at 15.549 s with resident input, versus 116.931 s for the software/zimg reference. It verified both original PTS traces, 120 dynamic records and exact PCM. WARP exercised exact software fallback. The rejected low-resolution encode is retained.
+- A saved 24-picture UHD project with private camera footage, motion, a mask, transitions and mixed audio passed reference and fast authoring with byte-identical masters. The shared managed render took 112.039 s. The full 60-second project remains open.
+- The loopback-only Python suite passed 169 tests and JavaScript passed 29. Fault coverage includes author fallback and a simulated disk-space rejection without publication.
+- The isolated development MSI passed all 44 administrative-image and package checks. Its packaged editor passed the normal offline 12-picture HDR10+ dialog export, with independently verified timing, audio and per-picture metadata. The current default author also matched the frozen 120-picture master byte for byte.
+
 ## 3.6.0 Phase 2B HDR delivery
 
 [Draft PR #17](https://github.com/JakubSoltysiak/VlogCraft/pull/17) is stacked on Phase 2 at `ef829c1c6c97c9915140dd16b81efd9ec8482b46`. [Report](docs/STUDIO_3_6_0_RENDERING_PHASE2B.md) and [measurements](docs/benchmarks/studio-3.6.0-phase2b.json).

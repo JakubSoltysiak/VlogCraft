@@ -1,5 +1,6 @@
 from fractions import Fraction
 from pathlib import Path
+from types import SimpleNamespace
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -81,6 +82,12 @@ class Phase2BExportTests(unittest.TestCase):
                                     progress=lambda _:None)
             self.assertTrue(report["author_fallback"])
             self.assertEqual(decoded(outputs[0]),decoded(author_fallback))
+            full_disk = folder/"disk-full.mp4"
+            with patch("hdr10plus_master.shutil.disk_usage",return_value=SimpleNamespace(free=0)):
+                with self.assertRaisesRegex(ValueError,"free working disk space"):
+                    export_project(restored,full_disk,progress=lambda _:None)
+            self.assertFalse(full_disk.exists())
+            self.assertEqual(saved.read_bytes(),original)
             info = probe(outputs[1])
             frames = [frame for frame in info["frames"] if frame["media_type"]=="video"]
             self.assertEqual([int(frame["pts"]) for frame in frames],[4004*index for index in range(6)])
