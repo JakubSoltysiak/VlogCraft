@@ -189,7 +189,7 @@ def write_sources(directory, scenario, camera, reference):
     return packed,planar
 
 
-def ffmpeg_graph(scenario, clips, frames, layers):
+def ffmpeg_graph(scenario, clips, frames, layers, warmup=0):
     w,h,r=scenario.width,scenario.height,scenario.fps
     black=layers.luma_linear('709','709','709','limited')
     filters=[f'color=black:s={w}x{h}:r={r},{black},format=gbrpf32le,bench=start[base]']
@@ -214,7 +214,7 @@ def ffmpeg_graph(scenario, clips, frames, layers):
             weight=f'clip(T*{r}/{max(1,frames-1)},0,1)'
             filters.append(f"[result0][result1]blend=all_expr='A*(1-({weight}))+B*({weight})'[mixed]")
             back='mixed'
-    filters.append(f'[{back}]bench=stop[output]')
+    filters.append(f'[{back}]trim=end_frame={frames+warmup},bench=stop[output]')
     return ';\n'.join(filters)
 
 
@@ -227,9 +227,9 @@ def distribution(values):
 
 def reference_trial(folder, scenario, clips, frames, warmup, planar, layers, output=None):
     graph=folder/'ffmpeg-graph.txt'
-    graph.write_text(ffmpeg_graph(scenario,clips,frames,layers),encoding='utf-8')
+    graph.write_text(ffmpeg_graph(scenario,clips,frames,layers,warmup),encoding='utf-8')
     command=['ffmpeg','-hide_banner','-nostats','-v','info','-benchmark','-filter_complex_threads','4',
-             '-noauto_conversion_filters','-nostdin']
+             '-noauto_conversion_filters','-nostdin','-progress','pipe:1']
     for path in planar:
         command+=['-stream_loop','-1','-f','rawvideo','-video_size',f'{scenario.width}x{scenario.height}',
                   '-pixel_format','gbrapf32le','-framerate',str(scenario.fps),'-i',path]
@@ -239,6 +239,10 @@ def reference_trial(folder, scenario, clips, frames, warmup, planar, layers, out
     start=time.perf_counter()
     result=call(command,240)
     wall=time.perf_counter()-start
+    progress=re.split(rb'\r?\n',result.stdout.strip())
+    counts=[line.split(b'=',1)[1].strip() for line in progress if line.startswith(b'frame=')]
+    if not counts or counts[-1]!=str(frames+warmup).encode() or progress[-1]!=b'progress=end':
+        raise ValueError('FFmpeg did not finish with the requested output picture count')
     values=[1000*float(v) for v in re.findall(rb'\bt:([0-9.]+) avg:',result.stderr)]
     if len(values)!=frames+warmup:
         raise ValueError('FFmpeg did not report one processing sample per picture')

@@ -23,9 +23,24 @@ class Phase2HarnessTests(unittest.TestCase):
         case=lab.Scenario('timing-check',16,16)
         with tempfile.TemporaryDirectory() as scratch:
             with patch.object(lab,'ffmpeg_graph',return_value='[0:v]null[output]'), \
-                 patch.object(lab,'call',return_value=SimpleNamespace(stderr=b't:0.01 avg:')):
+                 patch.object(lab,'call',return_value=SimpleNamespace(stdout=b'frame=2\nprogress=end',stderr=b't:0.01 avg:')):
                 with self.assertRaisesRegex(ValueError,'one processing sample per picture'):
                     lab.reference_trial(Path(scratch),case,[],2,0,[],None)
+
+    def test_ffmpeg_checks_final_count_and_excludes_warmup_from_distribution(self):
+        case=lab.Scenario('timing-check',16,16)
+        output=SimpleNamespace(stdout=b'frame=2\nprogress=continue\nframe=3\nprogress=end',
+                               stderr=b't:0.01 avg:\nt:0.02 avg:\nt:0.03 avg:')
+        with tempfile.TemporaryDirectory() as scratch:
+            with patch.object(lab,'ffmpeg_graph',return_value='[0:v]null[output]'), \
+                 patch.object(lab,'call',return_value=output):
+                result=lab.reference_trial(Path(scratch),case,[],2,1,[],None)
+                self.assertEqual(result['frames'],3)
+                self.assertEqual(result['measurement_frames'],2)
+                self.assertEqual(result['frame_ms']['median'],25.)
+                output.stdout=b'frame=3\nprogress=continue\nframe=2\nprogress=end'
+                with self.assertRaisesRegex(ValueError,'requested output picture count'):
+                    lab.reference_trial(Path(scratch),case,[],2,1,[],None)
 
     def test_transient_power_change_fails_ac_even_with_matching_endpoints(self):
         receipt={'conditions_start':{'ac_power':True},'conditions_last':{'ac_power':True},
