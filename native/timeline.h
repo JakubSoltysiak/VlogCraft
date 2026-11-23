@@ -137,6 +137,7 @@ struct Input {
   SetEvent(changed);
  }
  void clockStats(){Distribution copy;uint64_t count;{std::lock_guard<std::mutex> lock(guard);copy=correction;count=updates;}std::cout<<",\"clock_updates\":"<<count<<",\"clock_correction_absolute\":";copy.json();}
+ bool isGeneration(int64_t epoch){std::lock_guard<std::mutex> lock(guard);return epoch==generation;}
  void snapshot(int64_t& us,int64_t& gen,bool& play,double* age=nullptr,int64_t* adjustment=nullptr){
   std::lock_guard<std::mutex> lock(guard);us=microseconds;gen=generation;play=playing;
   if(age)*age=seconds(received)*1000;if(adjustment)*adjustment=lastCorrection;

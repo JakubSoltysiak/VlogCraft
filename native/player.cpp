@@ -21,6 +21,7 @@ int main(int argc,char** argv){
   std::map<std::string,std::unique_ptr<Producer>> producers;
   std::map<std::string,std::string> currentClip;std::map<std::string,const Clip*> clipLookup;for(auto& c:plan.clips)clipLookup[c.id]=&c;
   auto start=Clock::now(),lastReport=start;int64_t previous=-1,generation=-1,drawnGeneration=-1;uint64_t waiting=0,skipped=0,sourceWait=0,gpuWait=0,sourceSkipped=0,gpuSkipped=0,clockSkipped=0,clockBackwards=0,repeatedSource=0,clockHolds=0,distinctFrames=0,redraws=0;int64_t highest=-1;bool sawSourceWait=false,sawGpuWait=false;std::map<std::string,int64_t> lastPTS;size_t maxDecoders=0,maxQueue=0;
+  int64_t reportedPausedGeneration=-1;
   std::vector<std::pair<const Clip*,Frame>> selected;bool ready=false,eos=false;double first=0;
   struct Miss {int64_t frame,lost,adjustment;double loopGap,sourceMs,clockAge,presentMs,contextMs;bool source,gpu;};
   std::deque<Miss> misses;auto lastLoop=Clock::now();Distribution selectTime;double clockAge=0;int64_t adjustment=0;
@@ -54,6 +55,12 @@ int main(int argc,char** argv){
    // The clock anchor is an exact sequence frame plus an independently advancing audio sample clock.
    frame=std::max<int64_t>(0,frame);eos=frame>=plan.end;frame=std::min(frame,plan.end-1);
    renderer.available();
+   // Publish the completed paused target once per generation. Playback keeps
+   // its regular status cadence, and an older GPU submission cannot answer a seek.
+   if(!playing&&ready&&drawnGeneration==epoch&&previous==frame&&
+      renderer.completedGeneration==epoch&&renderer.completedFrame==frame&&reportedPausedGeneration!=epoch){
+    report("status",frame);lastReport=Clock::now();reportedPausedGeneration=epoch;
+   }
    if(playing&&drawnGeneration==epoch&&frame<previous){clockHolds++;frame=previous;}
    if(drawnGeneration==epoch&&frame==previous&&!(renderer.display&&renderer.display->needsResize())){if(seconds(lastReport)>.1){report("status",frame);lastReport=Clock::now();}deadline.wait(playing?std::clamp<int64_t>(av_rescale_q(previous+1,av_inv_q(plan.rate),AV_TIME_BASE_Q)-us,100,5000):20000);continue;}
    auto selectionStart=Clock::now();bool reset=generation!=epoch;generation=epoch;
@@ -77,6 +84,7 @@ int main(int argc,char** argv){
    double sourceMs=seconds(selectionStart)*1000;selectTime.add(sourceMs);
    Slot* slot=renderer.available();
    if(!ready||!slot){waiting++;if(!ready){sourceWait++;sawSourceWait=true;}else{gpuWait++;sawGpuWait=true;}if(seconds(lastReport)>.1){report("status",frame);lastReport=Clock::now();}deadline.wait(1000);continue;}
+   if(!playing&&!limit&&!input.isGeneration(epoch))continue;
    if(previous>=0&&drawnGeneration==generation&&frame>previous+1){auto lost=frame-previous-1;skipped+=lost;if(sawSourceWait)sourceSkipped+=lost;else if(sawGpuWait)gpuSkipped+=lost;else clockSkipped+=lost;
     if(misses.size()==256)misses.pop_front();misses.push_back({frame,lost,adjustment,loopGap,sourceMs,clockAge,renderer.display?renderer.display->lastPresentMs:0,renderer.contextWait.last,sawSourceWait,sawGpuWait});}
    if(drawnGeneration==generation&&frame<previous)clockBackwards++;

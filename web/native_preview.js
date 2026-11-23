@@ -168,7 +168,10 @@ async function nativePrepare(){
    try{
     const rect=nativeBoundsRect(),visible=!nativeState.seeking&&!document.querySelector('dialog[open],.modal-overlay:not([hidden]),#dropOverlay:not([hidden]),#transferOverlay:not([hidden])')&&(isPlaying||!($('referenceButton').classList.contains('active')||$('scopeChoice').value)),bounds=JSON.stringify([rect,visible]);
     if(bounds!==nativeState.bounds){nativeState.bounds=bounds;await request('native/bounds','POST',{rect,visible});}
-    const metrics=await request('native/clock','POST',{generation,microseconds:Math.round(nativeClock()*1e6),playing:isPlaying&&!nativeState.scrubbing&&!nativeState.seeking&&!!nativeState.ack&&!nativeState.ack.waiting});
+    // The seek request already placed the exact paused clock anchor.
+    // Read complete status without waking the clock loop to repeat that anchor.
+    const metrics=nativeState.seeking||nativeState.scrubbing?await request('native/status'):
+      await request('native/clock','POST',{generation,microseconds:Math.round(nativeClock()*1e6),playing:isPlaying&&!!nativeState.ack&&!nativeState.ack.waiting});
     if(generation!==nativeState.generation||serial!==nativeState.serial||!nativeState.prepared)return;
     nativeState.metrics=metrics;
     if(nativeState.seeking&&nativeSeekCompleted(metrics,generation,nativeState.seekFrame))nativeState.seeking=false;
