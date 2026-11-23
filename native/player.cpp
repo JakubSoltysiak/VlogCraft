@@ -3,6 +3,19 @@
 #include "renderer.h"
 #include "timing_wait.h"
 #include <set>
+struct CompletionStamps {
+ int64_t generation=-1,sequenceEnd=0,pictureDeadline=0,draw=0,gpu=0,eos=0,drained=0,joined=0;
+ static int64_t now(){
+  LARGE_INTEGER ticks,frequency;QueryPerformanceCounter(&ticks);QueryPerformanceFrequency(&frequency);
+  return ticks.QuadPart/frequency.QuadPart*1000000+(ticks.QuadPart%frequency.QuadPart)*1000000/frequency.QuadPart;
+ }
+ void json(std::ostream& out)const{
+  out<<",\"completion_stamps_us\":{\"generation\":"<<generation<<",\"sequence_end_deadline_qpc\":"<<sequenceEnd
+     <<",\"last_picture_deadline_qpc\":"<<pictureDeadline<<",\"final_draw_return_qpc\":"<<draw
+     <<",\"final_gpu_observed_qpc\":"<<gpu<<",\"first_clock_eos_qpc\":"<<eos<<",\"gpu_drained_qpc\":"<<drained
+     <<",\"producer_join_qpc\":"<<joined<<",\"status_write_qpc\":"<<now()<<"}";
+ }
+};
 struct Reader {
  Input& input;std::thread worker;
  Reader(Input& x):input(x),worker([&x]{std::string line;while(std::getline(std::cin,line)){x.command(line);if(x.stop)return;}x.command("CLOSE");}){}
@@ -20,6 +33,8 @@ int main(int argc,char** argv){
   std::unique_ptr<StallWatch> flight;
   if(const char* path=std::getenv("VLOGCRAFT_STALL_CAPTURE"))if(*path)flight=std::make_unique<StallWatch>(path);
   WatchThread renderLane(flight?0:-1);
+  const bool traceCompletion=std::getenv("VLOGCRAFT_COMPLETION_TRACE")!=nullptr;
+  CompletionStamps completion;
   const char* tracePath=std::getenv("VLOGCRAFT_NATIVE_TRACE_FILE");
   std::unique_ptr<SourceTrace> trace;if(tracePath){trace=std::make_unique<SourceTrace>();sourceTrace=trace.get();}
   auto launch=Clock::now();av_log_set_level(AV_LOG_QUIET);Plan plan(filename);Renderer renderer(plan,parent,offscreen);Input input;DeadlineWait deadline(input.changed);
@@ -83,7 +98,9 @@ int main(int argc,char** argv){
    std::cout<<",\"source_selection\":";selectTime.json();std::cout<<",\"wake_overshoot\":";deadline.overshoot.json();std::cout<<"},\"high_resolution_wait\":"<<(deadline.timer?"true":"false")<<",\"decoder_statistics\":[";bool dc=false;
    for(auto& entry:producers){auto& p=*entry.second;std::lock_guard<std::mutex> lock(p.guard);if(dc)std::cout<<",";dc=true;
     std::cout<<"{\"decoded_frames\":"<<p.decoded<<",\"decode_wall_seconds\":"<<p.decodedSeconds<<",\"seeks\":"<<p.seeks<<",\"queued_frames\":"<<p.queue.size()<<",\"warm_cache_frames\":"<<p.warm.size()<<",\"warm_cache_hits\":"<<p.warmHits<<",\"deferred_refills\":"<<p.deferredRefills<<",\"early_rewinds\":"<<p.earlyRewinds<<",\"adopted_rewinds\":"<<p.adoptedRewinds<<",\"rewind_tail_hits\":"<<p.tailHits<<",\"peak_queue_plus_tail\":"<<p.peakCombinedQueue<<",\"warm_budget_frames\":"<<p.warmBudget<<",\"decoder_threads\":"<<p.codecThreads<<",\"active_thread_type\":"<<p.threadType<<",\"hardware_pool_frames\":"<<p.poolFrames<<"}";}
-   std::cout<<"]";input.clockStats();std::cout<<",\"retained_surface_views\":"<<renderer.textures.views.size()<<",\"retained_texture_pools\":"<<renderer.textures.pools.size()<<",\"retained_texture_estimated_MiB\":"<<renderer.textures.estimatedBytes()/1048576.<<"}"<<std::endl;
+   std::cout<<"]";input.clockStats();std::cout<<",\"retained_surface_views\":"<<renderer.textures.views.size()<<",\"retained_texture_pools\":"<<renderer.textures.pools.size()<<",\"retained_texture_estimated_MiB\":"<<renderer.textures.estimatedBytes()/1048576.;
+   if(traceCompletion&&(completion.draw||completion.eos))completion.json(std::cout);
+   std::cout<<"}"<<std::endl;
   };
   // Prepare unseen sources only after an exact paused picture has been
   // acknowledged. One opening may be in flight, with at most two idle leases.
@@ -123,10 +140,28 @@ int main(int argc,char** argv){
    int64_t frame=limit?(int64_t)renderer.submitted:av_rescale_q_rnd(us+1,AV_TIME_BASE_Q,av_inv_q(plan.rate),(AVRounding)AV_ROUND_DOWN);
    // The clock anchor is an exact sequence frame plus an independently advancing audio sample clock.
    frame=std::max<int64_t>(0,frame);eos=frame>=plan.end;frame=std::min(frame,plan.end-1);
+   if(traceCompletion){
+    if(playing&&completion.generation!=epoch){completion={};completion.generation=epoch;}
+    if(playing&&frame==plan.end-1&&!completion.eos){
+     auto at=CompletionStamps::now()-us;
+     completion.sequenceEnd=at+av_rescale_q(plan.end,av_inv_q(plan.rate),AV_TIME_BASE_Q);
+     completion.pictureDeadline=at+av_rescale_q(plan.end-1,av_inv_q(plan.rate),AV_TIME_BASE_Q);
+    }
+    if(epoch==completion.generation&&eos&&!completion.eos)completion.eos=CompletionStamps::now();
+   }
    if(trace){sourceContext={};sourceContext.frame=frame;sourceContext.generation=epoch;sourceContext.clockUs=us;}
    if(flight)flight->loop.set({frame,epoch,us,av_rescale_q(frame+1,av_inv_q(plan.rate),AV_TIME_BASE_Q),flight->now()});
-   Slot* slot;
-   {SourceStage timer("gpu_available");slot=renderer.available();}
+   // The completion query shares the decoder device lock. During live
+   // playback with a free slot, inspect the exact source request before
+   // competing for that lock. Paused and terminal acknowledgements poll eagerly.
+   const bool sourcesFirst=playing&&frame<plan.end-1&&drawnGeneration==epoch;
+   Slot* slot=renderer.freeSlot();
+   const bool retireWithDraw=sourcesFirst&&slot;
+   if(!retireWithDraw){SourceStage timer("gpu_available");slot=renderer.available();}
+   if(traceCompletion&&completion.generation==renderer.completedGeneration&&renderer.completedFrame==plan.end-1){
+    if(!completion.gpu)completion.gpu=CompletionStamps::now();
+    if(!completion.drained&&renderer.completed==renderer.submitted)completion.drained=CompletionStamps::now();
+   }
    // Publish the completed paused target once per generation. Playback keeps
    // its regular status cadence, and an older GPU submission cannot answer a seek.
    if(!playing&&ready&&drawnGeneration==epoch&&previous==frame&&
@@ -207,15 +242,25 @@ int main(int argc,char** argv){
     parked=std::move(keep);observeStandby();
    }
    maxDecoders=std::max(maxDecoders,producers.size());selected.clear();ready=true;
+   WatchRequest observed;
+   size_t watchIndex=0;
+   if(flight){
+    observed.fields={0,0,frame,epoch,playing,us,av_rescale_q_rnd(frame,av_inv_q(plan.rate),AV_TIME_BASE_Q,AV_ROUND_UP),
+                     (1LL<<active.size())-1,0,previous,drawnGeneration,(int64_t)(renderer.submitted-renderer.completed)};
+   }
    const bool coordinateRefill=playing&&active.size()>1;
    auto releaseRefills=[&]{if(coordinateRefill)for(auto* clip:active)producers.at(clip->asset)->releaseRefill();};
    for(auto* c:active){
     auto& p=*producers[c->asset];
-    if(trace){sourceContext.decoder=p.request.decoder;sourceContext.source=sourceIds.at(c->asset);sourceContext.tick=plan.sourceTick(*c,frame);sourceContext.num=c->timebase.num;sourceContext.den=c->timebase.den;}
+    const auto tick=plan.sourceTick(*c,frame);
+    if(trace){sourceContext.decoder=p.request.decoder;sourceContext.source=sourceIds.at(c->asset);sourceContext.tick=tick;sourceContext.num=c->timebase.num;sourceContext.den=c->timebase.den;}
     bool available=false;Frame f;
-    try{SourceStage timer("select_picture");f=p.at(*c,frame,epoch,plan.sourceTick(*c,frame),available,coordinateRefill);}
+    auto index=watchIndex++;
+    auto* picture=flight?observed.at(index):nullptr;
+    try{SourceStage timer("select_picture");f=p.at(*c,frame,epoch,tick,available,coordinateRefill,picture);}
     catch(const std::runtime_error&){
      if(!retryOnFailure.erase(c->asset))throw;
+     if(picture)picture[12]=(int64_t)PictureReason::replaced;
      // Oversized/changed-format speculative decoding never removes a source
      // from playback. Retire and retry the exact active point at normal capacity.
      renderer.drain();renderer.textures.clear();producers.erase(c->asset);
@@ -227,10 +272,17 @@ int main(int argc,char** argv){
     if(available){c->sourceRotation=p.rotation;retryOnFailure.erase(c->asset);}
     {std::lock_guard<std::mutex> lock(p.guard);maxQueue=std::max(maxQueue,p.peak);}
     if(!available){ready=false;continue;}selected.push_back({c,f});
+    if(flight)observed.fields[8]|=1LL<<index;
    }
    double sourceMs=seconds(selectionStart)*1000;selectTime.add(sourceMs);
    // Source selection may drain slots, but only draw() can occupy one.
-   if(ready&&!slot)slot=renderer.available();
+   if(ready&&!slot){
+    SourceStage timer("gpu_available");slot=renderer.available();
+   }
+   if(flight){
+    if(slot)observed.fields[8]|=8;
+    flight->publishRequest(observed);
+   }
    if(!ready||!slot){releaseRefills();waiting++;if(!ready){sourceWait++;sawSourceWait=true;}else{gpuWait++;sawGpuWait=true;}if(seconds(lastReport)>.1){report("status",frame);lastReport=Clock::now();}WatchStage stage(!ready?"wait_source_retry":"wait_gpu_slot");deadline.wait(1000);continue;}
    // A seek can arrive while a playing source handoff is unlocking or opening.
    // Fence it at the same submission boundary as a paused seek.
@@ -242,8 +294,9 @@ int main(int argc,char** argv){
    sawSourceWait=sawGpuWait=false;
    if(drawnGeneration!=generation){highest=frame;distinctFrames++;}else if(frame>highest){highest=frame;distinctFrames++;}else redraws++;
    if(trace)trace->submitStart();
-   {SourceStage timer("draw_and_present");renderer.draw(*slot,plan,frame,generation,selected,playing);}
+   {SourceStage timer("draw_and_present");renderer.draw(*slot,plan,frame,generation,selected,playing,retireWithDraw);}
    if(flight&&(previous!=frame||drawnGeneration!=epoch))flight->submit.set({frame,epoch,flight->now()});
+   if(traceCompletion&&epoch==completion.generation&&frame==plan.end-1&&!completion.draw)completion.draw=CompletionStamps::now();
    if(coordinateRefill&&!software){
     // Only simultaneous same-file backwards boundaries qualify. The three
     // leads are staggered and no current-source lookup waits for a new frame.
@@ -266,8 +319,20 @@ int main(int argc,char** argv){
    if(limit&&renderer.submitted>=(uint64_t)limit)break;
   }
   for(auto& entry:producers)entry.second->cancel();
-  renderer.drain();report("closed",previous);
+  renderer.drain();
+  if(traceCompletion&&completion.draw){
+   if(renderer.completedFrame==plan.end-1&&renderer.completedGeneration==completion.generation){
+    if(!completion.gpu)completion.gpu=CompletionStamps::now();
+    if(!completion.drained)completion.drained=CompletionStamps::now();
+   }
+  }
+  report("closed",previous);
   selected.clear();producers.clear();
+  if(traceCompletion&&completion.draw){
+   completion.joined=CompletionStamps::now();
+   std::cout<<"{\"event\":\"completion_diagnostic\",\"generation\":"<<completion.generation;
+   completion.json(std::cout);std::cout<<"}"<<std::endl;
+  }
   if(trace){std::ofstream out(std::filesystem::u8path(tracePath));out<<"{\"bounded_missed_events\":[";bool comma=false;for(auto& m:misses){if(comma)out<<",";comma=true;out<<"{\"frame\":"<<m.frame<<",\"lost\":"<<m.lost<<",\"loop_gap_ms\":"<<m.loopGap<<",\"source_selection_ms\":"<<m.sourceMs<<",\"clock_age_ms\":"<<m.clockAge<<",\"clock_adjustment_us\":"<<m.adjustment<<",\"previous_present_ms\":"<<m.presentMs<<",\"context_wait_ms\":"<<m.contextMs<<",\"source_wait\":"<<m.source<<",\"gpu_wait\":"<<m.gpu<<"}";}out<<"]";trace->json(out);out<<"}";}
   return 0;
  }catch(const std::exception& error){std::string message=error.what();const char* code=message.find("HDR display is not active")!=std::string::npos?"hdr_display_inactive":message.find("color contract")!=std::string::npos?"color_contract":"native_failure";std::cout<<"{\"event\":\"error\",\"code\":\""<<code<<"\",\"hresult\":"<<(uint32_t)nativeHResult<<",\"av_error\":"<<nativeAVError<<",\"reason\":\"Native decode, display or device failure; use the reference renderer\"}"<<std::endl;return 1;}

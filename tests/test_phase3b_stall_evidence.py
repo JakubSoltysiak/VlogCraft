@@ -4,7 +4,7 @@ import sys
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "benchmarks"))
-from phase3b_stall_evidence import reduce_record
+from phase3b_stall_evidence import NO_PTS, reduce_record
 
 
 def sample(t):
@@ -23,6 +23,19 @@ def capture(samples):
     return {"version": 1, "incidents": [
         {"last_frame": 41, "generation": 3, "observed_age_us": 600000, "recovered": 1, "transition": 0,
          "truncated": 0, "dropped_middle_samples": 0, "samples": samples}]}
+
+
+def request(sequence, frame, generation, ready_mask):
+    due = frame * 10000
+    t = sequence * 10000
+    layers = []
+    for index in range(3):
+        selected = bool(ready_mask & (1 << index))
+        layers.extend([index + 1, index, index + 1, 5, frame, 1, 60, frame, 1, 60,
+                       frame, frame + 1 if selected else NO_PTS, 3 if selected else 2, t - 30, t - 5,
+                       int(selected), frame + 1 if selected else NO_PTS, NO_PTS, NO_PTS, NO_PTS,
+                       6, 0, 0, 0, sequence, sequence, sequence, -1, 5])
+    return [sequence, t, frame, generation, 1, due - 1, due, 7, ready_mask | 8, frame - 1, generation, 0, *layers]
 
 
 class Phase3BStallEvidence(unittest.TestCase):
@@ -52,6 +65,35 @@ class Phase3BStallEvidence(unittest.TestCase):
         self.assertEqual(attribution["sparse_us"], 60000)
         self.assertEqual(attribution["globally_coherent_us"], 540000)
         self.assertEqual(attribution["device_wait_overlaps"][0]["observed_us"], 540000)
+
+    def test_source_deadline_uses_one_request_and_reports_capture_limits(self):
+        encoded = capture([sample(50000), sample(70000)])
+        encoded.update(source_request_counts=[8, 8, 1], qpc_anchor="private anchor", first_source_miss={
+            "frame": 42, "generation": 3, "overwritten": 0, "samples": encoded["incidents"][0]["samples"],
+            "requests": [request(5, 41, 3, 7), request(6, 42, 3, 5),
+                         request(7, 43, 3, 2), request(8, 44, 3, 7), ["private malformed row"]],
+        })
+        result = reduce_record(encoded)
+        miss = result["first_source_miss"]
+        self.assertEqual(miss["invalid_requests"], 1)
+        self.assertEqual(miss["preceding_requests"][0]["frame"], 41)
+        self.assertTrue(miss["first_missing_request"]["deadline_due_at_clock_sample"])
+        self.assertEqual(miss["first_missing_request"]["layers"][1]["reason"], "missing_successor")
+        self.assertIsNone(miss["first_missing_request"]["layers"][1]["successor_pts"])
+        self.assertEqual(miss["first_all_intervals_verified"]["frame"], 44)
+        self.assertIsNone(miss["ready_on_missed_frame"])
+        self.assertEqual([row["sample_us"] for row in miss["watchdog_near_first_missing_request"]], [50000, 70000])
+        self.assertEqual(result["source_request_counts"]["lost"], 1)
+        self.assertNotIn("private", json.dumps(result))
+
+    def test_source_recovery_does_not_cross_generations(self):
+        encoded = {"version": 1, "incidents": [], "source_request_counts": [9, 9, 1], "first_source_miss": {
+            "frame": 42, "generation": 3, "overwritten": 0,
+            "requests": [request(6, 42, 3, 6), request(8, 42, 4, 7), request(9, 43, 3, 7)],
+        }}
+        miss = reduce_record(encoded)["first_source_miss"]
+        self.assertEqual(miss["missing_request_sequences"], 1)
+        self.assertIsNone(miss["first_all_layers_selected"])
 
 
 if __name__ == "__main__":

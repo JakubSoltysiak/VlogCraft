@@ -49,6 +49,7 @@ PROTOCOL_FILES=(
  'benchmarks/phase3b_stall_campaign.py','benchmarks/phase3b_stall_evidence.py',
  'benchmarks/phase3b_editing_qualification.py','tests/native_stall_watch.cpp',
  'tests/test_native_stall_watch.py','tests/test_phase3b_stall_evidence.py',
+ 'benchmarks/phase3b_completion.py','tests/test_native_completion_trace.py',
  'benchmarks/phase3b_mixed_preview.py','benchmarks/profile_preview_proxy.py','tests/native_source_timebase.py','tests/native_source_rewind.py',
  'benchmarks/phase3a_encoder_probe.py','benchmarks/phase3a_first_project.py',
  'tests/test_phase3a_export.py','tests/windows_phase3a_export.py',

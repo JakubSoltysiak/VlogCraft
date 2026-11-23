@@ -106,6 +106,28 @@ void retention(StallWatch& watch) {
     watch.write();
 }
 
+void requests(StallWatch& watch) {
+    WatchRequest row;
+    row.fields = {0, 0, 18, generation, 0, 300000, 300000, 7, 1, 17, generation, 0};
+    watch.publishRequest(row);  // Paused and unavailable.
+    row.fields[2] = 19;
+    row.fields[4] = 1;
+    row.fields[5] = 316665;
+    row.fields[6] = 316667;
+    watch.publishRequest(row);  // Deadline is still in the future.
+    row.fields[2] = 20;
+    row.fields[5] = 333333;
+    row.fields[6] = 333334;
+    row.at(1)[12] = static_cast<int64_t>(PictureReason::missingSuccessor);
+    watch.publishRequest(row);
+    watch.publishRequest(row);  // Redundant retry.
+    row.fields[8] = 15;
+    row.at(1)[12] = static_cast<int64_t>(PictureReason::live);
+    watch.publishRequest(row);
+    watch.readRequestsInto(nullptr);
+    watch.write();
+}
+
 int wmain(int argc, wchar_t** argv) {
     if (argc != 3) return 2;
     StallWatch watch(std::filesystem::path(argv[2]).u8string());
@@ -117,6 +139,10 @@ int wmain(int argc, wchar_t** argv) {
     }
     if (mode == L"retention") {
         retention(watch);
+        return 0;
+    }
+    if (mode == L"requests") {
+        requests(watch);
         return 0;
     }
     return 2;

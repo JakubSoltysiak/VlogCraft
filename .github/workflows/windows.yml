@@ -86,7 +86,16 @@ jobs:
           $followUpRecord = "$phase3bFollowUp/docs/benchmarks/studio-3.6.0-phase3b.json"
           python "$phase3bFollowUp/tools/performance_record.py" $followUpRecord --historical-record $priorRecord
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          python tools/performance_record.py docs/benchmarks/studio-3.6.0-phase3b.json --historical-record $followUpRecord
+          $phase3bStallFix = 'build/qa/phase3b-stall-fix-checkpoint'
+          New-Item -ItemType Directory -Force -Path $phase3bStallFix | Out-Null
+          git archive --format=tar --output=build/qa/phase3b-stall-fix-checkpoint.tar 28c0abf221c87e1b7c673a36abe70fac594cdc27
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          tar -xf build/qa/phase3b-stall-fix-checkpoint.tar -C $phase3bStallFix
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $stallFixRecord = "$phase3bStallFix/docs/benchmarks/studio-3.6.0-phase3b.json"
+          python "$phase3bStallFix/tools/performance_record.py" $stallFixRecord --historical-record $followUpRecord
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tools/performance_record.py docs/benchmarks/studio-3.6.0-phase3b.json --historical-record $stallFixRecord
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python tests/icon_assets.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

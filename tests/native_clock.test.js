@@ -19,6 +19,25 @@ test('audio clock excludes pause and underrun gaps without moving backward',()=>
  assert.equal(ctx.samplesAt(segments,2.5),48000);assert.equal(ctx.samplesAt(segments,3.5),72000);
  assert.equal(ctx.samplesAt(segments,5),96000);
 });
+
+test('completion probe timestamps only the active PCM generation and leaves the endpoint exact',()=>{
+ const ctx=transportContext();
+ Object.assign(ctx,{frameIndex:t=>t*60,duration:()=>1,
+  performance:{now:()=>1050},mixer:{currentTime:1,getOutputTimestamp:()=>({contextTime:1,performanceTime:1000})}});
+ const observed=vm.runInNewContext(`
+  nativeState.completionTrace={generation:2};
+  const finalAck={samples:48000,underruns:0,contextEnd:1,segments:[[0,1,0,48000]],finished:true};
+  nativeTraceAudio({...finalAck,generation:1});
+  const ignored=!nativeState.completionTrace.pcm_finished_ack;
+  nativeState.ack={...finalAck,generation:2};nativeTraceAudio(nativeState.ack);
+  const end=nativeClock();
+  ({ignored,end,trace:nativeState.completionTrace});
+ `,ctx);
+ assert.equal(observed.ignored,true);
+ assert.equal(observed.end,1);
+ assert.equal(observed.trace.pcm_finished_ack.received_ms,1050);
+ assert.equal(observed.trace.audio_clock_endpoint.pending_samples,0);
+});
 test('rapid seeks keep the newest destination and advance backend generation in order',async()=>{
  const ctx=transportContext();
  let generation=2;const seeks=[],audio=[];

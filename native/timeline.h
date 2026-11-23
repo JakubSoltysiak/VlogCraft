@@ -71,6 +71,7 @@ struct Plan {
 };
 struct Producer {
  WatchLease watch;
+ const int watchSourceId,watchDecoderId;
  SourceTrace::Context request;
  std::mutex guard;std::condition_variable changed;std::deque<Frame> queue;Frame current;
  std::vector<Frame> warm;size_t warmBudget=0;int64_t warmTarget=INT64_MIN;uint64_t warmHits=0;
@@ -98,7 +99,8 @@ struct Producer {
  }
  Producer(const Clip& c,int64_t initialTick,AVBufferRef* device,bool software,int extraHardwareFrames,size_t cacheFrames,
           uint64_t speculativeBytes=0,int watchSourceId=-1,int watchDecoderId=-1):
-          request(sourceContext),warmBudget(cacheFrames),requestedTick(initialTick),requestedBase(c.timebase){
+          watchSourceId(watchSourceId),watchDecoderId(watchDecoderId),request(sourceContext),
+          warmBudget(cacheFrames),requestedTick(initialTick),requestedBase(c.timebase){
   reservation.bytes=speculativeBytes;
   watchSource(watch.lane,watchSourceId,watchDecoderId,c.timebase.num,c.timebase.den);
   auto open=[this,clip=&c,device,software,extraHardwareFrames,watchSourceId,watchDecoderId]{
@@ -270,10 +272,28 @@ struct Producer {
  }
  // Returns the source picture whose half-open PTS interval contains the target.
  // Selection paths in the recorder are unavailable, live, warm and outgoing.
- Frame at(const Clip& clip,int64_t frame,int64_t transportGeneration,int64_t tick,bool& ready,bool coordinateRefill){
+ Frame at(const Clip& clip,int64_t frame,int64_t transportGeneration,int64_t tick,bool& ready,bool coordinateRefill,
+          int64_t* observation=nullptr){
   WatchStage stage("select_picture");
   auto sourceBase=clip.timebase;
+  auto entered=observation?stallWatch->now():0;
   std::lock_guard<std::mutex> lock(guard);
+  auto record=[&](int64_t target,int64_t floor,int64_t successor,PictureReason reason){
+   if(!observation||watch.lane<0)return;
+   auto& channel=stallWatch->lanes[watch.lane];
+   WatchTuple<3>::Values packet;
+   auto reads=channel.packet.get(packet)?packet[2]:-1;
+   const int64_t values[]={
+    watch.lane,watchSourceId,watchDecoderId,epoch,tick,sourceBase.num,sourceBase.den,
+    target,base.num,base.den,floor,successor,(int64_t)reason,entered,stallWatch->now(),
+    (int64_t)queue.size(),AV_NOPTS_VALUE,AV_NOPTS_VALUE,AV_NOPTS_VALUE,AV_NOPTS_VALUE,
+    (int64_t)warm.size(),(int64_t)cutTail.size(),eof,holdRefill,reads,channel.sent.load(std::memory_order_relaxed),
+    (int64_t)decoded,cutGeneration,workerEpoch
+   };
+   static_assert(std::size(values)==WatchRequest::layer,"Source observation schema");
+   std::copy(std::begin(values),std::end(values),observation);
+   for(size_t i=0;i<queue.size()&&i<4;i++)observation[16+i]=queue[i]->best_effort_timestamp;
+  };
   if(cutOld==&clip&&cutGeneration==transportGeneration){
    if(frame<tailFirstFrame||frame>=tailFirstFrame+(int64_t)cutTail.size())throw std::runtime_error("Requested old picture outside retained range");
    while(tailFirstFrame<frame){cutTail.pop_front();tailFirstFrame++;changed.notify_one();}
@@ -281,12 +301,15 @@ struct Producer {
     watchQueueLocked();
     watchSelection(watch.lane,frame,transportGeneration,streamTick(tick,sourceBase)+origin,
                    cutTail.front()->best_effort_timestamp,tailWatchSuccessors[(size_t)(frame-tailWatchFirstFrame)],3);
+    record(streamTick(tick,sourceBase)+origin,cutTail.front()->best_effort_timestamp,
+           tailWatchSuccessors[(size_t)(frame-tailWatchFirstFrame)],PictureReason::outgoing);
    }
    ready=true;tailHits++;return cutTail.front();
   }
   if(!failure.empty())throw std::runtime_error(failure);
   if(!opened){
    watchSelection(watch.lane,frame,transportGeneration,AV_NOPTS_VALUE,AV_NOPTS_VALUE,AV_NOPTS_VALUE,0);
+   record(AV_NOPTS_VALUE,AV_NOPTS_VALUE,AV_NOPTS_VALUE,PictureReason::opening);
    ready=false;return nullptr;
   }
   if(eof&&queue.empty()&&!current)throw std::runtime_error("No decodable source picture");
@@ -305,12 +328,17 @@ struct Producer {
   if(!ready&&warm.size()>1){
    for(size_t i=1;i<warm.size();i++)if(warm[i-1]->best_effort_timestamp<=target&&target<warm[i]->best_effort_timestamp){
     watchSelection(watch.lane,frame,transportGeneration,target,warm[i-1]->best_effort_timestamp,warm[i]->best_effort_timestamp,2);
+    record(target,warm[i-1]->best_effort_timestamp,warm[i]->best_effort_timestamp,PictureReason::warm);
     ready=true;warmHits++;return warm[i-1];
    }
   }
   if(stallWatch&&watch.lane>=0){
-   watchSelection(watch.lane,frame,transportGeneration,target,current?current->best_effort_timestamp:AV_NOPTS_VALUE,
-                  queue.empty()?AV_NOPTS_VALUE:queue.front()->best_effort_timestamp,ready?1:0);
+   const auto floor=current?current->best_effort_timestamp:AV_NOPTS_VALUE;
+   const auto successor=queue.empty()?AV_NOPTS_VALUE:queue.front()->best_effort_timestamp;
+   watchSelection(watch.lane,frame,transportGeneration,target,floor,successor,ready?1:0);
+   auto reason=!current||floor>target?(ready?PictureReason::beforeFirst:PictureReason::missingFloor):
+               !ready?PictureReason::missingSuccessor:eof&&queue.empty()?PictureReason::eof:PictureReason::live;
+   record(target,floor,successor,reason);
   }
   return ready?current:nullptr;
  }

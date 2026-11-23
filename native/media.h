@@ -124,7 +124,7 @@ struct Decoder {
                     if(packet->stream_index==stream){watchPacket(packet->pts,packet->dts);break;}
                     av_packet_unref(packet);
                 }}
-                if(!eof){SourceStage timer("send_packet");{WatchStage watch("send_packet");avcheck(avcodec_send_packet(codec,packet),"send packet");}av_packet_unref(packet);}
+                if(!eof){SourceStage timer("send_packet");{WatchStage watch("send_packet");avcheck(avcodec_send_packet(codec,packet),"send packet");}watchPacketSent();av_packet_unref(packet);}
             }
         }
     }

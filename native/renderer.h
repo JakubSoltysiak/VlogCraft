@@ -172,12 +172,19 @@ struct Renderer {
   }
   if(!offscreen)display=std::make_unique<NativeDisplay>(device,parent,plan.width,plan.height,plan.hdr,compile);
  }
+ Slot* freeSlot(){
+  for(auto& slot:slots)if(!slot.pending)return &slot;
+  return nullptr;
+ }
  Slot* available(){
   // Slot ownership and both counters are confined to the render thread.
   // With no outstanding query there is no D3D context work to synchronize.
   if(completed==submitted)return &slots.front();
   WatchStage watch("poll_gpu");
-  DeviceLock lock(hd,&contextWait);Slot* free=nullptr;for(auto& slot:slots){
+  DeviceLock lock(hd,&contextWait);return pollLocked();
+ }
+ Slot* pollLocked(){
+  Slot* free=nullptr;for(auto& slot:slots){
    if(slot.pending){BOOL done=false;HRESULT result=context->GetData(slot.query,&done,sizeof(done),D3D11_ASYNC_GETDATA_DONOTFLUSH);check(result,"Native GPU completion");
     if(result==S_OK){completionAge.add(seconds(slot.queuedAt)*1000);
      D3D11_QUERY_DATA_TIMESTAMP_DISJOINT data={};UINT64 begin=0,end=0;
@@ -189,8 +196,10 @@ struct Renderer {
   }return free;
  }
  void drain(){auto start=Clock::now();while(true){available();bool pending=false;for(auto& s:slots)pending|=s.pending;if(!pending)return;if(seconds(start)>5)throw std::runtime_error("Native GPU completion timeout");Sleep(1);}}
- void draw(Slot& slot,const Plan& plan,int64_t frame,int64_t gen,const std::vector<std::pair<const Clip*,Frame>>& layers,bool playing=false){
-  auto began=Clock::now();{WatchStage watch("compose_gpu");DeviceLock lock(hd,&contextWait);context->Begin(slot.disjoint);context->End(slot.beginStamp);float clear[4]={plan.hdr?0.f:16.f/255,plan.hdr?0.f:19.f/255,plan.hdr?0.f:26.f/255,1};context->ClearRenderTargetView(slot.target,clear);
+ void draw(Slot& slot,const Plan& plan,int64_t frame,int64_t gen,const std::vector<std::pair<const Clip*,Frame>>& layers,bool playing=false,bool retirePending=false){
+  auto began=Clock::now();{WatchStage watch("compose_gpu");DeviceLock lock(hd,&contextWait);
+  if(retirePending&&completed!=submitted){WatchStage polling("poll_gpu");pollLocked();}
+  context->Begin(slot.disjoint);context->End(slot.beginStamp);float clear[4]={plan.hdr?0.f:16.f/255,plan.hdr?0.f:19.f/255,plan.hdr?0.f:26.f/255,1};context->ClearRenderTargetView(slot.target,clear);
   ID3D11RenderTargetView* rt=slot.target;context->OMSetRenderTargets(1,&rt,nullptr);context->OMSetBlendState(blend,nullptr,0xffffffff);
   D3D11_VIEWPORT vp={0,0,(float)plan.width,(float)plan.height,0,1};context->RSSetViewports(1,&vp);context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
   context->VSSetShader(vertex,nullptr,0);context->PSSetShader(pixel,nullptr,0);ID3D11SamplerState* samp=sampler;context->PSSetSamplers(0,1,&samp);ID3D11Buffer* cb=constants;context->PSSetConstantBuffers(0,1,&cb);

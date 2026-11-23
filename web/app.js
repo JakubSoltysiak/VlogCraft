@@ -442,7 +442,17 @@ function syncAudio(force=false){const active=[];
 function stopPlayback(){isPlaying=false;recoveryCheckpoint(false);updateMeter.peak=0;updateMeter.lastPaint=undefined;nativePause();pauseRendered();$('masterMeter').value=-60;referenceChanged();$('playBtn').innerHTML=svg('play');for(const p of activePlayers.values())p.media?.pause?.();for(const p of audioPlayers.values())p.pause();}
 async function playPause(){if(nativeSelected())return nativePlayPause();if(isPlaying){stopPlayback();return;}if(duration()<=0)return toast('Add footage first',true);if(playhead>=duration()-.001)playhead=0;try{await initializeMixer();transportClock=mixer.state==='running'?mixer:null;}catch{transportClock=null;}
  isPlaying=true;playAt=playhead;playStart=transportNow();$('playBtn').innerHTML=svg('pause');syncPreview(true);requestAnimationFrame(animate);}
-function animate(){if(!isPlaying)return;updateMeter();playhead=nativeSelected()?nativeClock():renderedEnabled()?renderedClock():playAt+(transportNow()-playStart)/1000;if(nativeSelected()&&playhead>=nativeDuration()){playhead=nativeDuration();positionPlayhead();stopPlayback();return;}if(!nativeSelected()&&playhead>=duration()){seek(duration());stopPlayback();return;}positionPlayhead();syncPreview(false);followTimelinePlayhead();requestAnimationFrame(animate);}
+function animate(){if(!isPlaying)return;updateMeter();playhead=nativeSelected()?nativeClock():renderedEnabled()?renderedClock():playAt+(transportNow()-playStart)/1000;
+ if(nativeSelected()&&playhead>=nativeDuration()){
+  const trace=nativeState.completionTrace;
+  if(trace?.generation===nativeState.generation)trace.gui_endpoint_ms=performance.now();
+  playhead=nativeDuration();positionPlayhead();stopPlayback();
+  if(trace?.generation===nativeState.generation)trace.gui_stopped_ms=performance.now();
+  return;
+ }
+ if(!nativeSelected()&&playhead>=duration()){seek(duration());stopPlayback();return;}
+ positionPlayhead();syncPreview(false);followTimelinePlayhead();requestAnimationFrame(animate);
+}
 
 function followTimelinePlayhead(){
  const mode=$('timelineFollow').value;

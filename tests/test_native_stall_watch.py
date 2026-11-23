@@ -108,6 +108,16 @@ class NativeStallWatch(unittest.TestCase):
             [250000, 400000, 900000],
         )
 
+    def test_first_source_miss_binds_all_layers_and_retains_recovery(self):
+        report, _ = self.run_fixture("requests")
+        first = report["first_source_miss"]
+        self.assertEqual((first["frame"], first["generation"]), (20, 7))
+        self.assertEqual(report["source_request_counts"], [4, 4, 0])
+        before, early, miss, recovered = first["requests"]
+        self.assertEqual([before[2], early[2], miss[2], recovered[2]], [18, 19, 20, 20])
+        self.assertEqual((miss[8], recovered[8]), (1, 15))
+        self.assertEqual((miss[12 + 29 + 12], recovered[12 + 29 + 12]), (2, 3))
+
 
 if __name__ == "__main__":
     if sys.platform == "win32" and not compiler_path():

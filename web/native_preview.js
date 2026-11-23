@@ -27,6 +27,26 @@ function nativeDuration(){return frameIndex(duration())/sequenceRate();}
 function nativeSamplesAt(segments,now){
  let samples=0;for(const [start,end,first,last] of segments||[]){if(now<start)break;samples=Math.min(last,first+Math.max(0,now-start)*48000);}return samples;
 }
+function nativeTraceAudio(ack){
+ const trace=nativeState.completionTrace;
+ if(trace?.generation!==ack.generation)return;
+ const name=ack.finished?'pcm_finished_ack':ack.samples>0?'pcm_started_ack':null;
+ if(!name||trace[name])return;
+ const received=performance.now(),output=mixer.getOutputTimestamp?.();
+ trace[name]={received_ms:received,samples:ack.samples,underruns:ack.underruns,context_end:ack.contextEnd,
+  context_start:ack.segments?.[0]?.[0],output_context:output?.contextTime,output_ms:output?.performanceTime};
+}
+function nativeTraceStatus(metrics,endFrame){
+ const trace=nativeState.completionTrace;
+ if(trace.generation!==metrics.generation)return;
+ const final=metrics.completed_generation===trace.generation&&metrics.completed_sequence_frame===endFrame;
+ if(!final&&!metrics.eos)return;
+ const row={received_ms:performance.now(),wall_seconds:metrics.wall_seconds,completed_sequence_frame:metrics.completed_sequence_frame,
+  eos:metrics.eos,completion_stamps_us:metrics.completion_stamps_us};
+ if(final)trace.final_picture_status??=row;
+ if(metrics.eos)trace.eos_status??=row;
+ if(final&&metrics.eos)trace.terminal_status??=row;
+}
 function nativeClock(){
  if(nativeState.seeking||nativeState.scrubbing)return nativeState.seekFrame/sequenceRate();
  const ack=nativeState.ack;if(!ack)return nativeState.start;
@@ -34,8 +54,13 @@ function nativeClock(){
  if(audible?.performanceTime)now=audible.contextTime+(performance.now()-audible.performanceTime)/1000;
  const pending=ack.contextEnd?Math.max(0,(ack.contextEnd-now)*48000):0;
  const samples=nativeSamplesAt(ack.segments,now);
- if(ack.finished&&pending<1)return nativeDuration();
- return Math.min(nativeDuration(),nativeState.start+samples/48000);
+ const end=nativeDuration(),position=ack.finished&&pending<1?end:Math.min(end,nativeState.start+samples/48000);
+ const trace=nativeState.completionTrace;
+ if(position>=end&&trace&&trace.generation===ack.generation&&!trace.audio_clock_endpoint){
+  trace.audio_clock_endpoint={observed_ms:performance.now(),pending_samples:pending,finished:ack.finished,
+   output_context:audible?.contextTime,output_ms:audible?.performanceTime,context_end:ack.contextEnd};
+ }
+ return position;
 }
 function nativePause(){
  nativeState.node?.port.postMessage({type:'play',generation:nativeState.generation,playing:false});
@@ -68,7 +93,12 @@ async function nativeAudio(frame,serial){
  if(abort.signal.aborted||serial!==nativeState.serial)return;
  const generation=nativeState.generation,node=new AudioWorkletNode(mixer,'vlogcraft-pcm',{numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[2]});
  nativeState.node=node;node.connect(bus);node.port.postMessage({type:'reset',generation});
- node.port.onmessage=event=>{if(event.data.generation===nativeState.generation){if(event.data.error)return nativeFail(event.data.error);nativeState.ack=event.data;}};
+ node.port.onmessage=event=>{
+  if(event.data.generation!==nativeState.generation)return;
+  if(event.data.error)return nativeFail(event.data.error);
+  nativeState.ack=event.data;
+  if(nativeState.completionTrace)nativeTraceAudio(event.data);
+ };
  void(async()=>{
   let at=frame;
   while(at<frameIndex(duration())&&!abort.signal.aborted&&serial===nativeState.serial){
@@ -174,6 +204,7 @@ async function nativePrepare(){
       await request('native/clock','POST',{generation,microseconds:Math.round(nativeClock()*1e6),playing:isPlaying&&!!nativeState.ack&&!nativeState.ack.waiting});
     if(generation!==nativeState.generation||serial!==nativeState.serial||!nativeState.prepared)return;
     nativeState.metrics=metrics;
+    if(nativeState.completionTrace)nativeTraceStatus(metrics,result.endFrame-1);
     if(nativeState.seeking&&nativeSeekCompleted(metrics,generation,nativeState.seekFrame))nativeState.seeking=false;
     if(nativeState.metrics.event==='error')nativeFail(nativeState.metrics.reason,nativeState.metrics.code);
    }catch(error){if(serial===nativeState.serial&&nativeState.prepared&&nativeSelected())nativeFail(error.message);}
@@ -206,7 +237,9 @@ async function nativePlayPause(){
   if(performance.now()-started>30000)return nativeFail('Native audio preparation timed out');
   if(!nativeState.prepared)return;await new Promise(r=>setTimeout(r,10));
  }
- isPlaying=true;nativeState.node.port.postMessage({type:'play',generation:nativeState.generation,playing:true});
+ isPlaying=true;
+ if(nativeState.completionTrace)Object.assign(nativeState.completionTrace,{generation:nativeState.generation,play_requested_ms:performance.now()});
+ nativeState.node.port.postMessage({type:'play',generation:nativeState.generation,playing:true});
  $('playBtn').innerHTML=svg('pause');requestAnimationFrame(animate);
 }
 async function setupNative(){
