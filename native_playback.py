@@ -83,8 +83,8 @@ class Controller:
    if generation is not None and generation!=self.generation:return {'stale':True,'generation':self.generation}
    if self.snapshot is None:raise ValueError('Native preview is not prepared')
    fps=timing.rate(self.snapshot['output']['fps']);self.generation+=1;generation=self.generation;audio=list(self.audio_processes)
-  for p in audio:self._terminate(p)
   self.clock(round(int(frame)/fps*1000000),False,generation)
+  for p in audio:self._terminate(p)
   return {'generation':generation}
  def status(self):
   with self.guard:return dict(self.latest)|{'generation':self.generation,'running':bool(self.process and self.process.poll() is None)}

@@ -25,6 +25,7 @@ function nativeSamplesAt(segments,now){
  let samples=0;for(const [start,end,first,last] of segments||[]){if(now<start)break;samples=Math.min(last,first+Math.max(0,now-start)*48000);}return samples;
 }
 function nativeClock(){
+ if(nativeState.seeking||nativeState.scrubbing)return nativeState.seekFrame/sequenceRate();
  const ack=nativeState.ack;if(!ack)return nativeState.start;
  let audible=mixer?.getOutputTimestamp?.(),now=mixer?.currentTime||0;
  if(audible?.performanceTime)now=audible.contextTime+(performance.now()-audible.performanceTime)/1000;
@@ -44,7 +45,7 @@ function nativeReleaseAudio(){
 }
 async function nativeStop(){
  nativeState.serial++;nativeState.pendingSeek=null;nativeReleaseAudio();nativeState.metrics=null;nativeState.signature='';nativeState.bounds='';
- nativeState.prepared=false;nativeState.seeking=false;nativeState.ack=null;clearInterval(nativeState.timer);nativeState.timer=null;
+ nativeState.prepared=false;nativeState.seeking=false;nativeState.scrubbing=false;nativeState.activeSeek=null;nativeState.ack=null;clearInterval(nativeState.timer);nativeState.timer=null;
  await request('native/stop','POST',{}).catch(()=>{});
 }
 function nativeFail(message,code){
@@ -61,6 +62,7 @@ async function nativeAudio(frame,serial){
  if(!mixer)await initializeMixer();
  if(mixer.sampleRate!==48000)throw Error('Native PCM currently requires a 48 kHz audio device');
  if(!nativeState.module){await mixer.audioWorklet.addModule('native_audio_worklet.js');nativeState.module=true;}
+ if(abort.signal.aborted||serial!==nativeState.serial)return;
  const generation=nativeState.generation,node=new AudioWorkletNode(mixer,'vlogcraft-pcm',{numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[2]});
  nativeState.node=node;node.connect(bus);node.port.postMessage({type:'reset',generation});
  node.port.onmessage=event=>{if(event.data.generation===nativeState.generation){if(event.data.error)return nativeFail(event.data.error);nativeState.ack=event.data;}};
@@ -90,23 +92,44 @@ async function nativeAudio(frame,serial){
   if(!abort.signal.aborted)node.port.postMessage({type:'end',generation});
  })().catch(error=>{if(error.name!=='AbortError'&&serial===nativeState.serial)nativeFail(error.message);});
 }
-async function nativeSeek(frame){
- const serial=++nativeState.serial;nativeState.seeking=true;nativeState.seekFrame=frame;nativePause();nativeState.audioAbort?.abort();
- nativeState.pendingSeek={frame,serial};
+async function nativeResumeSeekAudio(frame,serial){
+ await nativeAudio(frame,serial);
+ const began=performance.now();
+ while(serial===nativeState.serial&&isPlaying&&(!nativeState.ack||nativeState.ack.queued<Math.min(12000,(nativeDuration()-nativeState.start)*48000)||nativeState.seeking)){
+  if(performance.now()-began>30000)throw Error('Native seek preparation timed out');
+  await new Promise(r=>setTimeout(r,10));
+ }
+ if(serial===nativeState.serial&&isPlaying)nativeState.node.port.postMessage({type:'play',generation:nativeState.generation,playing:true});
+}
+async function nativeSeek(frame,scrubbing=false){
+ // Releasing on the same frame keeps its decoder and presentation generation.
+ if(nativeState.scrubbing&&!scrubbing&&frame===nativeState.seekFrame){
+  const serial=nativeState.serial;
+  nativeState.scrubbing=false;
+  await nativeState.seekBusy;
+  if(serial===nativeState.serial)await nativeResumeSeekAudio(frame,serial);
+  return;
+ }
+ if(!nativeState.scrubbing)nativePause();
+ const serial=++nativeState.serial;
+ nativeState.seeking=true;nativeState.scrubbing=scrubbing;nativeState.seekFrame=frame;
+ nativeReleaseAudio();nativeState.ack=null;nativeState.start=frame/sequenceRate();
+ nativeState.pendingSeek={frame,serial,scrubbing};
  if(nativeState.seekBusy)return nativeState.seekBusy;
  nativeState.seekBusy=(async()=>{
   while(nativeState.pendingSeek){
-   const {frame,serial}=nativeState.pendingSeek;nativeState.pendingSeek=null;
-   const result=await request('native/seek','POST',{frame,generation:nativeState.generation});
-   nativeState.generation=Math.max(nativeState.generation,result.generation);
-   if(serial!==nativeState.serial)continue;nativeState.seeking=true;
-   await nativeAudio(frame,serial);
-   const began=performance.now();
-   while(serial===nativeState.serial&&isPlaying&&(!nativeState.ack||nativeState.ack.queued<Math.min(12000,(nativeDuration()-nativeState.start)*48000)||nativeState.seeking)){
-    if(performance.now()-began>30000)throw Error('Native seek preparation timed out');
-    await new Promise(r=>setTimeout(r,10));
+   const {frame,serial,scrubbing}=nativeState.pendingSeek;nativeState.pendingSeek=null;
+   try{
+    const result=await request('native/seek','POST',{frame,generation:nativeState.generation});
+    nativeState.generation=Math.max(nativeState.generation,result.generation);
+    if(serial!==nativeState.serial)continue;
+    if(result.stale)throw Error('Native seek generation was replaced');
+    nativeState.activeSeek=serial;
+    if(scrubbing)continue;
+    await nativeResumeSeekAudio(frame,serial);
+   }catch(error){
+    if(serial===nativeState.serial)throw error;
    }
-   if(serial===nativeState.serial&&isPlaying)nativeState.node.port.postMessage({type:'play',generation:nativeState.generation,playing:true});
   }
  })().finally(()=>nativeState.seekBusy=null);
  return nativeState.seekBusy;
@@ -124,31 +147,33 @@ async function nativePrepare(){
   clearInterval(nativeState.timer);
   nativeState.timer=setInterval(async()=>{
    if(!nativeSelected()||!nativeState.prepared||nativeState.polling)return;
+   const generation=nativeState.generation,serial=nativeState.serial;
+   if(nativeState.seeking&&nativeState.activeSeek!==serial)return;
    nativeState.polling=true;
    try{
-    const generation=nativeState.generation,serial=nativeState.serial;
     const rect=nativeBoundsRect(),visible=!nativeState.seeking&&!document.querySelector('dialog[open],.modal-overlay:not([hidden]),#dropOverlay:not([hidden]),#transferOverlay:not([hidden])')&&(isPlaying||!($('referenceButton').classList.contains('active')||$('scopeChoice').value)),bounds=JSON.stringify([rect,visible]);
     if(bounds!==nativeState.bounds){nativeState.bounds=bounds;await request('native/bounds','POST',{rect,visible});}
-    const metrics=await request('native/clock','POST',{generation,microseconds:Math.round(nativeClock()*1e6),playing:isPlaying&&!nativeState.seeking&&!!nativeState.ack&&!nativeState.ack.waiting});
+    const metrics=await request('native/clock','POST',{generation,microseconds:Math.round(nativeClock()*1e6),playing:isPlaying&&!nativeState.scrubbing&&!nativeState.seeking&&!!nativeState.ack&&!nativeState.ack.waiting});
     if(generation!==nativeState.generation||serial!==nativeState.serial||!nativeState.prepared)return;
     nativeState.metrics=metrics;
-    if(nativeState.seeking&&nativeState.metrics.completed_generation===nativeState.generation&&nativeState.metrics.completed_sequence_frame>=nativeState.seekFrame)nativeState.seeking=false;
+    if(nativeState.seeking&&!metrics.waiting&&metrics.completed_generation===generation&&metrics.completed_sequence_frame===nativeState.seekFrame)nativeState.seeking=false;
     if(nativeState.metrics.event==='error')nativeFail(nativeState.metrics.reason,nativeState.metrics.code);
-   }catch(error){if(nativeState.prepared&&nativeSelected())nativeFail(error.message);}
+   }catch(error){if(serial===nativeState.serial&&nativeState.prepared&&nativeSelected())nativeFail(error.message);}
    finally{nativeState.polling=false;}
   },15);
  })().catch(error=>nativeFail(error.message)).finally(()=>nativeState.busy=null);
  return nativeState.busy;
 }
-function nativePreview(force){
+function nativePreview(force,scrubbing=false){
  if(!nativeSelected())return false;
  if(nativeState.blocked)return true;
  if(!$('previewLayers').hidden)$('previewLayers').hidden=true;if(!$('emptyPreview').hidden)$('emptyPreview').hidden=true;
  if($('programPreviewStatus').hidden)$('programPreviewStatus').hidden=false;if($('programResolution').hidden)$('programResolution').hidden=false;
  if(!nativeState.prepared){if(!nativeState.busy)void nativePrepare();return true;}
  if(force){
-  if(nativeSignature()!==nativeState.signature){nativeState.prepared=false;void nativePrepare();}
-  else void nativeSeek(Math.min(frameIndex(playhead),Math.max(0,frameIndex(duration())-1))).catch(e=>nativeFail(e.message));
+  // Only a ruler's transient playhead updates can skip project serialization.
+  if(!scrubbing&&nativeSignature()!==nativeState.signature){nativeState.prepared=false;void nativePrepare();}
+  else void nativeSeek(Math.min(frameIndex(playhead),Math.max(0,frameIndex(duration())-1)),scrubbing).catch(e=>nativeFail(e.message));
  }
  return true;
 }
