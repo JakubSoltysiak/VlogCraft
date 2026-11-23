@@ -1,4 +1,7 @@
 /* Experimental native video + reference PCM. Unsupported operations remain explicit. */
+// A transient seek can reuse the decode opportunity when its previous
+// target completes. Releases and keyboard seeks bypass the wait.
+const nativeScrubDeadlineMs=65;
 const nativeState={available:false,blocked:false,seeking:false,seekFrame:0,prepared:false,hdr:false,busy:null,signature:'',generation:0,serial:0,node:null,audioAbort:null,sent:0,ack:null,start:0,metrics:null,timer:null,bounds:''};
 function* nativePCMBlocks(data,length){for(let offset=0;offset<length;offset+=32768)yield data.buffer.slice(offset,Math.min(length,offset+32768));}
 function nativeQualityOptions(){
@@ -45,7 +48,7 @@ function nativeReleaseAudio(){
 }
 async function nativeStop(){
  nativeState.serial++;nativeState.pendingSeek=null;nativeReleaseAudio();nativeState.metrics=null;nativeState.signature='';nativeState.bounds='';
- nativeState.prepared=false;nativeState.seeking=false;nativeState.scrubbing=false;nativeState.activeSeek=null;nativeState.ack=null;clearInterval(nativeState.timer);nativeState.timer=null;
+ nativeState.prepared=false;nativeState.seeking=false;nativeState.scrubbing=false;nativeState.activeSeek=null;nativeState.scrubRequest=null;nativeState.ack=null;clearInterval(nativeState.timer);nativeState.timer=null;
  await request('native/stop','POST',{}).catch(()=>{});
 }
 function nativeFail(message,code){
@@ -101,16 +104,20 @@ async function nativeResumeSeekAudio(frame,serial){
  }
  if(serial===nativeState.serial&&isPlaying)nativeState.node.port.postMessage({type:'play',generation:nativeState.generation,playing:true});
 }
+function nativeSeekCompleted(metrics,generation,frame){
+ return !metrics?.waiting&&metrics?.completed_generation===generation&&metrics.completed_sequence_frame===frame;
+}
 async function nativeSeek(frame,scrubbing=false){
  // Releasing on the same frame keeps its decoder and presentation generation.
  if(nativeState.scrubbing&&!scrubbing&&frame===nativeState.seekFrame){
   const serial=nativeState.serial;
-  nativeState.scrubbing=false;
+  nativeState.scrubbing=false;nativeState.scrubRequest=null;
   await nativeState.seekBusy;
   if(serial===nativeState.serial)await nativeResumeSeekAudio(frame,serial);
   return;
  }
  if(!nativeState.scrubbing)nativePause();
+ if(!scrubbing)nativeState.scrubRequest=null;
  const serial=++nativeState.serial;
  nativeState.seeking=true;nativeState.scrubbing=scrubbing;nativeState.seekFrame=frame;
  nativeReleaseAudio();nativeState.ack=null;nativeState.start=frame/sequenceRate();
@@ -118,10 +125,18 @@ async function nativeSeek(frame,scrubbing=false){
  if(nativeState.seekBusy)return nativeState.seekBusy;
  nativeState.seekBusy=(async()=>{
   while(nativeState.pendingSeek){
+   const previous=nativeState.scrubRequest;
+   if(nativeState.scrubbing&&previous&&performance.now()-previous.sent<nativeScrubDeadlineMs&&
+      !nativeSeekCompleted(nativeState.metrics,previous.generation,previous.frame)){
+    await new Promise(resolve=>setTimeout(resolve,5));
+    continue;
+   }
    const {frame,serial,scrubbing}=nativeState.pendingSeek;nativeState.pendingSeek=null;
    try{
+    const sent=performance.now();
     const result=await request('native/seek','POST',{frame,generation:nativeState.generation});
     nativeState.generation=Math.max(nativeState.generation,result.generation);
+    if(!result.stale&&scrubbing&&nativeState.scrubbing)nativeState.scrubRequest={sent,generation:result.generation,frame};
     if(serial!==nativeState.serial)continue;
     if(result.stale)throw Error('Native seek generation was replaced');
     nativeState.activeSeek=serial;
@@ -156,7 +171,7 @@ async function nativePrepare(){
     const metrics=await request('native/clock','POST',{generation,microseconds:Math.round(nativeClock()*1e6),playing:isPlaying&&!nativeState.scrubbing&&!nativeState.seeking&&!!nativeState.ack&&!nativeState.ack.waiting});
     if(generation!==nativeState.generation||serial!==nativeState.serial||!nativeState.prepared)return;
     nativeState.metrics=metrics;
-    if(nativeState.seeking&&!metrics.waiting&&metrics.completed_generation===generation&&metrics.completed_sequence_frame===nativeState.seekFrame)nativeState.seeking=false;
+    if(nativeState.seeking&&nativeSeekCompleted(metrics,generation,nativeState.seekFrame))nativeState.seeking=false;
     if(nativeState.metrics.event==='error')nativeFail(nativeState.metrics.reason,nativeState.metrics.code);
    }catch(error){if(serial===nativeState.serial&&nativeState.prepared&&nativeSelected())nativeFail(error.message);}
    finally{nativeState.polling=false;}

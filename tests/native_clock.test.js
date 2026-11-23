@@ -71,3 +71,23 @@ test('a failed obsolete request cannot fail the latest seek',async()=>{
  await ctx.seekPair();
  assert.deepEqual(audio,[2]);
 });
+
+test('the release supersedes a paced transient destination',async()=>{
+ const ctx=transportContext(),seeks=[];
+ // Freeze time so only a committed seek can pass the pacing check.
+ ctx.performance={now:()=>1};ctx.isPlaying=false;
+ ctx.request=async(path,method,{frame,generation})=>{
+  seeks.push(frame);return {generation:generation+1};
+ };
+ vm.runInNewContext(`
+  nativePause=()=>{};nativeAudio=async()=>{};
+  globalThis.exercise=async()=>{
+   await nativeSeek(1,true);
+   const inFlight=nativeSeek(2,true);
+   await nativeSeek(3);
+   await inFlight;
+  };
+ `,ctx);
+ await ctx.exercise();
+ assert.deepEqual(seeks,[1,3]);
+});
