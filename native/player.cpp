@@ -5,7 +5,7 @@
 #include <set>
 struct Reader {
  Input& input;std::thread worker;
- Reader(Input& x):input(x),worker([&x]{std::string line;while(std::getline(std::cin,line)){x.command(line);if(x.stop)break;}x.stop=true;SetEvent(x.changed);}){}
+ Reader(Input& x):input(x),worker([&x]{std::string line;while(std::getline(std::cin,line)){x.command(line);if(x.stop)return;}x.command("CLOSE");}){}
  ~Reader(){input.stop=true;CancelSynchronousIo((HANDLE)worker.native_handle());if(worker.joinable())worker.join();}
 };
 int main(int argc,char** argv){
@@ -17,14 +17,18 @@ int main(int argc,char** argv){
    else if(arg=="--offscreen")offscreen=true;else if(arg=="--software")software=true;else if(arg=="--frames")limit=std::stoi(value());
    else if(arg=="--capture")capture=value();else throw std::runtime_error("Unknown native option");
   }
+  std::unique_ptr<StallWatch> flight;
+  if(const char* path=std::getenv("VLOGCRAFT_STALL_CAPTURE"))if(*path)flight=std::make_unique<StallWatch>(path);
+  WatchThread renderLane(flight?0:-1);
   const char* tracePath=std::getenv("VLOGCRAFT_NATIVE_TRACE_FILE");
   std::unique_ptr<SourceTrace> trace;if(tracePath){trace=std::make_unique<SourceTrace>();sourceTrace=trace.get();}
   auto launch=Clock::now();av_log_set_level(AV_LOG_QUIET);Plan plan(filename);Renderer renderer(plan,parent,offscreen);Input input;DeadlineWait deadline(input.changed);
+  if(flight)flight->start(plan.end,plan.rate.num,plan.rate.den);
   std::unique_ptr<Reader> reader;if(!limit)reader=std::make_unique<Reader>(input);
   std::map<std::string,std::unique_ptr<Producer>> producers;
   std::map<std::string,std::string> currentClip;std::map<std::string,const Clip*> clipLookup;for(auto& c:plan.clips)clipLookup[c.id]=&c;
   std::map<std::string,int> sourceIds;int nextDecoderId=0;
-  if(trace)for(auto& c:plan.clips)if(!sourceIds.count(c.asset))sourceIds.emplace(c.asset,(int)sourceIds.size());
+  if(trace||flight)for(auto& c:plan.clips)if(!sourceIds.count(c.asset))sourceIds.emplace(c.asset,(int)sourceIds.size());
   // Resolve exact source/sequence boundaries once, outside the playback loop.
   std::map<const Clip*,const Clip*> rewinds;
   {
@@ -61,7 +65,7 @@ int main(int argc,char** argv){
    peakReservedBytes=std::max(peakReservedBytes,reserved);
   };
   auto report=[&](const char* event,int64_t frame){
-   SourceStage timer("status_report");observeStandby();if(renderer.display)renderer.display->stats();
+   WatchStage status("write_status");SourceStage timer("status_report");observeStandby();if(renderer.display)renderer.display->stats();
    std::cout<<"{\"event\":\""<<event<<"\",\"sequence_frame\":"<<frame<<",\"generation\":"<<generation
     <<",\"submitted_frames\":"<<renderer.submitted<<",\"completed_frames\":"<<renderer.completed
     <<",\"surface_parented\":"<<(renderer.display&&renderer.display->parent?"true":"false")<<",\"surface_visible\":"<<(renderer.display&&IsWindowVisible(renderer.display->window)?"true":"false")<<",\"surface_width\":"<<(renderer.display?renderer.display->width:0)<<",\"surface_height\":"<<(renderer.display?renderer.display->height:0)
@@ -102,25 +106,27 @@ int main(int argc,char** argv){
    }
    if(!next){exhaustedGeneration=generation;exhaustedFrame=frame;return;}
    if(!input.stillPaused(generation))return;
-   if(trace){
+   if(trace||flight){
     sourceContext.source=sourceIds.at(next->asset);sourceContext.decoder=nextDecoderId++;
     sourceContext.tick=next->inTick;sourceContext.num=next->timebase.num;sourceContext.den=next->timebase.den;
    }
    producers[next->asset]=std::make_unique<Producer>(*next,next->inTick,renderer.hw,false,
-       8+(int)renderer.slots.size()-3,Renderer::cacheBudget(),standbyBudget-reserved);
+       8+(int)renderer.slots.size()-3,Renderer::cacheBudget(),standbyBudget-reserved,flight?sourceIds.at(next->asset):-1,sourceContext.decoder);
    currentClip[next->asset]=next->id;parked[next->asset]=next;decoderOpens++;coldPrepares++;
    maxDecoders=std::max(maxDecoders,producers.size());observeStandby();
   };
   while(!input.stop){
    double loopGap=seconds(lastLoop)*1000;lastLoop=Clock::now();
-   MSG message;while(PeekMessageW(&message,nullptr,0,0,PM_REMOVE)){TranslateMessage(&message);DispatchMessageW(&message);}
+   {WatchStage stage("dispatch_messages");MSG message;while(PeekMessageW(&message,nullptr,0,0,PM_REMOVE)){TranslateMessage(&message);DispatchMessageW(&message);}}
    int64_t us,epoch;bool playing;if(limit){us=av_rescale_q(renderer.submitted,av_inv_q(plan.rate),AV_TIME_BASE_Q);epoch=0;playing=false;}
    else input.snapshot(us,epoch,playing,&clockAge,&adjustment);
    int64_t frame=limit?(int64_t)renderer.submitted:av_rescale_q_rnd(us+1,AV_TIME_BASE_Q,av_inv_q(plan.rate),(AVRounding)AV_ROUND_DOWN);
    // The clock anchor is an exact sequence frame plus an independently advancing audio sample clock.
    frame=std::max<int64_t>(0,frame);eos=frame>=plan.end;frame=std::min(frame,plan.end-1);
    if(trace){sourceContext={};sourceContext.frame=frame;sourceContext.generation=epoch;sourceContext.clockUs=us;}
-   {SourceStage timer("gpu_available");renderer.available();}
+   if(flight)flight->loop.set({frame,epoch,us,av_rescale_q(frame+1,av_inv_q(plan.rate),AV_TIME_BASE_Q),flight->now()});
+   Slot* slot;
+   {SourceStage timer("gpu_available");slot=renderer.available();}
    // Publish the completed paused target once per generation. Playback keeps
    // its regular status cadence, and an older GPU submission cannot answer a seek.
    if(!playing&&ready&&drawnGeneration==epoch&&previous==frame&&
@@ -129,7 +135,7 @@ int main(int argc,char** argv){
    }
    if(!limit&&!playing&&reportedPausedGeneration==epoch&&previous==frame)prepareWhilePaused(frame);
    if(playing&&drawnGeneration==epoch&&frame<previous){clockHolds++;frame=previous;}
-   if(drawnGeneration==epoch&&frame==previous&&!(renderer.display&&renderer.display->needsResize())){if(seconds(lastReport)>.1){report("status",frame);lastReport=Clock::now();}deadline.wait(playing?std::clamp<int64_t>(av_rescale_q(previous+1,av_inv_q(plan.rate),AV_TIME_BASE_Q)-us,100,5000):20000);continue;}
+   if(drawnGeneration==epoch&&frame==previous&&!(renderer.display&&renderer.display->needsResize())){if(seconds(lastReport)>.1){report("status",frame);lastReport=Clock::now();}WatchStage stage("wait_clock_deadline");deadline.wait(playing?std::clamp<int64_t>(av_rescale_q(previous+1,av_inv_q(plan.rate),AV_TIME_BASE_Q)-us,100,5000):20000);continue;}
    auto selectionStart=Clock::now();bool reset=generation!=epoch;generation=epoch;
    std::vector<Clip*> active;std::map<std::string,bool> wanted;
    for(auto& c:plan.clips)if(c.position<=frame&&frame<c.end){active.push_back(&c);wanted[c.asset]=true;}
@@ -176,9 +182,9 @@ int main(int argc,char** argv){
      auto tick=plan.sourceTick(*c,frame);
      if(trace){sourceContext.source=sourceIds.at(c->asset);sourceContext.tick=tick;sourceContext.num=c->timebase.num;sourceContext.den=c->timebase.den;}
      if(!producers.count(c->asset)){
-      if(trace)sourceContext.decoder=nextDecoderId++;
+      if(trace||flight)sourceContext.decoder=nextDecoderId++;
       SourceStage timer("create_decoder");
-      producers[c->asset]=std::make_unique<Producer>(*c,tick,renderer.hw,software,8+(int)renderer.slots.size()-3,Renderer::cacheBudget());
+      producers[c->asset]=std::make_unique<Producer>(*c,tick,renderer.hw,software,8+(int)renderer.slots.size()-3,Renderer::cacheBudget(),0,flight?sourceIds.at(c->asset):-1,sourceContext.decoder);
       decoderOpens++;
      }else{
       auto& outgoing=*clipLookup.at(currentClip.at(c->asset));
@@ -213,9 +219,9 @@ int main(int argc,char** argv){
      // Oversized/changed-format speculative decoding never removes a source
      // from playback. Retire and retry the exact active point at normal capacity.
      renderer.drain();renderer.textures.clear();producers.erase(c->asset);
-     if(trace)sourceContext.decoder=nextDecoderId++;
+     if(trace||flight)sourceContext.decoder=nextDecoderId++;
      producers[c->asset]=std::make_unique<Producer>(*c,plan.sourceTick(*c,frame),renderer.hw,software,
-         8+(int)renderer.slots.size()-3,Renderer::cacheBudget());
+         8+(int)renderer.slots.size()-3,Renderer::cacheBudget(),0,flight?sourceIds.at(c->asset):-1,sourceContext.decoder);
      decoderOpens++;prepareRetries++;ready=false;continue;
     }
     if(available){c->sourceRotation=p.rotation;retryOnFailure.erase(c->asset);}
@@ -223,8 +229,9 @@ int main(int argc,char** argv){
     if(!available){ready=false;continue;}selected.push_back({c,f});
    }
    double sourceMs=seconds(selectionStart)*1000;selectTime.add(sourceMs);
-   Slot* slot=renderer.available();
-   if(!ready||!slot){releaseRefills();waiting++;if(!ready){sourceWait++;sawSourceWait=true;}else{gpuWait++;sawGpuWait=true;}if(seconds(lastReport)>.1){report("status",frame);lastReport=Clock::now();}deadline.wait(1000);continue;}
+   // Source selection may drain slots, but only draw() can occupy one.
+   if(ready&&!slot)slot=renderer.available();
+   if(!ready||!slot){releaseRefills();waiting++;if(!ready){sourceWait++;sawSourceWait=true;}else{gpuWait++;sawGpuWait=true;}if(seconds(lastReport)>.1){report("status",frame);lastReport=Clock::now();}WatchStage stage(!ready?"wait_source_retry":"wait_gpu_slot");deadline.wait(1000);continue;}
    // A seek can arrive while a playing source handoff is unlocking or opening.
    // Fence it at the same submission boundary as a paused seek.
    if(!limit&&!input.isGeneration(epoch)){releaseRefills();continue;}
@@ -236,6 +243,7 @@ int main(int argc,char** argv){
    if(drawnGeneration!=generation){highest=frame;distinctFrames++;}else if(frame>highest){highest=frame;distinctFrames++;}else redraws++;
    if(trace)trace->submitStart();
    {SourceStage timer("draw_and_present");renderer.draw(*slot,plan,frame,generation,selected,playing);}
+   if(flight&&(previous!=frame||drawnGeneration!=epoch))flight->submit.set({frame,epoch,flight->now()});
    if(coordinateRefill&&!software){
     // Only simultaneous same-file backwards boundaries qualify. The three
     // leads are staggered and no current-source lookup waits for a new frame.

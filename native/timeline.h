@@ -70,6 +70,7 @@ struct Plan {
  }
 };
 struct Producer {
+ WatchLease watch;
  SourceTrace::Context request;
  std::mutex guard;std::condition_variable changed;std::deque<Frame> queue;Frame current;
  std::vector<Frame> warm;size_t warmBudget=0;int64_t warmTarget=INT64_MIN;uint64_t warmHits=0;
@@ -85,12 +86,25 @@ struct Producer {
  int64_t streamTick(int64_t tick,AVRational sourceBase)const{
   return av_rescale_q_rnd(tick,sourceBase,base,AV_ROUND_DOWN);
  }
+ // Call with guard held. Incoming decode state stays separate from the
+ // interval the renderer selects from a cached prefix or outgoing tail.
+ void watchQueueLocked()const{
+  if(!stallWatch||watch.lane<0)return;
+  watchQueue(watch.lane,opened?wantedPTS:AV_NOPTS_VALUE,
+             current?current->best_effort_timestamp:AV_NOPTS_VALUE,
+             queue.empty()?AV_NOPTS_VALUE:queue.front()->best_effort_timestamp,
+             (int)queue.size(),(int)warm.size(),(int)cutTail.size(),epoch,
+             opened&&current&&(eof||!queue.empty()),holdRefill,eof);
+ }
  Producer(const Clip& c,int64_t initialTick,AVBufferRef* device,bool software,int extraHardwareFrames,size_t cacheFrames,
-          uint64_t speculativeBytes=0):request(sourceContext),warmBudget(cacheFrames),requestedTick(initialTick),requestedBase(c.timebase){
+          uint64_t speculativeBytes=0,int watchSourceId=-1,int watchDecoderId=-1):
+          request(sourceContext),warmBudget(cacheFrames),requestedTick(initialTick),requestedBase(c.timebase){
   reservation.bytes=speculativeBytes;
-  auto open=[this,clip=&c,device,software,extraHardwareFrames]{
+  watchSource(watch.lane,watchSourceId,watchDecoderId,c.timebase.num,c.timebase.den);
+  auto open=[this,clip=&c,device,software,extraHardwareFrames,watchSourceId,watchDecoderId]{
    if(sourceTrace)sourceContext=request;
    SourceStage timer("open_producer");
+   WatchStage stage("open_producer");
    AVIOInterruptCB cancel{[](void* p){return static_cast<Producer*>(p)->stop.load()?1:0;},this};
    decoder=std::make_unique<Decoder>(clip->path,device,!software,extraHardwareFrames+(int)warmBudget,&reservation,cancel);
    auto* stream=decoder->file->streams[decoder->stream];
@@ -104,28 +118,35 @@ struct Producer {
    seekTick=streamTick(requestedTick,requestedBase);wantedPTS=seekTick+origin;warmTarget=seekTick;
    codecThreads=decoder->codec->thread_count;threadType=decoder->codec->active_thread_type;
    opened=true;
+   watchSource(watch.lane,watchSourceId,watchDecoderId,base.num,base.den);
+   watchQueueLocked();
   };
   if(speculativeBytes){
    worker=std::thread([this,open]{
+    WatchThread thread(watch.lane);
     try{open();produce();}
     catch(const std::exception&){std::lock_guard<std::mutex> lock(guard);failure="Native source preparation failed";}
    });
   }else{
-   open();worker=std::thread([this]{produce();});
+   open();worker=std::thread([this]{WatchThread thread(watch.lane);produce();});
   }
  }
  void cancel(){
+  WatchStage stage("cancel_producer");
   {std::lock_guard<std::mutex> lock(guard);stop=true;}
   changed.notify_all();
  }
- ~Producer(){cancel();if(worker.joinable())worker.join();}
+ ~Producer(){WatchStage stage("join_producer");cancel();if(worker.joinable())worker.join();}
  // The old tail and new decode queue SHARE the original four queue slots.
  // Each tail entry is a retained reference to an actual already-decoded
  // floor picture, proved against its successor before rewinding the decoder.
+ static constexpr int64_t maxRewindLead=3;
  std::deque<Frame> cutTail;
  const Clip* cutOld=nullptr;
  const Clip* cutNext=nullptr;
  int64_t cutGeneration=-1,tailFirstFrame=-1;
+ int64_t tailWatchFirstFrame=-1;
+ std::array<int64_t,maxRewindLead> tailWatchSuccessors{};
  size_t peakCombinedQueue=0;
  uint64_t earlyRewinds=0,adoptedRewinds=0,tailHits=0;
  void clearCutLocked(){
@@ -139,25 +160,33 @@ struct Producer {
    seekTick=streamTick(tick,sourceBase);wantedPTS=seekTick+origin;
    if(warmTarget!=seekTick){warm.clear();warmTarget=seekTick;}
   }
-  queue.clear();current.reset();eof=false;changed.notify_all();
+  queue.clear();current.reset();eof=false;watchQueueLocked();changed.notify_all();
  }
  void reset(int64_t tick,AVRational sourceBase){
+  WatchStage stage("reset_producer");
   std::lock_guard<std::mutex> lock(guard);
   clearCutLocked();resetLocked(tick,sourceBase);
  }
  bool primeRewind(const Plan& plan,const Clip& outgoing,const Clip& incoming,int64_t frame,int64_t transportGeneration){
+  WatchStage stage("prime_rewind");
   std::lock_guard<std::mutex> lock(guard);
   if(cutNext||!current||!singlePool||!surfacePoolBytes||decoding||!failure.empty()||epoch!=workerEpoch||
-     outgoing.end<=frame||outgoing.end-frame>3)return false;
+     outgoing.end<=frame||outgoing.end-frame>maxRewindLead)return false;
   std::deque<Frame> verified;
+  const bool recordTail=stallWatch&&watch.lane>=0;
   for(auto f=frame;f<outgoing.end;f++){
    const auto target=streamTick(plan.sourceTick(outgoing,f),outgoing.timebase)+origin;
    Frame floor=current;bool successor=false;
    for(auto& pictured:queue){
-    if(pictured->best_effort_timestamp>target){successor=true;break;}
+    if(pictured->best_effort_timestamp>target){
+     successor=true;
+     if(recordTail)tailWatchSuccessors[(size_t)(f-frame)]=pictured->best_effort_timestamp;
+     break;
+    }
     floor=pictured;
    }
    if(floor->best_effort_timestamp>target||(!successor&&!eof))return false;
+   if(recordTail&&!successor)tailWatchSuccessors[(size_t)(f-frame)]=AV_NOPTS_VALUE;
    verified.push_back(floor);
   }
   // Existing decoded surfaces stay alive through AVFrame/slot ownership.
@@ -165,19 +194,22 @@ struct Producer {
   reservation.hasPool=true;reservation.bytes=surfacePoolBytes;
   cutTail=std::move(verified);cutOld=&outgoing;cutNext=&incoming;
   cutGeneration=transportGeneration;tailFirstFrame=frame;
+  if(recordTail)tailWatchFirstFrame=frame;
   if(sourceTrace){request.frame=frame;request.tick=incoming.inTick;request.num=incoming.timebase.num;request.den=incoming.timebase.den;}
   resetLocked(incoming.inTick,incoming.timebase);
   peakCombinedQueue=std::max(peakCombinedQueue,cutTail.size());earlyRewinds++;
   return true;
  }
  bool adoptRewind(const Clip& requested,int64_t transportGeneration){
+  WatchStage stage("adopt_rewind");
   std::lock_guard<std::mutex> lock(guard);
   if(cutNext!=&requested||cutGeneration!=transportGeneration)return false;
-  clearCutLocked();adoptedRewinds++;changed.notify_one();return true;
+  clearCutLocked();adoptedRewinds++;watchQueueLocked();changed.notify_one();return true;
  }
  // Returns zero if retaining this decoder could overlap differently sized
  // pools or a currently running format negotiation. Its active budget is unchanged.
  uint64_t parkableBytes(){
+  WatchStage stage("parkable_producer");
   std::lock_guard<std::mutex> lock(guard);
   if(cutNext||!failure.empty()||!singlePool)return 0;
   if(reservation.bytes.load())return surfacePoolBytes?surfacePoolBytes:reservation.bytes.load();
@@ -189,25 +221,32 @@ struct Producer {
   try{
    while(!stop){
     int64_t generation,target;{
-     std::unique_lock<std::mutex> lock(guard);changed.wait(lock,[&]{return stop||workerEpoch!=epoch||(!eof&&!holdRefill&&queue.size()+cutTail.size()<4);});
+     std::unique_lock<std::mutex> lock(guard,std::defer_lock);
+     {WatchStage stage("producer_guard");lock.lock();}
+     while(!(stop||workerEpoch!=epoch||(!eof&&!holdRefill&&queue.size()+cutTail.size()<4))){
+      WatchStage stage("producer_cv_wait");changed.wait(lock);
+     }
      if(stop)return;decoding=true;generation=epoch;target=seekTick;
      if(sourceTrace){sourceContext=request;sourceContext.decodeEpoch=generation;sourceContext.depth=(int)queue.size();}
      if(workerEpoch!=generation){workerEpoch=generation;lock.unlock();
-      {SourceStage timer("seek_demux");avcheck(av_seek_frame(decoder->file,decoder->stream,target+origin,AVSEEK_FLAG_BACKWARD),"source seek");}
-      {SourceStage timer("flush_codec");avcodec_flush_buffers(decoder->codec);}decoder->eof=decoder->drained=false;
-      lock.lock();seeks++;
+      {SourceStage timer("seek_demux");WatchStage stage("seek_demux");avcheck(av_seek_frame(decoder->file,decoder->stream,target+origin,AVSEEK_FLAG_BACKWARD),"source seek");}
+      {SourceStage timer("flush_codec");WatchStage stage("flush_codec");avcodec_flush_buffers(decoder->codec);}decoder->eof=decoder->drained=false;
+      {WatchStage stage("producer_guard");lock.lock();}seeks++;
       if(stop)return;
       if(generation!=epoch){decoding=false;continue;}
      }
     }
-    auto began=Clock::now();bool ok=decoder->next();Frame frame=ok?retain(decoder->frame):nullptr;
+    auto began=Clock::now();bool ok;Frame frame;
+    {WatchStage stage("decode_next");ok=decoder->next();if(ok)frame=retain(decoder->frame);}
+    WatchStage stage("producer_commit");
     std::lock_guard<std::mutex> lock(guard);decoding=false;decodedSeconds+=seconds(began);if(generation!=epoch)continue;
     if(!ok)eof=true;
     else{
      if(frame->best_effort_timestamp==AV_NOPTS_VALUE)throw std::runtime_error("Missing source presentation timestamp");
      if(frame->format==AV_PIX_FMT_D3D11&&lastPool!=(ID3D11Texture2D*)frame->data[0]){
       if(lastPool)singlePool=false;lastPool=(ID3D11Texture2D*)frame->data[0];
-      D3D11_TEXTURE2D_DESC desc{};((ID3D11Texture2D*)frame->data[0])->GetDesc(&desc);
+      D3D11_TEXTURE2D_DESC desc{};
+      {WatchStage stage("decode_texture_desc");((ID3D11Texture2D*)frame->data[0])->GetDesc(&desc);}
       if(desc.Format==DXGI_FORMAT_NV12||desc.Format==DXGI_FORMAT_P010){
        poolFrames=(int)desc.ArraySize;
        surfacePoolBytes=(uint64_t)desc.Width*desc.Height*desc.ArraySize*3/(desc.Format==DXGI_FORMAT_P010?1:2);
@@ -220,25 +259,36 @@ struct Producer {
      if(frame->best_effort_timestamp<=wantedPTS&&queue.empty())current=frame;
      else queue.push_back(frame);
      decoded++;peak=std::max(peak,queue.size());peakCombinedQueue=std::max(peakCombinedQueue,queue.size()+cutTail.size());
-    }changed.notify_all();
+    }watchQueueLocked();changed.notify_all();
    }
   }catch(const std::exception&){std::lock_guard<std::mutex> lock(guard);failure="Native source decode or seek failed";changed.notify_all();}
  }
  void releaseRefill(){
+  WatchStage stage("release_refill");
   std::lock_guard<std::mutex> lock(guard);
-  if(holdRefill){holdRefill=false;changed.notify_one();}
+  if(holdRefill){holdRefill=false;watchQueueLocked();changed.notify_one();}
  }
  // Returns the source picture whose half-open PTS interval contains the target.
+ // Selection paths in the recorder are unavailable, live, warm and outgoing.
  Frame at(const Clip& clip,int64_t frame,int64_t transportGeneration,int64_t tick,bool& ready,bool coordinateRefill){
+  WatchStage stage("select_picture");
   auto sourceBase=clip.timebase;
   std::lock_guard<std::mutex> lock(guard);
   if(cutOld==&clip&&cutGeneration==transportGeneration){
    if(frame<tailFirstFrame||frame>=tailFirstFrame+(int64_t)cutTail.size())throw std::runtime_error("Requested old picture outside retained range");
    while(tailFirstFrame<frame){cutTail.pop_front();tailFirstFrame++;changed.notify_one();}
+   if(stallWatch&&watch.lane>=0){
+    watchQueueLocked();
+    watchSelection(watch.lane,frame,transportGeneration,streamTick(tick,sourceBase)+origin,
+                   cutTail.front()->best_effort_timestamp,tailWatchSuccessors[(size_t)(frame-tailWatchFirstFrame)],3);
+   }
    ready=true;tailHits++;return cutTail.front();
   }
   if(!failure.empty())throw std::runtime_error(failure);
-  if(!opened){ready=false;return nullptr;}
+  if(!opened){
+   watchSelection(watch.lane,frame,transportGeneration,AV_NOPTS_VALUE,AV_NOPTS_VALUE,AV_NOPTS_VALUE,0);
+   ready=false;return nullptr;
+  }
   if(eof&&queue.empty()&&!current)throw std::runtime_error("No decodable source picture");
   if(sourceTrace){request=sourceContext;request.tick=tick;request.num=sourceBase.num;request.den=sourceBase.den;}
   int64_t target=streamTick(tick,sourceBase)+origin;
@@ -251,8 +301,16 @@ struct Producer {
   // this multitrack Present to return. A source below this mark runs immediately.
   holdRefill=coordinateRefill&&ready&&queue.size()>=2&&queue.size()<4&&!eof;
   if(holdRefill)deferredRefills++;else changed.notify_one();
+  watchQueueLocked();
   if(!ready&&warm.size()>1){
-   for(size_t i=1;i<warm.size();i++)if(warm[i-1]->best_effort_timestamp<=target&&target<warm[i]->best_effort_timestamp){ready=true;warmHits++;return warm[i-1];}
+   for(size_t i=1;i<warm.size();i++)if(warm[i-1]->best_effort_timestamp<=target&&target<warm[i]->best_effort_timestamp){
+    watchSelection(watch.lane,frame,transportGeneration,target,warm[i-1]->best_effort_timestamp,warm[i]->best_effort_timestamp,2);
+    ready=true;warmHits++;return warm[i-1];
+   }
+  }
+  if(stallWatch&&watch.lane>=0){
+   watchSelection(watch.lane,frame,transportGeneration,target,current?current->best_effort_timestamp:AV_NOPTS_VALUE,
+                  queue.empty()?AV_NOPTS_VALUE:queue.front()->best_effort_timestamp,ready?1:0);
   }
   return ready?current:nullptr;
  }
@@ -270,8 +328,9 @@ struct Input {
    lastCorrection=(oldPlaying&&playing&&oldGeneration==generation)?microseconds-previous:0;
    if(oldPlaying&&playing&&oldGeneration==generation)correction.add(std::abs((double)lastCorrection)/1000.);
    updates++;received=now;
+   watchClock(microseconds,generation,playing);
   }
-  else if(op=="CLOSE")stop=true;
+  else if(op=="CLOSE"){stop=true;watchClock(microseconds,generation,false);}
   SetEvent(changed);
  }
  void clockStats(){Distribution copy;uint64_t count;{std::lock_guard<std::mutex> lock(guard);copy=correction;count=updates;}std::cout<<",\"clock_updates\":"<<count<<",\"clock_correction_absolute\":";copy.json();}

@@ -32,7 +32,8 @@ struct DeviceLock {
 };
 // The FFmpeg video decoder and the compositor share this recursive D3D11
 // device lock. Measure its outermost acquisition independently from time in
-// the driver. Store and publish both intervals only after unlocking.
+// the driver. The watchdog sees pending work before the lock returns.
+// SourceTrace still publishes completed intervals only after unlocking.
 struct DeviceLockTrace {
  AVD3D11VADeviceContext* device=nullptr;
  void* originalContext=nullptr;
@@ -42,20 +43,29 @@ struct DeviceLockTrace {
  static Span& span(){static thread_local Span current;return current;}
  static void enter(void* opaque){
   auto& hook=*static_cast<DeviceLockTrace*>(opaque);auto& current=span();
-  if(current.depth++==0)current.requesting=Clock::now();
+  if(current.depth++==0){
+   if(sourceTrace)current.requesting=Clock::now();
+   watchDevice(true,false);
+  }
   hook.originalLock(hook.originalContext);
-  if(current.depth==1)current.acquired=Clock::now();
+  if(current.depth==1){
+   if(sourceTrace)current.acquired=Clock::now();
+   watchDevice(false,true);
+  }
  }
  static void leave(void* opaque){
   auto& hook=*static_cast<DeviceLockTrace*>(opaque);auto& current=span();
   if(--current.depth!=0){hook.originalUnlock(hook.originalContext);return;}
-  auto releasing=Clock::now();
+  auto releasing=sourceTrace?Clock::now():Clock::time_point{};
+  watchDevice(false,false);
   hook.originalUnlock(hook.originalContext);
-  sourceTrace->interval("device_lock_wait",current.requesting,current.acquired,sourceContext);
-  sourceTrace->interval("device_lock_owned",current.acquired,releasing,sourceContext);
+  if(sourceTrace){
+   sourceTrace->interval("device_lock_wait",current.requesting,current.acquired,sourceContext);
+   sourceTrace->interval("device_lock_owned",current.acquired,releasing,sourceContext);
+  }
  }
  void attach(AVD3D11VADeviceContext* context){
-  if(!sourceTrace)return;
+  if(!sourceTrace&&!stallWatch)return;
   device=context;originalContext=device->lock_ctx;
   originalLock=device->lock;originalUnlock=device->unlock;
   device->lock_ctx=this;device->lock=enter;device->unlock=leave;
@@ -107,6 +117,7 @@ struct NativeDisplay {
  }
  bool needsResize()const{if(!parent)return false;RECT r={};GetClientRect(parent,&r);return r.right>=2&&r.bottom>=2&&(r.right!=width||r.bottom!=height||wasVisible!=(bool)IsWindowVisible(window));}
  void present(ID3D11DeviceContext* context,ID3D11ShaderResourceView* image){
+  WatchStage watch("prepare_present");
   if(parent){RECT r={};GetClientRect(parent,&r);resize(context,r.right,r.bottom);}
   ID3D11RenderTargetView* rt=target;context->OMSetRenderTargets(1,&rt,nullptr);context->OMSetBlendState(nullptr,nullptr,0xffffffff);
   D3D11_VIEWPORT vp={0,0,(float)width,(float)height,0,1};context->RSSetViewports(1,&vp);
@@ -114,11 +125,12 @@ struct NativeDisplay {
   ID3D11ShaderResourceView* empty=nullptr;context->PSSetShaderResources(0,1,&empty);
  }
  void flip(bool playing){
-  auto began=Clock::now();{SourceStage measure("dxgi_present");check(swap->Present(1,0),"Native Present");}lastPresentMs=seconds(began)*1000;presentTime.add(lastPresentMs);calls++;
+  auto began=Clock::now();{SourceStage measure("dxgi_present");WatchStage watch("dxgi_present");check(swap->Present(1,0),"Native Present");}watchPresent();lastPresentMs=seconds(began)*1000;presentTime.add(lastPresentMs);calls++;
   if(lastFlip!=Clock::time_point{}){double interval=seconds(lastFlip)*1000;presentIntervals.add(interval);if(playing&&lastPlaying)playIntervals.add(interval);}lastFlip=Clock::now();lastPlaying=playing;
   wasVisible=IsWindowVisible(window);stats();
  }
  void stats(){
+  WatchStage watch("dxgi_statistics");
   DXGI_FRAME_STATISTICS data={};if(SUCCEEDED(swap->GetFrameStatistics(&data))){statistics=true;displayed=data.PresentCount;}else statistics=false;
  }
  ~NativeDisplay(){if(window)DestroyWindow(window);}
@@ -161,19 +173,24 @@ struct Renderer {
   if(!offscreen)display=std::make_unique<NativeDisplay>(device,parent,plan.width,plan.height,plan.hdr,compile);
  }
  Slot* available(){
+  // Slot ownership and both counters are confined to the render thread.
+  // With no outstanding query there is no D3D context work to synchronize.
+  if(completed==submitted)return &slots.front();
+  WatchStage watch("poll_gpu");
   DeviceLock lock(hd,&contextWait);Slot* free=nullptr;for(auto& slot:slots){
    if(slot.pending){BOOL done=false;HRESULT result=context->GetData(slot.query,&done,sizeof(done),D3D11_ASYNC_GETDATA_DONOTFLUSH);check(result,"Native GPU completion");
     if(result==S_OK){completionAge.add(seconds(slot.queuedAt)*1000);
      D3D11_QUERY_DATA_TIMESTAMP_DISJOINT data={};UINT64 begin=0,end=0;
      if(context->GetData(slot.disjoint,&data,sizeof(data),D3D11_ASYNC_GETDATA_DONOTFLUSH)==S_OK&&!data.Disjoint&&data.Frequency&&context->GetData(slot.beginStamp,&begin,sizeof(begin),D3D11_ASYNC_GETDATA_DONOTFLUSH)==S_OK&&context->GetData(slot.endStamp,&end,sizeof(end),D3D11_ASYNC_GETDATA_DONOTFLUSH)==S_OK)gpuTime.add(1000.*(end-begin)/data.Frequency);
      slot.pending=false;slot.holds.clear();completed++;
-     if(slot.generation>completedGeneration){completedGeneration=slot.generation;completedFrame=slot.frame;}else if(slot.generation==completedGeneration)completedFrame=std::max(completedFrame,slot.frame);}}
+     if(slot.generation>completedGeneration){completedGeneration=slot.generation;completedFrame=slot.frame;}else if(slot.generation==completedGeneration)completedFrame=std::max(completedFrame,slot.frame);
+     watchGPU(submitted,completed,completedFrame,completedGeneration);}}
    if(!slot.pending&&!free)free=&slot;
   }return free;
  }
  void drain(){auto start=Clock::now();while(true){available();bool pending=false;for(auto& s:slots)pending|=s.pending;if(!pending)return;if(seconds(start)>5)throw std::runtime_error("Native GPU completion timeout");Sleep(1);}}
  void draw(Slot& slot,const Plan& plan,int64_t frame,int64_t gen,const std::vector<std::pair<const Clip*,Frame>>& layers,bool playing=false){
-  auto began=Clock::now();{DeviceLock lock(hd,&contextWait);context->Begin(slot.disjoint);context->End(slot.beginStamp);float clear[4]={plan.hdr?0.f:16.f/255,plan.hdr?0.f:19.f/255,plan.hdr?0.f:26.f/255,1};context->ClearRenderTargetView(slot.target,clear);
+  auto began=Clock::now();{WatchStage watch("compose_gpu");DeviceLock lock(hd,&contextWait);context->Begin(slot.disjoint);context->End(slot.beginStamp);float clear[4]={plan.hdr?0.f:16.f/255,plan.hdr?0.f:19.f/255,plan.hdr?0.f:26.f/255,1};context->ClearRenderTargetView(slot.target,clear);
   ID3D11RenderTargetView* rt=slot.target;context->OMSetRenderTargets(1,&rt,nullptr);context->OMSetBlendState(blend,nullptr,0xffffffff);
   D3D11_VIEWPORT vp={0,0,(float)plan.width,(float)plan.height,0,1};context->RSSetViewports(1,&vp);context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
   context->VSSetShader(vertex,nullptr,0);context->PSSetShader(pixel,nullptr,0);ID3D11SamplerState* samp=sampler;context->PSSetSamplers(0,1,&samp);ID3D11Buffer* cb=constants;context->PSSetConstantBuffers(0,1,&cb);
@@ -199,7 +216,8 @@ struct Renderer {
   }
   context->End(slot.endStamp);context->End(slot.disjoint);
   if(display)display->present(context,slot.view);
-  context->End(slot.query);context->Flush();slot.queuedAt=Clock::now();slot.pending=true;slot.frame=frame;slot.generation=gen;submitted++;
+  context->End(slot.query);{WatchStage flushing("flush_gpu");context->Flush();}slot.queuedAt=Clock::now();slot.pending=true;slot.frame=frame;slot.generation=gen;submitted++;
+  watchGPU(submitted,completed,completedFrame,completedGeneration);
   size_t pending=0;for(auto& s:slots)pending+=s.pending;peakPending=std::max(peakPending,pending);}
   submitTime.add(seconds(began)*1000);if(display)display->flip(playing);
  }

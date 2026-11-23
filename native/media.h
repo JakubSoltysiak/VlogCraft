@@ -29,6 +29,7 @@ extern "C" {
 }
 using Clock=std::chrono::steady_clock;
 #include <algorithm>
+#include "stall_watch.h"
 #include "source_trace.h"
 double seconds(Clock::time_point a){return std::chrono::duration<double>(Clock::now()-a).count();}
 thread_local HRESULT nativeHResult=S_OK;thread_local int nativeAVError=0;
@@ -46,6 +47,7 @@ struct DecodeReservation{
  std::atomic<bool> hasPool{false};
 };
 enum AVPixelFormat hardware_format(AVCodecContext* codec,const enum AVPixelFormat* choices){
+    WatchStage watch("hardware_format");
     auto* reservation=static_cast<DecodeReservation*>(codec->opaque);
     uint64_t limit=reservation?reservation->bytes.load():0;
     if(limit){
@@ -85,19 +87,20 @@ struct Decoder {
         if(!std::filesystem::is_regular_file(std::filesystem::u8path(path)))throw std::runtime_error("A local media file is required");
         file=avformat_alloc_context();if(!file)throw std::bad_alloc();file->interrupt_callback=interrupt;
         AVDictionary* options=nullptr;av_dict_set(&options,"protocol_whitelist","file",0);
-        int opened;{SourceStage timer("open_file");opened=avformat_open_input(&file,path.c_str(),nullptr,&options);}av_dict_free(&options);avcheck(opened,"open");
-        {SourceStage timer("probe_stream");avcheck(avformat_find_stream_info(file,nullptr),"stream info");}
+        int opened;{SourceStage timer("open_file");WatchStage watch("open_file");opened=avformat_open_input(&file,path.c_str(),nullptr,&options);}av_dict_free(&options);avcheck(opened,"open");
+        {SourceStage timer("probe_stream");WatchStage watch("probe_stream");avcheck(avformat_find_stream_info(file,nullptr),"stream info");}
         stream=av_find_best_stream(file,AVMEDIA_TYPE_VIDEO,-1,-1,nullptr,0);avcheck(stream,"video stream");
         auto decoder=avcodec_find_decoder(file->streams[stream]->codecpar->codec_id);
         codec=avcodec_alloc_context3(decoder);if(!codec)throw std::bad_alloc();
         avcheck(avcodec_parameters_to_context(codec,file->streams[stream]->codecpar),"parameters");
         codec->thread_count=workers;codec->extra_hw_frames=extraHardwareFrames;
         if(useHardware){codec->hw_device_ctx=av_buffer_ref(hw);codec->opaque=reservation;codec->get_format=hardware_format;}
-        {SourceStage timer("open_codec");avcheck(avcodec_open2(codec,decoder,nullptr),"codec open");}
+        {SourceStage timer("open_codec");WatchStage watch("open_codec");avcheck(avcodec_open2(codec,decoder,nullptr),"codec open");}
       }catch(...){release();throw;}
     }
     ~Decoder(){release();}
     void release(){
+        WatchStage watch("close_decoder");
         for(auto& v:views){v.second.first->Release();v.second.second->Release();}
         sws_freeContext(scaler);av_frame_free(&host);av_frame_free(&frame);av_packet_free(&packet);
         avcodec_free_context(&codec);avformat_close_input(&file);
@@ -105,29 +108,29 @@ struct Decoder {
     bool next(){
         auto start=Clock::now();av_frame_unref(frame);
         while(true){
-            int r;{SourceStage timer("receive_picture");r=avcodec_receive_frame(codec,frame);}
+            int r;{SourceStage timer("receive_picture");WatchStage watch("receive_picture");r=avcodec_receive_frame(codec,frame);}
             if(r==0){decode_s+=seconds(start);frames++;return true;}
             if(r==AVERROR_EOF){decode_s+=seconds(start);return false;}
             if(r!=AVERROR(EAGAIN))avcheck(r,"receive frame");
-            if(eof){if(!drained){SourceStage timer("drain_codec");avcheck(avcodec_send_packet(codec,nullptr),"flush decoder");drained=true;}else throw std::runtime_error("decoder made no progress");}
+            if(eof){if(!drained){SourceStage timer("drain_codec");WatchStage watch("drain_codec");avcheck(avcodec_send_packet(codec,nullptr),"flush decoder");drained=true;}else throw std::runtime_error("decoder made no progress");}
             else {
                 {SourceStage timer("read_demux");while(true){
-                    r=av_read_frame(file,packet);
+                    {WatchStage watch("read_demux");r=av_read_frame(file,packet);}
                     if(r==AVERROR_EOF){
                         if(file->pb&&file->pb->error<0&&file->pb->error!=AVERROR_EOF)avcheck(file->pb->error,"read source file");
                         eof=true;break;
                     }
                     avcheck(r,"read source packet");
-                    if(packet->stream_index==stream)break;
+                    if(packet->stream_index==stream){watchPacket(packet->pts,packet->dts);break;}
                     av_packet_unref(packet);
                 }}
-                if(!eof){SourceStage timer("send_packet");avcheck(avcodec_send_packet(codec,packet),"send packet");av_packet_unref(packet);}
+                if(!eof){SourceStage timer("send_packet");{WatchStage watch("send_packet");avcheck(avcodec_send_packet(codec,packet),"send packet");}av_packet_unref(packet);}
             }
         }
     }
     void seek(double at){
-        avcheck(av_seek_frame(file,stream,(int64_t)(at/av_q2d(file->streams[stream]->time_base)),AVSEEK_FLAG_BACKWARD),"seek");
-        avcodec_flush_buffers(codec);eof=drained=false;
+        {WatchStage watch("seek_demux");avcheck(av_seek_frame(file,stream,(int64_t)(at/av_q2d(file->streams[stream]->time_base)),AVSEEK_FLAG_BACKWARD),"seek");}
+        {WatchStage watch("flush_codec");avcodec_flush_buffers(codec);}eof=drained=false;
         while(next()){if(frame->best_effort_timestamp*av_q2d(file->streams[stream]->time_base)+1e-9>=at)return;}
         throw std::runtime_error("seek past end");
     }
