@@ -1,5 +1,17 @@
 # VlogCraft Studio development qualification
 
+## 3.6.0 Phase 3B triggered freeze investigation
+
+The protected recorder caught a 1,039.31 ms native presentation gap on the visible, AC-powered workstation. While frame 2307 remained last, each source read another 68 video packets. In 65 of 66 coherent stalled samples the renderer was waiting for the shared device lock in its GPU completion poll. In 55 the submitted and completed GPU counts were equal. The MSI built from `893dc6e23af419a69591bdbe5386f0db3f97cceb` skips those empty polls and reuses a free slot within a render iteration.
+
+**Three-layer playback remains unqualified.** The three final protected runs returned 58.934, 58.181 and 58.801 distinct FPS, with 4, 99 and 21 skips and maximum active gaps of 69.25, 438.60 and 133.98 ms. Each completed frame 3599 with exactly 2,880,000 PCM samples, zero underruns, held visibility and zero owned survivors. The 125-second rapid-switch control delivered all 7,500 pictures and 6,000,000 samples at 59.958 FPS, with a 31.33 ms maximum gap and zero underruns. The ordinary 958 × 539 monitor missed the 100 ms gap screen at 112.26 ms.
+
+The packaged worker passed 23 physical VFR picture checks, exact 499.5 ms boundary selection and adjacent backward cuts. It matched 117 additional layer/frame timestamp pairs, completed an exact seek during pending rewind and closed during another in 32 ms. Both WebView fault injections restored all 80 undo states. The independently decoded short HDR10+ first export returned 48 pictures, exact PTS, 48 associated dynamic metadata blocks, matching static signaling, 38,400 exact PCM samples and 55.63 dB PQ PSNR. All 48 extracted MSI bundle checks passed. The local tests used an administrative image. The hosted packaging job exercises actual MSI installation and lifecycle.
+
+The final diagnostic captured a 388.14 ms source-readiness stall before the first rewind. The verified fast path made zero empty GPU polls during that interval. Offline Python passed 196 tests with one skip, WARP/export passed 9/9 and JavaScript passed 32/32. All three private originals retained their recorded hashes and modification times.
+
+The 600-second playback, 30-minute editing, physical GPU recovery, calibrated HDR display and full 60-second mixed UHD60 HDR10+ export remain open. [All trials and artifact identities](docs/STUDIO_3_6_0_PHASE3B_PLAYBACK.md#triggered-freeze-investigation) · [Qualification handoff](docs/STUDIO_3_6_0_PHASE3B_HANDOFF.md).
+
 ## 3.6.0 Phase 3B native handoff follow-up
 
 The packaged worker reproduced the intended VFR holds across four sources. Twenty-three physical picture checks matched the independent reference, with 115,200 audio samples, zero underruns and zero surviving owned processes. A separate fractional seek at 499.5 ms and an adjacent backward cut both failed on the frozen worker and passed on the new worker.

@@ -2,7 +2,7 @@
 
 The starting point was Phase 3A at [f4a852b](https://github.com/JakubSoltysiak/VlogCraft/commit/f4a852ba36d9cd6e417c2cbfd1dc90af1ad2d630). [Draft PR #21](https://github.com/JakubSoltysiak/VlogCraft/pull/21) targets the Phase 3A branch. Windows results use the development MSI applications on the Radeon 890M workstation. Administrative MSI images and test projects were local and isolated from the user's active installation and projects.
 
-Current results are in the [follow-up qualification](#follow-up-acceptance-protocol). Three 125-second rapid-switch runs completed with zero skips. Two of three 60-second three-layer runs met all timing screens. The third lost 222 frames.
+Current results are in the [triggered freeze investigation](#triggered-freeze-investigation). The preceding [follow-up qualification](#follow-up-acceptance-protocol) established the comparison package. Three 125-second rapid-switch runs completed with zero skips. Two of three 60-second three-layer runs met all timing screens. The third lost 222 frames.
 
 ## Playback architecture and reproduced problems
 
@@ -245,3 +245,85 @@ Median private commit over the last 30 seconds of each 150-second editing diagno
 | Final follow-up repeat | 872.9 | 2,369.9 | 1,035.1 | 1,430.9 |
 
 Retained failed trials include final2/mixed, final2-mixed-retry/mixed, final2-mixed-geometry/mixed. The editor rejected the initial default SDR encoder for the HDR10 project and subsequently rejected an unspecified source pixel aspect. Both refusals preceded playback. With those settings corrected, a third run failed while publishing its rendered preview. Windows returned error 3 when replacing a 226-character temporary file path with a 268-character cache path. The frozen Phase 3B and the follow-up contain identical cache-publication and preview-serving code. Deep project paths remain an open Windows compatibility issue.
+## Triggered freeze investigation
+
+Before the first diagnostic run, the campaign budget is six 60-second protected three-layer trials with the recorder enabled, alternating with three fresh uninstrumented frozen controls where practical. End diagnostic collection early after a usable active gap of at least 500 ms with three identified source lanes and a stable playing generation. Keep all shorter triggers and failed attempts. If the threshold is not reached in six trials, report the capture limit and leave the historical cause open. Use up to three additional same-workload trials to test a specific change if causation is supported. Final packaged acceptance uses three fresh uninstrumented 60-second trials plus the 125-second rapid-cut control and the ordinary editor layout. The existing FPS, skip, gap, audio, visibility and ownership requirements apply unchanged.
+
+### What the recorder measures
+
+Set `VLOGCRAFT_STALL_CAPTURE` to a new absolute local output filename before starting the packaged host. The worker samples native state on its own thread. The render loop publishes its requested frame, audio-clock snapshot, next frame deadline, and the most recent **distinct draw that returned**. A separate GPU counter advances after Flush, before Present. Seeing the GPU counter advance while the same draw is outstanding distinguishes a blocked Present from a decoder that has not supplied the next picture. The WebView reporter is outside this trigger path.
+
+A trigger requires at least 100 ms without a new returned picture while the native audio clock expects a later one, the sequence still has pictures remaining and the reader, renderer and previous submission agree on the playing generation. Pause, seek, EOF and clock-mode changes fence measurements. A pause during an incident is reported as a transition. The watchdog never takes the device, producer, input or status-output locks. Only the watchdog writes files. A separate live snapshot at 500 ms can survive a blocked producer or renderer. A hard kill before that write can leave no report.
+
+The sampler requests a 4 ms sleep. Actual poll intervals, the largest scheduling gap and torn observations are recorded. Each sample has the three producers' numeric source/decoder IDs, timebases, packet PTS/DTS and read count, requested and available PTS intervals, queue depth, retained prefix and outgoing tail, decode epoch, selection path, D3D lock state, current and last slow operation. All producers share device ordinal zero. The first synchronous decoder open runs on the render thread. Unbound codec helper threads, kernel scheduling reasons and driver internals are outside this recording. Thread CPU times come from Windows and can update coarsely. Read all lanes as observations within an interval. A short lock transaction can occur between polls, and per-stage counters can change while a row is read. Cross-thread timing totals cannot be summed.
+
+Retention is 96 samples before the trigger, up to 768 through the stall including that prefix, and up to 64 further samples when needed for recovery. Recovery is observed for 180 ms. The longest three incidents survive in the final file. A fourth, active incident and the rolling prefix use at most 3,424 resident sample slots (4.60 MiB of sample payload in the tested x64 binary) plus container and I/O overhead. Each serialized sample is below 8 KiB for the fixed schema and stage names, bounding the final payload below 20 MiB and the single live payload below 7 MiB, plus small headers and temporary replacement files. The report counts triggers, partial reads, explicitly omitted middle samples and truncated incidents. The post-recovery interval can overlap the start of another stall. Missing-file, poll-gap or truncated coverage limits any causal inference.
+
+Diagnostic trial 2 established a testable software contribution. During a 277 ms gap after frame 400, the render lane was waiting for the device lock in every one of 17 coherent stalled observations. A decoder held the device in each observation. The final nine showed 391 submissions and 391 completions. At that point a completion poll acquires the shared lock without having a query to read. The candidate experiment will bypass that acquisition only when the renderer already knows all submissions completed, and reuse a free slot already inspected in the same render iteration. A second poll remains possible if the first found no free slot. Support would require removal of idle completion-lock waits in corresponding captured rows and passing matched playback and correctness controls. Persistent long gaps or failed timing gates would leave general smoothness open. The 112 ms Present stall from diagnostic trial 1 is a separate observation.
+
+### The one-second capture
+
+Recorder trial 3 met the predeclared early-stop rule. Its protected presentation counter recorded 1,039.31 ms. The independent worker measured 1,039.307 ms from frame 2307 to frame 2372 in playing generation 2. A live file existed at 515 ms. The final file retained 1.398 s before the last returned draw and 188 ms after the first observed recovery, with 66 coherent samples of the stall, no truncated middle and no torn stalled rows. The longest poll interval over the trial was 18.19 ms.
+
+The slowdown was already visible before frame 2307. Earlier Presents and device-lock waits let the audio target advance several frames ahead. At the first stalled sample the requested frame was 2311 and the three source FIFOs were empty. Across the 66 observations, 65 saw the renderer waiting to acquire the device for a completion poll. The last saw it waiting to compose. Each observation identified a decoder holding that device, with ownership split 23, 19 and 24 times among the three lanes. In 55 samples submitted and completed counts were both 2,225. All three source packet counters advanced by 68, including a rewind epoch change from 25 to 26 during the gap. Selection showed zero ready layers in 62 samples, one ready layer once, two twice and all three at recovery. The audible clock, loop and decoders continued advancing as the renderer repeatedly sampled later deadlines. This was a starvation and catch-up interval across multiple calls. It did not begin at a rewind or require a single one-second driver call. The longest individual Present in the trial was 88.44 ms.
+
+The candidate removes completion-lock acquisition when the renderer's own counters prove that no query remains, and reuses a free slot already inspected in the iteration. Only the render thread mutates slot ownership. Selection and draining cannot occupy that slot, draw still takes the existing D3D lock, completion still releases references only after a successful query, and FFmpeg keeps its recursive device synchronization. The captured episode identifies a removable contribution. There is no paired recorder for the historical frame-2343 episode and no kernel scheduler trace of this capture. Exclusive driver-level attribution and general resolution of the freeze require additional evidence.
+
+### Tested development MSI
+
+The native suite was compiled at `893dc6e23af419a69591bdbe5386f0db3f97cceb` with input SHA-256 `3fd8e7cb64c14ae97e6f8a8eda59d6749d51209fd205ed109d5ae6df0292c516`. The administrative extraction passed the bundle comparison. All distributed native worker and DLL bytes matched the isolated compiler outputs. The workstation retained the frozen MSI separately.
+
+| Candidate artifact | SHA-256 |
+|---|---|
+| Development MSI | `4d82887f41389b458278056970e12a49319850b0fb13df281c1f36fe947e9bd4` |
+| Packaged desktop host | `cb09208757e396e6a808d9f9bb88312817154a3e373eb34d40a430ac315eaf93` |
+| Packaged playback worker | `1717545bd55170d5299b524fd4a94bd12cb1564e6c31ff3f7cd3a9ab313746e0` |
+
+### All short playback trials
+
+Fresh host and project per run, unmanaged OS file caches, 2880 × 1800 desktop at 120 Hz and 175% scaling. The protected preview was 356 × 200 with a UHD60 composition. Every scheduled diagnostic and final trial is retained below. Peak working set sums process values and can include shared pages. Per-trial first-ready time, physical geometry, sampled conditions, p95/p99 intervals, exact final frame, ownership and pass/fail fields appear in the [sanitized record](benchmarks/studio-3.6.0-phase3b.json).
+
+| Group | Trial | Distinct FPS | Skips | Max gap ms | PCM samples / underruns | Peak summed working set MiB | Screen |
+|---|---|---:|---:|---:|---:|---:|---|
+| Frozen | watch-frozen60a | 55.484 | 249 | 61.75 | 2,880,000 / 82 | 2983 | failed |
+| Frozen | wd1-frozen602 | 57.905 | 104 | 658.56 | 2,880,000 / 0 | 3184 | failed |
+| Frozen | wd1-frozen603 | 59.704 | 3 | 77.80 | 2,880,000 / 0 | 3193 | passed |
+| Frozen | fix1-frozen604 | 59.617 | 2 | 35.23 | 2,880,000 / 0 | 3243 | passed |
+| Pre-fix recorder off | wd1-diag60-off | 57.935 | 113 | 1304.28 | 2,880,000 / 0 | 3968 | failed |
+| Pre-fix recorder on | wd1-diag60-on1 | 59.129 | 29 | 112.07 | 2,880,000 / 0 | 3536 | failed |
+| Pre-fix recorder on | wd1-diag60-on2 | 58.754 | 50 | 276.64 | 2,880,000 / 0 | 3798 | failed |
+| Pre-fix recorder on | wd1-diag60-on3 | 57.275 | 154 | 1039.31 | 2,880,000 / 0 | 3840 | failed |
+| Revised worker recorder on | fix1-diag60-on1 | 59.854 | 0 | 34.14 | 2,880,000 / 0 | 3276 | passed |
+| Revised worker recorder on | fix1-diag60-on2 | 59.629 | 7 | 96.91 | 2,880,000 / 0 | 3381 | passed |
+| Revised worker recorder on | fix1-diag60-on3 | 58.921 | 45 | 388.15 | 2,880,000 / 0 | 3460 | failed |
+| Final MSI | cand1-comp60a | 58.934 | 4 | 69.25 | 2,880,000 / 0 | 3693 | failed |
+| Final MSI | cand1-comp60b | 58.181 | 99 | 438.60 | 2,880,000 / 0 | 3899 | failed |
+| Final MSI | cand1-comp60c | 58.801 | 21 | 133.98 | 2,880,000 / 0 | 3878 | failed |
+| Final MSI | cand1-switch125 | 59.958 | 0 | 31.33 | 6,000,000 / 0 | 2882 | passed |
+| Editor size | cand1-frozen-editor60 | 58.847 | 63 | 762.42 | 2,880,000 / 0 | 3965 | failed |
+| Editor size | cand1-editor60 | 59.433 | 27 | 112.26 | 2,880,000 / 0 | 3816 | failed |
+
+The first frozen control spent 8 of 58 power samples off AC and recorded 82 underruns. It is included above and excluded only from the matched AC comparison. All three subsequent frozen controls and the three final protected measurements held AC and visibility. Two of three matched frozen controls passed. Zero of three final protected controls passed. The new worst active gap was smaller in this sample, but the median skip count rose from 3 to 21. Final median/worst skips of 21/99 exceed the historical goals of 3.5/16. The four-skip candidate run spanned 61.001 s and therefore failed the original wall-time FPS screen. Both 958 × 539 editor-size controls failed their 100 ms gap screen.
+
+The same pre-fix worker with the recorder disabled delivered 57.935 FPS, 113 skips and a 1,304.28 ms gap. Enabling it gave 57.275–59.129 FPS, 29–154 skips and 112.07–1,039.31 ms maximum gaps. Recorder-on median FPS was 58.754, 0.819 FPS above the single off control. This variability prevents a reliable estimate of a small positive or negative tracing cost. The recorded windows survived without apparent sampler starvation: 4,054–4,117 observations per pre-fix process, at most 18.19 ms between polls, zero torn samples and 101–276 KiB per completed file. The revised recorder saw up to two torn observations per run and flags them.
+
+### Remaining stall and handoff decision
+
+The reserved third revised-worker diagnostic captured a 388.14 ms native gap from frame 55 to 80, **before the first rewind**. There were 24 coherent observations. Eleven saw completion polling with outstanding GPU work and thirteen saw source retries after every GPU job completed. Zero saw an empty completion poll. In 20 of the 24 samples the last selection showed no ready layer. Packet counts grew by 23, 24 and 24, with decode epoch zero throughout. The target advanced from frame 58 to 80. The prior needless lock acquisitions are gone in this capture, while the renderer still runs out of exact source intervals when three streams must catch up together. Driver-internal scheduling and the trigger for the initial loss of decode headroom are unresolved. The default exporter remains FFmpeg and the optional native preview remains experimental.
+
+For the next diagnostic, trigger on the *first* presentation deadline missed with an unavailable layer. Correlate each layer's floor and successor PTS, packet-to-picture time, outermost lock wait and hold, query backlog, and time at which all three intervals first overlap the same requested frame. Retain the preceding Presents. Investigate the observed media-clock advance separately from the time until the end-of-playback acknowledgement. Keep admission, audio clock, queue bounds and the protected 60-second observer fixed. Further driver scheduling attribution needs a correlated trace with checked event loss. The long tests remain blocked pending three passing short runs and passing editor-size playback. [Executable qualification handoff](STUDIO_3_6_0_PHASE3B_HANDOFF.md).
+
+### Packaged regression results
+
+| Check | Frozen and/or revised measurements |
+|---|---|
+| Controlled seek | Twelve targets. Frozen p50/p95 450.17/608.59 ms, revised 454.94/584.37 ms. |
+| Committed ruler drag | Paused median release-to-picture 513.70 to 486.80 ms. Playing release 523.80 to 439.40 ms. Every measured drag fetched PCM once and checkpointed once, with zero post-release frames before the target and zero underruns. |
+| VFR and pending rewind | Correct 499.5 ms boundary, adjacent backward cut, 23 physical picture checks and 117 extra layer/frame pairs. Correct final seek during pending rewind and close during another in 32 ms. |
+| Resource ownership | The VFR handoff used at most three decoders, four queued pictures per producer and 6,819,840 bytes of standby surfaces against the 896 MiB reservation limit. Protected workloads stayed within four in-flight slots. Every supervised trial released its owned processes. |
+| Recovery and reference fallback | Packaged renderer and browser fault recovery restored the exact 80-entry history, unsaved draft, paused position and undo/redo in 7.40/7.45 s. Native worker failure, resize, modal visibility and reference fallback checks passed. |
+| First HDR10+ export | 44.80 s to terminal job. Independent decoding returned 48 pictures, exact PTS, matching static HDR, 48 conforming picture-associated dynamic blocks, 38,400 exact PCM samples and 55.63 dB PQ PSNR. Active export cancellation and confirmed shutdown released all owned processes. |
+| Repository and bundle | Loopback-only Python 196 passed, one skipped. Packaged WARP/export 9/9 and JavaScript 32/32 passed. Three dedicated watchdog tests passed, including live reporting while a producer held a real mutex wait. All 48 development MSI bundle comparisons passed, including the approved icon. |
+| Private originals | Three of three hashes and modification times matched the recorded manifest before and after the media checks. Zero tracked paths, history-path hits, matching binary/text objects or publishable text matches. |
+
+The MSI and native worker above identify the locally tested bytes. Later evidence commits bind the complete set of observations to the source and benchmark protocol. The hosted Windows regression and MSI lifecycle jobs run on the published PR revision. [Draft PR and exact-head checks](https://github.com/JakubSoltysiak/VlogCraft/pull/21/checks).
