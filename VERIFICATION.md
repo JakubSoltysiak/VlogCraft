@@ -1,5 +1,11 @@
 # VlogCraft Studio development qualification
 
+## Phase 3B polling order and decoder progress
+
+The corrected implementation `d247b6a` delivered 59.766 FPS, five skips and a 104.604 ms active gap on the recorder-off 958 × 539 workload. The matched `cand4` MSI delivered 59.120 FPS, 40 skips and 505.267 ms. Both finished frame 3599 with 2,880,000 PCM samples, zero underruns and clean shutdown. The 100 ms short prerequisite failed. The candidate remains a separately identified worker in a clone of the verified host. The last physically tested MSI is the earlier `8047cde8…` package.
+
+All four polling-order attempts and two additional API-attribution runs are retained. The reverse-order comparison rejected eager polling as a general fix. The longest eager freeze lasted 1.614 s even after slot retirement. The trace exposed three unnecessary decoder resets during a same-generation clock correction across a continuous source boundary. Guarded reuse passed the real-producer regression, the VFR color/PTS checks and the 120-pair pending-rewind test. A separate Direct3D trace observed a 65.95 ms picture-parameter input buffer acquisition with both peer decoders waiting for the shared device. Original file integrity passed before and after the campaign. The current short failure blocks MSI qualification and endurance. [Measurements, identities and limitations](docs/STUDIO_3_6_0_PHASE3B_PLAYBACK.md#polling-order-and-continuous-cut-rollback).
+
 ## 3.6.0 Phase 3B decoder refill and Present
 
 At 958 × 539 a 121.31 ms Present retained three refill holds with only 33.33 ms of successor coverage. The following common request found no successor. Disabling holds also reproduced long active stalls and lost more pictures in both alternating pairs. The worker now independently expires a hold at a monotonic, headroom-aware deadline. A real software decoder liveness test passed while the renderer withheld release. A same-worker editor-size comparison improved from 50 to 12 skips and 568.41 to 75.47 ms, with 22 retained producer expiries, 17 overlapping Present.

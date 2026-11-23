@@ -104,7 +104,16 @@ jobs:
           $readinessRecord = "$phase3bReadiness/docs/benchmarks/studio-3.6.0-phase3b.json"
           python "$phase3bReadiness/tools/performance_record.py" $readinessRecord --historical-record $stallFixRecord
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          python tools/performance_record.py docs/benchmarks/studio-3.6.0-phase3b.json --historical-record $readinessRecord
+          $phase3bRefill = 'build/qa/phase3b-refill-checkpoint'
+          New-Item -ItemType Directory -Force -Path $phase3bRefill | Out-Null
+          git archive --format=tar --output=build/qa/phase3b-refill-checkpoint.tar d11445a467e10a8757a672256d7975977d47522a
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          tar -xf build/qa/phase3b-refill-checkpoint.tar -C $phase3bRefill
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $refillRecord = "$phase3bRefill/docs/benchmarks/studio-3.6.0-phase3b.json"
+          python "$phase3bRefill/tools/performance_record.py" $refillRecord --historical-record $readinessRecord
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tools/performance_record.py docs/benchmarks/studio-3.6.0-phase3b.json --historical-record $refillRecord
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python tests/icon_assets.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

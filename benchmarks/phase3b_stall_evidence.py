@@ -32,6 +32,9 @@ REQUEST_LAYER = (
 PICTURE_REASONS = ("opening", "missing_floor", "missing_successor", "live", "warm", "outgoing",
                    "before_first_picture", "terminal_eof", "producer_replaced")
 REFILL_REASONS = ("active", "selection", "renderer", "reset", "cancel", "eof", "expired", "error")
+RENDERER_OWNERSHIP_TORN = 32
+SOURCE_OWNERSHIP_TORN = 64
+SURFACE_MASK = (1 << 64) - 1
 
 
 def number(value):
@@ -84,7 +87,7 @@ def overlaps(samples, start, finish):
             for key, left, right in endpoints:
                 overall[key] += max(0, right - left)
         states = {}
-        for index, (left, right) in enumerate(zip(before[8:], after[8:])):
+        for index, (left, right) in enumerate(zip(before[8:8+len(LANES)], after[8:8+len(LANES)])):
             if (before[1] | after[1]) & (2 << index):
                 continue
             activity, following = left[2], right[2]
@@ -289,6 +292,167 @@ def pacing_window(samples, start, finish, generation, *, request_us=None):
     }
 
 
+def picture_mask(pictures, pool, capacity):
+    mask = 0
+    for key, slice_index, _pts in pictures:
+        if key == pool and 0 <= slice_index < capacity:
+            mask |= 1 << slice_index
+    return mask
+
+
+def pictures(values, start):
+    return [values[index:index + 3] for index in range(start, len(values), 3)]
+
+
+def query_state(query, submitted):
+    entered, returned, result = query[2:]
+    if entered < submitted:
+        return "no_check_observed"
+    if not returned:
+        return "check_in_progress"
+    return {0: "ready", 1: "unready"}.get(result, "other_hresult")
+
+
+def ownership_window(samples, start, finish):
+    pools = {}
+    pending = {}
+    checks = {}
+    retirements = set()
+    coverage = Counter()
+    zero_pending_samples = []
+    max_cache_views = max_cache_pools = 0
+    for sample in samples:
+        timestamp, torn = sample[:2]
+        if not start <= timestamp <= finish or len(sample) < 13:
+            continue
+        coverage["samples"] += 1
+        if torn & (1 | RENDERER_OWNERSHIP_TORN):
+            coverage["torn_renderer_samples"] += 1
+            continue
+        selected, cache, slots = sample[12]
+        count, views, cached_pools, _cache_observed = cache
+        max_cache_views = max(max_cache_views, views)
+        max_cache_pools = max(max_cache_pools, cached_pools)
+        slot_pictures = []
+        pending_slots = []
+        for index, (holds, check, retired) in enumerate(slots[:count]):
+            active, frame, generation, submitted = holds[:4]
+            check_frame, check_generation, entered = check[:3]
+            if start <= entered <= finish and entered > 0:
+                checks[index, check_frame, check_generation, entered] = query_state(check, entered)
+            retired_frame, retired_generation, released = retired
+            if start <= released <= finish and released > 0:
+                retirements.add((index, retired_frame, retired_generation, released))
+            # A retirement and a slot state can straddle the sampling read.
+            if active and not (retired[:2] == holds[1:3] and released >= submitted):
+                slot_pictures.extend(pictures(holds, 4))
+                same_submission = check[:2] == holds[1:3] and entered >= submitted
+                state = query_state(check, submitted) if same_submission else "no_check_observed"
+                pending_slots.append((index, frame, generation, submitted, entered if same_submission else None, state))
+
+        # Application updates and slot reads are independent. Exclude
+        # snapshots whose pending count disagrees with the renderer counters.
+        counters = sample[6]
+        if len(pending_slots) != counters[0] - counters[1]:
+            coverage["transition_samples"] += 1
+            continue
+        coverage["coherent_renderer_samples"] += 1
+        if not pending_slots:
+            zero_pending_samples.append(timestamp)
+        for index, frame, generation, submitted, entered, state in pending_slots:
+            span = pending.setdefault((index, frame, generation, submitted), {
+                "slot": index, "frame": frame, "generation": generation, "submitted_observed_us": submitted,
+                "first_sample_us": timestamp, "last_sample_us": timestamp, "last_check_entered_us": entered,
+                "sampled_query_states": Counter(),
+            })
+            span["last_sample_us"] = timestamp
+            span["last_check_entered_us"] = entered
+            span["sampled_query_states"][state] += 1
+
+        selected_pictures = pictures(selected, 1)
+        for index, name in enumerate(LANES[1:], 1):
+            lane = sample[8 + index]
+            if torn & ((2 << index) | (SOURCE_OWNERSHIP_TORN << index)) or not lane[2][7] or len(lane) < 11:
+                continue
+            pool, capacity, current, queued, warm, tail, untracked, _producer_observed = lane[9]
+            if not pool or not 0 < capacity <= 2048:
+                continue
+            source, decoder = lane[3][:2]
+            scratch = lane[10]
+            producer_mask = (current | queued | warm | tail) & SURFACE_MASK
+            scratch_mask = picture_mask([scratch[:3]], pool, capacity)
+            selected_mask = picture_mask(selected_pictures, pool, capacity)
+            slot_mask = picture_mask(slot_pictures, pool, capacity)
+            outside_slots = producer_mask | scratch_mask | selected_mask
+            union = outside_slots | slot_mask
+            group = pools.setdefault((name, source, decoder, pool, capacity), {
+                "lane": name, "source_ordinal": source, "decoder_ordinal": decoder,
+                "pool_ordinal": len(pools) + 1, "pool_array_size": capacity,
+                "first_sample_us": timestamp, "last_sample_us": timestamp, "samples": 0,
+                "untracked_producer_samples": 0, "all_slices_app_referenced_samples": 0,
+                "first_and_last_decoder_received_count": [scratch[4], scratch[4]],
+                "first_and_last_decoder_output_pts": None,
+                "peak_unique_slices": Counter(), "minimum_unaccounted_slices": capacity,
+            })
+            group["last_sample_us"] = timestamp
+            group["samples"] += 1
+            group["untracked_producer_samples"] += bool(untracked)
+            group["all_slices_app_referenced_samples"] += union.bit_count() == capacity
+            group["first_and_last_decoder_received_count"][1] = scratch[4]
+            if scratch_mask and scratch[2] != NO_PTS:
+                if group["first_and_last_decoder_output_pts"] is None:
+                    group["first_and_last_decoder_output_pts"] = [scratch[2], scratch[2]]
+                group["first_and_last_decoder_output_pts"][1] = scratch[2]
+            group["minimum_unaccounted_slices"] = min(group["minimum_unaccounted_slices"], capacity - union.bit_count())
+            masks = {"current": current & SURFACE_MASK, "queue": queued & SURFACE_MASK, "warm": warm & SURFACE_MASK,
+                     "rewind_tail": tail & SURFACE_MASK, "producer": producer_mask, "decoder_output": scratch_mask,
+                     "selected": selected_mask, "gpu_slots": slot_mask, "gpu_slots_only": slot_mask & ~outside_slots,
+                     "app_union": union}
+            for name, mask in masks.items():
+                group["peak_unique_slices"][name] = max(group["peak_unique_slices"][name], mask.bit_count())
+    if not coverage:
+        return {}
+    longest = sorted(pending.values(), key=lambda row: row["last_sample_us"] - row["first_sample_us"],
+                     reverse=True)[:6]
+    ordered_retirements = sorted(retirements, key=lambda row: row[3])
+    endpoints = ordered_retirements if len(ordered_retirements) < 2 else [ordered_retirements[0], ordered_retirements[-1]]
+    return {
+        "coverage": dict(coverage), "source_pools": list(pools.values()),
+        "zero_pending_samples": len(zero_pending_samples),
+        "first_and_last_zero_pending_sample_us": [zero_pending_samples[0], zero_pending_samples[-1]]
+        if zero_pending_samples else [],
+        "peak_cached_views_observed": max_cache_views, "peak_cached_texture_pools_observed": max_cache_pools,
+        "observed_query_attempts": dict(Counter(checks.values())), "observed_retirements": len(retirements),
+        "first_and_last_retirements": [
+            {"slot": slot, "frame": frame, "generation": generation, "released_us": released}
+            for slot, frame, generation, released in endpoints
+        ],
+        "longest_observed_pending_spans": longest,
+        "scope": ("Surface counts deduplicate D3D11 slices within each pool. Unaccounted slices can be held by the "
+                  "codec or driver. COM views are excluded. Tuples are sampled independently and intermediate "
+                  "checks and retirements can be overwritten. Pending slots alone do not show ongoing GPU execution."),
+    }
+
+
+def playing_backsteps(requests, generation):
+    spans = []
+    count = 0
+    for index, (before, after) in enumerate(zip(requests, requests[1:])):
+        if (after["sequence"] != before["sequence"] + 1 or after["frame"] >= before["frame"] or
+                any(row["generation"] != generation or not row["playing"] for row in (before, after))):
+            continue
+        count += 1
+        if len(spans) == 6:
+            continue
+        following = requests[index + 2] if index + 2 < len(requests) else None
+        if (following and following["sequence"] == after["sequence"] + 1 and
+                following["generation"] == generation and following["playing"]):
+            spans.append([before, after, following])
+        else:
+            spans.append([before, after])
+    return {"count": count, "reported_spans": spans}
+
+
 def request_window(raw, *, generation, frame, exact_frame=False):
     retained = raw.get("requests", [])
     samples = raw.get("samples", [])
@@ -304,6 +468,9 @@ def request_window(raw, *, generation, frame, exact_frame=False):
         "torn_watchdog_samples": sum(bool(sample[1]) for sample in samples),
         "largest_retained_watchdog_gap_us": max((b[0] - a[0] for a, b in zip(samples, samples[1:])), default=None),
     }
+    backsteps = playing_backsteps(requests, generation)
+    if backsteps["count"]:
+        result["retained_playing_backsteps"] = backsteps
     miss_index = next((i for i, row in enumerate(requests)
                        if row["generation"] == generation and row["playing"] and row["layer_mask"] and
                        not row["all_layers_selected"] and row["last_returned_generation"] == generation and
@@ -350,6 +517,10 @@ def request_window(raw, *, generation, frame, exact_frame=False):
                       default=focus["observed_us"])
         result["pacing_near_first_missing_request"] = pacing_window(
             samples, inspect - 180_000, inspect + 30_000, generation, request_us=inspect)
+        ownership = ownership_window(samples, inspect - 30_000,
+                                     max(inspect + 30_000, ready["observed_us"] if ready else samples[-1][0]))
+        if ownership:
+            result["ownership_near_first_missing_request"] = ownership
     return result
 
 
@@ -385,6 +556,9 @@ def reduce_incident(record):
         span["source_request_window"] = request_window(record, generation=record["generation"], frame=record["last_frame"])
     if interval and any(len(sample[8]) > 8 for sample in interval):
         span["pacing_during_gap"] = pacing_window(samples, start, end, record["generation"])
+        ownership = ownership_window(samples, start, end)
+        if ownership:
+            span["ownership_during_gap"] = ownership
     return span
 
 

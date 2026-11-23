@@ -49,22 +49,27 @@ Use a fresh label if a later bounded experiment is warranted. If the evidence ca
 
 For a comparison of the original and independently expiring holds, build a worker that supports `VLOGCRAFT_DIAGNOSTIC_LEGACY_REFILL_HOLD=1`, then prepare a fresh label with `refill-setup --comparison bounded`. Use slot 1 once. Arm A sets the legacy hold and arm D uses the expiring hold in the same worker.
 
-## Next bounded comparison
+## Decoder input buffer investigation
 
-Use a fresh Astra High investigation if the D3D scheduling problem needs a larger design. First isolate source-first/combined polling at 958 × 539 with the bounded refill policy held fixed. Add a diagnostic-only check for `VLOGCRAFT_DIAGNOSTIC_LEGACY_POLL_ORDER=1` next to `sourcesFirst` in `native/player.cpp`. Arm C disables the combined order and still uses `Renderer::available()` with the existing empty-query bypass. Leave query-before-release and the final completion path unchanged. Build one worker and run one pair against arm D.
+The C→D and D→C comparisons are complete. Keep the existing source-first polling and independently expiring refill. The guarded rollback worker built from `d247b6a` reached 59.766 FPS, five skips and a 104.604 ms active gap in the original recorder-off editor. Its gate blocks a new MSI and both endurance stages. The older MSI identities below and in the refill section refer to their original campaigns.
+
+Continue with the corrected worker and the existing 958 × 539 three-layer fixture. In a bounded attribution rerun, Direct3D11 GetDecoderBuffer for picture parameters took 65.95 ms while the calling decoder held the shared device. The two peers waited for at least 46.18 ms of that call. The retained ETL already shows that the previous fence-bearing packet on this thread stopped 2.83 ms into the 65.95 ms call. Reuse of the same recorded output pointer did not uniquely identify a physical input-buffer fence. No DxgKrnl CPU wait event appeared on that thread during the call. The next measurement needs context switches, ready-thread and wait-state attribution covering the very same video call, plus GPU/API events. The current non-elevated token denied kernel context-switch collection. Use a Windows trace session authorized for those providers and report any lost events and unmatched resource identities. Examine whether a supported driver readiness signal or independent device/context design can avoid blocking peer decoders while preserving documented D3D11 synchronization and zero-copy ownership. Retain the current synchronization until an isolated alternative has an exact output and cancellation test.
+
+The following tracked commands reproduce one fixed-policy attribution run. Set `$py` to the QA interpreter, `$media` to the existing generated clip directory, and the MSI variables to the hash-verified cand4 and cand3 packages. Prepare the pinned lab Zig/shared FFmpeg SDK in the checkout first. Choose a fresh local result directory. Use the existing polling worker at revision `2e6b218` for the historical C/D comparison or the corrected implementation at `d247b6a` for the current investigation. The build receipt binds the active native inputs and worker hash.
 
 ```powershell
-$campaign = 'build/qa/phase3b-watch/campaign.py'
-$cohort = 'pollbounded1'
-& $py $campaign diag-build --label $cohort
+$runner = 'benchmarks/phase3b_stall_campaign.py'
+$run = 'build/qa/phase3b-decoder-input-next'
+& $py $runner --results $run refill-build
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-& $py $campaign refill-setup --label $cohort --comparison poll-order --hold-arm D
+& $py $runner --results $run refill-prepare --latest-msi $cand4Msi --prior-msi $cand3Msi --diagnostic-worker "$run/VlogCraftNative.exe" --media $media --comparison poll-order --hold-arm D
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-& $py $campaign refill-pair --label $cohort --slot 1
-& $py $campaign refill-review --label $cohort --slot 1
+& $py $runner --results $run decoder-attribution
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+& $py benchmarks/phase3b_gpu_events.py "$run/api-gpu.private.etl" "$run/api-attribution-d-stall.private.jsonl" --output "$run/correlated.json"
 ```
 
-Compare completed pictures, active gaps and the first coherent missing source interval. Separate time spent with the hold already expired from decoder packet submission and driver work. If C still loses source headroom, correlate the held/nonheld packet submission intervals, fair device-lock access and scheduling using a bounded trace with event-loss accounting. Keep the protected fixture, resource limits, exact timestamps and observer protocol unchanged.
+For a new justified correction use a fresh directory, the same build command and `refill-prepare --comparison ordinary` with both MSI paths, worker and fixtures as above. Run `refill-pair --slot 1` and `refill-review --slot 1`. Only a passing candidate qualifies for `refill-pair --slot 2 --reverse-reviewed` and its review. Keep the original thresholds, every raw receipt and each packaged baseline. The separate Windows cache publication and cold mixed-preview tasks remain below.
 
 ## Recorder campaign from a fresh checkout
 
