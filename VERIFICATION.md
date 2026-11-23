@@ -1,6 +1,12 @@
 # VlogCraft Studio development qualification
 
-## 3.6.0 Phase 3B playback development
+## 3.6.0 Phase 3B native handoff follow-up
+
+The packaged worker reproduced the intended VFR holds across four sources. Twenty-three physical picture checks matched the independent reference, with 115,200 audio samples, zero underruns and zero surviving owned processes. A separate fractional seek at 499.5 ms and an adjacent backward cut both failed on the frozen worker and passed on the new worker.
+
+The matched twelve-seek median and p95 were 437.3 / 596.8 ms on the frozen Phase 3B editor and 442.0 / 600.2 ms on the new package. Median paused scrub release improved from 521.6 to 489.5 ms. Playing release improved from 541.0 to 482.3 ms. These measurements supplement the earlier Phase 3A comparisons below.
+
+## Earlier 3.6.0 Phase 3B playback development
 
 - The matched final Windows ruler repeat measured 577.3 → 506.1 ms median paused release-to-picture and 675.4 → 523.7 ms during playback. Controlled repeated native seek median improved from 521.5 to 421.1 ms, and p95 from 657.8 to 559.9 ms. Each final ruler drag used one recovery checkpoint and one PCM fetch.
 - Visible AC 60-second runs preserved the exact PCM endpoints with zero underruns. The paced variant recorded 390 skips and a 1.414 s gap on the same native binary as Phase 3A. The final variant recorded 152 skips and a 1.020 s gap versus 2 skips and 51.283 ms in its frozen repeat. Both 125-second alternating-source trials exceeded 2,200 skips. Sustained playback qualification remains open.

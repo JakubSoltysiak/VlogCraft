@@ -6880,8 +6880,79 @@
       "cause": "The old binding checked the historical Phase 3A measurement against changed Phase 3B source. CI now verifies Phase 3A using its archived commit, then checks the new record."
     }
   ],
-  "source_fingerprint": "bcae6f62e67f1fb458225cb64ea59383f6ce1d164b48847cb3267aee9f9f50ab",
+  "source_fingerprint": "b3d3b975e6f72c098404879919b0cb1ef60b06a0baa92ca6ffb142dabadf6c55",
   "fingerprint_method": "SHA256 sorted relevant relative path + NUL + LF-normalized source + NUL",
-  "benchmark_protocol_fingerprint": "fc662e0c833a2b0323ffd5bc89a5af923511f37545508d7e5d4492e3e5233039",
-  "benchmark_protocol_fingerprint_method": "SHA256 sorted benchmark driver/observer relative path + NUL + LF-normalized source + NUL"
+  "benchmark_protocol_fingerprint": "20ae8c3a56798cec2aa9aaf5ffa289d4691f611c7239701f0203e22296eaa687",
+  "benchmark_protocol_fingerprint_method": "SHA256 sorted benchmark driver/observer relative path + NUL + LF-normalized source + NUL",
+  "follow_up": {
+    "status": "interim packaged correctness; repeated timing and memory series in progress",
+    "tested_implementation": "40e43da66797f70c57691b734effafcb34bc552a",
+    "artifact": {
+      "msi_sha256": "9a06324bb5ed51e49ba9fc44637f45e11321dd861c2771a4edb576799c590e0f",
+      "msi_bytes": 286261349,
+      "native_sha256": "2e2ebbbbfd1cfef538497d5b3ad4353e98d97b20a54d83766927162a5066ebb4"
+    },
+    "bundle_checks_passed": 48,
+    "timebase": {
+      "passed": true,
+      "source_timebase": "1/1000",
+      "plan_timebase": "1/2000",
+      "independent_pts": [
+        0,
+        100,
+        200,
+        300,
+        500,
+        600,
+        700,
+        800
+      ],
+      "samples": [
+        {
+          "plan_tick": 999,
+          "expected_stream_tick": 499,
+          "worker_tick": 499,
+          "expected_pts": 300,
+          "worker_pts": 300,
+          "center_color_matches": true
+        },
+        {
+          "plan_tick": 1000,
+          "expected_stream_tick": 500,
+          "worker_tick": 500,
+          "expected_pts": 500,
+          "worker_pts": 500,
+          "center_color_matches": true
+        },
+        {
+          "plan_tick": 1001,
+          "expected_stream_tick": 500,
+          "worker_tick": 500,
+          "expected_pts": 500,
+          "worker_pts": 500,
+          "center_color_matches": true
+        }
+      ],
+      "adjacent_backwards_boundary": {
+        "selected_pts": 300,
+        "target_tick": 400,
+        "colors_match": true
+      },
+      "scope": "Local generated VFR fixture, D3D11 offscreen, actual FP16 readback"
+    },
+    "physical_vfr": {
+      "passed": true,
+      "physical_color_checks": 23,
+      "audio": {
+        "samples": 115200,
+        "underruns": 0
+      },
+      "window_held": true,
+      "peak_live_decoders": 3,
+      "peak_queue_frames": 4,
+      "standby_peak_bytes": 6819840,
+      "standby_budget_bytes": 939524096,
+      "cancelled_during_seek": true
+    }
+  }
 }
