@@ -30,6 +30,42 @@ struct DeviceLock {
  DeviceLock(AVD3D11VADeviceContext* p,Distribution* timing=nullptr):hw(p){auto began=Clock::now();hw->lock(hw->lock_ctx);if(timing)timing->add(seconds(began)*1000);}
  ~DeviceLock(){hw->unlock(hw->lock_ctx);}
 };
+// The FFmpeg video decoder and the compositor share this recursive D3D11
+// device lock. Measure its outermost acquisition independently from time in
+// the driver. Store and publish both intervals only after unlocking.
+struct DeviceLockTrace {
+ AVD3D11VADeviceContext* device=nullptr;
+ void* originalContext=nullptr;
+ void (*originalLock)(void*)=nullptr;
+ void (*originalUnlock)(void*)=nullptr;
+ struct Span {unsigned depth=0;Clock::time_point requesting,acquired;};
+ static Span& span(){static thread_local Span current;return current;}
+ static void enter(void* opaque){
+  auto& hook=*static_cast<DeviceLockTrace*>(opaque);auto& current=span();
+  if(current.depth++==0)current.requesting=Clock::now();
+  hook.originalLock(hook.originalContext);
+  if(current.depth==1)current.acquired=Clock::now();
+ }
+ static void leave(void* opaque){
+  auto& hook=*static_cast<DeviceLockTrace*>(opaque);auto& current=span();
+  if(--current.depth!=0){hook.originalUnlock(hook.originalContext);return;}
+  auto releasing=Clock::now();
+  hook.originalUnlock(hook.originalContext);
+  sourceTrace->interval("device_lock_wait",current.requesting,current.acquired,sourceContext);
+  sourceTrace->interval("device_lock_owned",current.acquired,releasing,sourceContext);
+ }
+ void attach(AVD3D11VADeviceContext* context){
+  if(!sourceTrace)return;
+  device=context;originalContext=device->lock_ctx;
+  originalLock=device->lock;originalUnlock=device->unlock;
+  device->lock_ctx=this;device->lock=enter;device->unlock=leave;
+ }
+ void detach(){
+  if(!device)return;
+  device->lock=originalLock;device->unlock=originalUnlock;device->lock_ctx=originalContext;device=nullptr;
+ }
+ ~DeviceLockTrace(){detach();}
+};
 struct NativeDisplay {
  HWND window=nullptr,parent=nullptr;Com<IDXGISwapChain> swap;Com<ID3D11RenderTargetView> target;
  ID3D11Device* device;Com<ID3D11PixelShader> pixel;int width=0,height=0;bool hdr=false;
@@ -78,7 +114,7 @@ struct NativeDisplay {
   ID3D11ShaderResourceView* empty=nullptr;context->PSSetShaderResources(0,1,&empty);
  }
  void flip(bool playing){
-  auto began=Clock::now();check(swap->Present(1,0),"Native Present");lastPresentMs=seconds(began)*1000;presentTime.add(lastPresentMs);calls++;
+  auto began=Clock::now();{SourceStage measure("dxgi_present");check(swap->Present(1,0),"Native Present");}lastPresentMs=seconds(began)*1000;presentTime.add(lastPresentMs);calls++;
   if(lastFlip!=Clock::time_point{}){double interval=seconds(lastFlip)*1000;presentIntervals.add(interval);if(playing&&lastPlaying)playIntervals.add(interval);}lastFlip=Clock::now();lastPlaying=playing;
   wasVisible=IsWindowVisible(window);stats();
  }
@@ -93,6 +129,7 @@ struct Slot {
  bool pending=false;int64_t frame=-1,generation=-1;std::vector<Frame> holds;
 };
 struct Renderer {
+ DeviceLockTrace tracedLock;
  AVBufferRef* hw=nullptr;AVD3D11VADeviceContext* hd;ID3D11Device* device;ID3D11DeviceContext* context;
  HMODULE compiler=nullptr;Com<ID3D11VertexShader> vertex;Com<ID3D11PixelShader> pixel;
  Com<ID3D11Buffer> constants;Com<ID3D11SamplerState> sampler;Com<ID3D11BlendState> blend;
@@ -102,6 +139,7 @@ struct Renderer {
  Renderer(const Plan& plan,HWND parent,bool offscreen):slots(slotBudget(plan)){
   avcheck(av_hwdevice_ctx_create(&hw,AV_HWDEVICE_TYPE_D3D11VA,nullptr,nullptr,0),"D3D11 hardware");
   hd=(AVD3D11VADeviceContext*)((AVHWDeviceContext*)hw->data)->hwctx;hd->BindFlags|=D3D11_BIND_SHADER_RESOURCE;device=hd->device;context=hd->device_context;
+  tracedLock.attach(hd);
   compiler=LoadLibraryW(L"d3dcompiler_47.dll");if(!compiler)throw std::runtime_error("Shader compiler missing");
   auto compile=(decltype(&D3DCompile))GetProcAddress(compiler,"D3DCompile");
   Com<ID3DBlob> vs,ps,error;check(compile(nativeShader,strlen(nativeShader),"native",nullptr,nullptr,"vs","vs_5_0",D3DCOMPILE_OPTIMIZATION_LEVEL3,0,vs.out(),error.out()),"Native vertex shader");
@@ -171,5 +209,5 @@ struct Renderer {
   D3D11_MAPPED_SUBRESOURCE m;check(context->Map(cpu,0,D3D11_MAP_READ,0,&m),"Native readback");
   std::ofstream out(std::filesystem::u8path(path),std::ios::binary);for(UINT y=0;y<d.Height;y++)out.write((char*)m.pData+y*m.RowPitch,d.Width*8);context->Unmap(cpu,0);
  }
- ~Renderer(){display.reset();if(context)context->ClearState();textures.clear();if(hw)av_buffer_unref(&hw);if(compiler)FreeLibrary(compiler);}
+ ~Renderer(){display.reset();if(context)context->ClearState();textures.clear();tracedLock.detach();if(hw)av_buffer_unref(&hw);if(compiler)FreeLibrary(compiler);}
 };

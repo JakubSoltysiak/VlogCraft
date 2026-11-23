@@ -12,7 +12,7 @@ extern "C" {
 #include <libavutil/display.h>
 }
 using Frame=std::shared_ptr<AVFrame>;
-Frame retain(AVFrame* p){return Frame(av_frame_clone(p),[](AVFrame* f){av_frame_free(&f);});}
+Frame retain(AVFrame* p){auto* copy=av_frame_clone(p);if(!copy)throw std::bad_alloc();return Frame(copy,[](AVFrame* f){av_frame_free(&f);});}
 struct Key{double time=0,value=0;std::string mode;};
 struct Clip {
  std::string id,asset,path;int64_t position=0,end=0,inTick=0,outTick=0;AVRational timebase={1,1},speed={1,1};
@@ -54,7 +54,15 @@ struct Plan {
   }
   if(rate.num<=0||rate.den<=0||width<2||height<2||width>3840||height>2160||end<1)throw std::runtime_error("Invalid native sequence contract");
  }
- bool adjacent(const Clip& old,const Clip& next)const{return old.asset==next.asset&&old.end==next.position&&std::llabs(av_rescale_q(old.outTick,old.timebase,next.timebase)-next.inTick)<=1;}
+ bool continuousSource(const Clip& old,const Clip& next)const{
+  return old.asset==next.asset&&av_compare_ts(old.outTick,old.timebase,next.inTick,next.timebase)==0;
+ }
+ bool adjacent(const Clip& old,const Clip& next)const{return old.end==next.position&&continuousSource(old,next);}
+ const Clip* nextUse(const std::string& asset,int64_t frame)const{
+  const Clip* next=nullptr;
+  for(auto& c:clips)if(c.asset==asset&&c.position>frame&&(!next||c.position<next->position))next=&c;
+  return next;
+ }
  int64_t sourceTick(const Clip& c,int64_t frame)const{
   // Exact rescaling to source ticks, rounded down for half-open held-PTS selection.
   AVRational units=av_mul_q(av_inv_q(rate),c.speed);
@@ -62,45 +70,107 @@ struct Plan {
  }
 };
 struct Producer {
+ SourceTrace::Context request;
  std::mutex guard;std::condition_variable changed;std::deque<Frame> queue;Frame current;
  std::vector<Frame> warm;size_t warmBudget=0;int64_t warmTarget=INT64_MIN;uint64_t warmHits=0;
  std::thread worker;std::atomic<bool> stop{false};bool eof=false;std::string failure;
- int64_t epoch=0,workerEpoch=-1,seekTick=0;size_t peak=0;double decodedSeconds=0;uint64_t decoded=0,seeks=0;
- std::unique_ptr<Decoder> decoder;AVRational base;int64_t origin=0;double rotation=0;
- Producer(const Clip& c,AVBufferRef* device,bool software=false,int extraHardwareFrames=8,size_t cacheFrames=0):warmBudget(cacheFrames){
-  decoder=std::make_unique<Decoder>(c.path,device,!software,extraHardwareFrames+(int)warmBudget);
-  auto* parameters=decoder->file->streams[decoder->stream]->codecpar;
-  auto* matrix=av_packet_side_data_get(parameters->coded_side_data,parameters->nb_coded_side_data,AV_PKT_DATA_DISPLAYMATRIX);
-  if(matrix)rotation=av_display_rotation_get((const int32_t*)matrix->data);
-  if(!std::isfinite(rotation)||std::abs(rotation/90-std::round(rotation/90))>.001)throw std::runtime_error("Unsupported source display matrix");
-  base=decoder->file->streams[decoder->stream]->time_base;
-  origin=decoder->file->start_time==AV_NOPTS_VALUE?0:av_rescale_q(decoder->file->start_time,AV_TIME_BASE_Q,base);
-  decoder->file->interrupt_callback={[](void* p){return ((Producer*)p)->stop.load()?1:0;},this};
-  seekTick=av_rescale_q(c.inTick,c.timebase,base);worker=std::thread([this]{produce();});
+ int64_t epoch=0,workerEpoch=-1,seekTick=0,wantedPTS=0;size_t peak=0;double decodedSeconds=0;uint64_t decoded=0,seeks=0;
+ uint64_t surfacePoolBytes=0;int poolFrames=0,codecThreads=0,threadType=0;
+ DecodeReservation reservation;
+ std::unique_ptr<Decoder> decoder;AVRational base{0,1};int64_t origin=0;double rotation=0;
+ bool opened=false,decoding=false,singlePool=true;
+ ID3D11Texture2D* lastPool=nullptr;
+ int64_t requestedTick=0;AVRational requestedBase{1,1};
+ int64_t streamTick(int64_t tick,AVRational sourceBase)const{
+  return av_rescale_q_rnd(tick,sourceBase,base,AV_ROUND_DOWN);
  }
- ~Producer(){stop=true;changed.notify_all();if(worker.joinable())worker.join();}
+ Producer(const Clip& c,int64_t initialTick,AVBufferRef* device,bool software,int extraHardwareFrames,size_t cacheFrames,
+          uint64_t speculativeBytes=0):request(sourceContext),warmBudget(cacheFrames),requestedTick(initialTick),requestedBase(c.timebase){
+  reservation.bytes=speculativeBytes;
+  auto open=[this,clip=&c,device,software,extraHardwareFrames]{
+   if(sourceTrace)sourceContext=request;
+   SourceStage timer("open_producer");
+   AVIOInterruptCB cancel{[](void* p){return static_cast<Producer*>(p)->stop.load()?1:0;},this};
+   decoder=std::make_unique<Decoder>(clip->path,device,!software,extraHardwareFrames+(int)warmBudget,&reservation,cancel);
+   auto* stream=decoder->file->streams[decoder->stream];
+   auto* parameters=stream->codecpar;
+   auto* matrix=av_packet_side_data_get(parameters->coded_side_data,parameters->nb_coded_side_data,AV_PKT_DATA_DISPLAYMATRIX);
+   double angle=matrix?av_display_rotation_get((const int32_t*)matrix->data):0;
+   if(!std::isfinite(angle)||std::abs(angle/90-std::round(angle/90))>.001)throw std::runtime_error("Unsupported source display matrix");
+   std::lock_guard<std::mutex> lock(guard);
+   rotation=angle;base=stream->time_base;
+   origin=decoder->file->start_time==AV_NOPTS_VALUE?0:av_rescale_q(decoder->file->start_time,AV_TIME_BASE_Q,base);
+   seekTick=streamTick(requestedTick,requestedBase);wantedPTS=seekTick+origin;warmTarget=seekTick;
+   codecThreads=decoder->codec->thread_count;threadType=decoder->codec->active_thread_type;
+   opened=true;
+  };
+  if(speculativeBytes){
+   worker=std::thread([this,open]{
+    try{open();produce();}
+    catch(const std::exception&){std::lock_guard<std::mutex> lock(guard);failure="Native source preparation failed";}
+   });
+  }else{
+   open();worker=std::thread([this]{produce();});
+  }
+ }
+ void cancel(){
+  {std::lock_guard<std::mutex> lock(guard);stop=true;}
+  changed.notify_all();
+ }
+ ~Producer(){cancel();if(worker.joinable())worker.join();}
  void reset(int64_t tick,AVRational sourceBase){
-  std::lock_guard<std::mutex> lock(guard);epoch++;seekTick=av_rescale_q(tick,sourceBase,base);if(warmTarget!=seekTick){warm.clear();warmTarget=seekTick;}queue.clear();current.reset();eof=false;changed.notify_all();
+  std::lock_guard<std::mutex> lock(guard);epoch++;requestedTick=tick;requestedBase=sourceBase;
+  if(opened){
+   seekTick=streamTick(tick,sourceBase);wantedPTS=seekTick+origin;
+   if(warmTarget!=seekTick){warm.clear();warmTarget=seekTick;}
+  }
+  queue.clear();current.reset();eof=false;changed.notify_all();
+ }
+ // Returns zero if retaining this decoder could overlap differently sized
+ // pools or a currently running format negotiation. Its active budget is unchanged.
+ uint64_t parkableBytes(){
+  std::lock_guard<std::mutex> lock(guard);
+  if(!failure.empty()||!singlePool)return 0;
+  if(reservation.bytes.load())return surfacePoolBytes?surfacePoolBytes:reservation.bytes.load();
+  if(decoding||!surfacePoolBytes)return 0;
+  reservation.hasPool=true;reservation.bytes=surfacePoolBytes;
+  return surfacePoolBytes;
  }
  void produce(){
   try{
    while(!stop){
     int64_t generation,target;{
      std::unique_lock<std::mutex> lock(guard);changed.wait(lock,[&]{return stop||workerEpoch!=epoch||(!eof&&queue.size()<4);});
-     if(stop)return;generation=epoch;target=seekTick;
+     if(stop)return;decoding=true;generation=epoch;target=seekTick;
+     if(sourceTrace){sourceContext=request;sourceContext.decodeEpoch=generation;sourceContext.depth=(int)queue.size();}
      if(workerEpoch!=generation){workerEpoch=generation;lock.unlock();
-      avcheck(av_seek_frame(decoder->file,decoder->stream,target+origin,AVSEEK_FLAG_BACKWARD),"source seek");
-      avcodec_flush_buffers(decoder->codec);decoder->eof=decoder->drained=false;
+      {SourceStage timer("seek_demux");avcheck(av_seek_frame(decoder->file,decoder->stream,target+origin,AVSEEK_FLAG_BACKWARD),"source seek");}
+      {SourceStage timer("flush_codec");avcodec_flush_buffers(decoder->codec);}decoder->eof=decoder->drained=false;
       lock.lock();seeks++;
+      if(stop)return;
+      if(generation!=epoch){decoding=false;continue;}
      }
     }
     auto began=Clock::now();bool ok=decoder->next();Frame frame=ok?retain(decoder->frame):nullptr;
-    std::lock_guard<std::mutex> lock(guard);decodedSeconds+=seconds(began);if(generation!=epoch)continue;
+    std::lock_guard<std::mutex> lock(guard);decoding=false;decodedSeconds+=seconds(began);if(generation!=epoch)continue;
     if(!ok)eof=true;
     else{
      if(frame->best_effort_timestamp==AV_NOPTS_VALUE)throw std::runtime_error("Missing source presentation timestamp");
-     if(warmBudget&&frame->best_effort_timestamp>=target+origin&&warm.size()<warmBudget){if(warmTarget!=target){warm.clear();warmTarget=target;}warm.push_back(frame);}
-     queue.push_back(frame);decoded++;peak=std::max(peak,queue.size());
+     if(frame->format==AV_PIX_FMT_D3D11&&lastPool!=(ID3D11Texture2D*)frame->data[0]){
+      if(lastPool)singlePool=false;lastPool=(ID3D11Texture2D*)frame->data[0];
+      D3D11_TEXTURE2D_DESC desc{};((ID3D11Texture2D*)frame->data[0])->GetDesc(&desc);
+      if(desc.Format==DXGI_FORMAT_NV12||desc.Format==DXGI_FORMAT_P010){
+       poolFrames=(int)desc.ArraySize;
+       surfacePoolBytes=(uint64_t)desc.Width*desc.Height*desc.ArraySize*3/(desc.Format==DXGI_FORMAT_P010?1:2);
+      }
+     }
+     if(warmBudget&&frame->best_effort_timestamp>=target+origin&&warm.size()<warmBudget&&
+        (warm.empty()||frame->best_effort_timestamp>warm.back()->best_effort_timestamp))warm.push_back(frame);
+     // Keep the latest picture before the deadline and its actual successor.
+     // Preroll and late-frame catch-up can run without a round trip every four pictures.
+     if(frame->best_effort_timestamp<=wantedPTS&&queue.empty())current=frame;
+     else queue.push_back(frame);
+     decoded++;peak=std::max(peak,queue.size());
     }changed.notify_all();
    }
   }catch(const std::exception&){std::lock_guard<std::mutex> lock(guard);failure="Native source decode or seek failed";changed.notify_all();}
@@ -108,7 +178,11 @@ struct Producer {
  // Returns the source picture whose half-open PTS interval contains the target.
  Frame at(int64_t tick,AVRational sourceBase,bool& ready){
   std::lock_guard<std::mutex> lock(guard);if(!failure.empty())throw std::runtime_error(failure);
-  int64_t target=av_rescale_q(tick,sourceBase,base)+origin;
+  if(!opened){ready=false;return nullptr;}
+  if(eof&&queue.empty()&&!current)throw std::runtime_error("No decodable source picture");
+  if(sourceTrace){request=sourceContext;request.tick=tick;request.num=sourceBase.num;request.den=sourceBase.den;}
+  int64_t target=streamTick(tick,sourceBase)+origin;
+  wantedPTS=target;
   while(!queue.empty()&&(!current||queue.front()->best_effort_timestamp<=target)){
    current=queue.front();queue.pop_front();changed.notify_all();
   }
@@ -138,6 +212,7 @@ struct Input {
  }
  void clockStats(){Distribution copy;uint64_t count;{std::lock_guard<std::mutex> lock(guard);copy=correction;count=updates;}std::cout<<",\"clock_updates\":"<<count<<",\"clock_correction_absolute\":";copy.json();}
  bool isGeneration(int64_t epoch){std::lock_guard<std::mutex> lock(guard);return epoch==generation;}
+ bool stillPaused(int64_t epoch){std::lock_guard<std::mutex> lock(guard);return !stop&&!playing&&epoch==generation;}
  void snapshot(int64_t& us,int64_t& gen,bool& play,double* age=nullptr,int64_t* adjustment=nullptr){
   std::lock_guard<std::mutex> lock(guard);us=microseconds;gen=generation;play=playing;
   if(age)*age=seconds(received)*1000;if(adjustment)*adjustment=lastCorrection;
