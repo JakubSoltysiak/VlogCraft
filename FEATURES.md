@@ -4,9 +4,9 @@ Tested means the specific check in VERIFICATION.md passed. Implemented means cod
 
 | 3.6.0 Phase 3B editing transport | Status | Verified scope and remaining limits |
 |---|---|---|
-| Native timeline ruler | Tested subset | Coalesced transient seeks, exact released frame, a single committed recovery checkpoint and PCM preparation, and no stale playhead movement on the tested ruler drag. Longer projects and loaded-picture latency remain separately tracked. |
+| Native timeline ruler | Tested subset | Coalesced transient seeks, exact released frame, a single committed recovery checkpoint and PCM preparation, and no stale playhead movement on the tested ruler drag. The final matched ruler repeat improved release-to-picture latency. Cold seek latency and broader workloads remain under qualification. |
 | Interactive priority during proxy generation | Implemented | Windows proxy FFmpeg starts below normal priority. Installed Live Layers controls measure active proxy contention and still use original media. Longer proxy concurrency, completed-proxy playback and HDR source coverage remain open. |
-| Native UHD60 playback and editing memory | Qualification open | Short packaged playback with exact PCM passed on the generated tracks. Visible multitrack presentation can still stall under load. Extended memory, physical recovery and final production acceptance remain open. |
+| Native UHD60 playback and editing memory | Qualification open | Short packaged playback with exact PCM passed on the generated tracks. Visible multitrack presentation can still stall under load. Paired 150-second editing showed natural reclaim and zero observed underruns. Longer editing memory, physical recovery and production acceptance remain open. |
 
 | 3.6.0 Phase 3A GPU export | Status | Verified scope and remaining limits |
 |---|---|---|

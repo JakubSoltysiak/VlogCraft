@@ -2,10 +2,12 @@
 
 ## 3.6.0 Phase 3B playback development
 
-- Windows development packages were compared with the frozen Phase 3A MSI. The ruler tests verify the released frame independently, show reduced UI work and record every attempted performance result. The short playback tests preserve the exact PCM endpoint.
-- A visible AC-powered 60-second paced run delivered exact PCM with zero underruns but recorded 390 skips and a 1.414-second active presentation gap. The measured stall failed the performance gate. Both tests used the same native worker checksum.
+- The matched final Windows ruler repeat measured 577.3 → 506.1 ms median paused release-to-picture and 675.4 → 523.7 ms during playback. Controlled repeated native seek median improved from 521.5 to 421.1 ms, and p95 from 657.8 to 559.9 ms. Each final ruler drag used one recovery checkpoint and one PCM fetch.
+- Visible AC 60-second runs preserved the exact PCM endpoints with zero underruns. The paced variant recorded 390 skips and a 1.414 s gap on the same native binary as Phase 3A. The final variant recorded 152 skips and a 1.020 s gap versus 2 skips and 51.283 ms in its frozen repeat. Both 125-second alternating-source trials exceeded 2,200 skips. Sustained playback qualification remains open.
 - The paired 150-second editing diagnostic completed 15 edit batches per package without sampled audio underruns. The paced candidate used less WebView renderer private commit in this pair, and both runs showed natural reclamation after Stop without forced collection.
-- The offline mixed-photo and managed-HDR editing fixture verified eighteen authored HDR10+ records and identical decoded pictures to its static reference. The timeline fixture covered 32 linked assets, live trim, undo/redo and reopen. [Measured evidence and qualification limits](docs/STUDIO_3_6_0_PHASE3B_PLAYBACK.md).
+- The packaged timeline fixture covered 32 assets, live trim, undo/redo and reopen. Both WebView fault controls restored all 80 undo states exactly. Native playback, resize alignment and whole-program FFmpeg fallback passed. The optional development MSI image passed its bundle and icon checks.
+- The mixed HDR fixture verified 18 dynamic blocks and identical decoded static-reference pictures. The final packaged first export passed all 48 dynamic blocks, exact PCM and independent decoded PQ at 55.63 dB. The matched three-second camera preview delivered exact PCM, zero skips and zero underruns. All three private originals matched the pre/post hashes.
+- Local Windows regressions completed 184 Python cases with one hardware case deferred to the separate nine-test WARP run, and 32 JavaScript tests. [Measured evidence and qualification limits](docs/STUDIO_3_6_0_PHASE3B_PLAYBACK.md).
 
 ## 3.6.0 Phase 3A GPU export
 

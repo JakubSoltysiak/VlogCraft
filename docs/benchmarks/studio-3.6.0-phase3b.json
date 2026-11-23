@@ -1062,6 +1062,216 @@
         }
       ]
     },
+    "final-three": {
+      "seconds": 15.0,
+      "cut_seconds": 0.5,
+      "video_tracks": 3,
+      "audio_tracks": 3,
+      "source_files": 3,
+      "source_switches": false,
+      "original_resolution": [
+        3840,
+        2160
+      ],
+      "program_resolution": [
+        3840,
+        2160
+      ],
+      "rate": "60/1",
+      "proxies": false,
+      "application_ready_seconds": 2.147411199985072,
+      "first_ready_seconds": 1.0787301000091247,
+      "measured_seconds": 15.2125,
+      "distinct_sequence_fps": 59.0304026294166,
+      "present_calls_per_second": 59.0304026294166,
+      "dxgi_present_count_per_second": 59.0304026294166,
+      "reached_end": true,
+      "samples": 720000,
+      "expected_samples": 720000,
+      "underruns": 0,
+      "active_throughput_windows": [
+        {
+          "window_seconds": 1,
+          "count": 22,
+          "minimum_fps": 59.58311355955379,
+          "p05_fps": 59.58311355955379,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+        },
+        {
+          "window_seconds": 10,
+          "count": 5,
+          "minimum_fps": 59.86208013813719,
+          "p05_fps": 59.86208013813719,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+        }
+      ],
+      "supervisor": {
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 23.5,
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        }
+      },
+      "power": {
+        "samples": 15,
+        "all_observed_ac": true
+      },
+      "physical_surface": [
+        356,
+        200
+      ],
+      "foreground_unobscured": true,
+      "dpr": 1.75,
+      "browser_error_count": 0,
+      "counters": {
+        "skipped_sequence_frames": 1,
+        "skipped_after_source_wait": 0,
+        "skipped_after_gpu_wait": 0,
+        "skipped_without_queue_wait": 1,
+        "source_wait_iterations": 28,
+        "gpu_wait_iterations": 0,
+        "clock_correction_absolute": {
+          "count": 1000,
+          "mean_ms": 0.678635,
+          "p50_upper_ms": 0.5,
+          "p95_upper_ms": 1.6,
+          "p99_upper_ms": 3.3,
+          "max_ms": 19.146,
+          "overflow_100ms": 0
+        },
+        "peak_source_queue_frames": 4,
+        "gpu_slot_budget": 4,
+        "peak_decoder_count": 3,
+        "retained_surface_views": 48,
+        "retained_texture_pools": 3,
+        "retained_texture_estimated_MiB": 1245.85,
+        "dxgi_statistics_available": true
+      },
+      "timings": {
+        "playback_present_interval": {
+          "count": 897,
+          "mean_ms": 16.6874,
+          "p50_upper_ms": 16.7,
+          "p95_upper_ms": 18.2,
+          "p99_upper_ms": 37.9,
+          "max_ms": 48.2704,
+          "overflow_100ms": 0
+        },
+        "present_call": {
+          "count": 899,
+          "mean_ms": 1.01242,
+          "p50_upper_ms": 0.3,
+          "p95_upper_ms": 5.8,
+          "p99_upper_ms": 22,
+          "max_ms": 32.3034,
+          "overflow_100ms": 0
+        },
+        "composition_gpu": {
+          "count": 899,
+          "mean_ms": 2.90122,
+          "p50_upper_ms": 2.9,
+          "p95_upper_ms": 3.7,
+          "p99_upper_ms": 4.8,
+          "max_ms": 8.35312,
+          "overflow_100ms": 0
+        },
+        "source_selection": {
+          "count": 927,
+          "mean_ms": 0.146338,
+          "p50_upper_ms": 0.1,
+          "p95_upper_ms": 0.1,
+          "p99_upper_ms": 0.1,
+          "max_ms": 94.3088,
+          "overflow_100ms": 0
+        },
+        "context_wait": {
+          "count": 6220,
+          "mean_ms": 0.125501,
+          "p50_upper_ms": 0.1,
+          "p95_upper_ms": 0.8,
+          "p99_upper_ms": 1,
+          "max_ms": 86.7741,
+          "overflow_100ms": 0
+        },
+        "completion_observation": {
+          "count": 899,
+          "mean_ms": 11.9446,
+          "p50_upper_ms": 6.5,
+          "p95_upper_ms": 49.9,
+          "p99_upper_ms": 67,
+          "max_ms": 82.3656,
+          "overflow_100ms": 0
+        }
+      },
+      "resources": {
+        "average_cpu_machine_percent": 6.57,
+        "peak_summed_working_set_MiB": 2929.4,
+        "process_read_MiB": 291.1,
+        "process_write_MiB": 41.3,
+        "sampled_cpu_seconds": 24.78
+      },
+      "largest_status_skip_jumps": [
+        {
+          "skips": 1,
+          "last_frame": 751,
+          "from_native_seconds": 14.1596,
+          "to_native_seconds": 14.5829
+        },
+        {
+          "skips": 0,
+          "last_frame": 49,
+          "from_native_seconds": 2.07022,
+          "to_native_seconds": 2.89016
+        },
+        {
+          "skips": 0,
+          "last_frame": 74,
+          "from_native_seconds": 2.89016,
+          "to_native_seconds": 3.30012
+        },
+        {
+          "skips": 0,
+          "last_frame": 130,
+          "from_native_seconds": 3.30012,
+          "to_native_seconds": 4.233
+        },
+        {
+          "skips": 0,
+          "last_frame": 155,
+          "from_native_seconds": 4.233,
+          "to_native_seconds": 4.64402
+        },
+        {
+          "skips": 0,
+          "last_frame": 179,
+          "from_native_seconds": 4.64402,
+          "to_native_seconds": 5.05694
+        },
+        {
+          "skips": 0,
+          "last_frame": 230,
+          "from_native_seconds": 5.05694,
+          "to_native_seconds": 5.89973
+        },
+        {
+          "skips": 0,
+          "last_frame": 242,
+          "from_native_seconds": 5.89973,
+          "to_native_seconds": 6.10557
+        }
+      ]
+    },
     "baseline-60": {
       "seconds": 60.0,
       "cut_seconds": 0.5,
@@ -1479,6 +1689,1354 @@
           "last_frame": 61,
           "from_native_seconds": 2.05577,
           "to_native_seconds": 3.13739
+        }
+      ]
+    },
+    "frozen-repeat-60": {
+      "seconds": 60.0,
+      "cut_seconds": 0.5,
+      "video_tracks": 3,
+      "audio_tracks": 3,
+      "source_files": 3,
+      "source_switches": false,
+      "original_resolution": [
+        3840,
+        2160
+      ],
+      "program_resolution": [
+        3840,
+        2160
+      ],
+      "rate": "60/1",
+      "proxies": false,
+      "application_ready_seconds": 2.1740976000146475,
+      "first_ready_seconds": 1.2997945000242908,
+      "measured_seconds": 60.081,
+      "distinct_sequence_fps": 59.81924402057223,
+      "present_calls_per_second": 59.81924402057223,
+      "dxgi_present_count_per_second": 59.80259982357151,
+      "reached_end": true,
+      "samples": 2880000,
+      "expected_samples": 2880000,
+      "underruns": 0,
+      "active_throughput_windows": [
+        {
+          "window_seconds": 1,
+          "count": 104,
+          "minimum_fps": 58.21851348728897,
+          "p05_fps": 59.23961096374888,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+        },
+        {
+          "window_seconds": 10,
+          "count": 90,
+          "minimum_fps": 59.68999711177433,
+          "p05_fps": 59.75639974839411,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+        }
+      ],
+      "supervisor": {
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 70.04699999999139,
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        }
+      },
+      "power": {
+        "samples": 58,
+        "all_observed_ac": true
+      },
+      "physical_surface": [
+        356,
+        200
+      ],
+      "foreground_unobscured": true,
+      "dpr": 1.75,
+      "browser_error_count": 0,
+      "counters": {
+        "skipped_sequence_frames": 2,
+        "skipped_after_source_wait": 0,
+        "skipped_after_gpu_wait": 0,
+        "skipped_without_queue_wait": 2,
+        "source_wait_iterations": 30,
+        "gpu_wait_iterations": 0,
+        "clock_correction_absolute": {
+          "count": 3957,
+          "mean_ms": 0.625012,
+          "p50_upper_ms": 0.5,
+          "p95_upper_ms": 1.5,
+          "p99_upper_ms": 3.1,
+          "max_ms": 36.504,
+          "overflow_100ms": 0
+        },
+        "peak_source_queue_frames": 4,
+        "gpu_slot_budget": 4,
+        "peak_decoder_count": 3,
+        "retained_surface_views": 48,
+        "retained_texture_pools": 3,
+        "retained_texture_estimated_MiB": 1245.85,
+        "dxgi_statistics_available": true
+      },
+      "timings": {
+        "playback_present_interval": {
+          "count": 3593,
+          "mean_ms": 16.6827,
+          "p50_upper_ms": 16.7,
+          "p95_upper_ms": 18.4,
+          "p99_upper_ms": 36.3,
+          "max_ms": 51.283,
+          "overflow_100ms": 0
+        },
+        "present_call": {
+          "count": 3595,
+          "mean_ms": 1.17436,
+          "p50_upper_ms": 0.3,
+          "p95_upper_ms": 7.3,
+          "p99_upper_ms": 21.9,
+          "max_ms": 36.1847,
+          "overflow_100ms": 0
+        },
+        "composition_gpu": {
+          "count": 3595,
+          "mean_ms": 3.05208,
+          "p50_upper_ms": 3,
+          "p95_upper_ms": 3.5,
+          "p99_upper_ms": 4.3,
+          "max_ms": 7.44196,
+          "overflow_100ms": 0
+        },
+        "source_selection": {
+          "count": 3625,
+          "mean_ms": 0.0749561,
+          "p50_upper_ms": 0.1,
+          "p95_upper_ms": 0.1,
+          "p99_upper_ms": 0.2,
+          "max_ms": 89.552,
+          "overflow_100ms": 0
+        },
+        "context_wait": {
+          "count": 24297,
+          "mean_ms": 0.101918,
+          "p50_upper_ms": 0.1,
+          "p95_upper_ms": 0.7,
+          "p99_upper_ms": 0.9,
+          "max_ms": 180.04,
+          "overflow_100ms": 1
+        },
+        "completion_observation": {
+          "count": 3595,
+          "mean_ms": 13.2883,
+          "p50_upper_ms": 6.5,
+          "p95_upper_ms": 54.9,
+          "p99_upper_ms": 68,
+          "max_ms": 85.5345,
+          "overflow_100ms": 0
+        }
+      },
+      "resources": {
+        "average_cpu_machine_percent": 7.21,
+        "peak_summed_working_set_MiB": 2949.9,
+        "process_read_MiB": 1140.7,
+        "process_write_MiB": 164.7,
+        "sampled_cpu_seconds": 105.2
+      },
+      "largest_status_skip_jumps": [
+        {
+          "skips": 1,
+          "last_frame": 1905,
+          "from_native_seconds": 33.3106,
+          "to_native_seconds": 33.9265
+        },
+        {
+          "skips": 1,
+          "last_frame": 2281,
+          "from_native_seconds": 39.6828,
+          "to_native_seconds": 40.2025
+        },
+        {
+          "skips": 0,
+          "last_frame": 48,
+          "from_native_seconds": 2.26599,
+          "to_native_seconds": 2.97637
+        },
+        {
+          "skips": 0,
+          "last_frame": 66,
+          "from_native_seconds": 2.97637,
+          "to_native_seconds": 3.28347
+        },
+        {
+          "skips": 0,
+          "last_frame": 121,
+          "from_native_seconds": 3.28347,
+          "to_native_seconds": 4.20509
+        },
+        {
+          "skips": 0,
+          "last_frame": 152,
+          "from_native_seconds": 4.20509,
+          "to_native_seconds": 4.72378
+        },
+        {
+          "skips": 0,
+          "last_frame": 177,
+          "from_native_seconds": 4.72378,
+          "to_native_seconds": 5.12678
+        },
+        {
+          "skips": 0,
+          "last_frame": 232,
+          "from_native_seconds": 5.12678,
+          "to_native_seconds": 6.05493
+        }
+      ],
+      "bounded_missed_events": [
+        {
+          "frame": 1896,
+          "lost": 1,
+          "loop_gap_ms": 33.6948,
+          "source_selection_ms": 0.0413,
+          "clock_age_ms": 17.4096,
+          "clock_adjustment_us": 37,
+          "previous_present_ms": 32.8626,
+          "context_wait_ms": 0.001,
+          "source_wait": 0,
+          "gpu_wait": 0
+        },
+        {
+          "frame": 2256,
+          "lost": 1,
+          "loop_gap_ms": 36.4679,
+          "source_selection_ms": 0.0468,
+          "clock_age_ms": 6.7044,
+          "clock_adjustment_us": 267,
+          "previous_present_ms": 36.1847,
+          "context_wait_ms": 0.0011,
+          "source_wait": 0,
+          "gpu_wait": 0
+        }
+      ]
+    },
+    "final-60": {
+      "seconds": 60.0,
+      "cut_seconds": 0.5,
+      "video_tracks": 3,
+      "audio_tracks": 3,
+      "source_files": 3,
+      "source_switches": false,
+      "original_resolution": [
+        3840,
+        2160
+      ],
+      "program_resolution": [
+        3840,
+        2160
+      ],
+      "rate": "60/1",
+      "proxies": false,
+      "application_ready_seconds": 2.2077293999900576,
+      "first_ready_seconds": 0.9494711000006646,
+      "measured_seconds": 60.287199999988076,
+      "distinct_sequence_fps": 57.176316033928956,
+      "present_calls_per_second": 57.176316033928956,
+      "dxgi_present_count_per_second": 57.1929033028683,
+      "reached_end": true,
+      "samples": 2880000,
+      "expected_samples": 2880000,
+      "underruns": 0,
+      "active_throughput_windows": [
+        {
+          "window_seconds": 1,
+          "count": 97,
+          "minimum_fps": 19.792634095096,
+          "p05_fps": 45.69138276553098,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+        },
+        {
+          "window_seconds": 10,
+          "count": 80,
+          "minimum_fps": 54.3600863798667,
+          "p05_fps": 54.81968481098329,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+        }
+      ],
+      "supervisor": {
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 70.06299999999464,
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        }
+      },
+      "power": {
+        "samples": 57,
+        "all_observed_ac": true
+      },
+      "physical_surface": [
+        356,
+        200
+      ],
+      "foreground_unobscured": true,
+      "dpr": 1.75,
+      "browser_error_count": 0,
+      "counters": {
+        "skipped_sequence_frames": 152,
+        "skipped_after_source_wait": 113,
+        "skipped_after_gpu_wait": 0,
+        "skipped_without_queue_wait": 39,
+        "source_wait_iterations": 188,
+        "gpu_wait_iterations": 0,
+        "clock_correction_absolute": {
+          "count": 3953,
+          "mean_ms": 0.649088,
+          "p50_upper_ms": 0.5,
+          "p95_upper_ms": 1.4,
+          "p99_upper_ms": 2.9,
+          "max_ms": 47.777,
+          "overflow_100ms": 0
+        },
+        "peak_source_queue_frames": 4,
+        "gpu_slot_budget": 4,
+        "peak_decoder_count": 3,
+        "retained_surface_views": 48,
+        "retained_texture_pools": 3,
+        "retained_texture_estimated_MiB": 1245.85,
+        "dxgi_statistics_available": true
+      },
+      "timings": {
+        "playback_present_interval": {
+          "count": 3446,
+          "mean_ms": 17.4021,
+          "p50_upper_ms": 16.7,
+          "p95_upper_ms": 19,
+          "p99_upper_ms": 44.2,
+          "max_ms": 1019.53,
+          "overflow_100ms": 4
+        },
+        "present_call": {
+          "count": 3448,
+          "mean_ms": 1.68231,
+          "p50_upper_ms": 0.4,
+          "p95_upper_ms": 7.6,
+          "p99_upper_ms": 31.9,
+          "max_ms": 86.3363,
+          "overflow_100ms": 0
+        },
+        "composition_gpu": {
+          "count": 3448,
+          "mean_ms": 3.57452,
+          "p50_upper_ms": 3.3,
+          "p95_upper_ms": 6.7,
+          "p99_upper_ms": 7.8,
+          "max_ms": 9.09888,
+          "overflow_100ms": 0
+        },
+        "source_selection": {
+          "count": 3636,
+          "mean_ms": 0.0746993,
+          "p50_upper_ms": 0.1,
+          "p95_upper_ms": 0.1,
+          "p99_upper_ms": 0.2,
+          "max_ms": 76.8124,
+          "overflow_100ms": 0
+        },
+        "context_wait": {
+          "count": 23299,
+          "mean_ms": 0.182252,
+          "p50_upper_ms": 0.1,
+          "p95_upper_ms": 0.8,
+          "p99_upper_ms": 1.3,
+          "max_ms": 84.9124,
+          "overflow_100ms": 0
+        },
+        "completion_observation": {
+          "count": 3448,
+          "mean_ms": 16.453,
+          "p50_upper_ms": 6.9,
+          "p95_upper_ms": 65.1,
+          "p99_upper_ms": 370.26,
+          "max_ms": 370.26,
+          "overflow_100ms": 39
+        }
+      },
+      "resources": {
+        "average_cpu_machine_percent": 7.52,
+        "peak_summed_working_set_MiB": 4005.6,
+        "process_read_MiB": 1152.8,
+        "process_write_MiB": 163.4,
+        "sampled_cpu_seconds": 109.72
+      },
+      "largest_status_skip_jumps": [
+        {
+          "skips": 64,
+          "last_frame": 71,
+          "from_native_seconds": 2.27447,
+          "to_native_seconds": 3.02567
+        },
+        {
+          "skips": 25,
+          "last_frame": 3329,
+          "from_native_seconds": 56.5197,
+          "to_native_seconds": 57.319
+        },
+        {
+          "skips": 17,
+          "last_frame": 2833,
+          "from_native_seconds": 48.305,
+          "to_native_seconds": 49.038
+        },
+        {
+          "skips": 11,
+          "last_frame": 3280,
+          "from_native_seconds": 55.9845,
+          "to_native_seconds": 56.5197
+        },
+        {
+          "skips": 9,
+          "last_frame": 1854,
+          "from_native_seconds": 32.0796,
+          "to_native_seconds": 32.7258
+        },
+        {
+          "skips": 8,
+          "last_frame": 104,
+          "from_native_seconds": 3.02567,
+          "to_native_seconds": 3.58809
+        },
+        {
+          "skips": 6,
+          "last_frame": 1374,
+          "from_native_seconds": 24.4158,
+          "to_native_seconds": 24.7224
+        },
+        {
+          "skips": 4,
+          "last_frame": 426,
+          "from_native_seconds": 8.21671,
+          "to_native_seconds": 8.93373
+        }
+      ],
+      "bounded_missed_events": [
+        {
+          "frame": 71,
+          "lost": 64,
+          "loop_gap_ms": 5.1508,
+          "source_selection_ms": 0.0229,
+          "clock_age_ms": 5.203,
+          "clock_adjustment_us": 647,
+          "previous_present_ms": 86.3363,
+          "context_wait_ms": 4.1175,
+          "source_wait": 1,
+          "gpu_wait": 0
+        },
+        {
+          "frame": 77,
+          "lost": 2,
+          "loop_gap_ms": 44.1686,
+          "source_selection_ms": 0.0351,
+          "clock_age_ms": 13.6838,
+          "clock_adjustment_us": -109,
+          "previous_present_ms": 29.0586,
+          "context_wait_ms": 0.001,
+          "source_wait": 0,
+          "gpu_wait": 0
+        },
+        {
+          "frame": 80,
+          "lost": 2,
+          "loop_gap_ms": 2.058,
+          "source_selection_ms": 0.0209,
+          "clock_age_ms": 8.2202,
+          "clock_adjustment_us": -315,
+          "previous_present_ms": 45.7755,
+          "context_wait_ms": 0.0004,
+          "source_wait": 1,
+          "gpu_wait": 0
+        },
+        {
+          "frame": 92,
+          "lost": 1,
+          "loop_gap_ms": 24.3475,
+          "source_selection_ms": 0.0186,
+          "clock_age_ms": 9.7631,
+          "clock_adjustment_us": -12,
+          "previous_present_ms": 0.4362,
+          "context_wait_ms": 0.0004,
+          "source_wait": 0,
+          "gpu_wait": 0
+        },
+        {
+          "frame": 96,
+          "lost": 1,
+          "loop_gap_ms": 30.9319,
+          "source_selection_ms": 0.0782,
+          "clock_age_ms": 10.5599,
+          "clock_adjustment_us": -61,
+          "previous_present_ms": 0.3261,
+          "context_wait_ms": 0.0014,
+          "source_wait": 0,
+          "gpu_wait": 0
+        },
+        {
+          "frame": 102,
+          "lost": 2,
+          "loop_gap_ms": 54.6109,
+          "source_selection_ms": 0.0436,
+          "clock_age_ms": 5.5649,
+          "clock_adjustment_us": -537,
+          "previous_present_ms": 43.2456,
+          "context_wait_ms": 0.001,
+          "source_wait": 0,
+          "gpu_wait": 0
+        },
+        {
+          "frame": 106,
+          "lost": 1,
+          "loop_gap_ms": 34.2363,
+          "source_selection_ms": 0.033,
+          "clock_age_ms": 1.052,
+          "clock_adjustment_us": -605,
+          "previous_present_ms": 32.484,
+          "context_wait_ms": 0.0008,
+          "source_wait": 0,
+          "gpu_wait": 0
+        },
+        {
+          "frame": 109,
+          "lost": 1,
+          "loop_gap_ms": 37.0163,
+          "source_selection_ms": 0.0307,
+          "clock_age_ms": 10.5995,
+          "clock_adjustment_us": 399,
+          "previous_present_ms": 36.2645,
+          "context_wait_ms": 0.0007,
+          "source_wait": 0,
+          "gpu_wait": 0
+        },
+        {
+          "frame": 386,
+          "lost": 1,
+          "loop_gap_ms": 39.8252,
+          "source_selection_ms": 0.047,
+          "clock_age_ms": 7.3281,
+          "clock_adjustment_us": 1213,
+          "previous_present_ms": 39.2872,
+          "context_wait_ms": 0.0014,
+          "source_wait": 0,
+          "gpu_wait": 0
+        },
+        {
+          "frame": 392,
+          "lost": 1,
+          "loop_gap_ms": 47.7728,
+          "source_selection_ms": 0.0331,
+          "clock_age_ms": 29.3331,
+          "clock_adjustment_us": 335,
+          "previous_present_ms": 47.3362,
+          "context_wait_ms": 0.0008,
+          "source_wait": 0,
+          "gpu_wait": 0
+        },
+        {
+          "frame": 395,
+          "lost": 1,
+          "loop_gap_ms": 25.1874,
+          "source_selection_ms": 0.0379,
+          "clock_age_ms": 9.35,
+          "clock_adjustment_us": 946,
+          "previous_present_ms": 23.3059,
+          "context_wait_ms": 0.0013,
+          "source_wait": 0,
+          "gpu_wait": 0
+        },
+        {
+          "frame": 398,
+          "lost": 1,
+          "loop_gap_ms": 39.9415,
+          "source_selection_ms": 0.0393,
+          "clock_age_ms": 0.7872,
+          "clock_adjustment_us": -74,
+          "previous_present_ms": 39.2808,
+          "context_wait_ms": 0.0012,
+          "source_wait": 0,
+          "gpu_wait": 0
+        },
+        {
+          "frame": 1360,
+          "lost": 4,
+          "loop_gap_ms": 1.573,
+          "source_selection_ms": 0.046,
+          "clock_age_ms": 6.8519,
+          "clock_adjustment_us": 349,
+          "previous_present_ms": 43.2087,
+          "context_wait_ms": 0.0015,
+          "source_wait": 1,
+          "gpu_wait": 0
+        },
+        {
+          "frame": 1365,
+          "lost": 1,
+          "loop_gap_ms": 33.4566,
+          "source_selection_ms": 0.0419,
+          "clock_age_ms": 0.6372,
+          "clock_adjustment_us": -658,
+          "previous_present_ms": 32.2596,
+          "context_wait_ms": 0.0007,
+          "source_wait": 0,
+          "gpu_wait": 0
+        },
+        {
+          "frame": 1367,
+          "lost": 1,
+          "loop_gap_ms": 41.6867,
+          "source_selection_ms": 0.0161,
+          "clock_age_ms": 14.3697,
+          "clock_adjustment_us": -405,
+          "previous_present_ms": 40.7501,
+          "context_wait_ms": 0.2105,
+          "source_wait": 0,
+          "gpu_wait": 0
+        },
+        {
+          "frame": 1536,
+          "lost": 1,
+          "loop_gap_ms": 41.3546,
+          "source_selection_ms": 0.0245,
+          "clock_age_ms": 8.8584,
+          "clock_adjustment_us": 334,
+          "previous_present_ms": 40.7971,
+          "context_wait_ms": 0.0006,
+          "source_wait": 0,
+          "gpu_wait": 0
+        },
+        {
+          "frame": 1815,
+          "lost": 2,
+          "loop_gap_ms": 58.5221,
+          "source_selection_ms": 0.05,
+          "clock_age_ms": 5.7777,
+          "clock_adjustment_us": -59,
+          "previous_present_ms": 56.5596,
+          "context_wait_ms": 0.0015,
+          "source_wait": 0,
+          "gpu_wait": 0
+        },
+        {
+          "frame": 1822,
+          "lost": 3,
+          "loop_gap_ms": 1.616,
+          "source_selection_ms": 0.0183,
+          "clock_age_ms": 4.8014,
+          "clock_adjustment_us": 782,
+          "previous_present_ms": 67.7168,
+          "context_wait_ms": 0.0012,
+          "source_wait": 1,
+          "gpu_wait": 0
+        },
+        {
+          "frame": 1825,
+          "lost": 1,
+          "loop_gap_ms": 41.1688,
+          "source_selection_ms": 0.0396,
+          "clock_age_ms": 13.6016,
+          "clock_adjustment_us": 16,
+          "previous_present_ms": 40.2482,
+          "context_wait_ms": 0.0012,
+          "source_wait": 0,
+          "gpu_wait": 0
+        },
+        {
+          "frame": 1829,
+          "lost": 1,
+          "loop_gap_ms": 25.1368,
+          "source_selection_ms": 0.0439,
+          "clock_age_ms": 12.1603,
+          "clock_adjustment_us": -221,
+          "previous_present_ms": 23.7706,
+          "context_wait_ms": 0.0011,
+          "source_wait": 0,
+          "gpu_wait": 0
+        },
+        {
+          "frame": 1831,
+          "lost": 1,
+          "loop_gap_ms": 42.2831,
+          "source_selection_ms": 0.0321,
+          "clock_age_ms": 5.4765,
+          "clock_adjustment_us": -1384,
+          "previous_present_ms": 41.2869,
+          "context_wait_ms": 0.7047,
+          "source_wait": 0,
+          "gpu_wait": 0
+        },
+        {
+          "frame": 1842,
+          "lost": 1,
+          "loop_gap_ms": 33.8522,
+          "source_selection_ms": 0.0386,
+          "clock_age_ms": 0.6836,
+          "clock_adjustment_us": -451,
+          "previous_present_ms": 32.4441,
+          "context_wait_ms": 0.0012,
+          "source_wait": 0,
+          "gpu_wait": 0
+        },
+        {
+          "frame": 2076,
+          "lost": 1,
+          "loop_gap_ms": 45.9741,
+          "source_selection_ms": 0.0446,
+          "clock_age_ms": 15.527,
+          "clock_adjustment_us": 831,
+          "previous_present_ms": 44.913,
+          "context_wait_ms": 0.0012,
+          "source_wait": 0,
+          "gpu_wait": 0
+        },
+        {
+          "frame": 2268,
+          "lost": 1,
+          "loop_gap_ms": 33.5546,
+          "source_selection_ms": 0.0371,
+          "clock_age_ms": 7.0932,
+          "clock_adjustment_us": -81,
+          "previous_present_ms": 32.2836,
+          "context_wait_ms": 0.0006,
+          "source_wait": 0,
+          "gpu_wait": 0
+        },
+        {
+          "frame": 2616,
+          "lost": 1,
+          "loop_gap_ms": 36.0352,
+          "source_selection_ms": 0.0261,
+          "clock_age_ms": 1.076,
+          "clock_adjustment_us": -690,
+          "previous_present_ms": 35.148,
+          "context_wait_ms": 0.0009,
+          "source_wait": 0,
+          "gpu_wait": 0
+        },
+        {
+          "frame": 2706,
+          "lost": 1,
+          "loop_gap_ms": 34.0564,
+          "source_selection_ms": 0.0547,
+          "clock_age_ms": 13.8168,
+          "clock_adjustment_us": -282,
+          "previous_present_ms": 33.4038,
+          "context_wait_ms": 0.001,
+          "source_wait": 0,
+          "gpu_wait": 0
+        },
+        {
+          "frame": 2795,
+          "lost": 2,
+          "loop_gap_ms": 58.499,
+          "source_selection_ms": 0.062,
+          "clock_age_ms": 14.8949,
+          "clock_adjustment_us": 401,
+          "previous_present_ms": 0.3197,
+          "context_wait_ms": 0.0017,
+          "source_wait": 0,
+          "gpu_wait": 0
+        },
+        {
+          "frame": 2805,
+          "lost": 9,
+          "loop_gap_ms": 16.1588,
+          "source_selection_ms": 0.0584,
+          "clock_age_ms": 8.7695,
+          "clock_adjustment_us": 1240,
+          "previous_present_ms": 0.4536,
+          "context_wait_ms": 0.0019,
+          "source_wait": 1,
+          "gpu_wait": 0
+        },
+        {
+          "frame": 2813,
+          "lost": 4,
+          "loop_gap_ms": 1.5818,
+          "source_selection_ms": 0.0154,
+          "clock_age_ms": 4.5298,
+          "clock_adjustment_us": -1184,
+          "previous_present_ms": 59.2949,
+          "context_wait_ms": 0.0004,
+          "source_wait": 1,
+          "gpu_wait": 0
+        },
+        {
+          "frame": 2821,
+          "lost": 2,
+          "loop_gap_ms": 49.8941,
+          "source_selection_ms": 0.0529,
+          "clock_age_ms": 13.9631,
+          "clock_adjustment_us": -286,
+          "previous_present_ms": 48.9996,
+          "context_wait_ms": 0.001,
+          "source_wait": 0,
+          "gpu_wait": 0
+        },
+        {
+          "frame": 3156,
+          "lost": 1,
+          "loop_gap_ms": 41.2135,
+          "source_selection_ms": 0.0326,
+          "clock_age_ms": 10.8619,
+          "clock_adjustment_us": 391,
+          "previous_present_ms": 40.6466,
+          "context_wait_ms": 0.0012,
+          "source_wait": 0,
+          "gpu_wait": 0
+        },
+        {
+          "frame": 3252,
+          "lost": 1,
+          "loop_gap_ms": 20.4682,
+          "source_selection_ms": 0.0365,
+          "clock_age_ms": 14.3694,
+          "clock_adjustment_us": 1193,
+          "previous_present_ms": 19.4897,
+          "context_wait_ms": 0.001,
+          "source_wait": 0,
+          "gpu_wait": 0
+        },
+        {
+          "frame": 3255,
+          "lost": 1,
+          "loop_gap_ms": 40.5406,
+          "source_selection_ms": 0.0333,
+          "clock_age_ms": 8.9369,
+          "clock_adjustment_us": -534,
+          "previous_present_ms": 39.8437,
+          "context_wait_ms": 0.0012,
+          "source_wait": 0,
+          "gpu_wait": 0
+        },
+        {
+          "frame": 3260,
+          "lost": 2,
+          "loop_gap_ms": 49.5102,
+          "source_selection_ms": 0.0464,
+          "clock_age_ms": 10.2026,
+          "clock_adjustment_us": 371,
+          "previous_present_ms": 48.9521,
+          "context_wait_ms": 0.0013,
+          "source_wait": 0,
+          "gpu_wait": 0
+        },
+        {
+          "frame": 3265,
+          "lost": 2,
+          "loop_gap_ms": 49.7888,
+          "source_selection_ms": 0.0417,
+          "clock_age_ms": 9.904,
+          "clock_adjustment_us": 15895,
+          "previous_present_ms": 48.2025,
+          "context_wait_ms": 0.0013,
+          "source_wait": 0,
+          "gpu_wait": 0
+        },
+        {
+          "frame": 3269,
+          "lost": 2,
+          "loop_gap_ms": 48.9933,
+          "source_selection_ms": 0.0366,
+          "clock_age_ms": 9.3055,
+          "clock_adjustment_us": -146,
+          "previous_present_ms": 46.9963,
+          "context_wait_ms": 0.0008,
+          "source_wait": 0,
+          "gpu_wait": 0
+        },
+        {
+          "frame": 3274,
+          "lost": 3,
+          "loop_gap_ms": 3.7482,
+          "source_selection_ms": 0.0303,
+          "clock_age_ms": 0.032,
+          "clock_adjustment_us": -28,
+          "previous_present_ms": 74.5658,
+          "context_wait_ms": 0.0021,
+          "source_wait": 1,
+          "gpu_wait": 0
+        },
+        {
+          "frame": 3297,
+          "lost": 21,
+          "loop_gap_ms": 1.5259,
+          "source_selection_ms": 0.0216,
+          "clock_age_ms": 6.4107,
+          "clock_adjustment_us": -299,
+          "previous_present_ms": 79.856,
+          "context_wait_ms": 4.0748,
+          "source_wait": 1,
+          "gpu_wait": 0
+        },
+        {
+          "frame": 3304,
+          "lost": 3,
+          "loop_gap_ms": 1.6263,
+          "source_selection_ms": 0.0157,
+          "clock_age_ms": 9.5258,
+          "clock_adjustment_us": -316,
+          "previous_present_ms": 70.8397,
+          "context_wait_ms": 0.0011,
+          "source_wait": 1,
+          "gpu_wait": 0
+        },
+        {
+          "frame": 3309,
+          "lost": 1,
+          "loop_gap_ms": 41.5211,
+          "source_selection_ms": 0.0474,
+          "clock_age_ms": 8.5034,
+          "clock_adjustment_us": -561,
+          "previous_present_ms": 40.3739,
+          "context_wait_ms": 0.0019,
+          "source_wait": 0,
+          "gpu_wait": 0
+        }
+      ]
+    },
+    "baseline-125": {
+      "seconds": 125.0,
+      "cut_seconds": 0.5,
+      "video_tracks": 1,
+      "audio_tracks": 1,
+      "source_files": 3,
+      "source_switches": true,
+      "original_resolution": [
+        3840,
+        2160
+      ],
+      "program_resolution": [
+        3840,
+        2160
+      ],
+      "rate": "60/1",
+      "proxies": false,
+      "application_ready_seconds": 2.246979799994733,
+      "first_ready_seconds": 0.5926209000172094,
+      "measured_seconds": 125.25410000002384,
+      "distinct_sequence_fps": 42.210195115361444,
+      "present_calls_per_second": 42.210195115361444,
+      "dxgi_present_count_per_second": 42.210195115361444,
+      "reached_end": true,
+      "samples": 6000000,
+      "expected_samples": 6000000,
+      "underruns": 0,
+      "active_throughput_windows": [
+        {
+          "window_seconds": 1,
+          "count": 242,
+          "minimum_fps": 29.50364456785838,
+          "p05_fps": 33.54632587859399,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+        },
+        {
+          "window_seconds": 10,
+          "count": 218,
+          "minimum_fps": 40.08422516709809,
+          "p05_fps": 40.762463343108486,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+        }
+      ],
+      "supervisor": {
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 134.21900000001187,
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        }
+      },
+      "power": {
+        "samples": 119,
+        "all_observed_ac": true
+      },
+      "physical_surface": [
+        356,
+        200
+      ],
+      "foreground_unobscured": true,
+      "dpr": 1.75,
+      "browser_error_count": 0,
+      "counters": {
+        "skipped_sequence_frames": 2212,
+        "skipped_after_source_wait": 2180,
+        "skipped_after_gpu_wait": 0,
+        "skipped_without_queue_wait": 32,
+        "source_wait_iterations": 7474,
+        "gpu_wait_iterations": 0,
+        "clock_correction_absolute": {
+          "count": 8300,
+          "mean_ms": 0.562828,
+          "p50_upper_ms": 0.4,
+          "p95_upper_ms": 1.4,
+          "p99_upper_ms": 2.2,
+          "max_ms": 19.005,
+          "overflow_100ms": 0
+        },
+        "peak_source_queue_frames": 4,
+        "gpu_slot_budget": 4,
+        "peak_decoder_count": 1,
+        "retained_surface_views": 8,
+        "retained_texture_pools": 1,
+        "retained_texture_estimated_MiB": 415.283,
+        "dxgi_statistics_available": true
+      },
+      "timings": {
+        "playback_present_interval": {
+          "count": 5286,
+          "mean_ms": 23.6413,
+          "p50_upper_ms": 16.6,
+          "p95_upper_ms": 97.2,
+          "p99_upper_ms": 226.354,
+          "max_ms": 226.354,
+          "overflow_100ms": 253
+        },
+        "present_call": {
+          "count": 5288,
+          "mean_ms": 1.74339,
+          "p50_upper_ms": 0.3,
+          "p95_upper_ms": 4.8,
+          "p99_upper_ms": 68.2,
+          "max_ms": 90.0372,
+          "overflow_100ms": 0
+        },
+        "composition_gpu": {
+          "count": 5288,
+          "mean_ms": 1.7711,
+          "p50_upper_ms": 1.8,
+          "p95_upper_ms": 2.2,
+          "p99_upper_ms": 2.9,
+          "max_ms": 8.85288,
+          "overflow_100ms": 0
+        },
+        "source_selection": {
+          "count": 12762,
+          "mean_ms": 0.766865,
+          "p50_upper_ms": 0.1,
+          "p95_upper_ms": 0.1,
+          "p99_upper_ms": 31.3,
+          "max_ms": 87.4177,
+          "overflow_100ms": 0
+        },
+        "context_wait": {
+          "count": 50596,
+          "mean_ms": 0.364449,
+          "p50_upper_ms": 0.1,
+          "p95_upper_ms": 0.6,
+          "p99_upper_ms": 2.8,
+          "max_ms": 95.6382,
+          "overflow_100ms": 0
+        },
+        "completion_observation": {
+          "count": 5288,
+          "mean_ms": 14.3429,
+          "p50_upper_ms": 6,
+          "p95_upper_ms": 95.4,
+          "p99_upper_ms": 126.052,
+          "max_ms": 126.052,
+          "overflow_100ms": 209
+        }
+      },
+      "resources": {
+        "average_cpu_machine_percent": 6.5,
+        "peak_summed_working_set_MiB": 3174.9,
+        "process_read_MiB": 1322.6,
+        "process_write_MiB": 256.0,
+        "sampled_cpu_seconds": 196.53
+      },
+      "largest_status_skip_jumps": [
+        {
+          "skips": 30,
+          "last_frame": 1761,
+          "from_native_seconds": 30.0728,
+          "to_native_seconds": 30.7396
+        },
+        {
+          "skips": 27,
+          "last_frame": 5273,
+          "from_native_seconds": 88.5113,
+          "to_native_seconds": 89.2735
+        },
+        {
+          "skips": 26,
+          "last_frame": 3968,
+          "from_native_seconds": 66.3732,
+          "to_native_seconds": 67.5256
+        },
+        {
+          "skips": 23,
+          "last_frame": 6103,
+          "from_native_seconds": 102.369,
+          "to_native_seconds": 103.188
+        },
+        {
+          "skips": 22,
+          "last_frame": 2022,
+          "from_native_seconds": 34.3364,
+          "to_native_seconds": 35.164
+        },
+        {
+          "skips": 22,
+          "last_frame": 6343,
+          "from_native_seconds": 106.52,
+          "to_native_seconds": 107.163
+        },
+        {
+          "skips": 21,
+          "last_frame": 3102,
+          "from_native_seconds": 52.4955,
+          "to_native_seconds": 53.168
+        },
+        {
+          "skips": 20,
+          "last_frame": 3459,
+          "from_native_seconds": 58.19,
+          "to_native_seconds": 59.042
+        }
+      ]
+    },
+    "paced-125": {
+      "seconds": 125.0,
+      "cut_seconds": 0.5,
+      "video_tracks": 1,
+      "audio_tracks": 1,
+      "source_files": 3,
+      "source_switches": true,
+      "original_resolution": [
+        3840,
+        2160
+      ],
+      "program_resolution": [
+        3840,
+        2160
+      ],
+      "rate": "60/1",
+      "proxies": false,
+      "application_ready_seconds": 2.1965190000191797,
+      "first_ready_seconds": 0.6020660999929532,
+      "measured_seconds": 125.10080000001192,
+      "distinct_sequence_fps": 42.12602956975094,
+      "present_calls_per_second": 42.12602956975094,
+      "dxgi_present_count_per_second": 42.11004246175483,
+      "reached_end": true,
+      "samples": 6000000,
+      "expected_samples": 6000000,
+      "underruns": 0,
+      "active_throughput_windows": [
+        {
+          "window_seconds": 1,
+          "count": 229,
+          "minimum_fps": 30.54913940838987,
+          "p05_fps": 34.294759057333806,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+        },
+        {
+          "window_seconds": 10,
+          "count": 208,
+          "minimum_fps": 39.81703681221681,
+          "p05_fps": 40.975309227968985,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+        }
+      ],
+      "supervisor": {
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 133.43700000000536,
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        }
+      },
+      "power": {
+        "samples": 118,
+        "all_observed_ac": true
+      },
+      "physical_surface": [
+        356,
+        200
+      ],
+      "foreground_unobscured": true,
+      "dpr": 1.75,
+      "browser_error_count": 0,
+      "counters": {
+        "skipped_sequence_frames": 2226,
+        "skipped_after_source_wait": 2193,
+        "skipped_after_gpu_wait": 0,
+        "skipped_without_queue_wait": 33,
+        "source_wait_iterations": 7310,
+        "gpu_wait_iterations": 0,
+        "clock_correction_absolute": {
+          "count": 8296,
+          "mean_ms": 0.543361,
+          "p50_upper_ms": 0.4,
+          "p95_upper_ms": 1.3,
+          "p99_upper_ms": 2.5,
+          "max_ms": 24.259,
+          "overflow_100ms": 0
+        },
+        "peak_source_queue_frames": 4,
+        "gpu_slot_budget": 4,
+        "peak_decoder_count": 1,
+        "retained_surface_views": 8,
+        "retained_texture_pools": 1,
+        "retained_texture_estimated_MiB": 415.283,
+        "dxgi_statistics_available": true
+      },
+      "timings": {
+        "playback_present_interval": {
+          "count": 5269,
+          "mean_ms": 23.7083,
+          "p50_upper_ms": 16.7,
+          "p95_upper_ms": 99.6,
+          "p99_upper_ms": 217.107,
+          "max_ms": 217.107,
+          "overflow_100ms": 262
+        },
+        "present_call": {
+          "count": 5271,
+          "mean_ms": 1.79567,
+          "p50_upper_ms": 0.3,
+          "p95_upper_ms": 5.4,
+          "p99_upper_ms": 68.2,
+          "max_ms": 95.1112,
+          "overflow_100ms": 0
+        },
+        "composition_gpu": {
+          "count": 5271,
+          "mean_ms": 1.7892,
+          "p50_upper_ms": 1.8,
+          "p95_upper_ms": 2.4,
+          "p99_upper_ms": 3,
+          "max_ms": 8.2094,
+          "overflow_100ms": 0
+        },
+        "source_selection": {
+          "count": 12581,
+          "mean_ms": 0.789625,
+          "p50_upper_ms": 0.1,
+          "p95_upper_ms": 0.1,
+          "p99_upper_ms": 31.8,
+          "max_ms": 80.5126,
+          "overflow_100ms": 0
+        },
+        "context_wait": {
+          "count": 50087,
+          "mean_ms": 0.372096,
+          "p50_upper_ms": 0.1,
+          "p95_upper_ms": 0.6,
+          "p99_upper_ms": 2.9,
+          "max_ms": 89.6191,
+          "overflow_100ms": 0
+        },
+        "completion_observation": {
+          "count": 5271,
+          "mean_ms": 14.6467,
+          "p50_upper_ms": 6,
+          "p95_upper_ms": 96.5,
+          "p99_upper_ms": 131.191,
+          "max_ms": 131.191,
+          "overflow_100ms": 223
+        }
+      },
+      "resources": {
+        "average_cpu_machine_percent": 6.63,
+        "peak_summed_working_set_MiB": 3086.2,
+        "process_read_MiB": 1319.1,
+        "process_write_MiB": 257.6,
+        "sampled_cpu_seconds": 199.78
+      },
+      "largest_status_skip_jumps": [
+        {
+          "skips": 29,
+          "last_frame": 6980,
+          "from_native_seconds": 116.579,
+          "to_native_seconds": 117.816
+        },
+        {
+          "skips": 26,
+          "last_frame": 1249,
+          "from_native_seconds": 21.458,
+          "to_native_seconds": 22.2896
+        },
+        {
+          "skips": 25,
+          "last_frame": 6358,
+          "from_native_seconds": 106.616,
+          "to_native_seconds": 107.451
+        },
+        {
+          "skips": 24,
+          "last_frame": 679,
+          "from_native_seconds": 12.0993,
+          "to_native_seconds": 12.7895
+        },
+        {
+          "skips": 23,
+          "last_frame": 1521,
+          "from_native_seconds": 26.0787,
+          "to_native_seconds": 26.8289
+        },
+        {
+          "skips": 23,
+          "last_frame": 2022,
+          "from_native_seconds": 34.5814,
+          "to_native_seconds": 35.1856
+        },
+        {
+          "skips": 23,
+          "last_frame": 4453,
+          "from_native_seconds": 75.0414,
+          "to_native_seconds": 75.7488
+        },
+        {
+          "skips": 22,
+          "last_frame": 3942,
+          "from_native_seconds": 66.414,
+          "to_native_seconds": 67.2371
         }
       ]
     }
@@ -2017,6 +3575,276 @@
         },
         "post_release_frames_before_target": 0
       }
+    },
+    "final-frozen-scrub": {
+      "source_resolution": [
+        3840,
+        2160
+      ],
+      "program_resolution": [
+        960,
+        540
+      ],
+      "video_tracks": 3,
+      "audio_tracks": 3,
+      "sequence_seconds": 90,
+      "cut_seconds": 0.5,
+      "proxy_used": false,
+      "desktop_reported_refresh_hz": 120,
+      "app_ready_ms": 2186.5857999946456,
+      "project_setup_ms": 1455.43830000679,
+      "play_after_seek_ms": 45.82259999006055,
+      "preview_geometry": {
+        "x": 532.5982666015625,
+        "y": 170.57144165039062,
+        "width": 380.4375305175781,
+        "height": 213.85714721679688,
+        "dpr": 1.75
+      },
+      "ready_resources": {
+        "webviewMiB": 1176.2265625,
+        "nativeMiB": 1395.1796875,
+        "ffmpegProcesses": 0
+      },
+      "after_paused_resources": {
+        "webviewMiB": 1208.14453125,
+        "nativeMiB": 1255.1328125,
+        "ffmpegProcesses": 0
+      },
+      "idle_resources": {
+        "webviewMiB": 1232.43359375,
+        "nativeMiB": 1525.51171875,
+        "ffmpegProcesses": 0
+      },
+      "browser_error_count": 0,
+      "supervisor": {
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 15.35899999999674,
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        }
+      },
+      "power": {
+        "samples": 15,
+        "all_observed_ac": true
+      },
+      "foreground_unobscured": true,
+      "paused": [
+        {
+          "requested": 39,
+          "audioFetches": 5,
+          "checkpoints": 46,
+          "upFrame": 531,
+          "completed": 531,
+          "underruns": 0,
+          "timed_out": false,
+          "newest_picture_ms": 567.6000000238419,
+          "gesture_ui_cost_ms": {
+            "count": 46,
+            "median": 2.0999999940395355,
+            "p95": 3,
+            "maximum": 4
+          },
+          "post_release_frames_before_target": 0
+        },
+        {
+          "requested": 39,
+          "audioFetches": 6,
+          "checkpoints": 46,
+          "upFrame": 531,
+          "completed": 531,
+          "underruns": 0,
+          "timed_out": false,
+          "newest_picture_ms": 577.2999999821186,
+          "gesture_ui_cost_ms": {
+            "count": 46,
+            "median": 1.800000011920929,
+            "p95": 2.300000011920929,
+            "maximum": 3.0999999940395355
+          },
+          "post_release_frames_before_target": 0
+        },
+        {
+          "requested": 42,
+          "audioFetches": 3,
+          "checkpoints": 46,
+          "upFrame": 531,
+          "completed": 531,
+          "underruns": 0,
+          "timed_out": false,
+          "newest_picture_ms": 620.5999999940395,
+          "gesture_ui_cost_ms": {
+            "count": 46,
+            "median": 1.5,
+            "p95": 2.2000000178813934,
+            "maximum": 2.5
+          },
+          "post_release_frames_before_target": 0
+        }
+      ],
+      "playing": {
+        "requested": 29,
+        "audioFetches": 7,
+        "checkpoints": 47,
+        "upFrame": 531,
+        "completed": 538,
+        "underruns": 0,
+        "timed_out": false,
+        "newest_picture_ms": 675.4000000059605,
+        "gesture_ui_cost_ms": {
+          "count": 47,
+          "median": 1.5999999940395355,
+          "p95": 2.100000023841858,
+          "maximum": 2.699999988079071
+        },
+        "post_release_frames_before_target": 2
+      }
+    },
+    "final-scrub": {
+      "source_resolution": [
+        3840,
+        2160
+      ],
+      "program_resolution": [
+        960,
+        540
+      ],
+      "video_tracks": 3,
+      "audio_tracks": 3,
+      "sequence_seconds": 90,
+      "cut_seconds": 0.5,
+      "proxy_used": false,
+      "desktop_reported_refresh_hz": 120,
+      "app_ready_ms": 3135.2042999933474,
+      "project_setup_ms": 1915.7987000071444,
+      "play_after_seek_ms": 40.667900000698864,
+      "preview_geometry": {
+        "x": 532.5982666015625,
+        "y": 170.57144165039062,
+        "width": 380.4375305175781,
+        "height": 213.85714721679688,
+        "dpr": 1.75
+      },
+      "ready_resources": {
+        "webviewMiB": 959.15625,
+        "nativeMiB": 1441.953125,
+        "ffmpegProcesses": 0
+      },
+      "after_paused_resources": {
+        "webviewMiB": 985.4609375,
+        "nativeMiB": 1536.7109375,
+        "ffmpegProcesses": 1
+      },
+      "idle_resources": {
+        "webviewMiB": 1013.9296875,
+        "nativeMiB": 1661.1171875,
+        "ffmpegProcesses": 0
+      },
+      "browser_error_count": 0,
+      "supervisor": {
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 15.344000000011874,
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        }
+      },
+      "power": {
+        "samples": 15,
+        "all_observed_ac": true
+      },
+      "foreground_unobscured": true,
+      "paused": [
+        {
+          "requested": 9,
+          "audioFetches": 1,
+          "checkpoints": 1,
+          "upFrame": 531,
+          "completed": 531,
+          "underruns": 0,
+          "timed_out": false,
+          "newest_picture_ms": 506.09999999403954,
+          "gesture_ui_cost_ms": {
+            "count": 47,
+            "median": 0.09999999403953552,
+            "p95": 0.30000001192092896,
+            "maximum": 3.399999976158142
+          },
+          "post_release_frames_before_target": 0
+        },
+        {
+          "requested": 7,
+          "audioFetches": 1,
+          "checkpoints": 1,
+          "upFrame": 531,
+          "completed": 531,
+          "underruns": 0,
+          "timed_out": false,
+          "newest_picture_ms": 507.5,
+          "gesture_ui_cost_ms": {
+            "count": 47,
+            "median": 0.09999999403953552,
+            "p95": 0.20000001788139343,
+            "maximum": 1.199999988079071
+          },
+          "post_release_frames_before_target": 0
+        },
+        {
+          "requested": 8,
+          "audioFetches": 1,
+          "checkpoints": 1,
+          "upFrame": 531,
+          "completed": 531,
+          "underruns": 0,
+          "timed_out": false,
+          "newest_picture_ms": 481.59999999403954,
+          "gesture_ui_cost_ms": {
+            "count": 47,
+            "median": 0.09999999403953552,
+            "p95": 0.20000001788139343,
+            "maximum": 1.300000011920929
+          },
+          "post_release_frames_before_target": 0
+        }
+      ],
+      "playing": {
+        "requested": 8,
+        "audioFetches": 1,
+        "checkpoints": 1,
+        "upFrame": 531,
+        "completed": 542,
+        "underruns": 0,
+        "timed_out": false,
+        "newest_picture_ms": 523.7000000178814,
+        "gesture_ui_cost_ms": {
+          "count": 47,
+          "median": 0.09999999403953552,
+          "p95": 0.19999998807907104,
+          "maximum": 1.0999999940395355
+        },
+        "post_release_frames_before_target": 0
+      }
     }
   },
   "seeks": {
@@ -2104,7 +3932,12 @@
           "diagnostic_failure_type": null,
           "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
         }
-      }
+      },
+      "power": {
+        "samples": 0,
+        "all_observed_ac": false
+      },
+      "foreground_unobscured": null
     },
     "candidate-seek": {
       "first_ready_ms": 1049.0033999958541,
@@ -2190,7 +4023,12 @@
           "diagnostic_failure_type": null,
           "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
         }
-      }
+      },
+      "power": {
+        "samples": 0,
+        "all_observed_ac": false
+      },
+      "foreground_unobscured": null
     },
     "paced-seek": {
       "first_ready_ms": 1149.4111999927554,
@@ -2276,7 +4114,285 @@
           "diagnostic_failure_type": null,
           "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
         }
-      }
+      },
+      "power": {
+        "samples": 0,
+        "all_observed_ac": false
+      },
+      "foreground_unobscured": null
+    },
+    "final-seek": {
+      "first_ready_ms": 930.9476999915205,
+      "seek_samples": [
+        {
+          "target_seconds": 2.2,
+          "milliseconds": 549.6753999905195,
+          "first_visit": true
+        },
+        {
+          "target_seconds": 0.5,
+          "milliseconds": 450.7052999979351,
+          "first_visit": true
+        },
+        {
+          "target_seconds": 4.2,
+          "milliseconds": 248.9456000039354,
+          "first_visit": true
+        },
+        {
+          "target_seconds": 2.2,
+          "milliseconds": 560.2715999993961,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 0.5,
+          "milliseconds": 433.6930000281427,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 4.2,
+          "milliseconds": 250.01519999932498,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 2.2,
+          "milliseconds": 550.343500013696,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 0.5,
+          "milliseconds": 425.78510000021197,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 4.2,
+          "milliseconds": 250.2319999912288,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 2.2,
+          "milliseconds": 542.517299996689,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 0.5,
+          "milliseconds": 433.92470001708716,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 4.2,
+          "milliseconds": 249.63500001467764,
+          "first_visit": false
+        }
+      ],
+      "seek_p50_ms": 433.80885002261493,
+      "seek_p95_ms": 550.343500013696,
+      "endpoint": "completed GPU frame in requested generation; not physical scanout",
+      "supervisor": {
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 11.375,
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        }
+      },
+      "power": {
+        "samples": 0,
+        "all_observed_ac": false
+      },
+      "foreground_unobscured": null
+    },
+    "controlled-frozen-seek": {
+      "first_ready_ms": 1059.0356000175234,
+      "seek_samples": [
+        {
+          "target_seconds": 2.2,
+          "milliseconds": 657.8135000017937,
+          "first_visit": true
+        },
+        {
+          "target_seconds": 0.5,
+          "milliseconds": 617.2246999922208,
+          "first_visit": true
+        },
+        {
+          "target_seconds": 4.2,
+          "milliseconds": 308.5617999895476,
+          "first_visit": true
+        },
+        {
+          "target_seconds": 2.2,
+          "milliseconds": 618.99880002602,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 0.5,
+          "milliseconds": 534.4848999811802,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 4.2,
+          "milliseconds": 408.18649998982437,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 2.2,
+          "milliseconds": 718.1449999916367,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 0.5,
+          "milliseconds": 508.0931000120472,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 4.2,
+          "milliseconds": 307.8793000022415,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 2.2,
+          "milliseconds": 618.4652000083588,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 0.5,
+          "milliseconds": 508.46460001775995,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 4.2,
+          "milliseconds": 308.3914000017103,
+          "first_visit": false
+        }
+      ],
+      "seek_p50_ms": 521.4747499994701,
+      "seek_p95_ms": 657.8135000017937,
+      "endpoint": "completed GPU frame in requested generation; not physical scanout",
+      "supervisor": {
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 12.562000000005355,
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        }
+      },
+      "power": {
+        "samples": 8,
+        "all_observed_ac": true
+      },
+      "foreground_unobscured": true
+    },
+    "controlled-final-seek": {
+      "first_ready_ms": 938.1450999935623,
+      "seek_samples": [
+        {
+          "target_seconds": 2.2,
+          "milliseconds": 554.847699997481,
+          "first_visit": true
+        },
+        {
+          "target_seconds": 0.5,
+          "milliseconds": 417.5045999872964,
+          "first_visit": true
+        },
+        {
+          "target_seconds": 4.2,
+          "milliseconds": 258.7555999925826,
+          "first_visit": true
+        },
+        {
+          "target_seconds": 2.2,
+          "milliseconds": 583.9458999980707,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 0.5,
+          "milliseconds": 433.4130999923218,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 4.2,
+          "milliseconds": 249.27949998527765,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 2.2,
+          "milliseconds": 559.9328000098467,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 0.5,
+          "milliseconds": 424.79210000601597,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 4.2,
+          "milliseconds": 241.837299981853,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 2.2,
+          "milliseconds": 542.5356999912765,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 0.5,
+          "milliseconds": 417.43400000268593,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 4.2,
+          "milliseconds": 249.50919998809695,
+          "first_visit": false
+        }
+      ],
+      "seek_p50_ms": 421.1483499966562,
+      "seek_p95_ms": 559.9328000098467,
+      "endpoint": "completed GPU frame in requested generation; not physical scanout",
+      "supervisor": {
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 11.39100000000326,
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        }
+      },
+      "power": {
+        "samples": 6,
+        "all_observed_ac": true
+      },
+      "foreground_unobscured": true
     }
   },
   "memory": {
@@ -4301,12 +6417,14 @@
     "python_total": 184,
     "python_skipped": 1,
     "python_seconds": 97.381,
-    "javascript_passed": 32
+    "javascript_passed": 32,
+    "final_javascript_passed": 32,
+    "separate_warp_tests_passed": 9
   },
   "package": {
     "first_msi_sha256": "2755f3d64310498d79a164c4d2635d1deeab156d64c0f0caa90ec5864a523faf",
     "paced_msi_sha256": "cbba814ed311b3e21b29d6007f2c7e276ac4ab99a1a6111aa8955d76d1fae809",
-    "final_msi_sha256": null,
+    "final_msi_sha256": "a312e097f1ce751b80e4d27a8bbc6d072b9140475371731fea14b0df330ccf3e",
     "paced_bundle_checks": {
       "qa_modules_excluded": true,
       "approved_brand_assets": true,
@@ -4357,8 +6475,92 @@
       "installed_executable": true,
       "installed_web": true
     },
-    "final_bundle_checks": null,
-    "final_build": null,
+    "final_bundle_checks": {
+      "qa_modules_excluded": true,
+      "approved_brand_assets": true,
+      "approved_exe_icon": true,
+      "app_version": true,
+      "server": true,
+      "export_scratch": true,
+      "render_engine": true,
+      "color_management": true,
+      "hdr_render": true,
+      "hdr_layers": true,
+      "hdr10plus_index": true,
+      "hdr10plus_export": true,
+      "hdr10plus_bitstream": true,
+      "hdr10plus_authoring": true,
+      "hdr10plus_fast": true,
+      "hdr10plus_master": true,
+      "native_project_plan": true,
+      "native_project_render": true,
+      "native_project_verification": true,
+      "preview_cache": true,
+      "preview_dependencies": true,
+      "source_frames": true,
+      "timing": true,
+      "timeline_transitions": true,
+      "project_store": true,
+      "animation": true,
+      "sequences": true,
+      "video_effects": true,
+      "grading": true,
+      "audio_cache": true,
+      "audio_edit": true,
+      "waveform": true,
+      "motion": true,
+      "review_packet": true,
+      "timeline_proposal": true,
+      "ai_bridge": true,
+      "encoders": true,
+      "native_plan": true,
+      "native_playback": true,
+      "performance_profile": true,
+      "desktop_recovery": true,
+      "desktop": true,
+      "web": true,
+      "native_runtime": true,
+      "installed_native_runtime": true,
+      "installed_icon": true,
+      "installed_executable": true,
+      "installed_web": true
+    },
+    "final_build": {
+      "exit_code": 0,
+      "reason": null,
+      "seconds": 98.34399999998277,
+      "process_ownership": {
+        "Windows_job": true,
+        "job_members_at_cleanup": 0,
+        "remaining_owned_processes": 0,
+        "unrelated_processes_targeted": 0,
+        "forced_member_roles": {},
+        "visible_terminal_windows_before": 0,
+        "owned_visible_terminal_windows_at_cleanup": 0,
+        "visible_terminal_windows_after": 0,
+        "new_visible_terminal_windows_after": 0,
+        "diagnostic_failure_type": null,
+        "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+      }
+    },
+    "binary_sha256": {
+      "frozen": {
+        "native_worker_sha256": "ac206038cea559f87d784e0ec4fc8485bdebd1421b7c4a78853e7ea037e3f72a",
+        "desktop_exe_sha256": "78fe31e94b9722a015e25665b0e24dabfa1d8d83e4a358ffb3c7f3db75bb174b"
+      },
+      "first": {
+        "native_worker_sha256": "ac206038cea559f87d784e0ec4fc8485bdebd1421b7c4a78853e7ea037e3f72a",
+        "desktop_exe_sha256": "cd8e0b665a9318f99a4a7ba3008ecda717e2ab39bd8909d97f23bbc525986b7b"
+      },
+      "paced": {
+        "native_worker_sha256": "ac206038cea559f87d784e0ec4fc8485bdebd1421b7c4a78853e7ea037e3f72a",
+        "desktop_exe_sha256": "49b859f36283ac304acf1ae8e21d1bd5b2569b74f4ef09b12c990ef64650954a"
+      },
+      "final": {
+        "native_worker_sha256": "4fd0fd1c5412b4870b600dde7abe95fedac59ea83fa0da850779e168c5049f2e",
+        "desktop_exe_sha256": "e9b4aaefaae51d8223d836a297681789a7891b8e0be1a894b3b918b84553bd4e"
+      }
+    },
     "first_unpack_rejected": {
       "msiexec_exit": 1603,
       "installer_error": 1606,
@@ -4424,15 +6626,236 @@
         }
       }
     },
-    "final_native": null,
-    "final_recovery": null,
-    "final_export": null,
-    "camera": {
-      "frozen-hdr-camera": null,
-      "final-hdr-camera": null
+    "final_native": {
+      "exit_code": 0,
+      "reason": null,
+      "seconds": 14.062999999994645,
+      "process_ownership": {
+        "Windows_job": true,
+        "job_members_at_cleanup": 0,
+        "remaining_owned_processes": 0,
+        "unrelated_processes_targeted": 0,
+        "forced_member_roles": {},
+        "visible_terminal_windows_before": 0,
+        "owned_visible_terminal_windows_at_cleanup": 0,
+        "visible_terminal_windows_after": 0,
+        "new_visible_terminal_windows_after": 0,
+        "diagnostic_failure_type": null,
+        "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+      }
     },
-    "privacy_before": null,
-    "privacy_after": null
+    "final_recovery": {
+      "exit_code": 0,
+      "reason": null,
+      "seconds": 27.655999999988126,
+      "process_ownership": {
+        "Windows_job": true,
+        "job_members_at_cleanup": 0,
+        "remaining_owned_processes": 0,
+        "unrelated_processes_targeted": 0,
+        "forced_member_roles": {},
+        "visible_terminal_windows_before": 0,
+        "owned_visible_terminal_windows_at_cleanup": 0,
+        "visible_terminal_windows_after": 0,
+        "new_visible_terminal_windows_after": 0,
+        "diagnostic_failure_type": null,
+        "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+      }
+    },
+    "final_export": {
+      "result": {
+        "offline_first_export": true,
+        "active_cancellation": true,
+        "active_confirmed_shutdown": true,
+        "exact_source_hashes": true,
+        "owned_survivors": 0,
+        "new_terminal_windows": 0,
+        "conforming_hdr10plus_blocks": 48,
+        "timings": {
+          "first_export_to_terminal_job_seconds": 45.12332329998026
+        },
+        "full_comparison": {
+          "passed": true,
+          "exact_video_pts": true,
+          "static_hdr_matches": true,
+          "video_declaration_matches": true,
+          "hdr10plus_picture_associations": 48,
+          "exact_decoded_pcm": true,
+          "audio_endpoint_samples": 38400,
+          "decoded_pq_psnr_db": "55.631319",
+          "per_frame_psnr_db": [
+            "59.20",
+            "57.68",
+            "57.61",
+            "56.93",
+            "57.47",
+            "55.99",
+            "56.33",
+            "56.46",
+            "57.21",
+            "55.96",
+            "56.53",
+            "57.12",
+            "57.06",
+            "55.87",
+            "56.09",
+            "56.04",
+            "57.48",
+            "57.56",
+            "56.26",
+            "55.98",
+            "56.87",
+            "56.41",
+            "56.35",
+            "56.69",
+            "57.11",
+            "54.31",
+            "54.42",
+            "54.19",
+            "55.31",
+            "54.13",
+            "53.64",
+            "53.86",
+            "55.65",
+            "54.23",
+            "54.42",
+            "54.67",
+            "55.90",
+            "54.42",
+            "54.45",
+            "54.54",
+            "55.79",
+            "54.80",
+            "54.72",
+            "54.90",
+            "55.77",
+            "54.60",
+            "54.31",
+            "55.46"
+          ]
+        }
+      },
+      "supervisor": {
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 77.40600000001723,
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        }
+      }
+    },
+    "camera": {
+      "frozen-hdr-camera": {
+        "result": {
+          "duration_seconds": 3,
+          "source_PQ_Main10": true,
+          "native_HDR_linear_scRGB": true,
+          "composition": [
+            960,
+            1706
+          ],
+          "physical_surface": [
+            180,
+            320
+          ],
+          "samples": 144000,
+          "underruns": 0,
+          "skips": 0,
+          "dynamic_metadata_decode_retained": true,
+          "window_condition_held": true,
+          "calibrated_monitoring": false
+        },
+        "supervisor": {
+          "exit_code": 0,
+          "reason": null,
+          "seconds": 9.796999999991385,
+          "process_ownership": {
+            "Windows_job": true,
+            "job_members_at_cleanup": 0,
+            "remaining_owned_processes": 0,
+            "unrelated_processes_targeted": 0,
+            "forced_member_roles": {},
+            "visible_terminal_windows_before": 0,
+            "owned_visible_terminal_windows_at_cleanup": 0,
+            "visible_terminal_windows_after": 0,
+            "new_visible_terminal_windows_after": 0,
+            "diagnostic_failure_type": null,
+            "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+          }
+        }
+      },
+      "final-hdr-camera": {
+        "result": {
+          "duration_seconds": 3,
+          "source_PQ_Main10": true,
+          "native_HDR_linear_scRGB": true,
+          "composition": [
+            960,
+            1706
+          ],
+          "physical_surface": [
+            180,
+            320
+          ],
+          "samples": 144000,
+          "underruns": 0,
+          "skips": 0,
+          "dynamic_metadata_decode_retained": true,
+          "window_condition_held": true,
+          "calibrated_monitoring": false
+        },
+        "supervisor": {
+          "exit_code": 0,
+          "reason": null,
+          "seconds": 8.96799999999348,
+          "process_ownership": {
+            "Windows_job": true,
+            "job_members_at_cleanup": 0,
+            "remaining_owned_processes": 0,
+            "unrelated_processes_targeted": 0,
+            "forced_member_roles": {},
+            "visible_terminal_windows_before": 0,
+            "owned_visible_terminal_windows_at_cleanup": 0,
+            "visible_terminal_windows_after": 0,
+            "new_visible_terminal_windows_after": 0,
+            "diagnostic_failure_type": null,
+            "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+          }
+        }
+      }
+    },
+    "privacy_before": {
+      "source_count": 3,
+      "private_folder_tracked_files": 0,
+      "private_history_path_matches": 0,
+      "private_content_objects": 0,
+      "private_text_objects": 0,
+      "private_working_text_files": 0,
+      "missing_originals": 0,
+      "original_hashes_verified": true,
+      "changed_originals": 0
+    },
+    "privacy_after": {
+      "source_count": 3,
+      "private_folder_tracked_files": 0,
+      "private_history_path_matches": 0,
+      "private_content_objects": 0,
+      "private_text_objects": 0,
+      "private_working_text_files": 0,
+      "missing_originals": 0,
+      "original_hashes_verified": true,
+      "changed_originals": 0
+    }
   },
   "retained_rejections": [
     {
@@ -4444,6 +6867,14 @@
       "cause": "Source-wait presentation outlier despite visible AC conditions and exact PCM. Retained as a failed performance gate regardless of functional benchmark status."
     },
     {
+      "case": "final-60",
+      "cause": "Repeat failed the sustained presentation gate with 152 skips despite exact PCM, AC power and a visible window."
+    },
+    {
+      "case": "baseline-125 and paced-125",
+      "cause": "Rapid independent-source cuts exceeded 2200 skips in both builds."
+    },
+    {
       "case": "first GitHub workflow",
       "id": 45086645292,
       "cause": "The old binding checked the historical Phase 3A measurement against changed Phase 3B source. CI now verifies Phase 3A using its archived commit, then checks the new record."
@@ -4451,6 +6882,6 @@
   ],
   "source_fingerprint": "bcae6f62e67f1fb458225cb64ea59383f6ce1d164b48847cb3267aee9f9f50ab",
   "fingerprint_method": "SHA256 sorted relevant relative path + NUL + LF-normalized source + NUL",
-  "benchmark_protocol_fingerprint": "3ad7ec984694f0bae6360b958fc3fcee609ef031183d4aa7a87ca41daa320e81",
+  "benchmark_protocol_fingerprint": "fc662e0c833a2b0323ffd5bc89a5af923511f37545508d7e5d4492e3e5233039",
   "benchmark_protocol_fingerprint_method": "SHA256 sorted benchmark driver/observer relative path + NUL + LF-normalized source + NUL"
 }
