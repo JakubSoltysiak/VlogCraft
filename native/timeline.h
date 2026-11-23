@@ -119,19 +119,67 @@ struct Producer {
   changed.notify_all();
  }
  ~Producer(){cancel();if(worker.joinable())worker.join();}
- void reset(int64_t tick,AVRational sourceBase){
-  std::lock_guard<std::mutex> lock(guard);holdRefill=false;epoch++;requestedTick=tick;requestedBase=sourceBase;
+ // The old tail and new decode queue SHARE the original four queue slots.
+ // Each tail entry is a retained reference to an actual already-decoded
+ // floor picture, proved against its successor before rewinding the decoder.
+ std::deque<Frame> cutTail;
+ const Clip* cutOld=nullptr;
+ const Clip* cutNext=nullptr;
+ int64_t cutGeneration=-1,tailFirstFrame=-1;
+ size_t peakCombinedQueue=0;
+ uint64_t earlyRewinds=0,adoptedRewinds=0,tailHits=0;
+ void clearCutLocked(){
+  if(!cutNext)return;
+  cutTail.clear();cutOld=cutNext=nullptr;cutGeneration=-1;
+  reservation.bytes=0;
+ }
+ void resetLocked(int64_t tick,AVRational sourceBase){
+  holdRefill=false;epoch++;requestedTick=tick;requestedBase=sourceBase;
   if(opened){
    seekTick=streamTick(tick,sourceBase);wantedPTS=seekTick+origin;
    if(warmTarget!=seekTick){warm.clear();warmTarget=seekTick;}
   }
   queue.clear();current.reset();eof=false;changed.notify_all();
  }
+ void reset(int64_t tick,AVRational sourceBase){
+  std::lock_guard<std::mutex> lock(guard);
+  clearCutLocked();resetLocked(tick,sourceBase);
+ }
+ bool primeRewind(const Plan& plan,const Clip& outgoing,const Clip& incoming,int64_t frame,int64_t transportGeneration){
+  std::lock_guard<std::mutex> lock(guard);
+  if(cutNext||!current||!singlePool||!surfacePoolBytes||decoding||!failure.empty()||epoch!=workerEpoch||
+     outgoing.end<=frame||outgoing.end-frame>3)return false;
+  std::deque<Frame> verified;
+  for(auto f=frame;f<outgoing.end;f++){
+   const auto target=streamTick(plan.sourceTick(outgoing,f),outgoing.timebase)+origin;
+   Frame floor=current;bool successor=false;
+   for(auto& pictured:queue){
+    if(pictured->best_effort_timestamp>target){successor=true;break;}
+    floor=pictured;
+   }
+   if(floor->best_effort_timestamp>target||(!successor&&!eof))return false;
+   verified.push_back(floor);
+  }
+  // Existing decoded surfaces stay alive through AVFrame/slot ownership.
+  // Forbid allocation of a second pool until the old tail has been consumed.
+  reservation.hasPool=true;reservation.bytes=surfacePoolBytes;
+  cutTail=std::move(verified);cutOld=&outgoing;cutNext=&incoming;
+  cutGeneration=transportGeneration;tailFirstFrame=frame;
+  if(sourceTrace){request.frame=frame;request.tick=incoming.inTick;request.num=incoming.timebase.num;request.den=incoming.timebase.den;}
+  resetLocked(incoming.inTick,incoming.timebase);
+  peakCombinedQueue=std::max(peakCombinedQueue,cutTail.size());earlyRewinds++;
+  return true;
+ }
+ bool adoptRewind(const Clip& requested,int64_t transportGeneration){
+  std::lock_guard<std::mutex> lock(guard);
+  if(cutNext!=&requested||cutGeneration!=transportGeneration)return false;
+  clearCutLocked();adoptedRewinds++;changed.notify_one();return true;
+ }
  // Returns zero if retaining this decoder could overlap differently sized
  // pools or a currently running format negotiation. Its active budget is unchanged.
  uint64_t parkableBytes(){
   std::lock_guard<std::mutex> lock(guard);
-  if(!failure.empty()||!singlePool)return 0;
+  if(cutNext||!failure.empty()||!singlePool)return 0;
   if(reservation.bytes.load())return surfacePoolBytes?surfacePoolBytes:reservation.bytes.load();
   if(decoding||!surfacePoolBytes)return 0;
   reservation.hasPool=true;reservation.bytes=surfacePoolBytes;
@@ -141,7 +189,7 @@ struct Producer {
   try{
    while(!stop){
     int64_t generation,target;{
-     std::unique_lock<std::mutex> lock(guard);changed.wait(lock,[&]{return stop||workerEpoch!=epoch||(!eof&&!holdRefill&&queue.size()<4);});
+     std::unique_lock<std::mutex> lock(guard);changed.wait(lock,[&]{return stop||workerEpoch!=epoch||(!eof&&!holdRefill&&queue.size()+cutTail.size()<4);});
      if(stop)return;decoding=true;generation=epoch;target=seekTick;
      if(sourceTrace){sourceContext=request;sourceContext.decodeEpoch=generation;sourceContext.depth=(int)queue.size();}
      if(workerEpoch!=generation){workerEpoch=generation;lock.unlock();
@@ -171,7 +219,7 @@ struct Producer {
      // Preroll and late-frame catch-up can run without a round trip every four pictures.
      if(frame->best_effort_timestamp<=wantedPTS&&queue.empty())current=frame;
      else queue.push_back(frame);
-     decoded++;peak=std::max(peak,queue.size());
+     decoded++;peak=std::max(peak,queue.size());peakCombinedQueue=std::max(peakCombinedQueue,queue.size()+cutTail.size());
     }changed.notify_all();
    }
   }catch(const std::exception&){std::lock_guard<std::mutex> lock(guard);failure="Native source decode or seek failed";changed.notify_all();}
@@ -181,8 +229,15 @@ struct Producer {
   if(holdRefill){holdRefill=false;changed.notify_one();}
  }
  // Returns the source picture whose half-open PTS interval contains the target.
- Frame at(int64_t tick,AVRational sourceBase,bool& ready,bool coordinateRefill){
-  std::lock_guard<std::mutex> lock(guard);if(!failure.empty())throw std::runtime_error(failure);
+ Frame at(const Clip& clip,int64_t frame,int64_t transportGeneration,int64_t tick,bool& ready,bool coordinateRefill){
+  auto sourceBase=clip.timebase;
+  std::lock_guard<std::mutex> lock(guard);
+  if(cutOld==&clip&&cutGeneration==transportGeneration){
+   if(frame<tailFirstFrame||frame>=tailFirstFrame+(int64_t)cutTail.size())throw std::runtime_error("Requested old picture outside retained range");
+   while(tailFirstFrame<frame){cutTail.pop_front();tailFirstFrame++;changed.notify_one();}
+   ready=true;tailHits++;return cutTail.front();
+  }
+  if(!failure.empty())throw std::runtime_error(failure);
   if(!opened){ready=false;return nullptr;}
   if(eof&&queue.empty()&&!current)throw std::runtime_error("No decodable source picture");
   if(sourceTrace){request=sourceContext;request.tick=tick;request.num=sourceBase.num;request.den=sourceBase.den;}
@@ -221,6 +276,7 @@ struct Input {
  }
  void clockStats(){Distribution copy;uint64_t count;{std::lock_guard<std::mutex> lock(guard);copy=correction;count=updates;}std::cout<<",\"clock_updates\":"<<count<<",\"clock_correction_absolute\":";copy.json();}
  bool isGeneration(int64_t epoch){std::lock_guard<std::mutex> lock(guard);return epoch==generation;}
+ bool stillPlaying(int64_t epoch){std::lock_guard<std::mutex> lock(guard);return !stop&&playing&&epoch==generation;}
  bool stillPaused(int64_t epoch){std::lock_guard<std::mutex> lock(guard);return !stop&&!playing&&epoch==generation;}
  void snapshot(int64_t& us,int64_t& gen,bool& play,double* age=nullptr,int64_t* adjustment=nullptr){
   std::lock_guard<std::mutex> lock(guard);us=microseconds;gen=generation;play=playing;

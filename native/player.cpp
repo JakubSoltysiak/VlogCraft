@@ -25,6 +25,20 @@ int main(int argc,char** argv){
   std::map<std::string,std::string> currentClip;std::map<std::string,const Clip*> clipLookup;for(auto& c:plan.clips)clipLookup[c.id]=&c;
   std::map<std::string,int> sourceIds;int nextDecoderId=0;
   if(trace)for(auto& c:plan.clips)if(!sourceIds.count(c.asset))sourceIds.emplace(c.asset,(int)sourceIds.size());
+  // Resolve exact source/sequence boundaries once, outside the playback loop.
+  std::map<const Clip*,const Clip*> rewinds;
+  {
+  std::map<std::pair<std::string,int64_t>,const Clip*> starts;
+  for(auto& c:plan.clips){
+   auto result=starts.emplace(std::make_pair(c.asset,c.position),&c);
+   if(!result.second)result.first->second=nullptr;
+  }
+  for(auto& c:plan.clips){
+   auto next=starts.find({c.asset,c.end});
+   if(next!=starts.end()&&next->second&&av_compare_ts(next->second->inTick,next->second->timebase,c.outTick,c.timebase)<0)
+    rewinds[&c]=next->second;
+  }
+  }
   auto start=Clock::now(),lastReport=start;int64_t previous=-1,generation=-1,drawnGeneration=-1;uint64_t waiting=0,skipped=0,sourceWait=0,gpuWait=0,sourceSkipped=0,gpuSkipped=0,clockSkipped=0,clockBackwards=0,repeatedSource=0,clockHolds=0,distinctFrames=0,redraws=0;int64_t highest=-1;bool sawSourceWait=false,sawGpuWait=false;std::map<std::string,int64_t> lastPTS;size_t maxDecoders=0,maxQueue=0;
   int64_t reportedPausedGeneration=-1;
   std::set<std::string> lastActive;std::map<std::string,const Clip*> parked;
@@ -64,7 +78,7 @@ int main(int argc,char** argv){
    if(renderer.display){std::cout<<",\"present_call\":";renderer.display->presentTime.json();std::cout<<",\"present_call_interval\":";renderer.display->presentIntervals.json();std::cout<<",\"playback_present_interval\":";renderer.display->playIntervals.json();}
    std::cout<<",\"source_selection\":";selectTime.json();std::cout<<",\"wake_overshoot\":";deadline.overshoot.json();std::cout<<"},\"high_resolution_wait\":"<<(deadline.timer?"true":"false")<<",\"decoder_statistics\":[";bool dc=false;
    for(auto& entry:producers){auto& p=*entry.second;std::lock_guard<std::mutex> lock(p.guard);if(dc)std::cout<<",";dc=true;
-    std::cout<<"{\"decoded_frames\":"<<p.decoded<<",\"decode_wall_seconds\":"<<p.decodedSeconds<<",\"seeks\":"<<p.seeks<<",\"queued_frames\":"<<p.queue.size()<<",\"warm_cache_frames\":"<<p.warm.size()<<",\"warm_cache_hits\":"<<p.warmHits<<",\"deferred_refills\":"<<p.deferredRefills<<",\"warm_budget_frames\":"<<p.warmBudget<<",\"decoder_threads\":"<<p.codecThreads<<",\"active_thread_type\":"<<p.threadType<<",\"hardware_pool_frames\":"<<p.poolFrames<<"}";}
+    std::cout<<"{\"decoded_frames\":"<<p.decoded<<",\"decode_wall_seconds\":"<<p.decodedSeconds<<",\"seeks\":"<<p.seeks<<",\"queued_frames\":"<<p.queue.size()<<",\"warm_cache_frames\":"<<p.warm.size()<<",\"warm_cache_hits\":"<<p.warmHits<<",\"deferred_refills\":"<<p.deferredRefills<<",\"early_rewinds\":"<<p.earlyRewinds<<",\"adopted_rewinds\":"<<p.adoptedRewinds<<",\"rewind_tail_hits\":"<<p.tailHits<<",\"peak_queue_plus_tail\":"<<p.peakCombinedQueue<<",\"warm_budget_frames\":"<<p.warmBudget<<",\"decoder_threads\":"<<p.codecThreads<<",\"active_thread_type\":"<<p.threadType<<",\"hardware_pool_frames\":"<<p.poolFrames<<"}";}
    std::cout<<"]";input.clockStats();std::cout<<",\"retained_surface_views\":"<<renderer.textures.views.size()<<",\"retained_texture_pools\":"<<renderer.textures.pools.size()<<",\"retained_texture_estimated_MiB\":"<<renderer.textures.estimatedBytes()/1048576.<<"}"<<std::endl;
   };
   // Prepare unseen sources only after an exact paused picture has been
@@ -168,7 +182,13 @@ int main(int argc,char** argv){
       decoderOpens++;
      }else{
       auto& outgoing=*clipLookup.at(currentClip.at(c->asset));
-      if(reset||(outgoing.id!=c->id&&!plan.adjacent(outgoing,*c)))producers[c->asset]->reset(tick,c->timebase);
+      auto& producer=*producers[c->asset];
+      if(reset||outgoing.id!=c->id){
+       bool primed=producer.cutNext!=nullptr;
+       if(primed)retryOnFailure.insert(c->asset);
+       bool adopted=!reset&&primed&&producer.adoptRewind(*c,epoch);
+       if(!adopted&&(primed||reset||!plan.adjacent(outgoing,*c)))producer.reset(tick,c->timebase);
+      }
       if(parked.count(c->asset)){
        retryOnFailure.insert(c->asset);
        producers[c->asset]->reservation.bytes=0;
@@ -187,7 +207,7 @@ int main(int argc,char** argv){
     auto& p=*producers[c->asset];
     if(trace){sourceContext.decoder=p.request.decoder;sourceContext.source=sourceIds.at(c->asset);sourceContext.tick=plan.sourceTick(*c,frame);sourceContext.num=c->timebase.num;sourceContext.den=c->timebase.den;}
     bool available=false;Frame f;
-    try{SourceStage timer("select_picture");f=p.at(plan.sourceTick(*c,frame),c->timebase,available,coordinateRefill);}
+    try{SourceStage timer("select_picture");f=p.at(*c,frame,epoch,plan.sourceTick(*c,frame),available,coordinateRefill);}
     catch(const std::runtime_error&){
      if(!retryOnFailure.erase(c->asset))throw;
      // Oversized/changed-format speculative decoding never removes a source
@@ -216,6 +236,20 @@ int main(int argc,char** argv){
    if(drawnGeneration!=generation){highest=frame;distinctFrames++;}else if(frame>highest){highest=frame;distinctFrames++;}else redraws++;
    if(trace)trace->submitStart();
    {SourceStage timer("draw_and_present");renderer.draw(*slot,plan,frame,generation,selected,playing);}
+   if(coordinateRefill&&!software){
+    // Only simultaneous same-file backwards boundaries qualify. The three
+    // leads are staggered and no current-source lookup waits for a new frame.
+    for(size_t layer=0;layer<active.size();layer++){
+     auto* c=active[layer];
+     const auto lead=c->end-frame;
+     if(lead<1||lead>3-(int64_t)layer)continue;
+     auto next=rewinds.find(c);if(next==rewinds.end())continue;
+     bool simultaneous=std::any_of(active.begin(),active.end(),[&](const Clip* other){
+      return other!=c&&other->end==c->end&&rewinds.count(other);
+     });
+     if(simultaneous&&input.stillPlaying(epoch))producers.at(c->asset)->primeRewind(plan,*c,*next->second,frame,epoch);
+    }
+   }
    releaseRefills();
    if(!first)first=seconds(launch);
    previous=frame;drawnGeneration=generation;

@@ -70,7 +70,7 @@ COUNTERS = ("completed_frames present_calls dxgi_present_count distinct_sequence
             "gpu_wait_iterations nonadvancing_redraws clock_backwards_frames repeated_source_layer_frames")
 POOL = ("peak_decoder_count peak_source_queue_frames peak_inflight_gpu_frames gpu_slot_budget retained_texture_pools "
         "retained_surface_views retained_texture_estimated_MiB decoder_opens resumed_decoders peak_standby_surface_bytes "
-        "standby_surface_budget_bytes cold_prepares prepare_retries")
+        "standby_surface_budget_bytes peak_standby_reserved_bytes cold_prepares prepare_retries")
 HIST = "count mean_ms p50_upper_ms p95_upper_ms p99_upper_ms max_ms overflow_100ms"
 STAGES = ("open_file probe_stream open_codec receive_picture read_demux send_packet drain_codec "
           "seek_demux flush_codec gpu_available select_picture create_decoder status_report "
@@ -117,6 +117,7 @@ def stage_summary(trace):
     return {"bounded_missed_event_count":len(misses),
             "largest_missed_events":[numbers(item,"frame lost loop_gap_ms source_selection_ms clock_age_ms "
                  "clock_adjustment_us previous_present_ms context_wait_ms source_wait gpu_wait")
+                | {flag:item[flag] for flag in ("source_wait","gpu_wait") if type(item.get(flag)) is bool}
                 for item in sorted(misses,key=lambda row:row["lost"],reverse=True)[:5]],
             **numbers(trace,"stage_threshold_us stage_event_count"),
             "retained_stage_maxima":by_stage,
@@ -159,6 +160,7 @@ def playback(receipt, trace):
     dims=lambda k:[number(val) for val in receipt.get(k,[])]
     return {"seconds":seconds,"rate":rate,"source_px":dims("original_resolution"),"composition_px":dims("program_resolution"),
             "actual_surface_px":[number(last.get("surface_width")),number(last.get("surface_height"))],
+            "source_rewind_schedule":"staggered" if receipt.get("source_rewind_schedule")=="staggered diagnostic" else "original",
             "proxy":receipt.get("proxies"),"switch_sources":receipt.get("source_switches"),"cut_s":number(receipt.get("cut_seconds")),
             **numbers(receipt,"video_tracks audio_tracks measured_seconds distinct_sequence_fps samples expected_samples underruns"),
             "expected_last_frame":expected-1 if expected else None,
@@ -172,7 +174,8 @@ def playback(receipt, trace):
             "completed_last_frame":number(final.get("completed_sequence_frame")),"reached_end":receipt.get("reached_end"),
             "counter_delta":delta,"native_timings_ms":timings,"decoder_and_texture_pool":numbers(last,POOL),
             "final_decoder_statistics":[numbers(p,"seeks decoded_frames decode_wall_seconds queued_frames warm_cache_frames "
-                                         "warm_budget_frames warm_cache_hits hardware_pool_frames") for p in last.get("decoder_statistics",[])],
+                                         "warm_budget_frames warm_cache_hits hardware_pool_frames deferred_refills "
+                                         "early_rewinds adopted_rewinds rewind_tail_hits peak_queue_plus_tail") for p in last.get("decoder_statistics",[])],
             "peak_summed_working_set_MiB":number(resources.get("peak_summed_working_set_MiB")),"role_memory":memory,
             "gpu_allocation_peaks_MiB":{k:number(gpu.get("peak_process_gpu_memory_MiB",{}).get(k))
                                         for k in ("Dedicated Usage","Shared Usage")},
@@ -250,6 +253,7 @@ def comparison_contract(row):
     return {"seconds":p["seconds"],"source_px":tuple(p["source_px"]),"composition_px":tuple(p["composition_px"]),
             "actual_surface_px":tuple(p["actual_surface_px"]),"active_video":p["video_tracks"],"active_audio":p["audio_tracks"],
             "rate":p["rate"],"cut_s":p["cut_s"],"switch_sources":p["switch_sources"],"proxy":p["proxy"],
+            "source_rewind_schedule":p.get("source_rewind_schedule","original"),
             "runtime_observer":p["runtime_observer"],"gpu_pdh_observer":p["gpu_pdh_observer"],
             "native_trace":p["trace"] is not None,"refresh_hz":c["desktop_hz"],
             "actual_window_dpi":c["window_dpi"],"window_held":c["physical_window_held"],"ac_all":c["ac_all"]}

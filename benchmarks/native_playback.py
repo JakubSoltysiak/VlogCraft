@@ -11,14 +11,15 @@ from window_geometry import alignment
 from window_visibility import WindowVisibility
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'tests'))
 from performance import Resources
-SETUP="""({assets,seconds,cut,switchSources=false})=>{
+SETUP="""({assets,seconds,cut,switchSources=false,staggerRewinds=false})=>{
  stopPlayback();refreshPlayers();state.assets=assets;state.output.fps=60;useProxies=false;state.tracks=[];
  const trackAssets=switchSources?assets.slice(0,1):assets;
  trackAssets.forEach((a,n)=>{
   const video={id:uid(),type:'video',name:'Video'+n,volume:1,clips:[]},audio={id:uid(),type:'audio',name:'Audio'+n,volume:.2,clips:[]};
   for(let i=0;i<Math.ceil(seconds/cut);i++){
    const shot=switchSources?assets[i%assets.length]:a;
-   const start=switchSources?(Math.floor(i/assets.length)%3)*.5:(i%3)*.5;
+   const sourcePhase=staggerRewinds?n:0;
+   const start=switchSources?(Math.floor(i/assets.length)%3)*.5:((i+sourcePhase)%3)*.5;
    const c=clipFromAsset(shot,i*cut,'video');c.start=start;c.end=start+Math.min(cut,seconds-i*cut);c.audioDetached=true;
    if(n){c.scale=.4;c.x=n===1?-.2:.2;c.opacity=.7;c.keys={rotation:[{time:0,value:-4,mode:'linear'},{time:6,value:4,mode:'linear'}]};}
    video.clips.push(c);const sound=clipFromAsset(shot,i*cut,'audio');sound.start=c.start;sound.end=c.end;audio.clips.push(sound);
@@ -30,7 +31,7 @@ def main(a):
  with session(a.executable,a.results,offline=True,legacy_viewport=a.legacy_viewport,legacy_focus_emulation=a.legacy_focus_emulation) as (page,proc,project,errors),ExitStack() as owned_windows:
   result=page.evaluate("paths=>request('import','POST',{paths,autoProxy:false})",[str((a.media/f'h264-4k60-{n}.mp4').resolve()) for n in range(3 if a.switch_sources else a.layers)])
   assert not result['errors']
-  page.evaluate(SETUP,{'assets':result['assets'],'seconds':a.seconds,'cut':a.cut,'switchSources':a.switch_sources})
+  page.evaluate(SETUP,{'assets':result['assets'],'seconds':a.seconds,'cut':a.cut,'switchSources':a.switch_sources,'staggerRewinds':a.stagger_source_rewinds})
   page.evaluate("""({width,rate})=>{state.output.fps=rate;const select=$('programResolution');if(![...select.options].some(o=>o.value===String(width)))select.add(new Option('Benchmark',width));select.value=width;save();return flushSave();}""",{'width':a.width,'rate':a.rate})
   page.wait_for_function("Array.from(document.querySelector('#playbackEngine').options).some(o=>o.value==='native'&&!o.disabled)")
   if not a.legacy_viewport and not a.actual_display and not a.large_surface:
@@ -98,6 +99,7 @@ def main(a):
   data.update(ui_source_patch_sha256=ui_patch,application_ready_seconds=getattr(page,'_vlogcraft_launch_seconds',None),first_ready_seconds=ready,seconds=a.seconds,cut_seconds=a.cut,video_tracks=a.layers,audio_tracks=a.layers,source_files=len(result['assets']),source_switches=a.switch_sources,original_resolution=[3840,2160],
               program_resolution=[a.width,a.width*9//16],rate=a.rate,browser_errors=errors,proxies=False)
   data['expected_samples']=page.evaluate('Math.round(nativeDuration()*48000)')
+  data['source_rewind_schedule']='staggered diagnostic' if a.stagger_source_rewinds else 'original'
   data['gpu_counter_observer']='disabled for attribution diagnostic; not protected acceptance' if a.diagnostic_no_gpu_counters else 'legacy high-frequency PDH GPU observer; cost recorded separately'
   elapsed=data['measured_seconds']
   for key in ('completed_frames','present_calls','dxgi_present_count'):
@@ -122,7 +124,9 @@ if __name__=='__main__':
  p.add_argument('--diagnostic-no-gpu-counters',action='store_true',help='Attribution control only; retain all original/default-observer acceptance scores')
  p.add_argument('--legacy-viewport',action='store_true',help='Replay historical DPR1 measurement geometry; not visual-placement qualification');p.add_argument('--trace',action='store_true');p.add_argument('--ui-source',action='store_true');p.add_argument('--actual-display',action='store_true');p.add_argument('--large-surface',action='store_true');p.add_argument('--width',type=int,default=960);p.add_argument('--layers',type=int,choices=(1,3),default=3);p.add_argument('--rate',default='60/1');p.add_argument('--switch-sources',action='store_true',help='Alternate three sources in one picture track and one audio track')
  p.add_argument('--native-miss-trace',action='store_true',help='Retain the native per-miss diagnostic on clean playback-worker shutdown')
+ p.add_argument('--stagger-source-rewinds',action='store_true',help='Diagnostic: offset the three source loops by one cut each while preserving all pictures, audio tracks and cut boundaries')
  args=p.parse_args()
+ if args.stagger_source_rewinds and (args.layers!=3 or args.switch_sources or args.cut!=.5):p.error('Staggered rewinds require the three-layer half-second cut fixture')
  if args.switch_sources and args.layers!=1:p.error('--switch-sources requires --layers 1')
  if args.native_miss_trace:
   args.results.mkdir(parents=True,exist_ok=True)

@@ -46,7 +46,7 @@ PROTOCOL_FILES=(
  'benchmarks/resume_phase2d_reference.py',
  'benchmarks/phase3b_scrub.py','benchmarks/native_seek.py','benchmarks/program_seek.py',
  'benchmarks/phase3b_handoff_evidence.py','tests/windows_phase3b_handoff.py','tests/test_phase3b_handoff_evidence.py',
- 'benchmarks/phase3b_mixed_preview.py','benchmarks/profile_preview_proxy.py','tests/native_source_timebase.py',
+ 'benchmarks/phase3b_mixed_preview.py','benchmarks/profile_preview_proxy.py','tests/native_source_timebase.py','tests/native_source_rewind.py',
  'benchmarks/phase3a_encoder_probe.py','benchmarks/phase3a_first_project.py',
  'tests/test_phase3a_export.py','tests/windows_phase3a_export.py',
  'tests/verify_bundle.py','tools/setup_architecture_lab.py',
