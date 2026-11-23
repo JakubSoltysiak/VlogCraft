@@ -95,7 +95,16 @@ jobs:
           $stallFixRecord = "$phase3bStallFix/docs/benchmarks/studio-3.6.0-phase3b.json"
           python "$phase3bStallFix/tools/performance_record.py" $stallFixRecord --historical-record $followUpRecord
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          python tools/performance_record.py docs/benchmarks/studio-3.6.0-phase3b.json --historical-record $stallFixRecord
+          $phase3bReadiness = 'build/qa/phase3b-readiness-checkpoint'
+          New-Item -ItemType Directory -Force -Path $phase3bReadiness | Out-Null
+          git archive --format=tar --output=build/qa/phase3b-readiness-checkpoint.tar 59008494539a3a622ebc92f85fd072c39f527dcc
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          tar -xf build/qa/phase3b-readiness-checkpoint.tar -C $phase3bReadiness
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $readinessRecord = "$phase3bReadiness/docs/benchmarks/studio-3.6.0-phase3b.json"
+          python "$phase3bReadiness/tools/performance_record.py" $readinessRecord --historical-record $stallFixRecord
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tools/performance_record.py docs/benchmarks/studio-3.6.0-phase3b.json --historical-record $readinessRecord
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python tests/icon_assets.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
@@ -147,6 +156,8 @@ jobs:
           python -m pip install -r packaging/requirements.txt
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           .github/scripts/setup-ffmpeg.ps1
+      - name: Verify producer refill expiry without a GPU
+        run: python tests/test_native_refill_liveness.py
       - name: Verify compositor kernels and HDR fallback in software
         shell: pwsh
         run: |

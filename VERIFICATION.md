@@ -1,5 +1,13 @@
 # VlogCraft Studio development qualification
 
+## 3.6.0 Phase 3B decoder refill and Present
+
+At 958 × 539 a 121.31 ms Present retained three refill holds with only 33.33 ms of successor coverage. The following common request found no successor. Disabling holds also reproduced long active stalls and lost more pictures in both alternating pairs. The worker now independently expires a hold at a monotonic, headroom-aware deadline. A real software decoder liveness test passed while the renderer withheld release. A same-worker editor-size comparison improved from 50 to 12 skips and 568.41 to 75.47 ms, with 22 retained producer expiries, 17 overlapping Present.
+
+The development MSI built from `b42e37630810e880a38dda2b111168b9bd5d11f9` remains unqualified. The three protected trials measured 58.884, 56.455 and 59.214 FPS. They recorded 60, 200 and 3 skips and maximum gaps of 502.94, 435.87 and 86.87 ms. The 958 × 539 final MSI measured 58.142 FPS, 95 skips and 1,192.66 ms, versus 56.982 FPS, 164 skips and 1,368.44 ms in the fresh immediately preceding MSI control. The earlier package control measured 59.817 FPS, zero skips and 32.58 ms. Every final protected trial finished frame 3599 with exactly 2,880,000 PCM samples, zero underruns and visibility held on AC. Keep the original observer denominator, and keep both endurance gates blocked.
+
+The 125-second rapid-cut test delivered all 7,500 pictures and 6,000,000 PCM samples without skips or underruns. VFR, seek/scrub, pending rewind, 80-state recovery and native fallback passed. Independent HDR10+ verification returned 48 pictures, exact PTS, 38,400 PCM samples and 48 correctly associated metadata blocks. Python passed 202 with one skip, WARP 9/9, JavaScript 33/33 and the MSI bundle 48/48. The three private originals retained their hashes and modification times. The next comparison isolates completion polling with the refill policy held fixed. [Refill follow-up and exact package identities](docs/STUDIO_3_6_0_PHASE3B_PLAYBACK.md#refill-deferral-during-present) · [Executable handoff](docs/STUDIO_3_6_0_PHASE3B_HANDOFF.md).
+
 ## 3.6.0 Phase 3B source-readiness follow-up
 
 The new recorder attributed the first unavailable source intervals to empty successor queues in two protected runs. In one the target and all three floor pictures matched at PTS 4096, timebase 1/15360. A second observed empty queues after a long Present. The revised worker retains exact half-open selection, reports completed pictures on the existing single-layer path and combines optional completion queries with multitrack composition when a slot is free. It preserves eager polling around status, pause and the terminal frame.

@@ -1,10 +1,10 @@
 # Phase 3B qualification handoff
 
-Use [draft PR #21](https://github.com/JakubSoltysiak/VlogCraft/pull/21) and its published head on `codex/studio-3.6.0-phase3b`. The [current playback report](STUDIO_3_6_0_PHASE3B_PLAYBACK.md) gives the diagnosis and short-gate status. The [benchmark record](benchmarks/studio-3.6.0-phase3b.json) records the build commit, native-source digest, development MSI hash and extracted host and playback worker hashes for the tested candidate in `readiness_investigation.candidate_identity`. The previous tests remain in `freeze_investigation`.
+Use [draft PR #21](https://github.com/JakubSoltysiak/VlogCraft/pull/21) and its published head on `codex/studio-3.6.0-phase3b`. The [current playback report](STUDIO_3_6_0_PHASE3B_PLAYBACK.md) gives the diagnosis and short-gate status. The [benchmark record](benchmarks/studio-3.6.0-phase3b.json) records the build commit, native-source digest, development MSI hash and extracted host and playback worker hashes for the tested candidate in `refill_investigation.candidate_identity`. Earlier tests remain in `readiness_investigation` and `freeze_investigation`.
 
-**Long qualification remains blocked.** The revised MSI missed 59.5 FPS in all three protected trials. The third also exceeded the 100 ms active-gap cap. Preserve every attempt and the existing wall-time definition. Begin with an onset-centered comparison at the ordinary 958 × 539 preview, which also failed on both revised MSI candidates. Compare Present duration, the refill-hold state and each acquired successor. Test a bounded refill deferral only if it addresses the observed interval and protects existing VFR, rewind and audio semantics.
+**Long qualification remains blocked.** All three protected trials missed 59.5 FPS, two exceeded the skip and active-gap limits, and the ordinary 958 × 539 preview measured a 1.193 s gap. Retain all attempts and the original wall-time definition.
 
-The packaged implementation for this follow-up is `7086ed380d279855b2d81f87d4d2105e268b6335`. Its MSI SHA-256 is `2f9de210fe88a2e4903e679bb61e081201973b073f20bba2bce3cf14bc0b8266` and playback worker SHA-256 is `2251ac360af922971b0fbcde1a08eb2b4693e7f994e8bf77bf44d1897c0f36a6`. For comparing to the previous published checkpoint, use `cand1` and its MSI `4d82887f41389b458278056970e12a49319850b0fb13df281c1f36fe947e9bd4`. The older `b817372` image is a separate historical control.
+The packaged implementation is `b42e37630810e880a38dda2b111168b9bd5d11f9`. Its MSI SHA-256 is `8047cde8308fe394abc2fa2c6543d6c02f8b5dd2dc6ed7accfdb34e76daa0cf5` and playback worker SHA-256 is `152866b9a0ba6d9b4722e7e567ad1299d8a10a2cba6cd7b3160117c1178452f3`. The immediate comparison is `cand3` from published `5900849`, MSI `2f9de210fe88a2e4903e679bb61e081201973b073f20bba2bce3cf14bc0b8266`. The separate earlier control is `cand1` from published `28c0abf`, MSI `4d82887f41389b458278056970e12a49319850b0fb13df281c1f36fe947e9bd4`. Keep `b817372` historical.
 
 ## Decision and fixtures
 
@@ -16,26 +16,59 @@ The local QA scripts and receipts are in the worktree's ignored `build/qa/phase3
 $commonGit = git rev-parse --path-format=absolute --git-common-dir
 $py = Join-Path (Split-Path -Parent $commonGit) '.venv/Scripts/python.exe'
 $handoff = 'build/qa/phase3b-watch/handoff.py'
-$candidate = 'cand3'
+$candidate = 'cand4'
 & $py $handoff plan --candidate $candidate
 ```
 
-Use the published candidate trial prefix as `$candidate`. The plan lists each failed or missing prerequisite. If any is listed, the next run is a protected 60-second diagnostic. Reopen the longest relevant native recorder window and line up the last returned submission, current renderer or decoder stage, packet and queue progress, and device lock state. Check recorder discontinuities, torn observations, transition flags and recovery coverage. When the recorder leaves the interval unresolved, repeat the same-binary capture with the specific missing observation added. A short arm that lost AC or visibility must be repeated under the declared conditions.
+Use the published candidate trial prefix as `$candidate`. The plan lists each failed or missing prerequisite. Keep endurance blocked while any prerequisite remains open.
+
+## Matched editor-size refill diagnostic
+
+Run the 60-second three-layer UHD60 composition at the ordinary 958 × 539 physical preview. Arm A uses the original refill deferral. Arm B sets `VLOGCRAFT_DIAGNOSTIC_NO_REFILL_HOLD=1`. Both use the same instrumented worker in a clone of the verified `cand3` administrative image. The preparation also verifies the separate `cand1` package for packaged editor-size comparisons. Start with A then B. Review that pair before starting B then A. Stop after two pairs or when the controls fail, and retain all attempts.
 
 ```powershell
 $campaign = 'build/qa/phase3b-watch/campaign.py'
-& $py $campaign diag-build --label nextdiag
+$cohort = 'nextdiag'
+& $py $campaign diag-build --label $cohort
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-& $py $campaign diag-setup --label nextdiag
+& $py $campaign refill-setup --label $cohort
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-& $py $campaign diag-on --label nextdiag --slot 1
+& $py $campaign refill-pair --label $cohort --slot 1
+& $py $campaign refill-review --label $cohort --slot 1
 ```
 
-Use a fresh campaign label or an unused slot in a retained diagnostic cohort for the next bounded experiment. Review each capture before scheduling another.
+The review receipt is `build/qa/phase3b-watch/$cohort/pair-1-review.json`. Check both arms' window, AC, exact audio, geometry, process cleanup and flag controls. Compare wall-time FPS, active presentation gaps and skips, then check the coherent request and adjacent Present interval. Inspect the exact queued PTS headroom and the sampled wait, device lock and decoder progress across the three layers. Check torn lanes, missing requests, sampling gaps and any transport transition before attributing delay.
+
+```powershell
+# Run after the first pair's evidence has been reviewed and its controls passed.
+& $py $campaign refill-pair --label $cohort --slot 2
+& $py $campaign refill-review --label $cohort --slot 2
+```
+
+Use a fresh label if a later bounded experiment is warranted. If the evidence calls for a polling-order comparison, use a worker that implements `VLOGCRAFT_DIAGNOSTIC_LEGACY_POLL_ORDER=1`, then add `--comparison poll-order --hold-arm B` to `refill-setup`. Use slot 1 once. Both arms will have refill deferral disabled. Use `--hold-arm A` when the comparison instead calls for retaining the original refill behavior in both arms.
+
+For a comparison of the original and independently expiring holds, build a worker that supports `VLOGCRAFT_DIAGNOSTIC_LEGACY_REFILL_HOLD=1`, then prepare a fresh label with `refill-setup --comparison bounded`. Use slot 1 once. Arm A sets the legacy hold and arm D uses the expiring hold in the same worker.
+
+## Next bounded comparison
+
+Use a fresh Astra High investigation if the D3D scheduling problem needs a larger design. First isolate source-first/combined polling at 958 × 539 with the bounded refill policy held fixed. Add a diagnostic-only check for `VLOGCRAFT_DIAGNOSTIC_LEGACY_POLL_ORDER=1` next to `sourcesFirst` in `native/player.cpp`. Arm C disables the combined order and still uses `Renderer::available()` with the existing empty-query bypass. Leave query-before-release and the final completion path unchanged. Build one worker and run one pair against arm D.
+
+```powershell
+$campaign = 'build/qa/phase3b-watch/campaign.py'
+$cohort = 'pollbounded1'
+& $py $campaign diag-build --label $cohort
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+& $py $campaign refill-setup --label $cohort --comparison poll-order --hold-arm D
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+& $py $campaign refill-pair --label $cohort --slot 1
+& $py $campaign refill-review --label $cohort --slot 1
+```
+
+Compare completed pictures, active gaps and the first coherent missing source interval. Separate time spent with the hold already expired from decoder packet submission and driver work. If C still loses source headroom, correlate the held/nonheld packet submission intervals, fair device-lock access and scheduling using a bounded trace with event-loss accounting. Keep the protected fixture, resource limits, exact timestamps and observer protocol unchanged.
 
 ## Recorder campaign from a fresh checkout
 
-Point `$frozenMsi` to the development MSI with SHA-256 `4d82887f41389b458278056970e12a49319850b0fb13df281c1f36fe947e9bd4`. Point `$media` to the established generated fixture directory and `$py` to the QA Python environment. Build the diagnostic worker at the implementation under review. The command uses the pinned Zig 0.17.1 and FFmpeg 9.0.2 shared SDK from the existing architecture tool setup.
+Point `$latestMsi` and `$priorMsi` to the retained `cand3` and `cand1` development packages identified above. Point `$media` to the established generated fixture directory and `$py` to the QA Python environment. The command builds the original A/B diagnostic source with the pinned Zig 0.17.1 and FFmpeg 9.0.2 shared SDK.
 
 ```powershell
 # Set up the pinned toolchain if the checkout does not have it.
@@ -46,23 +79,32 @@ $zig = Join-Path $sdk 'zig/zig-x86_64-windows-0.17.1/zig.exe'
 $ffmpeg = Join-Path $sdk 'ffmpeg-shared/ffmpeg-9.0.2-full_build-shared'
 $workerFolder = New-Item -ItemType Directory -Path 'build/qa/phase3b-next-worker'
 $worker = Join-Path $workerFolder.FullName 'VlogCraftNative.exe'
-& $zig c++ -std=c++17 -O2 -target x86_64-windows-gnu native/player.cpp "-I$ffmpeg/include" "-L$ffmpeg/lib" -lavformat -lavcodec -lavutil -lswscale -ld3d11 -ldxgi -o $worker
+$diagnosticRef = '67c2033233d9b59733fc336c01f8e61ad52baec3'
+$archive = Join-Path $workerFolder.FullName 'diagnostic-source.tar'
+git archive --format=tar --output=$archive $diagnosticRef native
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-git rev-parse HEAD
+tar -xf $archive -C $workerFolder.FullName
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+$workerSource = Join-Path $workerFolder.FullName 'native/player.cpp'
+& $zig c++ -std=c++17 -O2 -target x86_64-windows-gnu $workerSource "-I$ffmpeg/include" "-L$ffmpeg/lib" -lavformat -lavcodec -lavutil -lswscale -ld3d11 -ldxgi -o $worker
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+git rev-parse $diagnosticRef
 Get-FileHash -Algorithm SHA256 -LiteralPath $worker
 $run = 'build/qa/phase3b-next-recorder'
 $campaign = 'benchmarks/phase3b_stall_campaign.py'
-& $py $campaign --results $run prepare --frozen-msi $frozenMsi --diagnostic-worker $worker --media $media
+& $py $campaign --results $run refill-prepare --latest-msi $latestMsi --prior-msi $priorMsi --diagnostic-worker $worker --media $media
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-& $py $campaign --results $run trial frozen --slot 1
-& $py $campaign --results $run trial off --slot 1
-& $py $campaign --results $run trial on --slot 1
+& $py $campaign --results $run refill-pair --slot 1
+& $py $campaign --results $run refill-review --slot 1
+# Run after reviewing the first pair and confirming that its controls passed.
+& $py $campaign --results $run refill-pair --slot 2
+& $py $campaign --results $run refill-review --slot 2
 ```
 
-The preparation verifies the frozen MSI and binaries and keeps a separate diagnostic image with a single replacement worker. It hashes the generated clips during setup. Each trial starts the unchanged protected workload. Retain every attempt, including failures, and compare recorder-on and recorder-off runs with the same worker. Repeat recorder-on with slots 2 through 6 until the campaign reaches its limit or a native gap of at least 500 ms has reviewed before, during and recovery coverage. The recorder may trigger on a shorter stall while waiting for that stopping condition. The pre-fix campaign stopped at its third recorder-on trial after capturing a 1.039-second submission gap at frame 2307.
+The preparation verifies both MSIs and their extracted host and worker hashes, then clones the latest image with a single worker replacement. It hashes the generated clips at setup and checks fixture metadata around each run. Each diagnostic arm uses a fresh editor process and project. The earlier protected recorder campaign remains available through the tracked launcher's `prepare` and `trial` commands with `--baseline cand1` at preparation.
 
 ```powershell
-& $py benchmarks/phase3b_stall_evidence.py "$run/on-1-stall.private.json" --output "$run/on-1-stall-summary.json"
+& $py benchmarks/phase3b_stall_evidence.py "$run/pair-1-1-a-stall.private.jsonl" --output "$run/pair-1-1-a-stall-summary.json"
 ```
 
 For an interrupted worker, inspect the `.live` mirror when present. The reducer reports relative times, coverage exclusions, observed lane and device overlap, source readiness and GPU progress. Its paired observations tolerate gaps of at most 30 ms and exclude torn lanes. Intervening device events and thread scheduling remain unobserved. Per-lane durations overlap. Keep full captures, identifiers and supervisor logs local.
@@ -82,7 +124,7 @@ if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 On a fresh checkout, use the tracked drivers directly after reviewing every short prerequisite in the published record. Point `$candidateMsi` and `$exe` to the retained MSI and the corresponding verified administrative image executable.
 
 ```powershell
-$evidence = (Get-Content -Raw 'docs/benchmarks/studio-3.6.0-phase3b.json' | ConvertFrom-Json).readiness_investigation
+$evidence = (Get-Content -Raw 'docs/benchmarks/studio-3.6.0-phase3b.json' | ConvertFrom-Json).refill_investigation
 $identity = $evidence.candidate_identity
 $native = Join-Path (Split-Path $exe) '_internal/engine/native/VlogCraftNative.exe'
 if ((Get-FileHash -Algorithm SHA256 -LiteralPath $candidateMsi).Hash -ne $identity.msi_sha256 -or

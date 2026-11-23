@@ -2,7 +2,7 @@
 
 The starting point was Phase 3A at [f4a852b](https://github.com/JakubSoltysiak/VlogCraft/commit/f4a852ba36d9cd6e417c2cbfd1dc90af1ad2d630). [Draft PR #21](https://github.com/JakubSoltysiak/VlogCraft/pull/21) targets the Phase 3A branch. Windows results use the development MSI applications on the Radeon 890M workstation. Administrative MSI images and test projects were local and isolated from the user's active installation and projects.
 
-Current results are in the [source-readiness follow-up](#source-readiness-and-terminal-acknowledgement-follow-up). The earlier [triggered freeze investigation](#triggered-freeze-investigation) preserves the first stall diagnosis. The preceding [follow-up qualification](#follow-up-acceptance-protocol) established the comparison package. Three 125-second rapid-switch runs completed with zero skips. Two of three 60-second three-layer runs met all timing screens. The third lost 222 frames.
+Current results are in the [refill deferral follow-up](#refill-deferral-during-present). The [source-readiness follow-up](#source-readiness-and-terminal-acknowledgement-follow-up) documents the earlier recorder and timing changes. The earlier [triggered freeze investigation](#triggered-freeze-investigation) preserves the first stall diagnosis. The preceding [follow-up qualification](#follow-up-acceptance-protocol) established the comparison package. Three 125-second rapid-switch runs completed with zero skips. Two of three 60-second three-layer runs met all timing screens. The third lost 222 frames.
 
 ## Playback architecture and reproduced problems
 
@@ -409,3 +409,77 @@ The final controlled seek comparison measured 432.69/549.69 ms p50/p95. Paused r
 The final recorder-only rerun produced 3,606 request observations without loss or torn rows and captured neither a source deadline miss nor a 100 ms presentation incident. It passed with zero skips in contrast with the uninstrumented failures. Repeated ordinary editor geometry misses are a stronger remaining concern than the protected observer tail alone. Use the ordinary 958 × 539 surface with the previous and revised verified packages to capture the interval immediately before loss of decode-ahead. In particular, measure refill-hold duration during costs of Present and required GPU work, alongside the first missing successor. Try a time-bounded hold only if the recorded sequence supports it. Keep the protected fixture and wall-time series as the acceptance reference. [Executable handoff](STUDIO_3_6_0_PHASE3B_HANDOFF.md).
 
 The 226-to-268-character Windows cache publication failure, 149.75-second cold mixed monitor preparation, physical GPU recovery, calibrated HDR display and representative full 60-second mixed UHD60 HDR10+ export remain separate gates. [Exact-head hosted checks](https://github.com/JakubSoltysiak/VlogCraft/pull/21/checks).
+
+## Refill deferral during Present
+
+The diagnostic starts with two serial pairs at the ordinary 958 × 539 preview. Pair 1 is current hold A then no hold B. Pair 2 is B then A. The two arms use the same diagnostic worker extracted into a clone of the latest package host, the same recorder and original three-layer UHD60 fixture. Each attempt gets a fresh editor and project. Source-first ordering, completion cadence, bounded rewind policy, AC, visibility and unmanaged file caches are held fixed. Review each pair before proceeding.
+
+Record a support finding only if an observed long Present contains a deliberately deferred producer with queue capacity remaining, and the resulting deficit is visible in the first coherent missed selection. Judge a correction on both paired timing and retained correctness. If A and B give conflicting performance or the dominant stalls persist without active holds, use one diagnostic comparison against the old polling order while preserving empty completion-poll bypass. Keep every failed run and stop the bounded experiment after that comparison.
+
+### What the paired runs isolated
+
+The retained earlier frame-39 trace shows why this was plausible. A 68.360 ms Present overlapped at least 47.641 ms of all three producers asleep with three queued successors and no device-lock wait or ownership. Their last successor covered 50 ms from the inspected source position. The next common request had no queued successor.
+
+The new editor-size A/B runs used worker SHA-256 `e58e6636c0208dfd3f92a24220dc77fd170448ab6a5c82a56dda8269fa58d101`, reproducible from the native source at `67c2033233d9b59733fc336c01f8e61ad52baec3`. All four held visibility and AC and completed exact audio and final picture without underruns or owned survivors.
+
+| Order | Refill policy | Distinct FPS | Skips | Max active gap | Max Present call |
+|---|---|---:|---:|---:|---:|
+| 1 | A · existing hold | 58.096 | 84 | 629.09 ms | 121.31 ms |
+| 2 | B · hold disabled | 57.838 | 124 | 837.11 ms | 82.91 ms |
+| 3 | B · hold disabled | 59.350 | 23 | 63.22 ms | 52.60 ms |
+| 4 | A · existing hold | 59.530 | 4 | 71.56 ms | 53.10 ms |
+
+In pair 1, all three A holds began about 9.46 ms before frame 8 entered Present. Each had two successors and 512 source ticks of available proof, equivalent to 33.33 ms. Present took 121.31 ms. The holds ended 15–32 microseconds after it returned, about 131 ms after installation. Frame 15 then requested tick 3840 from all three layers, which had floor 2816 and no successor. The subsequent 629.09 ms gap included decoder work, shared-device waits and repeated unavailable source requests after the scheduling holds had ended. In B, the 837.11 ms gap persisted with zero active holds. Its decoders continued packet progress around the shared device while source selections retried. Hold removal lost more pictures in both pairs, although it shortened the second pair's maximum gap.
+
+The evidence supports the hold as one cause of headroom loss. The candidate therefore retains short coordination and gives it an independent producer deadline. The deadline is at most half a sequence frame after the requested frame's due time, shortened if needed to reserve one full frame of the observed successor-PTS headroom. It uses the source timebase and clip speed. Installation wakes a producer that was sleeping on a full queue, so the producer switches to a timed monotonic condition-variable wait. Reinspection cannot renew a hold for the same frame and transport generation. EOF, reset/rewind, errors and cancellation clear it. Actual wake time still depends on OS scheduling and the next decoder operation still uses the existing device synchronization. Selection proof, early rewind admission, query-before-release and all queue/resource limits remain in place.
+
+The software liveness regression drives the real decoder and condition variable from a full queue, withholds renderer release, and verifies refill after expiry and no same-frame renewal. It does not measure physical GPU performance.
+
+### Same-worker bounded variant
+
+The additional A/D comparison held the host, worker and recorder fixed. A used the original unlimited hold and D used the monotonic expiry. A measured 58.950 FPS, 50 skips and a 568.41 ms active gap. D measured 59.364 FPS, 12 skips and a 75.47 ms active gap. Source retry iterations during the measured interval fell from 367 to 6. The longest direct Present increased from 55.58 to 75.10 ms, so the reduced active gap cannot be explained by a shorter longest Present. Both arms had exact PCM and final picture, zero underruns, full visibility on AC and no surviving owned processes.
+
+The D recorder retained 22 distinct expiries around its first missing source request and associated 17 of them with an in-progress or completed Present interval. For example, all three producers expired about 21.8 ms into frame 153's 54.38 ms Present. The observed hold lengths ranged from 3.63 to 22.10 ms. The ideal monotonic deadline can be checked late because of Windows timer and scheduling delays. The correction makes expiry independent of the renderer and bounds the requested wait. No source request records were lost and no rows were torn in either arm.
+
+This was one controlled pair. D still missed the original wall-time FPS threshold, and the physical qualification remains the separate uninstrumented MSI series. No change was made to the completion observer or the wall-time denominator.
+
+
+### Final MSI identity
+
+The final package was built from `b42e37630810e880a38dda2b111168b9bd5d11f9` with native source digest `9e6bf0b5004e074e02cfca62aa154e2c5d251b4eb646ba87e1c8586d62d7df99`. The packaged checks use a fresh administrative image, leaving the existing user installation out of the run.
+
+| Artifact | SHA-256 |
+|---|---|
+| Development MSI | `8047cde8308fe394abc2fa2c6543d6c02f8b5dd2dc6ed7accfdb34e76daa0cf5` |
+| Extracted host | `fd0fcbca279f3ce20e1bcd5d33e212e1cba88b2025c806003b39b9e9922ce4ed` |
+| Native playback worker | `152866b9a0ba6d9b4722e7e567ad1299d8a10a2cba6cd7b3160117c1178452f3` |
+
+### Uninstrumented short-gate results
+
+All protected attempts used the unchanged 356 × 200 physical preview, three simultaneous UHD60 picture and audio layers, the original source offsets and the protected wall-time denominator. The ordinary preview was 958 × 539. The workstation held 2880 × 1800 at 120 Hz and 175% DPI, with foreground visibility and AC. All runs below completed their exact PCM and final picture endpoints and cleaned up their owned processes.
+
+| Package and fixture | Distinct FPS | Skips | Maximum active gap | Gate |
+|---|---:|---:|---:|---|
+| Final MSI, protected A | 58.884 | 60 | 502.94 ms | FPS, skips and gap fail |
+| Final MSI, protected B | 56.455 | 200 | 435.87 ms | FPS, skips and gap fail |
+| Final MSI, protected C | 59.214 | 3 | 86.87 ms | FPS fail |
+| Final MSI, ordinary editor | 58.142 | 95 | 1,192.66 ms | FPS, skips and gap fail |
+| Immediately preceding MSI, fresh ordinary control | 56.982 | 164 | 1,368.44 ms | FPS, skips and gap fail |
+| Earlier `cand1` ordinary control, retained | 59.817 | 0 | 32.58 ms | Pass |
+| Final MSI, 125-second rapid cuts | 59.760 | 0 | 30.90 ms | Pass |
+
+Protected median/worst values were 58.884/56.455 FPS, 60/200 skips and 435.87/502.94 ms. The previous published package's historical protected skip median/worst was 11/29. The current sensitivity to active stalls remains. In the final ordinary run, the 1,192.66 ms gap and 804 source-wait iterations represent playback disruption. The matched prior package reproduced a 1,368.44 ms gap in the same new campaign despite its better earlier published observation. The final ordinary comparison improved by 69 skips and 175.78 ms in this pair. Both failed and the older passing control remains a separate artifact.
+
+The historical end-of-playback observer delay remains documented separately. The missed FPS floor on the three-skip run included a 60.7293 s wall interval. The large gaps in the other attempts are active presentation delays even when the terminal observer returns close to 60 seconds. The 600-second playback, editing smoke and 30-minute editing tests did not run because the final package failed the short timing screens.
+
+The paired evidence established a genuine unlimited-hold failure, so the single additional comparison evaluated the bounded variant. The isolation of source-first/combined polling is carried forward. The final worker still needs matched editor-size captures that distinguish post-expiry decode/driver contention from blocking completion checks. The next session can run a narrow same-worker comparison with the bounded refill policy fixed. If that still leaves all three sources starved, use the handoff to correlate D3D lock wait/hold, decoder progress, and scheduling without increasing queue or in-flight limits. [Windows reproduction commands](STUDIO_3_6_0_PHASE3B_HANDOFF.md).
+
+### Packaged correctness, recovery and export
+
+- Rapid cuts delivered all 7,500 pictures and 6,000,000 PCM samples with frame 7499 complete. The 499.5 ms VFR boundary, backward cuts and 23 physical VFR checks passed. Active handoff used 115,200 PCM samples with zero underruns. The pending-rewind fixture compared 120 layer/frame pairs, completed an exact seek and closed during another rewind in 16 ms.
+- Controlled seek p50/p95 were 457.77/623.25 ms. Paused ruler release median was 482.30 ms and playing release was 500.40 ms. Each commit used one PCM fetch and one recovery checkpoint. Native failure recovery, resize/modal visibility, reference fallback, cancellation and process cleanup passed.
+- Both WebView fault cases recovered the exact 80 undo entries, project output, unsaved draft, paused position and undo/redo. Renderer recovery took 7.05 s and browser recovery took 7.32 s.
+- Scoped first export reached terminal success in 44.41 s. Independent validation confirmed 48 decoded pictures, exact PTS, 38,400 PCM samples, static HDR and all 48 dynamic metadata associations with 55.63 dB PQ PSNR. Active export cancellation and confirmed shutdown passed. FFmpeg remains the default and whole-project fallback.
+- The loopback-only Python suite passed 202 tests with one skip. WARP/export passed 9/9, JavaScript passed 33/33 and the extracted MSI passed all 48 bundle comparisons including the approved icon. The three private originals retained their recorded hashes and modification times. Raw traces remain local.
+
+The publication stays in [draft PR #21](https://github.com/JakubSoltysiak/VlogCraft/pull/21). The 226-to-268-character cache publication error, 149.75-second mixed-preview cold preparation, physical GPU recovery, calibrated HDR display and representative 60-second mixed UHD60 HDR10+ export remain separate tasks.

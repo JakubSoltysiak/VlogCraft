@@ -12,6 +12,7 @@ STAGES = frozenset("""
     wait_clock_deadline wait_source_retry wait_gpu_slot open_producer cancel_producer join_producer
     reset_producer prime_rewind adopt_rewind parkable_producer producer_guard producer_cv_wait
     decode_next producer_commit decode_texture_desc release_refill select_picture
+    queue_full producer_eof refill_deferred
 """.split())
 LANES = ("renderer", "source_1", "source_2", "source_3")
 TRIGGER_US = 100_000
@@ -30,6 +31,7 @@ REQUEST_LAYER = (
 )
 PICTURE_REASONS = ("opening", "missing_floor", "missing_successor", "live", "warm", "outgoing",
                    "before_first_picture", "terminal_eof", "producer_replaced")
+REFILL_REASONS = ("active", "selection", "renderer", "reset", "cancel", "eof", "expired", "error")
 
 
 def number(value):
@@ -61,6 +63,8 @@ def overlaps(samples, start, finish):
     progress = [Counter() for _ in LANES]
     owner_waiters = Counter()
     render_decoder = Counter()
+    per_lane_device_wait = Counter()
+    per_lane_device_ownership = Counter()
     overall = Counter()
     for before, after in zip(samples, samples[1:]):
         interval = min(finish, after[0]) - max(start, before[0])
@@ -89,6 +93,12 @@ def overlaps(samples, start, finish):
             if activity[0] == following[0] and left[0] == right[0]:
                 states[index] = stage(left[0])
                 coverage[index][states[index]] += interval
+            device = left[7]
+            if device == right[7]:
+                if device[0]:
+                    per_lane_device_wait[LANES[index]] += interval
+                if device[1]:
+                    per_lane_device_ownership[LANES[index]] += interval
             if whole_interval:
                 for name, x, y in (("packet_reads", left[6][2], right[6][2]),
                                    ("stage_entries", activity[1], following[1]),
@@ -111,6 +121,8 @@ def overlaps(samples, start, finish):
     return {
         "coverage_by_lane": {lane: dict(coverage[i]) for i, lane in enumerate(LANES)},
         "observed_progress_by_lane": {lane: dict(progress[i]) for i, lane in enumerate(LANES)},
+        "device_wait_us_by_lane": dict(per_lane_device_wait),
+        "device_owned_us_by_lane": dict(per_lane_device_ownership),
         "device_wait_overlaps": [
             {"owner_lane": owner, "owner_stage": owning, "waiter_lane": waiter, "waiter_stage": waiting, "observed_us": us}
             for (owner, owning, waiter, waiting), us in owner_waiters.most_common()
@@ -172,10 +184,12 @@ def source_request(raw):
             layer[key] = bool(layer[key])
         target, floor, successor = (layer[key] for key in ("stream_tick", "floor_pts", "successor_pts"))
         bracket = None if None in (target, floor, successor) else floor <= target < successor
+        queued = [pts for pts in queue if pts != NO_PTS]
+        headroom = max(queued) - target if queued and target is not None else None
         terminal = (target is not None and floor is not None and floor <= target and successor is None and
                     name in ("terminal_eof", "outgoing"))
         layers.append({**layer, "layer": index + 1, "selected": selected, "reason": name,
-                       "queued_pts": [pts for pts in queue if pts != NO_PTS], "interval_covers_target": bracket,
+                       "queued_pts": queued, "queue_headroom_pts": headroom, "interval_covers_target": bracket,
                        "terminal_interval": terminal})
     return {**header, "layers": layers, "ready_layer_mask": ready, "all_layers_selected": bool(mask) and ready == mask,
             "gpu_slot_available": bool(header["outcome"] & 8),
@@ -208,6 +222,73 @@ def watchdog_observations(samples, at):
     return observations
 
 
+def pacing_lane(sample, index):
+    lane = sample[8 + index]
+    if sample[1] & (1 | (2 << index)) or not lane[2][7] or len(lane) < 9:
+        return None
+    return lane
+
+
+def pacing_window(samples, start, finish, generation, *, request_us=None):
+    presents = {}
+    holds = {}
+    for sample in samples:
+        renderer = pacing_lane(sample, 0)
+        if renderer is not None:
+            begin, frame, gen, last_begin, last_end, last_frame, last_gen = renderer[8]
+            if begin > 0 and gen == generation:
+                presents.setdefault((begin, frame), [None, begin])[1] = max(begin, sample[0])
+            if 0 < last_begin <= last_end and last_gen == generation:
+                presents[(last_begin, last_frame)] = [last_end, last_end]
+        for index in range(1, len(LANES)):
+            lane = pacing_lane(sample, index)
+            if lane is None:
+                continue
+            begin, end, reason, target, farthest, epoch, count = lane[8]
+            if begin <= 0 or count <= 0:
+                continue
+            key = (index, lane[3][0], lane[3][1], epoch, count, begin)
+            hold = holds.setdefault(key, {
+                "lane": LANES[index], "source_ordinal": lane[3][0], "decoder_ordinal": lane[3][1],
+                "stream_timebase": lane[3][2:], "hold_epoch": epoch, "hold_count": count,
+                "begin_us": begin, "end_us": None, "release_reason": None,
+                "target_pts": target, "farthest_queued_pts": farthest, "headroom_pts": farthest - target,
+            })
+            hold["observed_through_us"] = sample[0]
+            if end >= begin:
+                hold["end_us"] = end
+                hold["release_reason"] = REFILL_REASONS[reason] if 0 < reason < len(REFILL_REASONS) else "other"
+    candidates = [(begin, frame, end, through) for (begin, frame), (end, through) in presents.items()
+                  if begin < finish and through > start]
+    selected = sorted(candidates, key=lambda item: item[3] - item[0], reverse=True)[:3]
+    predecessor = max((item for item in candidates if request_us is not None and
+                       item[2] is not None and item[2] <= request_us), key=lambda item: item[2], default=None)
+    if predecessor is not None and predecessor not in selected:
+        selected.append(predecessor)
+    intervals = []
+    for begin, frame, end, through in sorted(selected):
+        coverage = overlaps(samples, begin, through)
+        related = []
+        for hold in holds.values():
+            end_or_sample = hold["end_us"] if hold["end_us"] is not None else hold["observed_through_us"]
+            overlap = min(through, end_or_sample) - max(begin, hold["begin_us"])
+            if overlap > 0:
+                related.append({**hold, "observed_overlap_us": overlap,
+                                "known_held_at_present_return": end is not None and end_or_sample >= end})
+        intervals.append({
+            "frame": frame, "generation": generation, "begin_us": begin, "end_us": end,
+            "observed_through_us": through, "completed_duration_us": end - begin if end is not None else None,
+            "latest_completed_before_request": (begin, frame, end, through) == predecessor,
+            "refill_holds": related, "sampled_interval": coverage,
+        })
+    return {
+        "retained_present_intervals": len(candidates),
+        "reported_present_intervals": intervals,
+        "present_selection": "Three longest observed intervals and the latest completed Present before the request, when retained.",
+        "pacing_scope": "Lane tuples are sampled independently. Open intervals end at the last valid observation. Progress and lock coverage exclude torn or sparse pairs. Intervening edges can be overwritten.",
+    }
+
+
 def request_window(raw, *, generation, frame, exact_frame=False):
     retained = raw.get("requests", [])
     samples = raw.get("samples", [])
@@ -231,6 +312,12 @@ def request_window(raw, *, generation, frame, exact_frame=False):
     if miss_index is None:
         return result
     miss = requests[miss_index]
+    successor_miss = next((row for row in requests[miss_index:] if row["generation"] == generation and
+                           row["playing"] and row["layer_mask"] == 7 and
+                           row["deadline_due_at_clock_sample"] and
+                           row["last_returned_generation"] == generation and row["frame"] > row["last_returned_frame"] >= 0 and
+                           not any(layer.get("incomplete") for layer in row["layers"]) and
+                           any(layer["reason"] == "missing_successor" for layer in row["layers"])), None)
     following = []
     for row in requests[miss_index + 1:]:
         if row["generation"] != generation or not row["playing"]:
@@ -244,6 +331,7 @@ def request_window(raw, *, generation, frame, exact_frame=False):
     result.update(
         requests_before_miss=miss_index,
         first_missing_request=miss,
+        first_retained_three_layer_missing_successor=successor_miss,
         preceding_requests=requests[max(0, miss_index - 3):miss_index],
         first_all_layers_selected=ready,
         first_all_intervals_verified=verified,
@@ -256,6 +344,12 @@ def request_window(raw, *, generation, frame, exact_frame=False):
         watchdog_near_first_missing_request=watchdog_observations(samples, miss["observed_us"]),
         watchdog_near_first_ready_request=watchdog_observations(samples, ready["observed_us"]) if ready else [],
     )
+    if samples and any(len(sample[8]) > 8 for sample in samples):
+        focus = successor_miss or miss
+        inspect = min((layer["entered_us"] for layer in focus["layers"] if "entered_us" in layer),
+                      default=focus["observed_us"])
+        result["pacing_near_first_missing_request"] = pacing_window(
+            samples, inspect - 180_000, inspect + 30_000, generation, request_us=inspect)
     return result
 
 
@@ -289,6 +383,8 @@ def reduce_incident(record):
             for row in (first, last)]
     if "requests" in record:
         span["source_request_window"] = request_window(record, generation=record["generation"], frame=record["last_frame"])
+    if interval and any(len(sample[8]) > 8 for sample in interval):
+        span["pacing_during_gap"] = pacing_window(samples, start, end, record["generation"])
     return span
 
 
@@ -296,7 +392,7 @@ def reduce_record(raw):
     if raw.get("version") != 1:
         raise ValueError("Unsupported Phase 3B native stall recorder version")
     result = {
-        **counts(raw, "version polls max_poll_gap_us torn_samples trigger_count shared_device_ordinal"),
+        **counts(raw, "version polls max_poll_gap_us torn_samples trigger_count shared_device_ordinal live_write_failures"),
         "maximum_coherent_pair_interval_us": MAX_INTERVAL_US,
         "incidents": [reduce_incident(item) for item in raw["incidents"]],
     }

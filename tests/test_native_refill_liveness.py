@@ -10,13 +10,15 @@ import unittest
 from test_native_stall_watch import ROOT, compiler_path
 
 
+def lab_tools():
+    lab = ROOT / "build/tools/architecture/ffmpeg-shared"
+    return compiler_path(), next(lab.glob("ffmpeg-*-full_build-shared"), None), shutil.which("ffmpeg")
+
+
 @unittest.skipUnless(sys.platform == "win32", "the native producer uses Windows APIs")
 class NativeRefillLiveness(unittest.TestCase):
     def test_producer_refills_while_renderer_cannot_release_hold(self):
-        compiler = compiler_path()
-        lab = ROOT / "build/tools/architecture/ffmpeg-shared"
-        sdk = next(lab.glob("ffmpeg-*-full_build-shared"), None)
-        ffmpeg = shutil.which("ffmpeg")
+        compiler, sdk, ffmpeg = lab_tools()
         if not (compiler and sdk and ffmpeg):
             self.skipTest("native lab Zig, shared FFmpeg SDK and FFmpeg are required")
         with tempfile.TemporaryDirectory() as directory:
@@ -39,4 +41,6 @@ class NativeRefillLiveness(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    if sys.platform == "win32" and not all(lab_tools()):
+        raise SystemExit("Install native Zig, shared FFmpeg SDK and FFmpeg before running this check.")
     unittest.main(verbosity=2)

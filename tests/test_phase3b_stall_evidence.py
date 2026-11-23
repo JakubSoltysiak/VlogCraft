@@ -95,6 +95,39 @@ class Phase3BStallEvidence(unittest.TestCase):
         self.assertEqual(miss["missing_request_sequences"], 1)
         self.assertIsNone(miss["first_all_layers_selected"])
 
+    def test_refill_edges_distinguish_present_overlap_and_wait_reasons(self):
+        rows = []
+        for t in range(90_000, 171_000, 10_000):
+            row = sample(t)
+            row[8][0] = "dxgi_present"
+            row[8].append([100000, 41, 3, 0, 0, 0, 0] if t < 150000 else [
+                0, 0, 0, 100000, 150000, 41, 3])
+            row[9][0] = "refill_deferred"
+            row[9][7] = [0, 0, 90000]
+            row[9].append([90000, 0 if t < 160000 else 160000, 0 if t < 160000 else 2, 512, 768, 5, 1])
+            row[10][0] = "queue_full"
+            row[10][7] = [0, 0, 90000]
+            row[10].append([0] * 7)
+            row[11].append([0] * 7)
+            rows.append(row)
+        rows[4][1] = 4  # Source 1's torn sample excludes both adjacent pairs.
+        encoded = {"version": 1, "incidents": [], "source_request_counts": [16, 16, 0], "first_source_miss": {
+            "frame": 42, "generation": 3, "overwritten": 0, "samples": rows,
+            "requests": [request(16, 42, 3, 6)]}}
+        miss = reduce_record(encoded)["first_source_miss"]
+        present = miss["pacing_near_first_missing_request"]["reported_present_intervals"][0]
+        hold = present["refill_holds"][0]
+        self.assertEqual(miss["first_retained_three_layer_missing_successor"]["layer_mask"], 7)
+        self.assertTrue(present["latest_completed_before_request"])
+        self.assertEqual(present["completed_duration_us"], 50_000)
+        self.assertEqual(hold["observed_overlap_us"], 50_000)
+        self.assertEqual(hold["release_reason"], "renderer")
+        self.assertEqual(hold["headroom_pts"], 256)
+        self.assertTrue(hold["known_held_at_present_return"])
+        self.assertEqual(present["sampled_interval"]["coverage_by_lane"]["source_1"], {"refill_deferred": 30_000})
+        self.assertEqual(present["sampled_interval"]["coverage_by_lane"]["source_2"], {"queue_full": 50_000})
+        self.assertEqual(present["sampled_interval"]["device_wait_us_by_lane"], {"source_3": 50_000})
+
 
 if __name__ == "__main__":
     unittest.main()
