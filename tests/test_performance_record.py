@@ -22,3 +22,15 @@ class EvidenceBindingTests(unittest.TestCase):
   for name in ('app.py','driver.py'):
    path=self.root/name;path.write_bytes(path.read_bytes().replace(b'\n',b'\r\n'))
   self.invoke();data=json.loads(self.path.read_text());self.assertIn('benchmark_protocol_fingerprint',data)
+
+ def test_follow_up_can_update_bindings_and_append_results_without_replacing_trials(self):
+  previous={'source_fingerprint':'old','benchmark_protocol_fingerprint':'old protocol',
+            'playback':{'failed':{'skipped_frames':152}},'unavailable':None}
+  candidate={**previous,'source_fingerprint':'new','benchmark_protocol_fingerprint':'new protocol',
+             'follow_up':{'trial':{'skipped_frames':0}}}
+  record.check_history(candidate,previous)
+  with self.assertRaisesRegex(ValueError,'playback'):
+   record.check_history({**candidate,'playback':{'failed':{'skipped_frames':0}}},previous)
+  del candidate['unavailable']
+  with self.assertRaisesRegex(ValueError,'unavailable'):
+   record.check_history(candidate,previous)
