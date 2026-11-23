@@ -77,7 +77,16 @@ jobs:
           $priorRecord = "$phase3b/docs/benchmarks/studio-3.6.0-phase3b.json"
           python "$phase3b/tools/performance_record.py" $priorRecord
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          python tools/performance_record.py docs/benchmarks/studio-3.6.0-phase3b.json --historical-record $priorRecord
+          $phase3bFollowUp = 'build/qa/phase3b-follow-up-checkpoint'
+          New-Item -ItemType Directory -Force -Path $phase3bFollowUp | Out-Null
+          git archive --format=tar --output=build/qa/phase3b-follow-up-checkpoint.tar b817372de67569d6fd0e2439a04147d93c27dba0
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          tar -xf build/qa/phase3b-follow-up-checkpoint.tar -C $phase3bFollowUp
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $followUpRecord = "$phase3bFollowUp/docs/benchmarks/studio-3.6.0-phase3b.json"
+          python "$phase3bFollowUp/tools/performance_record.py" $followUpRecord --historical-record $priorRecord
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tools/performance_record.py docs/benchmarks/studio-3.6.0-phase3b.json --historical-record $followUpRecord
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python tests/icon_assets.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
@@ -121,6 +130,8 @@ jobs:
           python-version: "3.11"
       - name: Compile isolated native experiment (no GPU execution)
         run: python tools/setup_architecture_lab.py --component zig --component ffmpeg-shared --build-native
+      - name: Verify native stall watchdog without a GPU
+        run: python tests/test_native_stall_watch.py
       - name: Install Phase 2 lab dependencies
         shell: pwsh
         run: |
