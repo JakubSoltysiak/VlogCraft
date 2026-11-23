@@ -238,7 +238,10 @@ int main(int argc,char** argv){
        bool primed=producer.cutNext!=nullptr;
        if(primed)retryOnFailure.insert(c->asset);
        bool adopted=!reset&&primed&&producer.adoptRewind(*c,epoch);
-       if(!adopted&&(primed||reset||!plan.adjacent(outgoing,*c)))producer.reset(tick,c->timebase);
+       if(!adopted&&(primed||reset||!plan.adjacent(outgoing,*c))){
+        const bool reversedContinuousCut=playing&&!reset&&!primed&&plan.adjacent(*c,outgoing);
+        if(!reversedContinuousCut||!producer.retargetFromFloor(tick,c->timebase))producer.reset(tick,c->timebase);
+       }
       }
       if(parked.count(c->asset)){
        retryOnFailure.insert(c->asset);

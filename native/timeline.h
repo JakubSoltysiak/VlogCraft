@@ -210,6 +210,19 @@ struct Producer {
   std::lock_guard<std::mutex> lock(guard);
   clearCutLocked();resetLocked(tick,sourceBase);
  }
+ // A playing audio estimate can cross a continuous cut backwards before the
+ // renderer has submitted either side. An actual decoded floor plus the
+ // uninterrupted decoder stream can still prove the new target's interval.
+ bool retargetFromFloor(int64_t tick,AVRational sourceBase){
+  std::lock_guard<std::mutex> lock(guard);
+  if(!opened||stop||!failure.empty()||epoch!=workerEpoch||cutNext||!current)return false;
+  const auto target=streamTick(tick,sourceBase)+origin;
+  if(current->best_effort_timestamp>target)return false;
+  // The decoder may be outside the guard with a newly received picture.
+  // Lower its commit target before unlocking so it queues any successor.
+  wantedPTS=target;
+  return true;
+ }
  bool primeRewind(const Plan& plan,const Clip& outgoing,const Clip& incoming,int64_t frame,int64_t transportGeneration){
   WatchStage stage("prime_rewind");
   std::lock_guard<std::mutex> lock(guard);

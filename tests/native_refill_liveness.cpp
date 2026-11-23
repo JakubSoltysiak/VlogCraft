@@ -3,6 +3,42 @@
 
 using namespace std::chrono_literals;
 
+// Exercise the decoded-floor guard with a real producer and a queued
+// successor that arrives after the request reverses across a continuous cut.
+int checkRetarget(const Clip& clip){
+ Producer producer(clip,0,nullptr,true,0,0);
+ int64_t floor,step,epoch;
+ uint64_t seeks;
+ {
+  std::unique_lock<std::mutex> lock(producer.guard);
+  if(!producer.changed.wait_for(lock,3s,[&]{return producer.queue.size()==4&&!producer.decoding;}))return 10;
+  auto& queue=producer.queue;
+  floor=queue.back()->best_effort_timestamp;
+  step=floor-queue[2]->best_effort_timestamp;
+  if(step<=1||av_cmp_q(producer.base,clip.timebase)||producer.origin)return 11;
+  producer.setRefillLocked(true,1);
+  producer.current=queue.back();queue.clear();
+  producer.wantedPTS=floor+4*step;
+  epoch=producer.epoch;seeks=producer.seeks;
+ }
+ if(producer.retargetFromFloor(floor-1,clip.timebase))return 12;
+ const auto target=floor+step/2;
+ if(!producer.retargetFromFloor(target,clip.timebase))return 13;
+ producer.releaseRefill();
+ {
+  std::unique_lock<std::mutex> lock(producer.guard);
+  if(!producer.changed.wait_for(lock,3s,[&]{return producer.queue.size()==4;}))return 14;
+  if(producer.current->best_effort_timestamp!=floor||producer.queue.front()->best_effort_timestamp!=floor+step||
+     producer.epoch!=epoch||producer.seeks!=seeks||producer.peakCombinedQueue>4)return 15;
+ }
+ bool ready=false;
+ auto picture=producer.at(clip,839,2,target,ready,false);
+ if(!ready||!picture||picture->best_effort_timestamp!=floor)return 16;
+ producer.cancel();
+ if(producer.retargetFromFloor(target,clip.timebase))return 17;
+ return 0;
+}
+
 int main(int argc,char** argv){
  if(argc!=2)return 2;
  av_log_set_level(AV_LOG_QUIET);
@@ -40,5 +76,5 @@ int main(int argc,char** argv){
   if(producer.holdRefill||producer.deferredRefills!=1||producer.peakCombinedQueue>4)return 9;
  }
  producer.cancel();
- return 0;
+ return checkRetarget(clip);
 }
