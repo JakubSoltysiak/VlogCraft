@@ -34,6 +34,8 @@ int main(int argc,char** argv){
   if(const char* path=std::getenv("VLOGCRAFT_STALL_CAPTURE"))if(*path)flight=std::make_unique<StallWatch>(path);
   WatchThread renderLane(flight?0:-1);
   const bool traceCompletion=std::getenv("VLOGCRAFT_COMPLETION_TRACE")!=nullptr;
+  const char* noRefillHold=std::getenv("VLOGCRAFT_DIAGNOSTIC_NO_REFILL_HOLD");
+  const bool deferRefill=!flight||!noRefillHold||std::strcmp(noRefillHold,"1")!=0;
   CompletionStamps completion;
   const char* tracePath=std::getenv("VLOGCRAFT_NATIVE_TRACE_FILE");
   std::unique_ptr<SourceTrace> trace;if(tracePath){trace=std::make_unique<SourceTrace>();sourceTrace=trace.get();}
@@ -257,7 +259,7 @@ int main(int argc,char** argv){
     bool available=false;Frame f;
     auto index=watchIndex++;
     auto* picture=flight?observed.at(index):nullptr;
-    try{SourceStage timer("select_picture");f=p.at(*c,frame,epoch,tick,available,coordinateRefill,picture);}
+    try{SourceStage timer("select_picture");f=p.at(*c,frame,epoch,tick,available,coordinateRefill&&deferRefill,picture);}
     catch(const std::runtime_error&){
      if(!retryOnFailure.erase(c->asset))throw;
      if(picture)picture[12]=(int64_t)PictureReason::replaced;

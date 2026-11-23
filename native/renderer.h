@@ -124,8 +124,19 @@ struct NativeDisplay {
   context->PSSetShader(pixel,nullptr,0);context->PSSetShaderResources(0,1,&image);context->Draw(3,0);
   ID3D11ShaderResourceView* empty=nullptr;context->PSSetShaderResources(0,1,&empty);
  }
- void flip(bool playing){
-  auto began=Clock::now();{SourceStage measure("dxgi_present");WatchStage watch("dxgi_present");check(swap->Present(1,0),"Native Present");}watchPresent();lastPresentMs=seconds(began)*1000;presentTime.add(lastPresentMs);calls++;
+ WatchTuple<7>::Values presentSpan{};
+ void flip(bool playing,int64_t frame,int64_t generation){
+  auto began=Clock::now();
+  if(stallWatch){
+   presentSpan[0]=stallWatch->now();presentSpan[1]=frame;presentSpan[2]=generation;
+   stallWatch->lanes[0].pacing.set(presentSpan);
+  }
+  {SourceStage measure("dxgi_present");WatchStage watch("dxgi_present");check(swap->Present(1,0),"Native Present");}
+  if(stallWatch){
+   presentSpan={0,0,0,presentSpan[0],stallWatch->now(),frame,generation};
+   stallWatch->lanes[0].pacing.set(presentSpan);
+  }
+  watchPresent();lastPresentMs=seconds(began)*1000;presentTime.add(lastPresentMs);calls++;
   if(lastFlip!=Clock::time_point{}){double interval=seconds(lastFlip)*1000;presentIntervals.add(interval);if(playing&&lastPlaying)playIntervals.add(interval);}lastFlip=Clock::now();lastPlaying=playing;
   wasVisible=IsWindowVisible(window);stats();
  }
@@ -228,7 +239,7 @@ struct Renderer {
   context->End(slot.query);{WatchStage flushing("flush_gpu");context->Flush();}slot.queuedAt=Clock::now();slot.pending=true;slot.frame=frame;slot.generation=gen;submitted++;
   watchGPU(submitted,completed,completedFrame,completedGeneration);
   size_t pending=0;for(auto& s:slots)pending+=s.pending;peakPending=std::max(peakPending,pending);}
-  submitTime.add(seconds(began)*1000);if(display)display->flip(playing);
+  submitTime.add(seconds(began)*1000);if(display)display->flip(playing,frame,gen);
  }
  void capture(Slot& slot,const std::string& path){
   drain();DeviceLock lock(hd);D3D11_TEXTURE2D_DESC d;slot.image->GetDesc(&d);d.BindFlags=0;d.Usage=D3D11_USAGE_STAGING;d.CPUAccessFlags=D3D11_CPU_ACCESS_READ;

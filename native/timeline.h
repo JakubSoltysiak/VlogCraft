@@ -82,6 +82,7 @@ struct Producer {
  std::unique_ptr<Decoder> decoder;AVRational base{0,1};int64_t origin=0;double rotation=0;
  bool opened=false,decoding=false,singlePool=true,holdRefill=false;
  uint64_t deferredRefills=0;
+ WatchTuple<7>::Values refillEdge{};
  ID3D11Texture2D* lastPool=nullptr;
  int64_t requestedTick=0;AVRational requestedBase{1,1};
  int64_t streamTick(int64_t tick,AVRational sourceBase)const{
@@ -96,6 +97,16 @@ struct Producer {
              queue.empty()?AV_NOPTS_VALUE:queue.front()->best_effort_timestamp,
              (int)queue.size(),(int)warm.size(),(int)cutTail.size(),epoch,
              opened&&current&&(eof||!queue.empty()),holdRefill,eof);
+ }
+ // Called with guard held, as are the CV predicate and decoded queue updates.
+ void setRefillLocked(bool hold,int reason){
+  if(hold==holdRefill)return;
+  holdRefill=hold;
+  if(!stallWatch||watch.lane<0)return;
+  auto now=stallWatch->now();
+  if(hold)refillEdge={now,0,0,wantedPTS,queue.back()->best_effort_timestamp,epoch,refillEdge[6]+1};
+  else {refillEdge[1]=now;refillEdge[2]=reason;}
+  stallWatch->lanes[watch.lane].pacing.set(refillEdge);
  }
  Producer(const Clip& c,int64_t initialTick,AVBufferRef* device,bool software,int extraHardwareFrames,size_t cacheFrames,
           uint64_t speculativeBytes=0,int watchSourceId=-1,int watchDecoderId=-1):
@@ -135,7 +146,7 @@ struct Producer {
  }
  void cancel(){
   WatchStage stage("cancel_producer");
-  {std::lock_guard<std::mutex> lock(guard);stop=true;}
+  {std::lock_guard<std::mutex> lock(guard);stop=true;setRefillLocked(false,4);}
   changed.notify_all();
  }
  ~Producer(){WatchStage stage("join_producer");cancel();if(worker.joinable())worker.join();}
@@ -157,7 +168,7 @@ struct Producer {
   reservation.bytes=0;
  }
  void resetLocked(int64_t tick,AVRational sourceBase){
-  holdRefill=false;epoch++;requestedTick=tick;requestedBase=sourceBase;
+  setRefillLocked(false,3);epoch++;requestedTick=tick;requestedBase=sourceBase;
   if(opened){
    seekTick=streamTick(tick,sourceBase);wantedPTS=seekTick+origin;
    if(warmTarget!=seekTick){warm.clear();warmTarget=seekTick;}
@@ -226,7 +237,7 @@ struct Producer {
      std::unique_lock<std::mutex> lock(guard,std::defer_lock);
      {WatchStage stage("producer_guard");lock.lock();}
      while(!(stop||workerEpoch!=epoch||(!eof&&!holdRefill&&queue.size()+cutTail.size()<4))){
-      WatchStage stage("producer_cv_wait");changed.wait(lock);
+      WatchStage stage(eof?"producer_eof":queue.size()+cutTail.size()>=4?"queue_full":"refill_deferred");changed.wait(lock);
      }
      if(stop)return;decoding=true;generation=epoch;target=seekTick;
      if(sourceTrace){sourceContext=request;sourceContext.decodeEpoch=generation;sourceContext.depth=(int)queue.size();}
@@ -242,7 +253,7 @@ struct Producer {
     {WatchStage stage("decode_next");ok=decoder->next();if(ok)frame=retain(decoder->frame);}
     WatchStage stage("producer_commit");
     std::lock_guard<std::mutex> lock(guard);decoding=false;decodedSeconds+=seconds(began);if(generation!=epoch)continue;
-    if(!ok)eof=true;
+    if(!ok){eof=true;setRefillLocked(false,5);}
     else{
      if(frame->best_effort_timestamp==AV_NOPTS_VALUE)throw std::runtime_error("Missing source presentation timestamp");
      if(frame->format==AV_PIX_FMT_D3D11&&lastPool!=(ID3D11Texture2D*)frame->data[0]){
@@ -268,7 +279,7 @@ struct Producer {
  void releaseRefill(){
   WatchStage stage("release_refill");
   std::lock_guard<std::mutex> lock(guard);
-  if(holdRefill){holdRefill=false;watchQueueLocked();changed.notify_one();}
+  if(holdRefill){setRefillLocked(false,2);watchQueueLocked();changed.notify_one();}
  }
  // Returns the source picture whose half-open PTS interval contains the target.
  // Selection paths in the recorder are unavailable, live, warm and outgoing.
@@ -322,7 +333,7 @@ struct Producer {
   ready=current&&(eof||!queue.empty());
   // With two future pictures already decoded, the next refill can wait for
   // this multitrack Present to return. A source below this mark runs immediately.
-  holdRefill=coordinateRefill&&ready&&queue.size()>=2&&queue.size()<4&&!eof;
+  setRefillLocked(coordinateRefill&&ready&&queue.size()>=2&&queue.size()<4&&!eof,1);
   if(holdRefill)deferredRefills++;else changed.notify_one();
   watchQueueLocked();
   if(!ready&&warm.size()>1){
