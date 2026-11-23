@@ -1,4 +1,4 @@
-import json,os,subprocess,sys,tempfile,unittest
+import json,os,subprocess,sys,tempfile,threading,unittest
 from pathlib import Path
 from types import SimpleNamespace
 from unittest import mock
@@ -22,6 +22,32 @@ class ConsoleLaunchTests(unittest.TestCase):
    self.assertEqual(run.call_args.kwargs['creationflags'],getattr(subprocess,'CREATE_NO_WINDOW',0))
    self.assertTrue(run.call_args.kwargs['capture_output'])
    self.assertEqual(run.call_args.kwargs['timeout'],7200)
+
+ def test_proxy_uses_background_priority_and_publishes_completed_output(self):
+  options=getattr(subprocess,'CREATE_NO_WINDOW',0)|getattr(subprocess,'BELOW_NORMAL_PRIORITY_CLASS',0)
+  with tempfile.TemporaryDirectory() as folder:
+   proxy=Path(folder)/'proxy.mp4'
+   asset={'id':'generated','path':'generated.mp4','name':'generated','duration':2}
+   process=mock.MagicMock()
+   process.stdout=[b'out_time_us=2000000']
+   process.wait.return_value=0
+   process.__enter__.return_value=process
+   def launch(cmd,**kwargs):
+    self.assertEqual(kwargs['creationflags'],options)
+    Path(cmd[-1]).write_bytes(b'completed proxy')
+    return process
+   with mock.patch.object(server,'PROXIES',Path(folder)), \
+        mock.patch.object(server,'proxy_path',return_value=proxy), \
+        mock.patch.object(server,'CURRENT_PROCESS',{}), \
+        mock.patch.object(server,'CANCEL',{'proxy':threading.Event()}), \
+        mock.patch.object(server,'job_status') as status, \
+        mock.patch.object(server,'start_next_proxy'), \
+        mock.patch('server.subprocess.Popen',side_effect=launch):
+    server.run_proxy(asset)
+    self.assertEqual(proxy.read_bytes(),b'completed proxy')
+    self.assertEqual(server.CURRENT_PROCESS,{'proxy':None})
+    self.assertEqual(status.call_args.kwargs['status'],'done')
+    self.assertFalse(proxy.with_suffix('.partial.mp4').exists())
 
  @unittest.skipUnless(os.name=='nt','GUI-parent console allocation is Windows-specific')
  def test_real_gui_parent_metadata_probes_leave_no_console_hosts(self):

@@ -844,7 +844,8 @@ def run_proxy(asset):
              '-c:v','libx264','-preset','veryfast','-crf','24','-pix_fmt','yuv420p','-g','24',
              '-c:a','aac','-b:a','160k','-movflags','+faststart',str(tmp)]
         with tempfile.TemporaryFile() as errors:
-            with subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=errors,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0)) as proc:
+            flags=getattr(subprocess,'CREATE_NO_WINDOW',0) | getattr(subprocess,'BELOW_NORMAL_PRIORITY_CLASS',0)
+            with subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=errors,creationflags=flags) as proc:
                 with JOB_LOCK:
                     CURRENT_PROCESS['proxy']=proc
                     if CANCEL['proxy'].is_set():proc.terminate()
