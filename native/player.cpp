@@ -154,8 +154,8 @@ int main(int argc,char** argv){
    // The completion query shares the decoder device lock. During live
    // playback with a free slot, inspect the exact source request before
    // competing for that lock. Paused and terminal acknowledgements poll eagerly.
-   const bool sourcesFirst=playing&&frame<plan.end-1&&drawnGeneration==epoch;
-   Slot* slot=renderer.freeSlot();
+   const bool sourcesFirst=playing&&frame<plan.end-1&&drawnGeneration==epoch&&lastActive.size()>1&&seconds(lastReport)<=.1;
+   Slot* slot=sourcesFirst?renderer.freeSlot():nullptr;
    const bool retireWithDraw=sourcesFirst&&slot;
    if(!retireWithDraw){SourceStage timer("gpu_available");slot=renderer.available();}
    if(traceCompletion&&completion.generation==renderer.completedGeneration&&renderer.completedFrame==plan.end-1){
