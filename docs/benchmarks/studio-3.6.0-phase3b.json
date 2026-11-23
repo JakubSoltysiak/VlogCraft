@@ -6880,12 +6880,12 @@
       "cause": "The old binding checked the historical Phase 3A measurement against changed Phase 3B source. CI now verifies Phase 3A using its archived commit, then checks the new record."
     }
   ],
-  "source_fingerprint": "b3d3b975e6f72c098404879919b0cb1ef60b06a0baa92ca6ffb142dabadf6c55",
+  "source_fingerprint": "64dbf88e48f6a5f6d75a2a11d1f4e09c59dbeded3bf7fc14a67ed1d1b0feb52f",
   "fingerprint_method": "SHA256 sorted relevant relative path + NUL + LF-normalized source + NUL",
-  "benchmark_protocol_fingerprint": "20ae8c3a56798cec2aa9aaf5ffa289d4691f611c7239701f0203e22296eaa687",
+  "benchmark_protocol_fingerprint": "93ec516470ac68124e533728314ef8e62723d0d4ccd977bda7f4bb9ed500b348",
   "benchmark_protocol_fingerprint_method": "SHA256 sorted benchmark driver/observer relative path + NUL + LF-normalized source + NUL",
   "follow_up": {
-    "status": "interim packaged correctness; repeated timing and memory series in progress",
+    "status": "Interim two-stage development checkpoint; protected repeat and long-session decision pending.",
     "tested_implementation": "40e43da66797f70c57691b734effafcb34bc552a",
     "artifact": {
       "msi_sha256": "9a06324bb5ed51e49ba9fc44637f45e11321dd861c2771a4edb576799c590e0f",
@@ -6953,6 +6953,22 @@
       "standby_peak_bytes": 6819840,
       "standby_budget_bytes": 939524096,
       "cancelled_during_seek": true
+    },
+    "synchronized_rewind_package": {
+      "source": "7fb4a7208e26d23e6ae6a0e15284cf48145d33a1",
+      "package": {
+        "msi_sha256": "4513cef410ffe7d2fe775b0b1eec8dc86732f82dcbe9cf5d7ae30d055dd76fa0",
+        "msi_bytes": 286269541,
+        "native_sha256": "0138b285593a55aa5ac57c3448ee23e2b4c61be0dd6d80af9bf7d1014f7dcc49"
+      },
+      "verified_bundle_checks": 48,
+      "rewind_check": {
+        "passed": true,
+        "source_frame_pairs": 117,
+        "exact_seek_during_pending_rewind": true,
+        "closed_during_another_pending_rewind": true,
+        "close_ms": 31.0
+      }
     }
   }
 }
