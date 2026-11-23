@@ -69,6 +69,10 @@ struct Plan {
   return c.inTick+av_rescale_q_rnd(frame-c.position,units,c.timebase,(AVRounding)AV_ROUND_DOWN);
  }
 };
+struct RefillWindow {
+ Clock::time_point observedAt;
+ int64_t clockUs,frameDueUs,periodUs;
+};
 struct Producer {
  WatchLease watch;
  const int watchSourceId,watchDecoderId;
@@ -83,6 +87,8 @@ struct Producer {
  bool opened=false,decoding=false,singlePool=true,holdRefill=false;
  uint64_t deferredRefills=0;
  WatchTuple<7>::Values refillEdge{};
+ Clock::time_point refillDeadline=Clock::time_point::max();
+ int64_t lastTimedRefillFrame=-1,lastTimedRefillGeneration=-1;
  ID3D11Texture2D* lastPool=nullptr;
  int64_t requestedTick=0;AVRational requestedBase{1,1};
  int64_t streamTick(int64_t tick,AVRational sourceBase)const{
@@ -102,6 +108,7 @@ struct Producer {
  void setRefillLocked(bool hold,int reason){
   if(hold==holdRefill)return;
   holdRefill=hold;
+  if(!hold)refillDeadline=Clock::time_point::max();
   if(!stallWatch||watch.lane<0)return;
   auto now=stallWatch->now();
   if(hold)refillEdge={now,0,0,wantedPTS,queue.back()->best_effort_timestamp,epoch,refillEdge[6]+1};
@@ -168,7 +175,8 @@ struct Producer {
   reservation.bytes=0;
  }
  void resetLocked(int64_t tick,AVRational sourceBase){
-  setRefillLocked(false,3);epoch++;requestedTick=tick;requestedBase=sourceBase;
+  setRefillLocked(false,3);lastTimedRefillFrame=lastTimedRefillGeneration=-1;
+  epoch++;requestedTick=tick;requestedBase=sourceBase;
   if(opened){
    seekTick=streamTick(tick,sourceBase);wantedPTS=seekTick+origin;
    if(warmTarget!=seekTick){warm.clear();warmTarget=seekTick;}
@@ -236,8 +244,16 @@ struct Producer {
     int64_t generation,target;{
      std::unique_lock<std::mutex> lock(guard,std::defer_lock);
      {WatchStage stage("producer_guard");lock.lock();}
-     while(!(stop||workerEpoch!=epoch||(!eof&&!holdRefill&&queue.size()+cutTail.size()<4))){
-      WatchStage stage(eof?"producer_eof":queue.size()+cutTail.size()>=4?"queue_full":"refill_deferred");changed.wait(lock);
+     while(!stop&&workerEpoch==epoch){
+      if(holdRefill&&refillDeadline!=Clock::time_point::max()&&Clock::now()>=refillDeadline){
+       setRefillLocked(false,6);watchQueueLocked();
+      }
+      if(!eof&&!holdRefill&&queue.size()+cutTail.size()<4)break;
+      if(holdRefill&&refillDeadline!=Clock::time_point::max()){
+       WatchStage stage("refill_deferred");changed.wait_until(lock,refillDeadline);
+      }else{
+       WatchStage stage(eof?"producer_eof":queue.size()+cutTail.size()>=4?"queue_full":"refill_deferred");changed.wait(lock);
+      }
      }
      if(stop)return;decoding=true;generation=epoch;target=seekTick;
      if(sourceTrace){sourceContext=request;sourceContext.decodeEpoch=generation;sourceContext.depth=(int)queue.size();}
@@ -274,7 +290,7 @@ struct Producer {
      decoded++;peak=std::max(peak,queue.size());peakCombinedQueue=std::max(peakCombinedQueue,queue.size()+cutTail.size());
     }watchQueueLocked();changed.notify_all();
    }
-  }catch(const std::exception&){std::lock_guard<std::mutex> lock(guard);failure="Native source decode or seek failed";changed.notify_all();}
+  }catch(const std::exception&){std::lock_guard<std::mutex> lock(guard);setRefillLocked(false,7);failure="Native source decode or seek failed";changed.notify_all();}
  }
  void releaseRefill(){
   WatchStage stage("release_refill");
@@ -284,7 +300,7 @@ struct Producer {
  // Returns the source picture whose half-open PTS interval contains the target.
  // Selection paths in the recorder are unavailable, live, warm and outgoing.
  Frame at(const Clip& clip,int64_t frame,int64_t transportGeneration,int64_t tick,bool& ready,bool coordinateRefill,
-          int64_t* observation=nullptr){
+          int64_t* observation=nullptr,const RefillWindow* window=nullptr){
   WatchStage stage("select_picture");
   auto sourceBase=clip.timebase;
   auto entered=observation?stallWatch->now():0;
@@ -331,10 +347,26 @@ struct Producer {
    current=queue.front();queue.pop_front();
   }
   ready=current&&(eof||!queue.empty());
-  // With two future pictures already decoded, the next refill can wait for
-  // this multitrack Present to return. A source below this mark runs immediately.
-  setRefillLocked(coordinateRefill&&ready&&queue.size()>=2&&queue.size()<4&&!eof,1);
-  if(holdRefill)deferredRefills++;else changed.notify_one();
+  bool hold=coordinateRefill&&ready&&queue.size()>=2&&queue.size()+cutTail.size()<4&&!eof;
+  bool notifyDeadline=false;
+  if(hold&&window&&!holdRefill){
+   // The last queued picture proves history only up to its own PTS. Keep
+   // one full frame of that proof in reserve and never hold past half a
+   // sequence frame after the requested deadline, even inside Present.
+   const bool newRequest=frame!=lastTimedRefillFrame||transportGeneration!=lastTimedRefillGeneration;
+   lastTimedRefillFrame=frame;lastTimedRefillGeneration=transportGeneration;
+   const auto ahead=av_rescale_q_rnd(queue.back()->best_effort_timestamp-target,
+       av_mul_q(base,av_inv_q(clip.speed)),AV_TIME_BASE_Q,AV_ROUND_DOWN);
+   const auto holdUs=std::min(window->periodUs/2,ahead-window->periodUs);
+   auto deadline=window->observedAt+std::chrono::microseconds(window->frameDueUs-window->clockUs+holdUs);
+   hold=newRequest&&holdUs>0&&Clock::now()<deadline;
+   if(hold){refillDeadline=deadline;notifyDeadline=true;}
+  }
+  setRefillLocked(hold,1);
+  if(holdRefill)deferredRefills++;
+  // A producer can already be asleep waiting for queue space. Notify when
+  // installing a finite deadline so it can switch to the timed CV wait.
+  if(!holdRefill||notifyDeadline)changed.notify_one();
   watchQueueLocked();
   if(!ready&&warm.size()>1){
    for(size_t i=1;i<warm.size();i++)if(warm[i-1]->best_effort_timestamp<=target&&target<warm[i]->best_effort_timestamp){

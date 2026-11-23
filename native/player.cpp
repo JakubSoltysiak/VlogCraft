@@ -36,6 +36,8 @@ int main(int argc,char** argv){
   const bool traceCompletion=std::getenv("VLOGCRAFT_COMPLETION_TRACE")!=nullptr;
   const char* noRefillHold=std::getenv("VLOGCRAFT_DIAGNOSTIC_NO_REFILL_HOLD");
   const bool deferRefill=!flight||!noRefillHold||std::strcmp(noRefillHold,"1")!=0;
+  const char* legacyRefillHold=std::getenv("VLOGCRAFT_DIAGNOSTIC_LEGACY_REFILL_HOLD");
+  const bool legacyRefill=flight&&legacyRefillHold&&std::strcmp(legacyRefillHold,"1")==0;
   CompletionStamps completion;
   const char* tracePath=std::getenv("VLOGCRAFT_NATIVE_TRACE_FILE");
   std::unique_ptr<SourceTrace> trace;if(tracePath){trace=std::make_unique<SourceTrace>();sourceTrace=trace.get();}
@@ -139,6 +141,7 @@ int main(int argc,char** argv){
    {WatchStage stage("dispatch_messages");MSG message;while(PeekMessageW(&message,nullptr,0,0,PM_REMOVE)){TranslateMessage(&message);DispatchMessageW(&message);}}
    int64_t us,epoch;bool playing;if(limit){us=av_rescale_q(renderer.submitted,av_inv_q(plan.rate),AV_TIME_BASE_Q);epoch=0;playing=false;}
    else input.snapshot(us,epoch,playing,&clockAge,&adjustment);
+   const auto requestClock=playing?Clock::now():Clock::time_point{};
    int64_t frame=limit?(int64_t)renderer.submitted:av_rescale_q_rnd(us+1,AV_TIME_BASE_Q,av_inv_q(plan.rate),(AVRounding)AV_ROUND_DOWN);
    // The clock anchor is an exact sequence frame plus an independently advancing audio sample clock.
    frame=std::max<int64_t>(0,frame);eos=frame>=plan.end;frame=std::min(frame,plan.end-1);
@@ -251,6 +254,12 @@ int main(int argc,char** argv){
                      (1LL<<active.size())-1,0,previous,drawnGeneration,(int64_t)(renderer.submitted-renderer.completed)};
    }
    const bool coordinateRefill=playing&&active.size()>1;
+   RefillWindow refillWindow{};
+   if(coordinateRefill&&!legacyRefill){
+    auto due=av_rescale_q_rnd(frame,av_inv_q(plan.rate),AV_TIME_BASE_Q,AV_ROUND_UP);
+    auto next=av_rescale_q_rnd(frame+1,av_inv_q(plan.rate),AV_TIME_BASE_Q,AV_ROUND_UP);
+    refillWindow={requestClock,us,due,next-due};
+   }
    auto releaseRefills=[&]{if(coordinateRefill)for(auto* clip:active)producers.at(clip->asset)->releaseRefill();};
    for(auto* c:active){
     auto& p=*producers[c->asset];
@@ -259,7 +268,8 @@ int main(int argc,char** argv){
     bool available=false;Frame f;
     auto index=watchIndex++;
     auto* picture=flight?observed.at(index):nullptr;
-    try{SourceStage timer("select_picture");f=p.at(*c,frame,epoch,tick,available,coordinateRefill&&deferRefill,picture);}
+    try{SourceStage timer("select_picture");f=p.at(*c,frame,epoch,tick,available,coordinateRefill&&deferRefill,picture,
+          coordinateRefill&&!legacyRefill?&refillWindow:nullptr);}
     catch(const std::runtime_error&){
      if(!retryOnFailure.erase(c->asset))throw;
      if(picture)picture[12]=(int64_t)PictureReason::replaced;
