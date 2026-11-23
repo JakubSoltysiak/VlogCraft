@@ -1,0 +1,4456 @@
+{
+  "qualification": "partial",
+  "source_checkpoints": {
+    "frozen": "f4a852ba36d9cd6e417c2cbfd1dc90af1ad2d630",
+    "first_candidate": "08e77decfe942c83f9a7a1149b1de0f4afaef71f",
+    "paced_candidate": "bd5a523bfca4b6b0236e4c351ed6d70078705ff7",
+    "final_production_source": "66a4af3c19334f81a442ff71a1d794c76cd9bf42"
+  },
+  "test_workstation": {
+    "video_adapter": "AMD Radeon 890M",
+    "scrub_desktop_display_hz": 120,
+    "normal_native_test_composition": [
+      3840,
+      2160
+    ],
+    "controlled_physical_preview": [
+      356,
+      200
+    ],
+    "thermal_throttling": "unavailable via reliable local sensors"
+  },
+  "playback": {
+    "baseline-single": {
+      "seconds": 15.0,
+      "cut_seconds": 0.5,
+      "video_tracks": 1,
+      "audio_tracks": 1,
+      "original_resolution": [
+        3840,
+        2160
+      ],
+      "program_resolution": [
+        3840,
+        2160
+      ],
+      "rate": "60/1",
+      "proxies": false,
+      "application_ready_seconds": 4.9188875000108965,
+      "first_ready_seconds": 0.9517028999980539,
+      "measured_seconds": 15.16330000001192,
+      "distinct_sequence_fps": 59.090039767022716,
+      "present_calls_per_second": 59.090039767022716,
+      "dxgi_present_count_per_second": 59.024091061925596,
+      "reached_end": true,
+      "samples": 720000,
+      "expected_samples": 720000,
+      "underruns": 0,
+      "active_throughput_windows": [
+        {
+          "window_seconds": 1,
+          "count": 29,
+          "minimum_fps": 59.197738116274955,
+          "p05_fps": 59.197738116274955,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+        },
+        {
+          "window_seconds": 10,
+          "count": 10,
+          "minimum_fps": 59.585204384133824,
+          "p05_fps": 59.585204384133824,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+        }
+      ],
+      "supervisor": {
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 27.03200000000652,
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        }
+      },
+      "power": {
+        "samples": 16,
+        "all_observed_ac": true
+      },
+      "physical_surface": [
+        356,
+        200
+      ],
+      "foreground_unobscured": true,
+      "dpr": 1.75,
+      "browser_error_count": 0,
+      "counters": {
+        "skipped_sequence_frames": 0,
+        "skipped_after_source_wait": 0,
+        "skipped_after_gpu_wait": 0,
+        "skipped_without_queue_wait": 0,
+        "source_wait_iterations": 28,
+        "gpu_wait_iterations": 0,
+        "clock_correction_absolute": {
+          "count": 1003,
+          "mean_ms": 0.584286,
+          "p50_upper_ms": 0.4,
+          "p95_upper_ms": 1.3,
+          "p99_upper_ms": 5.6,
+          "max_ms": 15.8,
+          "overflow_100ms": 0
+        },
+        "peak_source_queue_frames": 4,
+        "gpu_slot_budget": 4,
+        "peak_decoder_count": 1,
+        "retained_surface_views": 14,
+        "retained_texture_pools": 1,
+        "retained_texture_estimated_MiB": 415.283,
+        "dxgi_statistics_available": true
+      },
+      "timings": {
+        "playback_present_interval": {
+          "count": 895,
+          "mean_ms": 16.7442,
+          "p50_upper_ms": 16.7,
+          "p95_upper_ms": 17.8,
+          "p99_upper_ms": 18.4,
+          "max_ms": 87.2469,
+          "overflow_100ms": 0
+        },
+        "present_call": {
+          "count": 897,
+          "mean_ms": 0.212372,
+          "p50_upper_ms": 0.2,
+          "p95_upper_ms": 0.5,
+          "p99_upper_ms": 0.6,
+          "max_ms": 9.3423,
+          "overflow_100ms": 0
+        },
+        "composition_gpu": {
+          "count": 897,
+          "mean_ms": 1.68644,
+          "p50_upper_ms": 1.7,
+          "p95_upper_ms": 1.8,
+          "p99_upper_ms": 1.9,
+          "max_ms": 2.33182,
+          "overflow_100ms": 0
+        },
+        "source_selection": {
+          "count": 925,
+          "mean_ms": 0.115564,
+          "p50_upper_ms": 0.1,
+          "p95_upper_ms": 0.1,
+          "p99_upper_ms": 0.1,
+          "max_ms": 85.632,
+          "overflow_100ms": 0
+        },
+        "context_wait": {
+          "count": 6516,
+          "mean_ms": 0.0343439,
+          "p50_upper_ms": 0.1,
+          "p95_upper_ms": 0.3,
+          "p99_upper_ms": 0.5,
+          "max_ms": 17.5617,
+          "overflow_100ms": 0
+        },
+        "completion_observation": {
+          "count": 897,
+          "mean_ms": 5.57904,
+          "p50_upper_ms": 5.7,
+          "p95_upper_ms": 7.1,
+          "p99_upper_ms": 15,
+          "max_ms": 29.9964,
+          "overflow_100ms": 0
+        }
+      },
+      "resources": {
+        "average_cpu_machine_percent": 4.43,
+        "peak_summed_working_set_MiB": 1518.3,
+        "process_read_MiB": 116.3,
+        "process_write_MiB": 31.4,
+        "sampled_cpu_seconds": 17.34
+      },
+      "largest_status_skip_jumps": [
+        {
+          "skips": 0,
+          "last_frame": 46,
+          "from_native_seconds": 3.04259,
+          "to_native_seconds": 3.66301
+        },
+        {
+          "skips": 0,
+          "last_frame": 64,
+          "from_native_seconds": 3.66301,
+          "to_native_seconds": 3.96511
+        },
+        {
+          "skips": 0,
+          "last_frame": 107,
+          "from_native_seconds": 3.96511,
+          "to_native_seconds": 4.67999
+        },
+        {
+          "skips": 0,
+          "last_frame": 125,
+          "from_native_seconds": 4.67999,
+          "to_native_seconds": 4.98899
+        },
+        {
+          "skips": 0,
+          "last_frame": 156,
+          "from_native_seconds": 4.98899,
+          "to_native_seconds": 5.50661
+        },
+        {
+          "skips": 0,
+          "last_frame": 193,
+          "from_native_seconds": 5.50661,
+          "to_native_seconds": 6.12373
+        },
+        {
+          "skips": 0,
+          "last_frame": 212,
+          "from_native_seconds": 6.12373,
+          "to_native_seconds": 6.42999
+        },
+        {
+          "skips": 0,
+          "last_frame": 236,
+          "from_native_seconds": 6.42999,
+          "to_native_seconds": 6.83608
+        }
+      ]
+    },
+    "candidate-single": {
+      "seconds": 15.0,
+      "cut_seconds": 0.5,
+      "video_tracks": 1,
+      "audio_tracks": 1,
+      "original_resolution": [
+        3840,
+        2160
+      ],
+      "program_resolution": [
+        3840,
+        2160
+      ],
+      "rate": "60/1",
+      "proxies": false,
+      "application_ready_seconds": 2.2523479999799747,
+      "first_ready_seconds": 0.5632673000218347,
+      "measured_seconds": 15.08190000000596,
+      "distinct_sequence_fps": 59.408960409474,
+      "present_calls_per_second": 59.408960409474,
+      "dxgi_present_count_per_second": 59.408960409474,
+      "reached_end": true,
+      "samples": 720000,
+      "expected_samples": 720000,
+      "underruns": 0,
+      "active_throughput_windows": [
+        {
+          "window_seconds": 1,
+          "count": 28,
+          "minimum_fps": 59.18307946056071,
+          "p05_fps": 59.18307946056071,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+        },
+        {
+          "window_seconds": 10,
+          "count": 10,
+          "minimum_fps": 59.938927898340395,
+          "p05_fps": 59.938927898340395,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+        }
+      ],
+      "supervisor": {
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 21.76500000001397,
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        }
+      },
+      "power": {
+        "samples": 15,
+        "all_observed_ac": true
+      },
+      "physical_surface": [
+        356,
+        200
+      ],
+      "foreground_unobscured": true,
+      "dpr": 1.75,
+      "browser_error_count": 0,
+      "counters": {
+        "skipped_sequence_frames": 0,
+        "skipped_after_source_wait": 0,
+        "skipped_after_gpu_wait": 0,
+        "skipped_without_queue_wait": 0,
+        "source_wait_iterations": 38,
+        "gpu_wait_iterations": 0,
+        "clock_correction_absolute": {
+          "count": 997,
+          "mean_ms": 0.535401,
+          "p50_upper_ms": 0.4,
+          "p95_upper_ms": 1.3,
+          "p99_upper_ms": 2.4,
+          "max_ms": 16.473,
+          "overflow_100ms": 0
+        },
+        "peak_source_queue_frames": 4,
+        "gpu_slot_budget": 4,
+        "peak_decoder_count": 1,
+        "retained_surface_views": 13,
+        "retained_texture_pools": 1,
+        "retained_texture_estimated_MiB": 415.283,
+        "dxgi_statistics_available": true
+      },
+      "timings": {
+        "playback_present_interval": {
+          "count": 895,
+          "mean_ms": 16.6658,
+          "p50_upper_ms": 16.7,
+          "p95_upper_ms": 17.8,
+          "p99_upper_ms": 18.6,
+          "max_ms": 26.5002,
+          "overflow_100ms": 0
+        },
+        "present_call": {
+          "count": 897,
+          "mean_ms": 0.251907,
+          "p50_upper_ms": 0.2,
+          "p95_upper_ms": 0.5,
+          "p99_upper_ms": 0.7,
+          "max_ms": 20.0983,
+          "overflow_100ms": 0
+        },
+        "composition_gpu": {
+          "count": 897,
+          "mean_ms": 1.65392,
+          "p50_upper_ms": 1.7,
+          "p95_upper_ms": 1.8,
+          "p99_upper_ms": 1.9,
+          "max_ms": 3.80284,
+          "overflow_100ms": 0
+        },
+        "source_selection": {
+          "count": 935,
+          "mean_ms": 0.0619044,
+          "p50_upper_ms": 0.1,
+          "p95_upper_ms": 0.1,
+          "p99_upper_ms": 0.1,
+          "max_ms": 35.6848,
+          "overflow_100ms": 0
+        },
+        "context_wait": {
+          "count": 6418,
+          "mean_ms": 0.039886,
+          "p50_upper_ms": 0.1,
+          "p95_upper_ms": 0.3,
+          "p99_upper_ms": 0.5,
+          "max_ms": 17.0484,
+          "overflow_100ms": 0
+        },
+        "completion_observation": {
+          "count": 897,
+          "mean_ms": 5.84631,
+          "p50_upper_ms": 5.8,
+          "p95_upper_ms": 7.8,
+          "p99_upper_ms": 14.4,
+          "max_ms": 28.9528,
+          "overflow_100ms": 0
+        }
+      },
+      "resources": {
+        "average_cpu_machine_percent": 5.33,
+        "peak_summed_working_set_MiB": 1507.6,
+        "process_read_MiB": 111.8,
+        "process_write_MiB": 32.5,
+        "sampled_cpu_seconds": 19.86
+      },
+      "largest_status_skip_jumps": [
+        {
+          "skips": 0,
+          "last_frame": 39,
+          "from_native_seconds": 1.52146,
+          "to_native_seconds": 2.13733
+        },
+        {
+          "skips": 0,
+          "last_frame": 70,
+          "from_native_seconds": 2.13733,
+          "to_native_seconds": 2.65618
+        },
+        {
+          "skips": 0,
+          "last_frame": 107,
+          "from_native_seconds": 2.65618,
+          "to_native_seconds": 3.27107
+        },
+        {
+          "skips": 0,
+          "last_frame": 132,
+          "from_native_seconds": 3.27107,
+          "to_native_seconds": 3.68096
+        },
+        {
+          "skips": 0,
+          "last_frame": 150,
+          "from_native_seconds": 3.68096,
+          "to_native_seconds": 3.9871
+        },
+        {
+          "skips": 0,
+          "last_frame": 199,
+          "from_native_seconds": 3.9871,
+          "to_native_seconds": 4.80528
+        },
+        {
+          "skips": 0,
+          "last_frame": 224,
+          "from_native_seconds": 4.80528,
+          "to_native_seconds": 5.22042
+        },
+        {
+          "skips": 0,
+          "last_frame": 249,
+          "from_native_seconds": 5.22042,
+          "to_native_seconds": 5.63148
+        }
+      ]
+    },
+    "baseline-three": {
+      "seconds": 15.0,
+      "cut_seconds": 0.5,
+      "video_tracks": 3,
+      "audio_tracks": 3,
+      "original_resolution": [
+        3840,
+        2160
+      ],
+      "program_resolution": [
+        3840,
+        2160
+      ],
+      "rate": "60/1",
+      "proxies": false,
+      "application_ready_seconds": 2.113567700027488,
+      "first_ready_seconds": 1.0102100000076462,
+      "measured_seconds": 15.324,
+      "distinct_sequence_fps": 58.600887496737144,
+      "present_calls_per_second": 58.600887496737144,
+      "dxgi_present_count_per_second": 58.66614460976246,
+      "reached_end": true,
+      "samples": 720000,
+      "expected_samples": 720000,
+      "underruns": 0,
+      "active_throughput_windows": [
+        {
+          "window_seconds": 1,
+          "count": 31,
+          "minimum_fps": 58.33738454059308,
+          "p05_fps": 58.33738454059308,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+        },
+        {
+          "window_seconds": 10,
+          "count": 11,
+          "minimum_fps": 59.81461366481411,
+          "p05_fps": 59.81461366481411,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+        }
+      ],
+      "supervisor": {
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 23.578000000008615,
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        }
+      },
+      "power": {
+        "samples": 15,
+        "all_observed_ac": true
+      },
+      "physical_surface": [
+        356,
+        200
+      ],
+      "foreground_unobscured": true,
+      "dpr": 1.75,
+      "browser_error_count": 0,
+      "counters": {
+        "skipped_sequence_frames": 1,
+        "skipped_after_source_wait": 0,
+        "skipped_after_gpu_wait": 0,
+        "skipped_without_queue_wait": 1,
+        "source_wait_iterations": 50,
+        "gpu_wait_iterations": 0,
+        "clock_correction_absolute": {
+          "count": 1001,
+          "mean_ms": 0.583168,
+          "p50_upper_ms": 0.5,
+          "p95_upper_ms": 1.3,
+          "p99_upper_ms": 2,
+          "max_ms": 22.352,
+          "overflow_100ms": 0
+        },
+        "peak_source_queue_frames": 4,
+        "gpu_slot_budget": 4,
+        "peak_decoder_count": 3,
+        "retained_surface_views": 48,
+        "retained_texture_pools": 3,
+        "retained_texture_estimated_MiB": 1245.85,
+        "dxgi_statistics_available": true
+      },
+      "timings": {
+        "playback_present_interval": {
+          "count": 897,
+          "mean_ms": 16.7323,
+          "p50_upper_ms": 16.7,
+          "p95_upper_ms": 18.2,
+          "p99_upper_ms": 31.2,
+          "max_ms": 59.0019,
+          "overflow_100ms": 0
+        },
+        "present_call": {
+          "count": 899,
+          "mean_ms": 0.742061,
+          "p50_upper_ms": 0.3,
+          "p95_upper_ms": 0.8,
+          "p99_upper_ms": 18.7,
+          "max_ms": 33.4911,
+          "overflow_100ms": 0
+        },
+        "composition_gpu": {
+          "count": 899,
+          "mean_ms": 2.83644,
+          "p50_upper_ms": 3,
+          "p95_upper_ms": 3.2,
+          "p99_upper_ms": 3.9,
+          "max_ms": 7.33344,
+          "overflow_100ms": 0
+        },
+        "source_selection": {
+          "count": 949,
+          "mean_ms": 0.121346,
+          "p50_upper_ms": 0.1,
+          "p95_upper_ms": 0.1,
+          "p99_upper_ms": 0.1,
+          "max_ms": 73.0999,
+          "overflow_100ms": 0
+        },
+        "context_wait": {
+          "count": 6355,
+          "mean_ms": 0.137248,
+          "p50_upper_ms": 0.1,
+          "p95_upper_ms": 0.7,
+          "p99_upper_ms": 0.9,
+          "max_ms": 149.525,
+          "overflow_100ms": 1
+        },
+        "completion_observation": {
+          "count": 899,
+          "mean_ms": 10.353,
+          "p50_upper_ms": 6.3,
+          "p95_upper_ms": 45.5,
+          "p99_upper_ms": 66.5,
+          "max_ms": 83.1179,
+          "overflow_100ms": 0
+        }
+      },
+      "resources": {
+        "average_cpu_machine_percent": 5.92,
+        "peak_summed_working_set_MiB": 2773.1,
+        "process_read_MiB": 280.0,
+        "process_write_MiB": 43.2,
+        "sampled_cpu_seconds": 22.56
+      },
+      "largest_status_skip_jumps": [
+        {
+          "skips": 1,
+          "last_frame": 205,
+          "from_native_seconds": 5.07899,
+          "to_native_seconds": 5.4932
+        },
+        {
+          "skips": 0,
+          "last_frame": 38,
+          "from_native_seconds": 2.19253,
+          "to_native_seconds": 2.70031
+        },
+        {
+          "skips": 0,
+          "last_frame": 63,
+          "from_native_seconds": 2.70031,
+          "to_native_seconds": 3.11156
+        },
+        {
+          "skips": 0,
+          "last_frame": 101,
+          "from_native_seconds": 3.11156,
+          "to_native_seconds": 3.7509
+        },
+        {
+          "skips": 0,
+          "last_frame": 119,
+          "from_native_seconds": 3.7509,
+          "to_native_seconds": 4.0569
+        },
+        {
+          "skips": 0,
+          "last_frame": 138,
+          "from_native_seconds": 4.0569,
+          "to_native_seconds": 4.36185
+        },
+        {
+          "skips": 0,
+          "last_frame": 181,
+          "from_native_seconds": 4.36185,
+          "to_native_seconds": 5.07899
+        },
+        {
+          "skips": 0,
+          "last_frame": 230,
+          "from_native_seconds": 5.4932,
+          "to_native_seconds": 5.89594
+        }
+      ]
+    },
+    "candidate-three": {
+      "seconds": 15.0,
+      "cut_seconds": 0.5,
+      "video_tracks": 3,
+      "audio_tracks": 3,
+      "original_resolution": [
+        3840,
+        2160
+      ],
+      "program_resolution": [
+        3840,
+        2160
+      ],
+      "rate": "60/1",
+      "proxies": false,
+      "application_ready_seconds": 2.1483470000093803,
+      "first_ready_seconds": 1.40280419998453,
+      "measured_seconds": 15.133200000017881,
+      "distinct_sequence_fps": 58.811090846545895,
+      "present_calls_per_second": 58.811090846545895,
+      "dxgi_present_count_per_second": 58.678931091834556,
+      "reached_end": true,
+      "samples": 720000,
+      "expected_samples": 720000,
+      "underruns": 0,
+      "active_throughput_windows": [
+        {
+          "window_seconds": 1,
+          "count": 25,
+          "minimum_fps": 53.43571880937303,
+          "p05_fps": 53.43571880937303,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+        },
+        {
+          "window_seconds": 10,
+          "count": 7,
+          "minimum_fps": 59.05417872936086,
+          "p05_fps": 59.05417872936086,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+        }
+      ],
+      "supervisor": {
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 23.85999999998603,
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        }
+      },
+      "power": {
+        "samples": 15,
+        "all_observed_ac": true
+      },
+      "physical_surface": [
+        356,
+        200
+      ],
+      "foreground_unobscured": true,
+      "dpr": 1.75,
+      "browser_error_count": 0,
+      "counters": {
+        "skipped_sequence_frames": 9,
+        "skipped_after_source_wait": 1,
+        "skipped_after_gpu_wait": 0,
+        "skipped_without_queue_wait": 8,
+        "source_wait_iterations": 118,
+        "gpu_wait_iterations": 0,
+        "clock_correction_absolute": {
+          "count": 1000,
+          "mean_ms": 0.637369,
+          "p50_upper_ms": 0.5,
+          "p95_upper_ms": 1.5,
+          "p99_upper_ms": 2.5,
+          "max_ms": 17.745,
+          "overflow_100ms": 0
+        },
+        "peak_source_queue_frames": 4,
+        "gpu_slot_budget": 4,
+        "peak_decoder_count": 3,
+        "retained_surface_views": 48,
+        "retained_texture_pools": 3,
+        "retained_texture_estimated_MiB": 1245.85,
+        "dxgi_statistics_available": true
+      },
+      "timings": {
+        "playback_present_interval": {
+          "count": 889,
+          "mean_ms": 16.8616,
+          "p50_upper_ms": 16.7,
+          "p95_upper_ms": 18.7,
+          "p99_upper_ms": 34.8,
+          "max_ms": 57.9114,
+          "overflow_100ms": 0
+        },
+        "present_call": {
+          "count": 891,
+          "mean_ms": 1.57154,
+          "p50_upper_ms": 0.3,
+          "p95_upper_ms": 8.1,
+          "p99_upper_ms": 29.6,
+          "max_ms": 56.6975,
+          "overflow_100ms": 0
+        },
+        "composition_gpu": {
+          "count": 891,
+          "mean_ms": 2.93795,
+          "p50_upper_ms": 2.9,
+          "p95_upper_ms": 3.5,
+          "p99_upper_ms": 5.6,
+          "max_ms": 7.30016,
+          "overflow_100ms": 0
+        },
+        "source_selection": {
+          "count": 1009,
+          "mean_ms": 0.131359,
+          "p50_upper_ms": 0.1,
+          "p95_upper_ms": 0.1,
+          "p99_upper_ms": 0.1,
+          "max_ms": 88.3432,
+          "overflow_100ms": 0
+        },
+        "context_wait": {
+          "count": 6269,
+          "mean_ms": 0.158136,
+          "p50_upper_ms": 0.1,
+          "p95_upper_ms": 0.7,
+          "p99_upper_ms": 1,
+          "max_ms": 292.201,
+          "overflow_100ms": 2
+        },
+        "completion_observation": {
+          "count": 891,
+          "mean_ms": 15.5965,
+          "p50_upper_ms": 6.5,
+          "p95_upper_ms": 65.6,
+          "p99_upper_ms": 89.1,
+          "max_ms": 109.432,
+          "overflow_100ms": 4
+        }
+      },
+      "resources": {
+        "average_cpu_machine_percent": 6.56,
+        "peak_summed_working_set_MiB": 2799.9,
+        "process_read_MiB": 277.5,
+        "process_write_MiB": 39.7,
+        "sampled_cpu_seconds": 24.56
+      },
+      "largest_status_skip_jumps": [
+        {
+          "skips": 6,
+          "last_frame": 432,
+          "from_native_seconds": 8.69498,
+          "to_native_seconds": 9.70554
+        },
+        {
+          "skips": 2,
+          "last_frame": 329,
+          "from_native_seconds": 7.14674,
+          "to_native_seconds": 7.98445
+        },
+        {
+          "skips": 1,
+          "last_frame": 845,
+          "from_native_seconds": 16.0571,
+          "to_native_seconds": 16.5909
+        },
+        {
+          "skips": 0,
+          "last_frame": 51,
+          "from_native_seconds": 2.425,
+          "to_native_seconds": 3.34423
+        },
+        {
+          "skips": 0,
+          "last_frame": 69,
+          "from_native_seconds": 3.34423,
+          "to_native_seconds": 3.65372
+        },
+        {
+          "skips": 0,
+          "last_frame": 113,
+          "from_native_seconds": 3.65372,
+          "to_native_seconds": 4.37715
+        },
+        {
+          "skips": 0,
+          "last_frame": 150,
+          "from_native_seconds": 4.37715,
+          "to_native_seconds": 4.99621
+        },
+        {
+          "skips": 0,
+          "last_frame": 174,
+          "from_native_seconds": 4.99621,
+          "to_native_seconds": 5.40673
+        }
+      ]
+    },
+    "paced-three": {
+      "seconds": 15.0,
+      "cut_seconds": 0.5,
+      "video_tracks": 3,
+      "audio_tracks": 3,
+      "source_files": 3,
+      "source_switches": false,
+      "original_resolution": [
+        3840,
+        2160
+      ],
+      "program_resolution": [
+        3840,
+        2160
+      ],
+      "rate": "60/1",
+      "proxies": false,
+      "application_ready_seconds": 2.17773809999926,
+      "first_ready_seconds": 1.2290940000093542,
+      "measured_seconds": 15.081300000011922,
+      "distinct_sequence_fps": 59.477631238639304,
+      "present_calls_per_second": 59.477631238639304,
+      "dxgi_present_count_per_second": 59.41132395743681,
+      "reached_end": true,
+      "samples": 720000,
+      "expected_samples": 720000,
+      "underruns": 0,
+      "active_throughput_windows": [
+        {
+          "window_seconds": 1,
+          "count": 19,
+          "minimum_fps": 58.62621705058176,
+          "p05_fps": 58.62621705058176,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+        },
+        {
+          "window_seconds": 10,
+          "count": 6,
+          "minimum_fps": 59.75955682945869,
+          "p05_fps": 59.75955682945869,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+        }
+      ],
+      "supervisor": {
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 23.48499999998603,
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        }
+      },
+      "power": {
+        "samples": 15,
+        "all_observed_ac": true
+      },
+      "physical_surface": [
+        356,
+        200
+      ],
+      "foreground_unobscured": true,
+      "dpr": 1.75,
+      "browser_error_count": 0,
+      "counters": {
+        "skipped_sequence_frames": 2,
+        "skipped_after_source_wait": 0,
+        "skipped_after_gpu_wait": 0,
+        "skipped_without_queue_wait": 2,
+        "source_wait_iterations": 22,
+        "gpu_wait_iterations": 0,
+        "clock_correction_absolute": {
+          "count": 997,
+          "mean_ms": 0.642121,
+          "p50_upper_ms": 0.5,
+          "p95_upper_ms": 1.5,
+          "p99_upper_ms": 4.3,
+          "max_ms": 29.654,
+          "overflow_100ms": 0
+        },
+        "peak_source_queue_frames": 4,
+        "gpu_slot_budget": 4,
+        "peak_decoder_count": 3,
+        "retained_surface_views": 48,
+        "retained_texture_pools": 3,
+        "retained_texture_estimated_MiB": 1245.85,
+        "dxgi_statistics_available": true
+      },
+      "timings": {
+        "playback_present_interval": {
+          "count": 896,
+          "mean_ms": 16.7043,
+          "p50_upper_ms": 16.7,
+          "p95_upper_ms": 18.4,
+          "p99_upper_ms": 40.6,
+          "max_ms": 52.1685,
+          "overflow_100ms": 0
+        },
+        "present_call": {
+          "count": 898,
+          "mean_ms": 1.2817,
+          "p50_upper_ms": 0.3,
+          "p95_upper_ms": 7.5,
+          "p99_upper_ms": 24.6,
+          "max_ms": 40.9544,
+          "overflow_100ms": 0
+        },
+        "composition_gpu": {
+          "count": 898,
+          "mean_ms": 3.4649,
+          "p50_upper_ms": 3.3,
+          "p95_upper_ms": 5.5,
+          "p99_upper_ms": 7,
+          "max_ms": 9.35888,
+          "overflow_100ms": 0
+        },
+        "source_selection": {
+          "count": 920,
+          "mean_ms": 0.16377,
+          "p50_upper_ms": 0.1,
+          "p95_upper_ms": 0.1,
+          "p99_upper_ms": 0.2,
+          "max_ms": 105.736,
+          "overflow_100ms": 1
+        },
+        "context_wait": {
+          "count": 6172,
+          "mean_ms": 0.140593,
+          "p50_upper_ms": 0.1,
+          "p95_upper_ms": 0.8,
+          "p99_upper_ms": 1,
+          "max_ms": 110.262,
+          "overflow_100ms": 1
+        },
+        "completion_observation": {
+          "count": 898,
+          "mean_ms": 13.684,
+          "p50_upper_ms": 6.6,
+          "p95_upper_ms": 57.3,
+          "p99_upper_ms": 75.7,
+          "max_ms": 92.3073,
+          "overflow_100ms": 0
+        }
+      },
+      "resources": {
+        "average_cpu_machine_percent": 7.09,
+        "peak_summed_working_set_MiB": 2952.0,
+        "process_read_MiB": 291.1,
+        "process_write_MiB": 40.2,
+        "sampled_cpu_seconds": 26.5
+      },
+      "largest_status_skip_jumps": [
+        {
+          "skips": 1,
+          "last_frame": 187,
+          "from_native_seconds": 4.91889,
+          "to_native_seconds": 5.43223
+        },
+        {
+          "skips": 1,
+          "last_frame": 398,
+          "from_native_seconds": 8.20074,
+          "to_native_seconds": 8.93442
+        },
+        {
+          "skips": 0,
+          "last_frame": 52,
+          "from_native_seconds": 2.34848,
+          "to_native_seconds": 3.16703
+        },
+        {
+          "skips": 0,
+          "last_frame": 94,
+          "from_native_seconds": 3.16703,
+          "to_native_seconds": 3.89643
+        },
+        {
+          "skips": 0,
+          "last_frame": 145,
+          "from_native_seconds": 3.89643,
+          "to_native_seconds": 4.71738
+        },
+        {
+          "skips": 0,
+          "last_frame": 157,
+          "from_native_seconds": 4.71738,
+          "to_native_seconds": 4.91889
+        },
+        {
+          "skips": 0,
+          "last_frame": 231,
+          "from_native_seconds": 5.43223,
+          "to_native_seconds": 6.15787
+        },
+        {
+          "skips": 0,
+          "last_frame": 256,
+          "from_native_seconds": 6.15787,
+          "to_native_seconds": 6.56928
+        }
+      ]
+    },
+    "baseline-60": {
+      "seconds": 60.0,
+      "cut_seconds": 0.5,
+      "video_tracks": 3,
+      "audio_tracks": 3,
+      "source_files": 3,
+      "source_switches": false,
+      "original_resolution": [
+        3840,
+        2160
+      ],
+      "program_resolution": [
+        3840,
+        2160
+      ],
+      "rate": "60/1",
+      "proxies": false,
+      "application_ready_seconds": 2.2130436999723315,
+      "first_ready_seconds": 1.191907700005686,
+      "measured_seconds": 60.25119999998808,
+      "distinct_sequence_fps": 58.953182675211494,
+      "present_calls_per_second": 58.953182675211494,
+      "dxgi_present_count_per_second": 58.953182675211494,
+      "reached_end": true,
+      "samples": 2880000,
+      "expected_samples": 2880000,
+      "underruns": 0,
+      "active_throughput_windows": [
+        {
+          "window_seconds": 1,
+          "count": 108,
+          "minimum_fps": 51.253855687780145,
+          "p05_fps": 53.18264916071123,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+        },
+        {
+          "window_seconds": 10,
+          "count": 93,
+          "minimum_fps": 57.58530796467063,
+          "p05_fps": 57.60907708503918,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+        }
+      ],
+      "supervisor": {
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 69.98400000002584,
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        }
+      },
+      "power": {
+        "samples": 58,
+        "all_observed_ac": true
+      },
+      "physical_surface": [
+        356,
+        200
+      ],
+      "foreground_unobscured": true,
+      "dpr": 1.75,
+      "browser_error_count": 0,
+      "counters": {
+        "skipped_sequence_frames": 47,
+        "skipped_after_source_wait": 23,
+        "skipped_after_gpu_wait": 0,
+        "skipped_without_queue_wait": 24,
+        "source_wait_iterations": 113,
+        "gpu_wait_iterations": 0,
+        "clock_correction_absolute": {
+          "count": 3910,
+          "mean_ms": 0.654538,
+          "p50_upper_ms": 0.5,
+          "p95_upper_ms": 1.5,
+          "p99_upper_ms": 3.8,
+          "max_ms": 40.207,
+          "overflow_100ms": 0
+        },
+        "peak_source_queue_frames": 4,
+        "gpu_slot_budget": 4,
+        "peak_decoder_count": 3,
+        "retained_surface_views": 48,
+        "retained_texture_pools": 3,
+        "retained_texture_estimated_MiB": 1245.85,
+        "dxgi_statistics_available": true
+      },
+      "timings": {
+        "playback_present_interval": {
+          "count": 3551,
+          "mean_ms": 16.887,
+          "p50_upper_ms": 16.7,
+          "p95_upper_ms": 18.7,
+          "p99_upper_ms": 41.9,
+          "max_ms": 106.228,
+          "overflow_100ms": 2
+        },
+        "present_call": {
+          "count": 3553,
+          "mean_ms": 1.5081,
+          "p50_upper_ms": 0.3,
+          "p95_upper_ms": 7.4,
+          "p99_upper_ms": 28.2,
+          "max_ms": 92.6777,
+          "overflow_100ms": 0
+        },
+        "composition_gpu": {
+          "count": 3553,
+          "mean_ms": 3.47933,
+          "p50_upper_ms": 3.3,
+          "p95_upper_ms": 5.9,
+          "p99_upper_ms": 7.2,
+          "max_ms": 9.34468,
+          "overflow_100ms": 0
+        },
+        "source_selection": {
+          "count": 3666,
+          "mean_ms": 0.0755188,
+          "p50_upper_ms": 0.1,
+          "p95_upper_ms": 0.1,
+          "p99_upper_ms": 0.2,
+          "max_ms": 87.6723,
+          "overflow_100ms": 0
+        },
+        "context_wait": {
+          "count": 24027,
+          "mean_ms": 0.115602,
+          "p50_upper_ms": 0.1,
+          "p95_upper_ms": 0.7,
+          "p99_upper_ms": 0.9,
+          "max_ms": 157.114,
+          "overflow_100ms": 2
+        },
+        "completion_observation": {
+          "count": 3553,
+          "mean_ms": 15.3147,
+          "p50_upper_ms": 6.6,
+          "p95_upper_ms": 59.6,
+          "p99_upper_ms": 99.3,
+          "max_ms": 162.54,
+          "overflow_100ms": 29
+        }
+      },
+      "resources": {
+        "average_cpu_machine_percent": 7.76,
+        "peak_summed_working_set_MiB": 3244.7,
+        "process_read_MiB": 1162.3,
+        "process_write_MiB": 161.3,
+        "sampled_cpu_seconds": 113.08
+      },
+      "largest_status_skip_jumps": [
+        {
+          "skips": 10,
+          "last_frame": 130,
+          "from_native_seconds": 3.17292,
+          "to_native_seconds": 4.04341
+        },
+        {
+          "skips": 9,
+          "last_frame": 2730,
+          "from_native_seconds": 47.0024,
+          "to_native_seconds": 47.363
+        },
+        {
+          "skips": 9,
+          "last_frame": 2814,
+          "from_native_seconds": 47.8767,
+          "to_native_seconds": 48.7771
+        },
+        {
+          "skips": 6,
+          "last_frame": 2452,
+          "from_native_seconds": 42.4226,
+          "to_native_seconds": 42.7505
+        },
+        {
+          "skips": 4,
+          "last_frame": 3289,
+          "from_native_seconds": 56.1342,
+          "to_native_seconds": 56.685
+        },
+        {
+          "skips": 2,
+          "last_frame": 499,
+          "from_native_seconds": 9.52979,
+          "to_native_seconds": 10.1841
+        },
+        {
+          "skips": 2,
+          "last_frame": 1365,
+          "from_native_seconds": 23.875,
+          "to_native_seconds": 24.6169
+        },
+        {
+          "skips": 1,
+          "last_frame": 574,
+          "from_native_seconds": 10.8015,
+          "to_native_seconds": 11.4391
+        }
+      ]
+    },
+    "paced-60": {
+      "seconds": 60.0,
+      "cut_seconds": 0.5,
+      "video_tracks": 3,
+      "audio_tracks": 3,
+      "source_files": 3,
+      "source_switches": false,
+      "original_resolution": [
+        3840,
+        2160
+      ],
+      "program_resolution": [
+        3840,
+        2160
+      ],
+      "rate": "60/1",
+      "proxies": false,
+      "application_ready_seconds": 2.2152507999853697,
+      "first_ready_seconds": 1.1170052000088617,
+      "measured_seconds": 60.45629999998212,
+      "distinct_sequence_fps": 53.07966250003637,
+      "present_calls_per_second": 53.07966250003637,
+      "dxgi_present_count_per_second": 53.07966250003637,
+      "reached_end": true,
+      "samples": 2880000,
+      "expected_samples": 2880000,
+      "underruns": 0,
+      "active_throughput_windows": [
+        {
+          "window_seconds": 1,
+          "count": 91,
+          "minimum_fps": 2.2104332449160053,
+          "p05_fps": 6.574081682964897,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+        },
+        {
+          "window_seconds": 10,
+          "count": 79,
+          "minimum_fps": 35.397352634971014,
+          "p05_fps": 39.10904408655879,
+          "method": "Native status-counter deltas over >=window, <=window+.5 s; not physical scanout. Frame-zero preparation and terminal paused status excluded."
+        }
+      ],
+      "supervisor": {
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 70.375,
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        }
+      },
+      "power": {
+        "samples": 58,
+        "all_observed_ac": true
+      },
+      "physical_surface": [
+        356,
+        200
+      ],
+      "foreground_unobscured": true,
+      "dpr": 1.75,
+      "browser_error_count": 0,
+      "counters": {
+        "skipped_sequence_frames": 390,
+        "skipped_after_source_wait": 332,
+        "skipped_after_gpu_wait": 0,
+        "skipped_without_queue_wait": 58,
+        "source_wait_iterations": 498,
+        "gpu_wait_iterations": 0,
+        "clock_correction_absolute": {
+          "count": 3940,
+          "mean_ms": 0.658103,
+          "p50_upper_ms": 0.5,
+          "p95_upper_ms": 1.6,
+          "p99_upper_ms": 2.6,
+          "max_ms": 43.454,
+          "overflow_100ms": 0
+        },
+        "peak_source_queue_frames": 4,
+        "gpu_slot_budget": 4,
+        "peak_decoder_count": 3,
+        "retained_surface_views": 48,
+        "retained_texture_pools": 3,
+        "retained_texture_estimated_MiB": 1245.85,
+        "dxgi_statistics_available": true
+      },
+      "timings": {
+        "playback_present_interval": {
+          "count": 3208,
+          "mean_ms": 18.7033,
+          "p50_upper_ms": 16.7,
+          "p95_upper_ms": 25.2,
+          "p99_upper_ms": 69.3,
+          "max_ms": 1413.86,
+          "overflow_100ms": 15
+        },
+        "present_call": {
+          "count": 3210,
+          "mean_ms": 2.54863,
+          "p50_upper_ms": 0.4,
+          "p95_upper_ms": 12.8,
+          "p99_upper_ms": 49.6,
+          "max_ms": 167.078,
+          "overflow_100ms": 3
+        },
+        "composition_gpu": {
+          "count": 3210,
+          "mean_ms": 3.43192,
+          "p50_upper_ms": 3.2,
+          "p95_upper_ms": 5.8,
+          "p99_upper_ms": 6.9,
+          "max_ms": 8.9066,
+          "overflow_100ms": 0
+        },
+        "source_selection": {
+          "count": 3708,
+          "mean_ms": 0.075857,
+          "p50_upper_ms": 0.1,
+          "p95_upper_ms": 0.1,
+          "p99_upper_ms": 0.2,
+          "max_ms": 97.225,
+          "overflow_100ms": 0
+        },
+        "context_wait": {
+          "count": 22098,
+          "mean_ms": 0.301572,
+          "p50_upper_ms": 0.1,
+          "p95_upper_ms": 0.8,
+          "p99_upper_ms": 8.9,
+          "max_ms": 74.3256,
+          "overflow_100ms": 0
+        },
+        "completion_observation": {
+          "count": 3210,
+          "mean_ms": 20.6785,
+          "p50_upper_ms": 7,
+          "p95_upper_ms": 84.4,
+          "p99_upper_ms": 236.129,
+          "max_ms": 236.129,
+          "overflow_100ms": 100
+        }
+      },
+      "resources": {
+        "average_cpu_machine_percent": 7.52,
+        "peak_summed_working_set_MiB": 3590.9,
+        "process_read_MiB": 1166.8,
+        "process_write_MiB": 165.2,
+        "sampled_cpu_seconds": 110.11
+      },
+      "largest_status_skip_jumps": [
+        {
+          "skips": 86,
+          "last_frame": 1442,
+          "from_native_seconds": 25.3644,
+          "to_native_seconds": 26.182
+        },
+        {
+          "skips": 60,
+          "last_frame": 1869,
+          "from_native_seconds": 32.1461,
+          "to_native_seconds": 33.363
+        },
+        {
+          "skips": 48,
+          "last_frame": 542,
+          "from_native_seconds": 10.1532,
+          "to_native_seconds": 11.1837
+        },
+        {
+          "skips": 42,
+          "last_frame": 1361,
+          "from_native_seconds": 24.2644,
+          "to_native_seconds": 24.8248
+        },
+        {
+          "skips": 24,
+          "last_frame": 1491,
+          "from_native_seconds": 26.3972,
+          "to_native_seconds": 26.9781
+        },
+        {
+          "skips": 18,
+          "last_frame": 596,
+          "from_native_seconds": 11.3958,
+          "to_native_seconds": 12.0667
+        },
+        {
+          "skips": 17,
+          "last_frame": 2519,
+          "from_native_seconds": 43.3747,
+          "to_native_seconds": 44.1104
+        },
+        {
+          "skips": 13,
+          "last_frame": 61,
+          "from_native_seconds": 2.05577,
+          "to_native_seconds": 3.13739
+        }
+      ]
+    }
+  },
+  "ruler": {
+    "baseline-scrub": {
+      "source_resolution": [
+        3840,
+        2160
+      ],
+      "program_resolution": [
+        960,
+        540
+      ],
+      "video_tracks": 3,
+      "audio_tracks": 3,
+      "sequence_seconds": 90,
+      "cut_seconds": 0.5,
+      "proxy_used": false,
+      "app_ready_ms": 2134.355999995023,
+      "project_setup_ms": 1375.6514999840874,
+      "play_after_seek_ms": 44.4019999995362,
+      "preview_geometry": {
+        "x": 532.5982666015625,
+        "y": 170.57144165039062,
+        "width": 380.4375305175781,
+        "height": 213.85714721679688,
+        "dpr": 1.75
+      },
+      "ready_resources": {
+        "webviewMiB": 1012.03515625,
+        "nativeMiB": 1422.3671875,
+        "ffmpegProcesses": 0
+      },
+      "after_paused_resources": {
+        "webviewMiB": 1026.40625,
+        "nativeMiB": 1459.6796875,
+        "ffmpegProcesses": 1
+      },
+      "failure_type": "Error",
+      "supervisor": {
+        "exit_code": 1,
+        "reason": null,
+        "seconds": 13.280999999988126,
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        }
+      },
+      "power": {
+        "samples": 13,
+        "all_observed_ac": true
+      },
+      "foreground_unobscured": null,
+      "paused": [
+        {
+          "requested": 39,
+          "audioFetches": 4,
+          "checkpoints": 46,
+          "upFrame": 531,
+          "completed": 531,
+          "underruns": 0,
+          "timed_out": false,
+          "newest_picture_ms": 351.40000000596046,
+          "gesture_ui_cost_ms": {
+            "count": 46,
+            "median": 1.75,
+            "p95": 2.5,
+            "maximum": 3.800000011920929
+          },
+          "post_release_frames_before_target": 0
+        },
+        {
+          "requested": 43,
+          "audioFetches": 3,
+          "checkpoints": 46,
+          "upFrame": 531,
+          "completed": 531,
+          "underruns": 0,
+          "timed_out": false,
+          "newest_picture_ms": 478.09999999403954,
+          "gesture_ui_cost_ms": {
+            "count": 46,
+            "median": 1.699999988079071,
+            "p95": 2.4000000059604645,
+            "maximum": 2.7000000178813934
+          },
+          "post_release_frames_before_target": 0
+        },
+        {
+          "requested": 36,
+          "audioFetches": 7,
+          "checkpoints": 46,
+          "upFrame": 531,
+          "completed": 531,
+          "underruns": 0,
+          "timed_out": false,
+          "newest_picture_ms": 401.89999997615814,
+          "gesture_ui_cost_ms": {
+            "count": 46,
+            "median": 1.699999988079071,
+            "p95": 2.199999988079071,
+            "maximum": 2.9000000059604645
+          },
+          "post_release_frames_before_target": 0
+        }
+      ],
+      "playing": {
+        "requested": 34,
+        "audioFetches": 6,
+        "checkpoints": 47,
+        "upFrame": 381,
+        "completed": 538,
+        "underruns": 0,
+        "timed_out": false,
+        "newest_picture_ms": 466.5,
+        "gesture_ui_cost_ms": {
+          "count": 47,
+          "median": 1.5,
+          "p95": 2.0999999940395355,
+          "maximum": 2.5
+        },
+        "post_release_frames_before_target": 0
+      }
+    },
+    "baseline-scrub-retry": {
+      "source_resolution": [
+        3840,
+        2160
+      ],
+      "program_resolution": [
+        960,
+        540
+      ],
+      "video_tracks": 3,
+      "audio_tracks": 3,
+      "sequence_seconds": 90,
+      "cut_seconds": 0.5,
+      "proxy_used": false,
+      "desktop_reported_refresh_hz": 120,
+      "app_ready_ms": 2176.1977999994997,
+      "project_setup_ms": 1489.036999992095,
+      "play_after_seek_ms": 43.74710001866333,
+      "preview_geometry": {
+        "x": 532.5982666015625,
+        "y": 170.57144165039062,
+        "width": 380.4375305175781,
+        "height": 213.85714721679688,
+        "dpr": 1.75
+      },
+      "ready_resources": {
+        "webviewMiB": 1227.16015625,
+        "nativeMiB": 1317.9296875,
+        "ffmpegProcesses": 0
+      },
+      "after_paused_resources": {
+        "webviewMiB": 1246.796875,
+        "nativeMiB": 1148.265625,
+        "ffmpegProcesses": 1
+      },
+      "idle_resources": {
+        "webviewMiB": 1279.44140625,
+        "nativeMiB": 1412.60546875,
+        "ffmpegProcesses": 0
+      },
+      "browser_error_count": 0,
+      "supervisor": {
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 15.10899999999674,
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        }
+      },
+      "power": {
+        "samples": 15,
+        "all_observed_ac": true
+      },
+      "foreground_unobscured": true,
+      "paused": [
+        {
+          "requested": 46,
+          "audioFetches": 1,
+          "checkpoints": 46,
+          "upFrame": 531,
+          "completed": 531,
+          "underruns": 0,
+          "timed_out": false,
+          "newest_picture_ms": 451.09999999403954,
+          "gesture_ui_cost_ms": {
+            "count": 46,
+            "median": 1.9000000059604645,
+            "p95": 2.300000011920929,
+            "maximum": 3.2999999821186066
+          },
+          "post_release_frames_before_target": 0
+        },
+        {
+          "requested": 37,
+          "audioFetches": 4,
+          "checkpoints": 46,
+          "upFrame": 531,
+          "completed": 531,
+          "underruns": 0,
+          "timed_out": false,
+          "newest_picture_ms": 386.5,
+          "gesture_ui_cost_ms": {
+            "count": 46,
+            "median": 1.8999999910593033,
+            "p95": 2.399999976158142,
+            "maximum": 3.4000000059604645
+          },
+          "post_release_frames_before_target": 0
+        },
+        {
+          "requested": 36,
+          "audioFetches": 6,
+          "checkpoints": 46,
+          "upFrame": 531,
+          "completed": 531,
+          "underruns": 0,
+          "timed_out": false,
+          "newest_picture_ms": 433.09999999403954,
+          "gesture_ui_cost_ms": {
+            "count": 46,
+            "median": 1.5999999940395355,
+            "p95": 2.199999988079071,
+            "maximum": 2.600000023841858
+          },
+          "post_release_frames_before_target": 0
+        }
+      ],
+      "playing": {
+        "requested": 40,
+        "audioFetches": 4,
+        "checkpoints": 47,
+        "upFrame": 531,
+        "completed": 538,
+        "underruns": 0,
+        "timed_out": false,
+        "newest_picture_ms": 458.30000001192093,
+        "gesture_ui_cost_ms": {
+          "count": 47,
+          "median": 1.600000023841858,
+          "p95": 2.300000011920929,
+          "maximum": 3.0999999940395355
+        },
+        "post_release_frames_before_target": 5
+      }
+    },
+    "candidate-scrub": {
+      "source_resolution": [
+        3840,
+        2160
+      ],
+      "program_resolution": [
+        960,
+        540
+      ],
+      "video_tracks": 3,
+      "audio_tracks": 3,
+      "sequence_seconds": 90,
+      "cut_seconds": 0.5,
+      "proxy_used": false,
+      "desktop_reported_refresh_hz": 120,
+      "app_ready_ms": 3162.6425000140443,
+      "project_setup_ms": 2506.545499985805,
+      "play_after_seek_ms": 42.447399988304824,
+      "preview_geometry": {
+        "x": 532.5982666015625,
+        "y": 170.57144165039062,
+        "width": 380.4375305175781,
+        "height": 213.85714721679688,
+        "dpr": 1.75
+      },
+      "ready_resources": {
+        "webviewMiB": 1212.46875,
+        "nativeMiB": 977.94140625,
+        "ffmpegProcesses": 0
+      },
+      "after_paused_resources": {
+        "webviewMiB": 1058.19921875,
+        "nativeMiB": 1008.90625,
+        "ffmpegProcesses": 0
+      },
+      "idle_resources": {
+        "webviewMiB": 1097.37109375,
+        "nativeMiB": 1282.3046875,
+        "ffmpegProcesses": 0
+      },
+      "browser_error_count": 0,
+      "supervisor": {
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 18.125,
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        }
+      },
+      "power": {
+        "samples": 18,
+        "all_observed_ac": true
+      },
+      "foreground_unobscured": true,
+      "paused": [
+        {
+          "requested": 46,
+          "audioFetches": 1,
+          "checkpoints": 1,
+          "upFrame": 531,
+          "completed": 531,
+          "underruns": 0,
+          "timed_out": false,
+          "newest_picture_ms": 512.1999999880791,
+          "gesture_ui_cost_ms": {
+            "count": 47,
+            "median": 0.6000000238418579,
+            "p95": 0.9000000059604645,
+            "maximum": 1.4000000059604645
+          },
+          "post_release_frames_before_target": 0
+        },
+        {
+          "requested": 46,
+          "audioFetches": 1,
+          "checkpoints": 1,
+          "upFrame": 531,
+          "completed": 531,
+          "underruns": 0,
+          "timed_out": false,
+          "newest_picture_ms": 572.5,
+          "gesture_ui_cost_ms": {
+            "count": 47,
+            "median": 0.699999988079071,
+            "p95": 0.800000011920929,
+            "maximum": 1
+          },
+          "post_release_frames_before_target": 0
+        },
+        {
+          "requested": 46,
+          "audioFetches": 1,
+          "checkpoints": 1,
+          "upFrame": 531,
+          "completed": 531,
+          "underruns": 0,
+          "timed_out": false,
+          "newest_picture_ms": 554.3000000119209,
+          "gesture_ui_cost_ms": {
+            "count": 47,
+            "median": 0.5999999940395355,
+            "p95": 0.9000000059604645,
+            "maximum": 1.0999999940395355
+          },
+          "post_release_frames_before_target": 0
+        }
+      ],
+      "playing": {
+        "requested": 46,
+        "audioFetches": 1,
+        "checkpoints": 1,
+        "upFrame": 531,
+        "completed": 538,
+        "underruns": 0,
+        "timed_out": false,
+        "newest_picture_ms": 629.3999999761581,
+        "gesture_ui_cost_ms": {
+          "count": 47,
+          "median": 0.699999988079071,
+          "p95": 1,
+          "maximum": 1.100000023841858
+        },
+        "post_release_frames_before_target": 0
+      }
+    },
+    "paced-scrub": {
+      "source_resolution": [
+        3840,
+        2160
+      ],
+      "program_resolution": [
+        960,
+        540
+      ],
+      "video_tracks": 3,
+      "audio_tracks": 3,
+      "sequence_seconds": 90,
+      "cut_seconds": 0.5,
+      "proxy_used": false,
+      "desktop_reported_refresh_hz": 120,
+      "app_ready_ms": 3704.913999972632,
+      "project_setup_ms": 2312.446900003124,
+      "play_after_seek_ms": 35.02769998158328,
+      "preview_geometry": {
+        "x": 532.5982666015625,
+        "y": 170.57144165039062,
+        "width": 380.4375305175781,
+        "height": 213.85714721679688,
+        "dpr": 1.75
+      },
+      "ready_resources": {
+        "webviewMiB": 1045.31640625,
+        "nativeMiB": 989.578125,
+        "ffmpegProcesses": 0
+      },
+      "after_paused_resources": {
+        "webviewMiB": 1056.94921875,
+        "nativeMiB": 1075.125,
+        "ffmpegProcesses": 0
+      },
+      "idle_resources": {
+        "webviewMiB": 1065.5546875,
+        "nativeMiB": 1291.01953125,
+        "ffmpegProcesses": 0
+      },
+      "browser_error_count": 0,
+      "supervisor": {
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 18.187999999994645,
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        }
+      },
+      "power": {
+        "samples": 18,
+        "all_observed_ac": true
+      },
+      "foreground_unobscured": true,
+      "paused": [
+        {
+          "requested": 12,
+          "audioFetches": 1,
+          "checkpoints": 1,
+          "upFrame": 531,
+          "completed": 531,
+          "underruns": 0,
+          "timed_out": false,
+          "newest_picture_ms": 554.4000000059605,
+          "gesture_ui_cost_ms": {
+            "count": 47,
+            "median": 0.10000002384185791,
+            "p95": 0.20000001788139343,
+            "maximum": 2.0999999940395355
+          },
+          "post_release_frames_before_target": 0
+        },
+        {
+          "requested": 7,
+          "audioFetches": 1,
+          "checkpoints": 1,
+          "upFrame": 531,
+          "completed": 531,
+          "underruns": 0,
+          "timed_out": false,
+          "newest_picture_ms": 522.8000000119209,
+          "gesture_ui_cost_ms": {
+            "count": 47,
+            "median": 0.09999999403953552,
+            "p95": 0.19999998807907104,
+            "maximum": 1.2000000178813934
+          },
+          "post_release_frames_before_target": 0
+        },
+        {
+          "requested": 8,
+          "audioFetches": 1,
+          "checkpoints": 1,
+          "upFrame": 531,
+          "completed": 531,
+          "underruns": 0,
+          "timed_out": false,
+          "newest_picture_ms": 588,
+          "gesture_ui_cost_ms": {
+            "count": 47,
+            "median": 0.09999999403953552,
+            "p95": 0.20000001788139343,
+            "maximum": 1.0999999940395355
+          },
+          "post_release_frames_before_target": 0
+        }
+      ],
+      "playing": {
+        "requested": 8,
+        "audioFetches": 1,
+        "checkpoints": 1,
+        "upFrame": 531,
+        "completed": 538,
+        "underruns": 0,
+        "timed_out": false,
+        "newest_picture_ms": 599.1999999880791,
+        "gesture_ui_cost_ms": {
+          "count": 47,
+          "median": 0.09999999403953552,
+          "p95": 0.20000001788139343,
+          "maximum": 1
+        },
+        "post_release_frames_before_target": 0
+      }
+    }
+  },
+  "seeks": {
+    "baseline-seek": {
+      "first_ready_ms": 785.7663999893703,
+      "seek_samples": [
+        {
+          "target_seconds": 2.2,
+          "milliseconds": 507.92199998977594,
+          "first_visit": true
+        },
+        {
+          "target_seconds": 0.5,
+          "milliseconds": 509.6800000173971,
+          "first_visit": true
+        },
+        {
+          "target_seconds": 4.2,
+          "milliseconds": 307.42129997815937,
+          "first_visit": true
+        },
+        {
+          "target_seconds": 2.2,
+          "milliseconds": 618.7793999852147,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 0.5,
+          "milliseconds": 316.6418999899179,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 4.2,
+          "milliseconds": 308.1819999788422,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 2.2,
+          "milliseconds": 626.1577999975998,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 0.5,
+          "milliseconds": 316.7692999995779,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 4.2,
+          "milliseconds": 207.34149997588247,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 2.2,
+          "milliseconds": 400.39739999338053,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 0.5,
+          "milliseconds": 424.8037000070326,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 4.2,
+          "milliseconds": 198.98849999299273,
+          "first_visit": false
+        }
+      ],
+      "seek_p50_ms": 358.5833499964792,
+      "seek_p95_ms": 618.7793999852147,
+      "endpoint": "completed GPU frame in requested generation; not physical scanout",
+      "supervisor": {
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 11.046999999991385,
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        }
+      }
+    },
+    "candidate-seek": {
+      "first_ready_ms": 1049.0033999958541,
+      "seek_samples": [
+        {
+          "target_seconds": 2.2,
+          "milliseconds": 625.880400009919,
+          "first_visit": true
+        },
+        {
+          "target_seconds": 0.5,
+          "milliseconds": 519.4598000089172,
+          "first_visit": true
+        },
+        {
+          "target_seconds": 4.2,
+          "milliseconds": 304.79739999282174,
+          "first_visit": true
+        },
+        {
+          "target_seconds": 2.2,
+          "milliseconds": 735.2144000178669,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 0.5,
+          "milliseconds": 508.6515999864787,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 4.2,
+          "milliseconds": 307.8622000175528,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 2.2,
+          "milliseconds": 619.3078999931458,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 0.5,
+          "milliseconds": 516.0828000225592,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 4.2,
+          "milliseconds": 317.24429997848347,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 2.2,
+          "milliseconds": 608.3319000026677,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 0.5,
+          "milliseconds": 525.8406000211835,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 4.2,
+          "milliseconds": 316.5117000171449,
+          "first_visit": false
+        }
+      ],
+      "seek_p50_ms": 517.7713000157382,
+      "seek_p95_ms": 625.880400009919,
+      "endpoint": "completed GPU frame in requested generation; not physical scanout",
+      "supervisor": {
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 12.46899999998277,
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        }
+      }
+    },
+    "paced-seek": {
+      "first_ready_ms": 1149.4111999927554,
+      "seek_samples": [
+        {
+          "target_seconds": 2.2,
+          "milliseconds": 625.5605000187643,
+          "first_visit": true
+        },
+        {
+          "target_seconds": 0.5,
+          "milliseconds": 525.6469000014476,
+          "first_visit": true
+        },
+        {
+          "target_seconds": 4.2,
+          "milliseconds": 417.10729998885654,
+          "first_visit": true
+        },
+        {
+          "target_seconds": 2.2,
+          "milliseconds": 734.2937999928836,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 0.5,
+          "milliseconds": 517.0536000223365,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 4.2,
+          "milliseconds": 317.20719998702407,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 2.2,
+          "milliseconds": 609.4241999962833,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 0.5,
+          "milliseconds": 525.7600999902934,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 4.2,
+          "milliseconds": 316.22830001288094,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 2.2,
+          "milliseconds": 609.3130999943241,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 0.5,
+          "milliseconds": 508.73760000104085,
+          "first_visit": false
+        },
+        {
+          "target_seconds": 4.2,
+          "milliseconds": 317.4682999961078,
+          "first_visit": false
+        }
+      ],
+      "seek_p50_ms": 521.3502500118921,
+      "seek_p95_ms": 625.5605000187643,
+      "endpoint": "completed GPU frame in requested generation; not physical scanout",
+      "supervisor": {
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 12.39100000000326,
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        }
+      }
+    }
+  },
+  "memory": {
+    "baseline-memory150": {
+      "mode": "editing",
+      "seconds": 150,
+      "timeline_seconds": 125,
+      "rows": [
+        {
+          "seconds": 0.958302899991395,
+          "stage": "prepared",
+          "heap": {
+            "Documents": 1,
+            "JSEventListeners": 544,
+            "Nodes": 4591,
+            "JSHeapUsedSize": 4964392,
+            "JSHeapTotalSize": 14237696
+          },
+          "state": {
+            "frame": 0,
+            "playing": false,
+            "underruns": 0,
+            "samples": 0,
+            "undo": 0,
+            "redo": 0,
+            "resolution": "960"
+          },
+          "clock_wire": {
+            "requests": 60,
+            "encoded_bytes": 239086
+          },
+          "WebView_roles": {
+            "browser": {
+              "rss_MiB": 111.0546875,
+              "private_commit_MiB": 34.92578125,
+              "processes": 1
+            },
+            "other": {
+              "rss_MiB": 13.3125,
+              "private_commit_MiB": 2.69140625,
+              "processes": 1
+            },
+            "gpu-process": {
+              "rss_MiB": 354.59765625,
+              "private_commit_MiB": 440.23828125,
+              "processes": 1
+            },
+            "utility": {
+              "rss_MiB": 96.30859375,
+              "private_commit_MiB": 30.85546875,
+              "processes": 3
+            },
+            "renderer": {
+              "rss_MiB": 388.17578125,
+              "private_commit_MiB": 353.45703125,
+              "processes": 1
+            }
+          }
+        },
+        {
+          "seconds": 34.45876439998392,
+          "stage": "active",
+          "heap": {
+            "Documents": 1,
+            "JSEventListeners": 735,
+            "Nodes": 6058,
+            "JSHeapUsedSize": 20335280,
+            "JSHeapTotalSize": 46657536
+          },
+          "state": {
+            "frame": 1267,
+            "playing": true,
+            "underruns": 0,
+            "samples": 11264,
+            "undo": 3,
+            "redo": 0,
+            "resolution": "960"
+          },
+          "clock_wire": {
+            "requests": 2051,
+            "encoded_bytes": 8319828
+          },
+          "WebView_roles": {
+            "browser": {
+              "rss_MiB": 122.078125,
+              "private_commit_MiB": 40.19921875,
+              "processes": 1
+            },
+            "other": {
+              "rss_MiB": 21.83984375,
+              "private_commit_MiB": 3.57421875,
+              "processes": 1
+            },
+            "gpu-process": {
+              "rss_MiB": 388.8203125,
+              "private_commit_MiB": 452.32421875,
+              "processes": 1
+            },
+            "utility": {
+              "rss_MiB": 96.80859375,
+              "private_commit_MiB": 31.08203125,
+              "processes": 3
+            },
+            "renderer": {
+              "rss_MiB": 650.55078125,
+              "private_commit_MiB": 611.6484375,
+              "processes": 1
+            }
+          }
+        },
+        {
+          "seconds": 64.79025120000006,
+          "stage": "active",
+          "heap": {
+            "Documents": 1,
+            "JSEventListeners": 1262,
+            "Nodes": 10075,
+            "JSHeapUsedSize": 16251584,
+            "JSHeapTotalSize": 60145664
+          },
+          "state": {
+            "frame": 2533,
+            "playing": true,
+            "underruns": 0,
+            "samples": 16640,
+            "undo": 6,
+            "redo": 0,
+            "resolution": "1280"
+          },
+          "clock_wire": {
+            "requests": 3776,
+            "encoded_bytes": 15215970
+          },
+          "WebView_roles": {
+            "browser": {
+              "rss_MiB": 127.171875,
+              "private_commit_MiB": 40.359375,
+              "processes": 1
+            },
+            "other": {
+              "rss_MiB": 16.07421875,
+              "private_commit_MiB": 3.23828125,
+              "processes": 1
+            },
+            "gpu-process": {
+              "rss_MiB": 440.04296875,
+              "private_commit_MiB": 500.8046875,
+              "processes": 1
+            },
+            "utility": {
+              "rss_MiB": 98.484375,
+              "private_commit_MiB": 31.78515625,
+              "processes": 3
+            },
+            "renderer": {
+              "rss_MiB": 742.80078125,
+              "private_commit_MiB": 705.10546875,
+              "processes": 1
+            }
+          }
+        },
+        {
+          "seconds": 93.48217879998265,
+          "stage": "active",
+          "heap": {
+            "Documents": 1,
+            "JSEventListeners": 1913,
+            "Nodes": 15148,
+            "JSHeapUsedSize": 19078688,
+            "JSHeapTotalSize": 70561792
+          },
+          "state": {
+            "frame": 3785,
+            "playing": true,
+            "underruns": 0,
+            "samples": 8064,
+            "undo": 9,
+            "redo": 0,
+            "resolution": "1280"
+          },
+          "clock_wire": {
+            "requests": 5419,
+            "encoded_bytes": 21858573
+          },
+          "WebView_roles": {
+            "browser": {
+              "rss_MiB": 132.35546875,
+              "private_commit_MiB": 45.54296875,
+              "processes": 1
+            },
+            "other": {
+              "rss_MiB": 16.07421875,
+              "private_commit_MiB": 3.23828125,
+              "processes": 1
+            },
+            "gpu-process": {
+              "rss_MiB": 444.36328125,
+              "private_commit_MiB": 504.50390625,
+              "processes": 1
+            },
+            "utility": {
+              "rss_MiB": 100.234375,
+              "private_commit_MiB": 33.546875,
+              "processes": 3
+            },
+            "renderer": {
+              "rss_MiB": 850.61328125,
+              "private_commit_MiB": 816.7890625,
+              "processes": 1
+            }
+          }
+        },
+        {
+          "seconds": 125.71375389999594,
+          "stage": "active",
+          "heap": {
+            "Documents": 1,
+            "JSEventListeners": 1986,
+            "Nodes": 15633,
+            "JSHeapUsedSize": 26623184,
+            "JSHeapTotalSize": 72372224
+          },
+          "state": {
+            "frame": 5042,
+            "playing": true,
+            "underruns": 0,
+            "samples": 9472,
+            "undo": 12,
+            "redo": 0,
+            "resolution": "960"
+          },
+          "clock_wire": {
+            "requests": 7269,
+            "encoded_bytes": 29277407
+          },
+          "WebView_roles": {
+            "browser": {
+              "rss_MiB": 137.3515625,
+              "private_commit_MiB": 49.36328125,
+              "processes": 1
+            },
+            "other": {
+              "rss_MiB": 16.07421875,
+              "private_commit_MiB": 3.234375,
+              "processes": 1
+            },
+            "gpu-process": {
+              "rss_MiB": 438.0,
+              "private_commit_MiB": 501.4453125,
+              "processes": 1
+            },
+            "utility": {
+              "rss_MiB": 100.23828125,
+              "private_commit_MiB": 33.4765625,
+              "processes": 3
+            },
+            "renderer": {
+              "rss_MiB": 979.00390625,
+              "private_commit_MiB": 946.41796875,
+              "processes": 1
+            }
+          }
+        },
+        {
+          "seconds": 153.79247789998772,
+          "stage": "active",
+          "heap": {
+            "Documents": 1,
+            "JSEventListeners": 1153,
+            "Nodes": 9190,
+            "JSHeapUsedSize": 41774760,
+            "JSHeapTotalSize": 65011712
+          },
+          "state": {
+            "frame": 6306,
+            "playing": true,
+            "underruns": 0,
+            "samples": 9088,
+            "undo": 15,
+            "redo": 0,
+            "resolution": "960"
+          },
+          "clock_wire": {
+            "requests": 8854,
+            "encoded_bytes": 35678462
+          },
+          "WebView_roles": {
+            "browser": {
+              "rss_MiB": 131.48828125,
+              "private_commit_MiB": 43.47265625,
+              "processes": 1
+            },
+            "other": {
+              "rss_MiB": 16.015625,
+              "private_commit_MiB": 3.125,
+              "processes": 1
+            },
+            "gpu-process": {
+              "rss_MiB": 447.6875,
+              "private_commit_MiB": 503.56640625,
+              "processes": 1
+            },
+            "utility": {
+              "rss_MiB": 100.1640625,
+              "private_commit_MiB": 33.2421875,
+              "processes": 3
+            },
+            "renderer": {
+              "rss_MiB": 982.89453125,
+              "private_commit_MiB": 954.52734375,
+              "processes": 1
+            }
+          }
+        },
+        {
+          "seconds": 153.8281642999791,
+          "stage": "end",
+          "heap": {
+            "Documents": 1,
+            "JSEventListeners": 1153,
+            "Nodes": 9193,
+            "JSHeapUsedSize": 41819104,
+            "JSHeapTotalSize": 65011712
+          },
+          "state": {
+            "frame": 6306,
+            "playing": true,
+            "underruns": 0,
+            "samples": 10112,
+            "undo": 15,
+            "redo": 0,
+            "resolution": "960"
+          },
+          "clock_wire": {
+            "requests": 8857,
+            "encoded_bytes": 35686736
+          },
+          "WebView_roles": {
+            "browser": {
+              "rss_MiB": 131.48828125,
+              "private_commit_MiB": 43.47265625,
+              "processes": 1
+            },
+            "other": {
+              "rss_MiB": 16.015625,
+              "private_commit_MiB": 3.125,
+              "processes": 1
+            },
+            "gpu-process": {
+              "rss_MiB": 447.69140625,
+              "private_commit_MiB": 503.56640625,
+              "processes": 1
+            },
+            "utility": {
+              "rss_MiB": 100.1640625,
+              "private_commit_MiB": 33.2421875,
+              "processes": 3
+            },
+            "renderer": {
+              "rss_MiB": 983.01953125,
+              "private_commit_MiB": 954.66015625,
+              "processes": 1
+            }
+          }
+        },
+        {
+          "seconds": 154.97481849999167,
+          "stage": "stopped",
+          "heap": {
+            "Documents": 1,
+            "JSEventListeners": 1153,
+            "Nodes": 9203,
+            "JSHeapUsedSize": 42425792,
+            "JSHeapTotalSize": 65536000
+          },
+          "state": {
+            "frame": 6316,
+            "playing": false,
+            "underruns": 0,
+            "samples": 12928,
+            "undo": 15,
+            "redo": 0,
+            "resolution": "960"
+          },
+          "clock_wire": {
+            "requests": 8934,
+            "encoded_bytes": 36010719
+          },
+          "WebView_roles": {
+            "browser": {
+              "rss_MiB": 131.48828125,
+              "private_commit_MiB": 43.47265625,
+              "processes": 1
+            },
+            "other": {
+              "rss_MiB": 16.015625,
+              "private_commit_MiB": 3.125,
+              "processes": 1
+            },
+            "gpu-process": {
+              "rss_MiB": 447.640625,
+              "private_commit_MiB": 503.53125,
+              "processes": 1
+            },
+            "utility": {
+              "rss_MiB": 100.1640625,
+              "private_commit_MiB": 33.2421875,
+              "processes": 3
+            },
+            "renderer": {
+              "rss_MiB": 983.8203125,
+              "private_commit_MiB": 955.42578125,
+              "processes": 1
+            }
+          }
+        },
+        {
+          "seconds": 169.99980689998483,
+          "stage": "natural_idle",
+          "heap": {
+            "Documents": 1,
+            "JSEventListeners": 638,
+            "Nodes": 5277,
+            "JSHeapUsedSize": 14741944,
+            "JSHeapTotalSize": 16072704
+          },
+          "state": {
+            "frame": 6316,
+            "playing": false,
+            "underruns": 0,
+            "samples": 12928,
+            "undo": 15,
+            "redo": 0,
+            "resolution": "960"
+          },
+          "clock_wire": {
+            "requests": 9935,
+            "encoded_bytes": 40169912
+          },
+          "WebView_roles": {
+            "browser": {
+              "rss_MiB": 129.890625,
+              "private_commit_MiB": 41.8125,
+              "processes": 1
+            },
+            "other": {
+              "rss_MiB": 16.015625,
+              "private_commit_MiB": 3.125,
+              "processes": 1
+            },
+            "gpu-process": {
+              "rss_MiB": 416.875,
+              "private_commit_MiB": 434.65625,
+              "processes": 1
+            },
+            "utility": {
+              "rss_MiB": 99.13671875,
+              "private_commit_MiB": 32.19921875,
+              "processes": 3
+            },
+            "renderer": {
+              "rss_MiB": 843.95703125,
+              "private_commit_MiB": 813.84375,
+              "processes": 1
+            }
+          }
+        },
+        {
+          "seconds": 171.19542059997912,
+          "stage": "native_released",
+          "heap": {
+            "Documents": 1,
+            "JSEventListeners": 638,
+            "Nodes": 5278,
+            "JSHeapUsedSize": 14772704,
+            "JSHeapTotalSize": 16072704
+          },
+          "state": {
+            "frame": null,
+            "playing": false,
+            "underruns": null,
+            "samples": null,
+            "undo": 15,
+            "redo": 0,
+            "resolution": "960"
+          },
+          "clock_wire": {
+            "requests": 9936,
+            "encoded_bytes": 40174069
+          },
+          "WebView_roles": {
+            "browser": {
+              "rss_MiB": 129.93359375,
+              "private_commit_MiB": 41.8359375,
+              "processes": 1
+            },
+            "other": {
+              "rss_MiB": 16.015625,
+              "private_commit_MiB": 3.125,
+              "processes": 1
+            },
+            "gpu-process": {
+              "rss_MiB": 412.8671875,
+              "private_commit_MiB": 430.88671875,
+              "processes": 1
+            },
+            "utility": {
+              "rss_MiB": 99.1328125,
+              "private_commit_MiB": 32.1953125,
+              "processes": 3
+            },
+            "renderer": {
+              "rss_MiB": 841.50390625,
+              "private_commit_MiB": 812.61328125,
+              "processes": 1
+            }
+          }
+        }
+      ],
+      "clock_wire": {
+        "requests": 9936,
+        "encoded_bytes": 40174069
+      },
+      "failure_type": null,
+      "audio_underruns_observed": 0,
+      "editing_batches": [
+        {
+          "iteration": 1,
+          "seconds": 13.977712799998699,
+          "wall_ms": 3346.526499983156
+        },
+        {
+          "iteration": 2,
+          "seconds": 23.747891699982574,
+          "wall_ms": 3282.808499992825
+        },
+        {
+          "iteration": 3,
+          "seconds": 34.4005424999923,
+          "wall_ms": 3703.7628999969456
+        },
+        {
+          "iteration": 4,
+          "seconds": 44.24263530000462,
+          "wall_ms": 3295.550999988336
+        },
+        {
+          "iteration": 5,
+          "seconds": 53.96454359998461,
+          "wall_ms": 3212.477499997476
+        },
+        {
+          "iteration": 6,
+          "seconds": 64.7232613999804,
+          "wall_ms": 4414.594700007001
+        },
+        {
+          "iteration": 7,
+          "seconds": 74.7122168999922,
+          "wall_ms": 3508.1782000197563
+        },
+        {
+          "iteration": 8,
+          "seconds": 84.36934219999239,
+          "wall_ms": 3413.4265999891795
+        },
+        {
+          "iteration": 9,
+          "seconds": 93.43426829998498,
+          "wall_ms": 3046.4799999899697
+        },
+        {
+          "iteration": 10,
+          "seconds": 104.45854619998136,
+          "wall_ms": 3275.1239000062924
+        },
+        {
+          "iteration": 11,
+          "seconds": 113.28220369998598,
+          "wall_ms": 3274.906800012104
+        },
+        {
+          "iteration": 12,
+          "seconds": 125.66084870000486,
+          "wall_ms": 4970.53489999962
+        },
+        {
+          "iteration": 13,
+          "seconds": 133.5453123000043,
+          "wall_ms": 3421.8056999961846
+        },
+        {
+          "iteration": 14,
+          "seconds": 142.8709944000002,
+          "wall_ms": 2851.6385999973863
+        },
+        {
+          "iteration": 15,
+          "seconds": 153.74406309999176,
+          "wall_ms": 3047.254900011467
+        }
+      ],
+      "forced_gc": false,
+      "scope": "Counters and heap observer enabled. Use the separate FPS benchmark for acceptance. RSS may double-count UMA mappings. Private commit is separate.",
+      "supervisor": {
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 180.31299999999464,
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        }
+      },
+      "power": {
+        "samples": 159,
+        "all_observed_ac": true
+      },
+      "foreground_unobscured": true,
+      "groups_by_30s": {
+        "ffmpeg": [
+          {
+            "start_seconds": 0,
+            "private_commit_mib": 0.0,
+            "working_set_mib": 0.0
+          },
+          {
+            "start_seconds": 30,
+            "private_commit_mib": 0,
+            "working_set_mib": 0
+          },
+          {
+            "start_seconds": 60,
+            "private_commit_mib": 0,
+            "working_set_mib": 0
+          },
+          {
+            "start_seconds": 90,
+            "private_commit_mib": 0.0,
+            "working_set_mib": 0.0
+          },
+          {
+            "start_seconds": 120,
+            "private_commit_mib": 0,
+            "working_set_mib": 0
+          }
+        ],
+        "host": [
+          {
+            "start_seconds": 0,
+            "private_commit_mib": 855.21875,
+            "working_set_mib": 163.896484375
+          },
+          {
+            "start_seconds": 30,
+            "private_commit_mib": 862.43359375,
+            "working_set_mib": 168.51953125
+          },
+          {
+            "start_seconds": 60,
+            "private_commit_mib": 869.03515625,
+            "working_set_mib": 172.82421875
+          },
+          {
+            "start_seconds": 90,
+            "private_commit_mib": 872.04296875,
+            "working_set_mib": 176.4140625
+          },
+          {
+            "start_seconds": 120,
+            "private_commit_mib": 870.671875,
+            "working_set_mib": 170.80078125
+          }
+        ],
+        "native": [
+          {
+            "start_seconds": 0,
+            "private_commit_mib": 2434.990234375,
+            "working_set_mib": 1639.001953125
+          },
+          {
+            "start_seconds": 30,
+            "private_commit_mib": 2416.73046875,
+            "working_set_mib": 1644.82421875
+          },
+          {
+            "start_seconds": 60,
+            "private_commit_mib": 2416.33203125,
+            "working_set_mib": 1631.46875
+          },
+          {
+            "start_seconds": 90,
+            "private_commit_mib": 2433.9453125,
+            "working_set_mib": 1570.939453125
+          },
+          {
+            "start_seconds": 120,
+            "private_commit_mib": 2417.8515625,
+            "working_set_mib": 1590.65625
+          }
+        ],
+        "webview": [
+          {
+            "start_seconds": 0,
+            "private_commit_mib": 1009.1953125,
+            "working_set_mib": 1128.298828125
+          },
+          {
+            "start_seconds": 30,
+            "private_commit_mib": 1208.69140625,
+            "working_set_mib": 1339.375
+          },
+          {
+            "start_seconds": 60,
+            "private_commit_mib": 1312.08203125,
+            "working_set_mib": 1457.765625
+          },
+          {
+            "start_seconds": 90,
+            "private_commit_mib": 1467.7109375,
+            "working_set_mib": 1605.60546875
+          },
+          {
+            "start_seconds": 120,
+            "private_commit_mib": 1520.0546875,
+            "working_set_mib": 1656.19921875
+          }
+        ]
+      }
+    },
+    "paced-memory150": {
+      "mode": "editing",
+      "seconds": 150,
+      "timeline_seconds": 125,
+      "rows": [
+        {
+          "seconds": 0.8675865999830421,
+          "stage": "prepared",
+          "heap": {
+            "Documents": 1,
+            "JSEventListeners": 544,
+            "Nodes": 4730,
+            "JSHeapUsedSize": 6058644,
+            "JSHeapTotalSize": 15200256
+          },
+          "state": {
+            "frame": 0,
+            "playing": false,
+            "underruns": 0,
+            "samples": 0,
+            "undo": 0,
+            "redo": 0,
+            "resolution": "960"
+          },
+          "clock_wire": {
+            "requests": 55,
+            "encoded_bytes": 218934
+          },
+          "WebView_roles": {
+            "browser": {
+              "rss_MiB": 109.87890625,
+              "private_commit_MiB": 33.8515625,
+              "processes": 1
+            },
+            "other": {
+              "rss_MiB": 13.3125,
+              "private_commit_MiB": 2.6875,
+              "processes": 1
+            },
+            "gpu-process": {
+              "rss_MiB": 532.2578125,
+              "private_commit_MiB": 614.7734375,
+              "processes": 1
+            },
+            "utility": {
+              "rss_MiB": 96.171875,
+              "private_commit_MiB": 30.95703125,
+              "processes": 3
+            },
+            "renderer": {
+              "rss_MiB": 410.5,
+              "private_commit_MiB": 378.01953125,
+              "processes": 1
+            }
+          }
+        },
+        {
+          "seconds": 46.64512040000409,
+          "stage": "active",
+          "heap": {
+            "Documents": 1,
+            "JSEventListeners": 1360,
+            "Nodes": 10581,
+            "JSHeapUsedSize": 14110272,
+            "JSHeapTotalSize": 21299200
+          },
+          "state": {
+            "frame": null,
+            "playing": false,
+            "underruns": null,
+            "samples": null,
+            "undo": 2,
+            "redo": 0,
+            "resolution": "960"
+          },
+          "clock_wire": {
+            "requests": 741,
+            "encoded_bytes": 3076185
+          },
+          "WebView_roles": {
+            "browser": {
+              "rss_MiB": 123.5,
+              "private_commit_MiB": 41.76171875,
+              "processes": 1
+            },
+            "other": {
+              "rss_MiB": 21.8359375,
+              "private_commit_MiB": 3.5625,
+              "processes": 1
+            },
+            "gpu-process": {
+              "rss_MiB": 400.7734375,
+              "private_commit_MiB": 468.2734375,
+              "processes": 1
+            },
+            "utility": {
+              "rss_MiB": 97.29296875,
+              "private_commit_MiB": 31.6484375,
+              "processes": 3
+            },
+            "renderer": {
+              "rss_MiB": 476.49609375,
+              "private_commit_MiB": 440.75390625,
+              "processes": 1
+            }
+          }
+        },
+        {
+          "seconds": 62.769511599995894,
+          "stage": "active",
+          "heap": {
+            "Documents": 1,
+            "JSEventListeners": 751,
+            "Nodes": 6209,
+            "JSHeapUsedSize": 37215160,
+            "JSHeapTotalSize": 59686912
+          },
+          "state": {
+            "frame": null,
+            "playing": false,
+            "underruns": null,
+            "samples": null,
+            "undo": 6,
+            "redo": 0,
+            "resolution": "1280"
+          },
+          "clock_wire": {
+            "requests": 741,
+            "encoded_bytes": 3076185
+          },
+          "WebView_roles": {
+            "browser": {
+              "rss_MiB": 128.42578125,
+              "private_commit_MiB": 41.8203125,
+              "processes": 1
+            },
+            "other": {
+              "rss_MiB": 16.078125,
+              "private_commit_MiB": 3.23046875,
+              "processes": 1
+            },
+            "gpu-process": {
+              "rss_MiB": 416.16015625,
+              "private_commit_MiB": 447.85546875,
+              "processes": 1
+            },
+            "utility": {
+              "rss_MiB": 97.7578125,
+              "private_commit_MiB": 31.16015625,
+              "processes": 3
+            },
+            "renderer": {
+              "rss_MiB": 548.140625,
+              "private_commit_MiB": 512.9453125,
+              "processes": 1
+            }
+          }
+        },
+        {
+          "seconds": 93.02645959999063,
+          "stage": "active",
+          "heap": {
+            "Documents": 1,
+            "JSEventListeners": 673,
+            "Nodes": 5576,
+            "JSHeapUsedSize": 11799532,
+            "JSHeapTotalSize": 27439104
+          },
+          "state": {
+            "frame": null,
+            "playing": false,
+            "underruns": null,
+            "samples": null,
+            "undo": 9,
+            "redo": 0,
+            "resolution": "1280"
+          },
+          "clock_wire": {
+            "requests": 741,
+            "encoded_bytes": 3076185
+          },
+          "WebView_roles": {
+            "browser": {
+              "rss_MiB": 126.9921875,
+              "private_commit_MiB": 40.26953125,
+              "processes": 1
+            },
+            "other": {
+              "rss_MiB": 16.078125,
+              "private_commit_MiB": 3.23046875,
+              "processes": 1
+            },
+            "gpu-process": {
+              "rss_MiB": 412.45703125,
+              "private_commit_MiB": 443.55859375,
+              "processes": 1
+            },
+            "utility": {
+              "rss_MiB": 96.6953125,
+              "private_commit_MiB": 30.0625,
+              "processes": 3
+            },
+            "renderer": {
+              "rss_MiB": 521.90234375,
+              "private_commit_MiB": 486.75,
+              "processes": 1
+            }
+          }
+        },
+        {
+          "seconds": 123.11403920000885,
+          "stage": "active",
+          "heap": {
+            "Documents": 1,
+            "JSEventListeners": 745,
+            "Nodes": 6159,
+            "JSHeapUsedSize": 13734008,
+            "JSHeapTotalSize": 29949952
+          },
+          "state": {
+            "frame": null,
+            "playing": false,
+            "underruns": null,
+            "samples": null,
+            "undo": 12,
+            "redo": 0,
+            "resolution": "960"
+          },
+          "clock_wire": {
+            "requests": 741,
+            "encoded_bytes": 3076185
+          },
+          "WebView_roles": {
+            "browser": {
+              "rss_MiB": 130.328125,
+              "private_commit_MiB": 42.49609375,
+              "processes": 1
+            },
+            "other": {
+              "rss_MiB": 16.08203125,
+              "private_commit_MiB": 3.23046875,
+              "processes": 1
+            },
+            "gpu-process": {
+              "rss_MiB": 414.24609375,
+              "private_commit_MiB": 444.82421875,
+              "processes": 1
+            },
+            "utility": {
+              "rss_MiB": 97.9453125,
+              "private_commit_MiB": 31.31640625,
+              "processes": 3
+            },
+            "renderer": {
+              "rss_MiB": 550.41015625,
+              "private_commit_MiB": 514.92578125,
+              "processes": 1
+            }
+          }
+        },
+        {
+          "seconds": 153.54815089999465,
+          "stage": "active",
+          "heap": {
+            "Documents": 1,
+            "JSEventListeners": 751,
+            "Nodes": 6203,
+            "JSHeapUsedSize": 15220648,
+            "JSHeapTotalSize": 35430400
+          },
+          "state": {
+            "frame": null,
+            "playing": false,
+            "underruns": null,
+            "samples": null,
+            "undo": 15,
+            "redo": 0,
+            "resolution": "960"
+          },
+          "clock_wire": {
+            "requests": 741,
+            "encoded_bytes": 3076185
+          },
+          "WebView_roles": {
+            "browser": {
+              "rss_MiB": 130.43359375,
+              "private_commit_MiB": 42.53515625,
+              "processes": 1
+            },
+            "other": {
+              "rss_MiB": 16.02734375,
+              "private_commit_MiB": 3.125,
+              "processes": 1
+            },
+            "gpu-process": {
+              "rss_MiB": 417.3515625,
+              "private_commit_MiB": 447.7890625,
+              "processes": 1
+            },
+            "utility": {
+              "rss_MiB": 97.375,
+              "private_commit_MiB": 30.66796875,
+              "processes": 3
+            },
+            "renderer": {
+              "rss_MiB": 584.4375,
+              "private_commit_MiB": 548.3984375,
+              "processes": 1
+            }
+          }
+        },
+        {
+          "seconds": 153.57138909999048,
+          "stage": "end",
+          "heap": {
+            "Documents": 1,
+            "JSEventListeners": 751,
+            "Nodes": 6205,
+            "JSHeapUsedSize": 15233812,
+            "JSHeapTotalSize": 35430400
+          },
+          "state": {
+            "frame": null,
+            "playing": false,
+            "underruns": null,
+            "samples": null,
+            "undo": 15,
+            "redo": 0,
+            "resolution": "960"
+          },
+          "clock_wire": {
+            "requests": 741,
+            "encoded_bytes": 3076185
+          },
+          "WebView_roles": {
+            "browser": {
+              "rss_MiB": 130.43359375,
+              "private_commit_MiB": 42.53515625,
+              "processes": 1
+            },
+            "other": {
+              "rss_MiB": 16.02734375,
+              "private_commit_MiB": 3.125,
+              "processes": 1
+            },
+            "gpu-process": {
+              "rss_MiB": 417.3515625,
+              "private_commit_MiB": 447.7890625,
+              "processes": 1
+            },
+            "utility": {
+              "rss_MiB": 97.375,
+              "private_commit_MiB": 30.66796875,
+              "processes": 3
+            },
+            "renderer": {
+              "rss_MiB": 584.4375,
+              "private_commit_MiB": 548.3984375,
+              "processes": 1
+            }
+          }
+        },
+        {
+          "seconds": 155.02249949998804,
+          "stage": "stopped",
+          "heap": {
+            "Documents": 1,
+            "JSEventListeners": 751,
+            "Nodes": 6220,
+            "JSHeapUsedSize": 15278828,
+            "JSHeapTotalSize": 35430400
+          },
+          "state": {
+            "frame": null,
+            "playing": false,
+            "underruns": null,
+            "samples": null,
+            "undo": 15,
+            "redo": 0,
+            "resolution": "960"
+          },
+          "clock_wire": {
+            "requests": 741,
+            "encoded_bytes": 3076185
+          },
+          "WebView_roles": {
+            "browser": {
+              "rss_MiB": 130.43359375,
+              "private_commit_MiB": 42.53515625,
+              "processes": 1
+            },
+            "other": {
+              "rss_MiB": 16.02734375,
+              "private_commit_MiB": 3.125,
+              "processes": 1
+            },
+            "gpu-process": {
+              "rss_MiB": 417.38671875,
+              "private_commit_MiB": 447.83984375,
+              "processes": 1
+            },
+            "utility": {
+              "rss_MiB": 97.375,
+              "private_commit_MiB": 30.66796875,
+              "processes": 3
+            },
+            "renderer": {
+              "rss_MiB": 567.80078125,
+              "private_commit_MiB": 531.5,
+              "processes": 1
+            }
+          }
+        },
+        {
+          "seconds": 170.77451719998498,
+          "stage": "natural_idle",
+          "heap": {
+            "Documents": 1,
+            "JSEventListeners": 751,
+            "Nodes": 6265,
+            "JSHeapUsedSize": 13184916,
+            "JSHeapTotalSize": 15081472
+          },
+          "state": {
+            "frame": null,
+            "playing": false,
+            "underruns": null,
+            "samples": null,
+            "undo": 15,
+            "redo": 0,
+            "resolution": "960"
+          },
+          "clock_wire": {
+            "requests": 741,
+            "encoded_bytes": 3076185
+          },
+          "WebView_roles": {
+            "browser": {
+              "rss_MiB": 127.58203125,
+              "private_commit_MiB": 39.60546875,
+              "processes": 1
+            },
+            "other": {
+              "rss_MiB": 16.02734375,
+              "private_commit_MiB": 3.125,
+              "processes": 1
+            },
+            "gpu-process": {
+              "rss_MiB": 389.7578125,
+              "private_commit_MiB": 418.48828125,
+              "processes": 1
+            },
+            "utility": {
+              "rss_MiB": 96.86328125,
+              "private_commit_MiB": 30.140625,
+              "processes": 3
+            },
+            "renderer": {
+              "rss_MiB": 540.12109375,
+              "private_commit_MiB": 502.046875,
+              "processes": 1
+            }
+          }
+        },
+        {
+          "seconds": 172.1056001999823,
+          "stage": "native_released",
+          "heap": {
+            "Documents": 1,
+            "JSEventListeners": 751,
+            "Nodes": 6273,
+            "JSHeapUsedSize": 13227576,
+            "JSHeapTotalSize": 15081472
+          },
+          "state": {
+            "frame": null,
+            "playing": false,
+            "underruns": null,
+            "samples": null,
+            "undo": 15,
+            "redo": 0,
+            "resolution": "960"
+          },
+          "clock_wire": {
+            "requests": 741,
+            "encoded_bytes": 3076185
+          },
+          "WebView_roles": {
+            "browser": {
+              "rss_MiB": 127.63671875,
+              "private_commit_MiB": 39.66015625,
+              "processes": 1
+            },
+            "other": {
+              "rss_MiB": 16.02734375,
+              "private_commit_MiB": 3.125,
+              "processes": 1
+            },
+            "gpu-process": {
+              "rss_MiB": 389.74609375,
+              "private_commit_MiB": 418.4765625,
+              "processes": 1
+            },
+            "utility": {
+              "rss_MiB": 96.88671875,
+              "private_commit_MiB": 30.17578125,
+              "processes": 3
+            },
+            "renderer": {
+              "rss_MiB": 540.2265625,
+              "private_commit_MiB": 502.203125,
+              "processes": 1
+            }
+          }
+        }
+      ],
+      "clock_wire": {
+        "requests": 741,
+        "encoded_bytes": 3076185
+      },
+      "failure_type": null,
+      "audio_underruns_observed": 0,
+      "editing_batches": [
+        {
+          "iteration": 1,
+          "seconds": 43.90066889999434,
+          "wall_ms": 32713.581099989824
+        },
+        {
+          "iteration": 2,
+          "seconds": 46.61790350000956,
+          "wall_ms": 2455.645199981518
+        },
+        {
+          "iteration": 3,
+          "seconds": 49.45518190000439,
+          "wall_ms": 2547.149399993941
+        },
+        {
+          "iteration": 4,
+          "seconds": 52.60507230000803,
+          "wall_ms": 2882.5404999952298
+        },
+        {
+          "iteration": 5,
+          "seconds": 55.519293699995615,
+          "wall_ms": 2662.1965000231285
+        },
+        {
+          "iteration": 6,
+          "seconds": 62.747577800008,
+          "wall_ms": 2584.480799996527
+        },
+        {
+          "iteration": 7,
+          "seconds": 73.46311099999002,
+          "wall_ms": 2908.980200008955
+        },
+        {
+          "iteration": 8,
+          "seconds": 83.48214810001082,
+          "wall_ms": 3236.565899976995
+        },
+        {
+          "iteration": 9,
+          "seconds": 92.9888718999864,
+          "wall_ms": 2823.489000002155
+        },
+        {
+          "iteration": 10,
+          "seconds": 102.73100800000248,
+          "wall_ms": 2534.40549998777
+        },
+        {
+          "iteration": 11,
+          "seconds": 113.16116859999602,
+          "wall_ms": 2938.3353000157513
+        },
+        {
+          "iteration": 12,
+          "seconds": 123.08984909998253,
+          "wall_ms": 2729.527599993162
+        },
+        {
+          "iteration": 13,
+          "seconds": 133.11043259999133,
+          "wall_ms": 2945.2685000142083
+        },
+        {
+          "iteration": 14,
+          "seconds": 143.388852700009,
+          "wall_ms": 2998.6519000085536
+        },
+        {
+          "iteration": 15,
+          "seconds": 153.13852109998697,
+          "wall_ms": 2990.762300003553
+        }
+      ],
+      "forced_gc": false,
+      "scope": "Counters and heap observer enabled. Use the separate FPS benchmark for acceptance. RSS may double-count UMA mappings. Private commit is separate.",
+      "supervisor": {
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 181.35900000002584,
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        }
+      },
+      "power": {
+        "samples": 160,
+        "all_observed_ac": true
+      },
+      "foreground_unobscured": true,
+      "groups_by_30s": {
+        "ffmpeg": [
+          {
+            "start_seconds": 0,
+            "private_commit_mib": 0,
+            "working_set_mib": 0
+          },
+          {
+            "start_seconds": 30,
+            "private_commit_mib": 0.0,
+            "working_set_mib": 0.0
+          },
+          {
+            "start_seconds": 60,
+            "private_commit_mib": 1452.01171875,
+            "working_set_mib": 1436.67578125
+          },
+          {
+            "start_seconds": 90,
+            "private_commit_mib": 2039.5078125,
+            "working_set_mib": 2021.5546875
+          },
+          {
+            "start_seconds": 120,
+            "private_commit_mib": 1268.94921875,
+            "working_set_mib": 1253.2734375
+          }
+        ],
+        "host": [
+          {
+            "start_seconds": 0,
+            "private_commit_mib": 859.92578125,
+            "working_set_mib": 167.23046875
+          },
+          {
+            "start_seconds": 30,
+            "private_commit_mib": 859.9296875,
+            "working_set_mib": 167.2265625
+          },
+          {
+            "start_seconds": 60,
+            "private_commit_mib": 879.03515625,
+            "working_set_mib": 186.26953125
+          },
+          {
+            "start_seconds": 90,
+            "private_commit_mib": 880.5859375,
+            "working_set_mib": 190.8046875
+          },
+          {
+            "start_seconds": 120,
+            "private_commit_mib": 881.83203125,
+            "working_set_mib": 186.5078125
+          }
+        ],
+        "native": [
+          {
+            "start_seconds": 0,
+            "private_commit_mib": 2372.54296875,
+            "working_set_mib": 1229.1015625
+          },
+          {
+            "start_seconds": 30,
+            "private_commit_mib": 2267.15234375,
+            "working_set_mib": 1123.859375
+          },
+          {
+            "start_seconds": 60,
+            "private_commit_mib": 2397.48828125,
+            "working_set_mib": 1296.46875
+          },
+          {
+            "start_seconds": 90,
+            "private_commit_mib": 2406.078125,
+            "working_set_mib": 1238.36328125
+          },
+          {
+            "start_seconds": 120,
+            "private_commit_mib": 2369.68359375,
+            "working_set_mib": 1273.2265625
+          }
+        ],
+        "webview": [
+          {
+            "start_seconds": 0,
+            "private_commit_mib": 1004.40625,
+            "working_set_mib": 1129.125
+          },
+          {
+            "start_seconds": 30,
+            "private_commit_mib": 888.013671875,
+            "working_set_mib": 1040.75390625
+          },
+          {
+            "start_seconds": 60,
+            "private_commit_mib": 1005.79296875,
+            "working_set_mib": 1176.4921875
+          },
+          {
+            "start_seconds": 90,
+            "private_commit_mib": 1007.53515625,
+            "working_set_mib": 1181.09765625
+          },
+          {
+            "start_seconds": 120,
+            "private_commit_mib": 1036.86328125,
+            "working_set_mib": 1209.08203125
+          }
+        ]
+      }
+    }
+  },
+  "proxy": {
+    "baseline-proxy": {
+      "arms": {
+        "idle": {
+          "source": [
+            3840,
+            2160
+          ],
+          "callbackCount": 235,
+          "spanSeconds": 4.1851,
+          "maxCallbackGapMs": 243.9000000000001,
+          "decodedFrames": 243,
+          "droppedFrames": 2,
+          "initial": {
+            "webviewMiB": 560.515625,
+            "nativeMiB": 0,
+            "ffmpegProcesses": 2
+          },
+          "stopped": {
+            "webviewMiB": 1212.73046875,
+            "nativeMiB": 0,
+            "ffmpegProcesses": 0
+          },
+          "samples": [
+            {
+              "status": "idle",
+              "focused": true,
+              "webviewMiB": 1150.34375,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "idle",
+              "focused": true,
+              "webviewMiB": 1191.01953125,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "idle",
+              "focused": true,
+              "webviewMiB": 1208.62890625,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "idle",
+              "focused": true,
+              "webviewMiB": 1199.04296875,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "idle",
+              "focused": true,
+              "webviewMiB": 1189.60546875,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "idle",
+              "focused": true,
+              "webviewMiB": 1191.81640625,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "idle",
+              "focused": true,
+              "webviewMiB": 1194.6328125,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "idle",
+              "focused": true,
+              "webviewMiB": 1197.75,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "idle",
+              "focused": true,
+              "webviewMiB": 1201.1796875,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "idle",
+              "focused": true,
+              "webviewMiB": 1202.14453125,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "idle",
+              "focused": true,
+              "webviewMiB": 1202.92578125,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "idle",
+              "focused": true,
+              "webviewMiB": 1202.95703125,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "idle",
+              "focused": true,
+              "webviewMiB": 1210.22265625,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "idle",
+              "focused": true,
+              "webviewMiB": 1210.640625,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            }
+          ],
+          "proxy_requested": false,
+          "proxy_active_samples": 0,
+          "failed": false,
+          "foreground_unobscured": true
+        },
+        "proxy": {
+          "source": [
+            3840,
+            2160
+          ],
+          "callbackCount": 233,
+          "spanSeconds": 4.5783,
+          "maxCallbackGapMs": 711.4000000000001,
+          "decodedFrames": 237,
+          "droppedFrames": 0,
+          "initial": {
+            "webviewMiB": 598.765625,
+            "nativeMiB": 0,
+            "ffmpegProcesses": 2
+          },
+          "stopped": {
+            "webviewMiB": 1213.33984375,
+            "nativeMiB": 0,
+            "ffmpegProcesses": 0
+          },
+          "samples": [
+            {
+              "status": "rendering",
+              "focused": true,
+              "webviewMiB": 1202.96484375,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 1
+            },
+            {
+              "status": "rendering",
+              "focused": true,
+              "webviewMiB": 1206.734375,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 1
+            },
+            {
+              "status": "done",
+              "focused": true,
+              "webviewMiB": 1221.8984375,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "done",
+              "focused": true,
+              "webviewMiB": 1213.37890625,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "done",
+              "focused": true,
+              "webviewMiB": 1213.53125,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "done",
+              "focused": true,
+              "webviewMiB": 1215.48828125,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "done",
+              "focused": true,
+              "webviewMiB": 1200.3984375,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "done",
+              "focused": true,
+              "webviewMiB": 1201.82421875,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "done",
+              "focused": true,
+              "webviewMiB": 1205.8203125,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "done",
+              "focused": true,
+              "webviewMiB": 1205.94921875,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "done",
+              "focused": true,
+              "webviewMiB": 1205.94921875,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "done",
+              "focused": true,
+              "webviewMiB": 1206.66796875,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "done",
+              "focused": true,
+              "webviewMiB": 1209.37890625,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "done",
+              "focused": true,
+              "webviewMiB": 1211.140625,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            }
+          ],
+          "proxy_requested": true,
+          "proxy_active_samples": 2,
+          "failed": false,
+          "foreground_unobscured": true
+        }
+      },
+      "supervisor": {
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 19.46899999998277,
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        }
+      }
+    },
+    "candidate-proxy": {
+      "arms": {
+        "idle": {
+          "source": [
+            3840,
+            2160
+          ],
+          "callbackCount": 236,
+          "spanSeconds": 4.0762,
+          "maxCallbackGapMs": 167.5,
+          "decodedFrames": 241,
+          "droppedFrames": 0,
+          "initial": {
+            "webviewMiB": 595.1015625,
+            "nativeMiB": 0,
+            "ffmpegProcesses": 2
+          },
+          "stopped": {
+            "webviewMiB": 1195.25,
+            "nativeMiB": 0,
+            "ffmpegProcesses": 0
+          },
+          "samples": [
+            {
+              "status": "idle",
+              "focused": true,
+              "webviewMiB": 1181.24609375,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "idle",
+              "focused": true,
+              "webviewMiB": 1183.19140625,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "idle",
+              "focused": true,
+              "webviewMiB": 1196.59375,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "idle",
+              "focused": true,
+              "webviewMiB": 1188.74609375,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "idle",
+              "focused": true,
+              "webviewMiB": 1172.8828125,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "idle",
+              "focused": true,
+              "webviewMiB": 1175.484375,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "idle",
+              "focused": true,
+              "webviewMiB": 1178.44921875,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "idle",
+              "focused": true,
+              "webviewMiB": 1183.2421875,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "idle",
+              "focused": true,
+              "webviewMiB": 1183.37890625,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "idle",
+              "focused": true,
+              "webviewMiB": 1184.13671875,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "idle",
+              "focused": true,
+              "webviewMiB": 1185.07421875,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "idle",
+              "focused": true,
+              "webviewMiB": 1191.1796875,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "idle",
+              "focused": true,
+              "webviewMiB": 1193.1015625,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "idle",
+              "focused": true,
+              "webviewMiB": 1193.7734375,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            }
+          ],
+          "proxy_requested": false,
+          "proxy_active_samples": 0,
+          "failed": false,
+          "foreground_unobscured": true
+        },
+        "proxy": {
+          "source": [
+            3840,
+            2160
+          ],
+          "callbackCount": 243,
+          "spanSeconds": 4.3272,
+          "maxCallbackGapMs": 292.9000000000001,
+          "decodedFrames": 247,
+          "droppedFrames": 0,
+          "initial": {
+            "webviewMiB": 622.55859375,
+            "nativeMiB": 0,
+            "ffmpegProcesses": 2
+          },
+          "stopped": {
+            "webviewMiB": 1215.00390625,
+            "nativeMiB": 0,
+            "ffmpegProcesses": 0
+          },
+          "samples": [
+            {
+              "status": "rendering",
+              "focused": true,
+              "webviewMiB": 1192.01171875,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 1
+            },
+            {
+              "status": "rendering",
+              "focused": true,
+              "webviewMiB": 1201.25,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 1
+            },
+            {
+              "status": "rendering",
+              "focused": true,
+              "webviewMiB": 1202.5390625,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 1
+            },
+            {
+              "status": "done",
+              "focused": true,
+              "webviewMiB": 1220.40625,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "done",
+              "focused": true,
+              "webviewMiB": 1211.34375,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "done",
+              "focused": true,
+              "webviewMiB": 1214.1953125,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "done",
+              "focused": true,
+              "webviewMiB": 1211.90234375,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "done",
+              "focused": true,
+              "webviewMiB": 1198.9296875,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "done",
+              "focused": true,
+              "webviewMiB": 1199.9140625,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "done",
+              "focused": true,
+              "webviewMiB": 1200.21875,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "done",
+              "focused": true,
+              "webviewMiB": 1200.56640625,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "done",
+              "focused": true,
+              "webviewMiB": 1206.67578125,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "done",
+              "focused": true,
+              "webviewMiB": 1211.140625,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            },
+            {
+              "status": "done",
+              "focused": true,
+              "webviewMiB": 1213.18359375,
+              "nativeMiB": 0,
+              "ffmpegProcesses": 0
+            }
+          ],
+          "proxy_requested": true,
+          "proxy_active_samples": 3,
+          "failed": false,
+          "foreground_unobscured": true
+        }
+      },
+      "supervisor": {
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 19.76600000000326,
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        }
+      }
+    }
+  },
+  "local_regression": {
+    "python_total": 184,
+    "python_skipped": 1,
+    "python_seconds": 97.381,
+    "javascript_passed": 32
+  },
+  "package": {
+    "first_msi_sha256": "2755f3d64310498d79a164c4d2635d1deeab156d64c0f0caa90ec5864a523faf",
+    "paced_msi_sha256": "cbba814ed311b3e21b29d6007f2c7e276ac4ab99a1a6111aa8955d76d1fae809",
+    "final_msi_sha256": null,
+    "paced_bundle_checks": {
+      "qa_modules_excluded": true,
+      "approved_brand_assets": true,
+      "approved_exe_icon": true,
+      "app_version": true,
+      "server": true,
+      "export_scratch": true,
+      "render_engine": true,
+      "color_management": true,
+      "hdr_render": true,
+      "hdr_layers": true,
+      "hdr10plus_index": true,
+      "hdr10plus_export": true,
+      "hdr10plus_bitstream": true,
+      "hdr10plus_authoring": true,
+      "hdr10plus_fast": true,
+      "hdr10plus_master": true,
+      "native_project_plan": true,
+      "native_project_render": true,
+      "native_project_verification": true,
+      "preview_cache": true,
+      "preview_dependencies": true,
+      "source_frames": true,
+      "timing": true,
+      "timeline_transitions": true,
+      "project_store": true,
+      "animation": true,
+      "sequences": true,
+      "video_effects": true,
+      "grading": true,
+      "audio_cache": true,
+      "audio_edit": true,
+      "waveform": true,
+      "motion": true,
+      "review_packet": true,
+      "timeline_proposal": true,
+      "ai_bridge": true,
+      "encoders": true,
+      "native_plan": true,
+      "native_playback": true,
+      "performance_profile": true,
+      "desktop_recovery": true,
+      "desktop": true,
+      "web": true,
+      "native_runtime": true,
+      "installed_native_runtime": true,
+      "installed_icon": true,
+      "installed_executable": true,
+      "installed_web": true
+    },
+    "final_bundle_checks": null,
+    "final_build": null,
+    "first_unpack_rejected": {
+      "msiexec_exit": 1603,
+      "installer_error": 1606,
+      "cause": "Forward slashes in TARGETDIR. Same MSI extracted successfully with the canonical Windows path."
+    }
+  },
+  "verification": {
+    "timeline": {
+      "result": {
+        "linked_asset_count": 32,
+        "mouse_trim_frames": 600,
+        "live_guide": true,
+        "undo_redo": true,
+        "playhead_zoom_delta_pixels": 0.1428375244140625,
+        "portrait_and_custom_reopen": true,
+        "transforms_preserved": true
+      },
+      "supervisor": {
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 11.655999999988126,
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        }
+      }
+    },
+    "generated_hdr": {
+      "result": {
+        "frames": 18,
+        "equal_decoded_static_and_hdr10plus": true,
+        "dynamic_blocks": 18,
+        "body_duration_seconds": 0.75,
+        "undo_redo_reopen": true,
+        "versions_match": true,
+        "source_hashes_match": true
+      },
+      "supervisor": {
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 15.203000000008615,
+        "process_ownership": {
+          "Windows_job": true,
+          "job_members_at_cleanup": 0,
+          "remaining_owned_processes": 0,
+          "unrelated_processes_targeted": 0,
+          "forced_member_roles": {},
+          "visible_terminal_windows_before": 0,
+          "owned_visible_terminal_windows_at_cleanup": 0,
+          "visible_terminal_windows_after": 0,
+          "new_visible_terminal_windows_after": 0,
+          "diagnostic_failure_type": null,
+          "terminal_scope": "Before/after snapshots; no titles, global window changes or termination of unowned terminals. Brief intermediate flashes are not excluded by snapshots."
+        }
+      }
+    },
+    "final_native": null,
+    "final_recovery": null,
+    "final_export": null,
+    "camera": {
+      "frozen-hdr-camera": null,
+      "final-hdr-camera": null
+    },
+    "privacy_before": null,
+    "privacy_after": null
+  },
+  "retained_rejections": [
+    {
+      "case": "baseline-scrub",
+      "cause": "The first driver used an illegal JavaScript return statement at cleanup. Its samples are retained. The retry derived the release frame independently from pointer geometry."
+    },
+    {
+      "case": "paced-60",
+      "cause": "Source-wait presentation outlier despite visible AC conditions and exact PCM. Retained as a failed performance gate regardless of functional benchmark status."
+    },
+    {
+      "case": "first GitHub workflow",
+      "id": 45086645292,
+      "cause": "The old binding checked the historical Phase 3A measurement against changed Phase 3B source. CI now verifies Phase 3A using its archived commit, then checks the new record."
+    }
+  ],
+  "source_fingerprint": "bcae6f62e67f1fb458225cb64ea59383f6ce1d164b48847cb3267aee9f9f50ab",
+  "fingerprint_method": "SHA256 sorted relevant relative path + NUL + LF-normalized source + NUL",
+  "benchmark_protocol_fingerprint": "3ad7ec984694f0bae6360b958fc3fcee609ef031183d4aa7a87ca41daa320e81",
+  "benchmark_protocol_fingerprint_method": "SHA256 sorted benchmark driver/observer relative path + NUL + LF-normalized source + NUL"
+}

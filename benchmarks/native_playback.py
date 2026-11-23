@@ -1,5 +1,5 @@
 """Sustained native program transport: moving original4K layers, PCM and frequent cuts."""
-import argparse,json,sys,time
+import argparse,json,os,sys,time
 from pathlib import Path
 from fractions import Fraction
 from contextlib import ExitStack
@@ -11,23 +11,26 @@ from window_geometry import alignment
 from window_visibility import WindowVisibility
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'tests'))
 from performance import Resources
-SETUP="""({assets,seconds,cut})=>{
+SETUP="""({assets,seconds,cut,switchSources=false})=>{
  stopPlayback();refreshPlayers();state.assets=assets;state.output.fps=60;useProxies=false;state.tracks=[];
- assets.forEach((a,n)=>{
+ const trackAssets=switchSources?assets.slice(0,1):assets;
+ trackAssets.forEach((a,n)=>{
   const video={id:uid(),type:'video',name:'Video'+n,volume:1,clips:[]},audio={id:uid(),type:'audio',name:'Audio'+n,volume:.2,clips:[]};
   for(let i=0;i<Math.ceil(seconds/cut);i++){
-   const start=(i%3)*.5,c=clipFromAsset(a,i*cut,'video');c.start=start;c.end=start+Math.min(cut,seconds-i*cut);c.audioDetached=true;
+   const shot=switchSources?assets[i%assets.length]:a;
+   const start=switchSources?(Math.floor(i/assets.length)%3)*.5:(i%3)*.5;
+   const c=clipFromAsset(shot,i*cut,'video');c.start=start;c.end=start+Math.min(cut,seconds-i*cut);c.audioDetached=true;
    if(n){c.scale=.4;c.x=n===1?-.2:.2;c.opacity=.7;c.keys={rotation:[{time:0,value:-4,mode:'linear'},{time:6,value:4,mode:'linear'}]};}
-   video.clips.push(c);const sound=clipFromAsset(a,i*cut,'audio');sound.start=c.start;sound.end=c.end;audio.clips.push(sound);
+   video.clips.push(c);const sound=clipFromAsset(shot,i*cut,'audio');sound.start=c.start;sound.end=c.end;audio.clips.push(sound);
   }
   state.tracks.unshift(video);state.tracks.push(audio);
  });playhead=0;redraw();save();return flushSave();
 }"""
 def main(a):
  with session(a.executable,a.results,offline=True,legacy_viewport=a.legacy_viewport,legacy_focus_emulation=a.legacy_focus_emulation) as (page,proc,project,errors),ExitStack() as owned_windows:
-  result=page.evaluate("paths=>request('import','POST',{paths,autoProxy:false})",[str((a.media/f'h264-4k60-{n}.mp4').resolve()) for n in range(a.layers)])
+  result=page.evaluate("paths=>request('import','POST',{paths,autoProxy:false})",[str((a.media/f'h264-4k60-{n}.mp4').resolve()) for n in range(3 if a.switch_sources else a.layers)])
   assert not result['errors']
-  page.evaluate(SETUP,{'assets':result['assets'],'seconds':a.seconds,'cut':a.cut})
+  page.evaluate(SETUP,{'assets':result['assets'],'seconds':a.seconds,'cut':a.cut,'switchSources':a.switch_sources})
   page.evaluate("""({width,rate})=>{state.output.fps=rate;const select=$('programResolution');if(![...select.options].some(o=>o.value===String(width)))select.add(new Option('Benchmark',width));select.value=width;save();return flushSave();}""",{'width':a.width,'rate':a.rate})
   page.wait_for_function("Array.from(document.querySelector('#playbackEngine').options).some(o=>o.value==='native'&&!o.disabled)")
   if not a.legacy_viewport and not a.actual_display and not a.large_surface:
@@ -92,7 +95,7 @@ def main(a):
    raise failure
   data['layout_contract']='legacy DPR1 emulation' if a.legacy_viewport else 'native DPI; fixed356x200 physical monitor unless actual-display/large-surface';data['physical_alignment']=physical_alignment;data['actual_display_layout']=display;data['native_rect']=page.evaluate('nativeRect()')
   if a.large_surface:assert abs(data['native_rect']['width']/data['native_rect']['height']-16/9)<.005,'Benchmark monitor aspect changed unexpectedly'
-  data.update(ui_source_patch_sha256=ui_patch,application_ready_seconds=getattr(page,'_vlogcraft_launch_seconds',None),first_ready_seconds=ready,seconds=a.seconds,cut_seconds=a.cut,video_tracks=a.layers,audio_tracks=a.layers,original_resolution=[3840,2160],
+  data.update(ui_source_patch_sha256=ui_patch,application_ready_seconds=getattr(page,'_vlogcraft_launch_seconds',None),first_ready_seconds=ready,seconds=a.seconds,cut_seconds=a.cut,video_tracks=a.layers,audio_tracks=a.layers,source_files=len(result['assets']),source_switches=a.switch_sources,original_resolution=[3840,2160],
               program_resolution=[a.width,a.width*9//16],rate=a.rate,browser_errors=errors,proxies=False)
   data['expected_samples']=page.evaluate('Math.round(nativeDuration()*48000)')
   data['gpu_counter_observer']='disabled for attribution diagnostic; not protected acceptance' if a.diagnostic_no_gpu_counters else 'legacy high-frequency PDH GPU observer; cost recorded separately'
@@ -117,4 +120,11 @@ if __name__=='__main__':
  p.add_argument('--window-mode',choices=('uncontrolled','visible','visible-unfocused','visible-browser-unfocused','preview-covered','editor-covered','editor-covered-unfocused'),default='visible')
  p.add_argument('--legacy-focus-emulation',action='store_true',help='Diagnostic reproduction only; keep Playwright artificial page focus')
  p.add_argument('--diagnostic-no-gpu-counters',action='store_true',help='Attribution control only; retain all original/default-observer acceptance scores')
- p.add_argument('--legacy-viewport',action='store_true',help='Replay historical DPR1 measurement geometry; not visual-placement qualification');p.add_argument('--trace',action='store_true');p.add_argument('--ui-source',action='store_true');p.add_argument('--actual-display',action='store_true');p.add_argument('--large-surface',action='store_true');p.add_argument('--width',type=int,default=960);p.add_argument('--layers',type=int,choices=(1,3),default=3);p.add_argument('--rate',default='60/1');main(p.parse_args())
+ p.add_argument('--legacy-viewport',action='store_true',help='Replay historical DPR1 measurement geometry; not visual-placement qualification');p.add_argument('--trace',action='store_true');p.add_argument('--ui-source',action='store_true');p.add_argument('--actual-display',action='store_true');p.add_argument('--large-surface',action='store_true');p.add_argument('--width',type=int,default=960);p.add_argument('--layers',type=int,choices=(1,3),default=3);p.add_argument('--rate',default='60/1');p.add_argument('--switch-sources',action='store_true',help='Alternate three sources in one picture track and one audio track')
+ p.add_argument('--native-miss-trace',action='store_true',help='Retain the native per-miss diagnostic on clean playback-worker shutdown')
+ args=p.parse_args()
+ if args.switch_sources and args.layers!=1:p.error('--switch-sources requires --layers 1')
+ if args.native_miss_trace:
+  args.results.mkdir(parents=True,exist_ok=True)
+  os.environ['VLOGCRAFT_NATIVE_TRACE_FILE']=str((args.results/'native-misses.json').resolve())
+ main(args)

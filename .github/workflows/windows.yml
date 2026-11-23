@@ -60,7 +60,15 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python "$phase2d/tools/performance_record.py" "$phase2d/docs/benchmarks/studio-3.6.0-phase2d.json"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          python tools/performance_record.py docs/benchmarks/studio-3.6.0-phase3a.json
+          $phase3a = 'build/qa/phase3a-evidence'
+          New-Item -ItemType Directory -Force -Path $phase3a | Out-Null
+          git archive --format=tar --output=build/qa/phase3a-evidence.tar f4a852ba36d9cd6e417c2cbfd1dc90af1ad2d630
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          tar -xf build/qa/phase3a-evidence.tar -C $phase3a
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python "$phase3a/tools/performance_record.py" "$phase3a/docs/benchmarks/studio-3.6.0-phase3a.json"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tools/performance_record.py docs/benchmarks/studio-3.6.0-phase3b.json
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python tests/icon_assets.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

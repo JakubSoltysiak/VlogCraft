@@ -1,5 +1,12 @@
 # VlogCraft Studio development qualification
 
+## 3.6.0 Phase 3B playback development
+
+- Windows development packages were compared with the frozen Phase 3A MSI. The ruler tests verify the released frame independently, show reduced UI work and record every attempted performance result. The short playback tests preserve the exact PCM endpoint.
+- A visible AC-powered 60-second paced run delivered exact PCM with zero underruns but recorded 390 skips and a 1.414-second active presentation gap. The measured stall failed the performance gate. Both tests used the same native worker checksum.
+- The paired 150-second editing diagnostic completed 15 edit batches per package without sampled audio underruns. The paced candidate used less WebView renderer private commit in this pair, and both runs showed natural reclamation after Stop without forced collection.
+- The offline mixed-photo and managed-HDR editing fixture verified eighteen authored HDR10+ records and identical decoded pictures to its static reference. The timeline fixture covered 32 linked assets, live trim, undo/redo and reopen. [Measured evidence and qualification limits](docs/STUDIO_3_6_0_PHASE3B_PLAYBACK.md).
+
 ## 3.6.0 Phase 3A GPU export
 
 - Frame 193 was reproduced in its eight-picture GOP. Repeat encodes were deterministic for each exact input and CPU zimg substitution alone still missed the 50 dB gate. The repaired 300-picture candidate reached 57.08 dB overall and 52.53 dB minimum in 137.763 s with exact clocks, PCM and 300 HDR10+ associations.

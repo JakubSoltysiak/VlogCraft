@@ -44,6 +44,7 @@ PROTOCOL_FILES=(
  'benchmarks/phase2d_project_export.py','tests/test_native_project_render.py','tests/windows_native_project_export.py',
  'benchmarks/check_phase2d_preview.py','benchmarks/check_phase2d_source_clock.py',
  'benchmarks/resume_phase2d_reference.py',
+ 'benchmarks/phase3b_scrub.py','benchmarks/native_seek.py','benchmarks/program_seek.py',
  'benchmarks/phase3a_encoder_probe.py','benchmarks/phase3a_first_project.py',
  'tests/test_phase3a_export.py','tests/windows_phase3a_export.py',
  'tests/verify_bundle.py','tools/setup_architecture_lab.py',
