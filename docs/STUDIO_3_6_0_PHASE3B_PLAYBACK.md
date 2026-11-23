@@ -2,6 +2,8 @@
 
 The starting point was Phase 3A at [f4a852b](https://github.com/JakubSoltysiak/VlogCraft/commit/f4a852ba36d9cd6e417c2cbfd1dc90af1ad2d630). [Draft PR #21](https://github.com/JakubSoltysiak/VlogCraft/pull/21) targets the Phase 3A branch. Windows results use the development MSI applications on the Radeon 890M workstation. Administrative MSI images and test projects were local and isolated from the user's active installation and projects.
 
+Current results are in the [follow-up qualification](#follow-up-acceptance-protocol). Three 125-second rapid-switch runs completed with zero skips. Two of three 60-second three-layer runs met all timing screens. The third lost 222 frames.
+
 ## Playback architecture and reproduced problems
 
 The native worker selects original source frames using rational timeline and source timestamps, decodes through libav with bounded queues, and composites with D3D11. The preview clock is driven by 48 kHz reference PCM played through an AudioWorklet. The WebView owns editor state and sends seek generations to the desktop host. Unsupported native effects and color contracts retain the existing explicit fallback. Neither the native export provider nor HDR10+ authoring changed here.
@@ -23,7 +25,7 @@ Native throughput uses distinct submitted sequence frames, DXGI Present counters
 
 Ruler drags use actual pointer input across a 90-second project with three video and three audio tracks and 0.5-second cuts. The expected release frame is calculated from the pointer and ruler geometry. The UI timing measures synchronous `seek()` work. The picture timing measures release to exact completed-generation acknowledgement. A benchmark return code establishes its functional assertions. Qualification also considers skips and presentation gaps.
 
-## Measured results
+## Earlier Phase 3B measurements
 
 <!-- PHASE3B_RESULTS_START -->
 
@@ -160,3 +162,86 @@ The follow-up implementation now checks whether each source already holds the ex
 An isolated worker on the synchronized fixture adopted all 39 early rewinds on each of three layers in both runs. The traced result was 59.822 FPS, two skips and a 44.67 ms maximum gap. The run without native miss tracing reached 59.713 FPS, one skip and a 36.56 ms maximum. Neither recorded skips following a source wait. An offscreen hardware test independently checked 120 source/frame pairs across VFR cuts, sought backward during a pending rewind and closed the worker in 31 ms during another one. The final package repeats these checks.
 
 The same intermediate MSI was then rerun with the original synchronized cuts and with the three source loops offset by one cut each. The traced synchronized run measured 59.507 FPS, 20 skips and a 73.50 ms maximum gap. The staggered diagnostic measured 59.829 FPS, zero skips and a 36.76 ms maximum. Each completed exactly 2,880,000 audio samples with zero underruns. This comparison changes the source offsets for diagnosis only. All protected final trials use the original timeline and source offsets.
+
+### Consistency on the development MSI
+
+With the native miss tracer off, the three matched frozen runs lost 5, 16 and 3 pictures in 60 seconds. The synchronized-rewind MSI lost 222, 0 and 1. Both packages passed two of three predeclared wall-time screens. Median skips improved from 5 to 1, but the worst matched result worsened from 16 to 222 and the maximum gap from 61.81 to 976.93 ms. The retained traced frozen outlier was worse still at 572 skips and 1.364 s. No run was removed for a low score.
+
+In the 976.93 ms trial, the last submitted frame stayed at 2343 for at least 778.3 ms while source waits rose from 142 to 175 and GPU-slot waits did not increase. The first six cached source pictures give five fully bracketed VFR intervals. The stall began three frames into a source loop. Individual maxima were 102.48 ms in Present, 144.83 ms waiting for the device context and 11.81 ms of GPU composition. None explains the full missing interval on its own. Each decoder spent 7.08–7.73 s in decode over the full failing minute, versus 2.87–3.62 s in the two passing runs. Those three decoder times overlap. Windows logged no display-driver timeout, hardware-error report or critical power event in the failing trial.
+
+All three revised 125-second rapid-cut trials delivered all 7,500 distinct pictures, with no redrawn frame needed to meet the count. The audio endpoint was exactly 6,000,000 samples in every trial. This qualifies the measured original-source switching case. Three simultaneous layers on the same machine still have an intermittent long stall.
+
+### Windows graphics trace and actual editor size
+
+At the ordinary editor layout the native preview measured 958 × 539 physical pixels on the 2880 × 1800, 120 Hz, 175% desktop. Both source and composition were UHD. Frozen Phase 3B measured 58.998 FPS, 30 skipped pictures and a 105.20 ms maximum gap. The new MSI measured 59.622 FPS, 11 skips and a 102.26 ms maximum gap. Both exceeded the 100 ms limit.
+
+Two additional instrumented synchronized trials on the same MSI measured 59.645 FPS / 0 skips / 46.04 ms and 59.685 FPS / 2 skips / 52.37 ms. A separate bounded Windows graphics recording with the native miss tracer off yielded 59.626 FPS / 1 skip / 58.41 ms. It retained 828 of 3,599 native Present starts. There were 809 usable paired calls inside the conservative active range, covering about 14 seconds. Their observed p95 call time was 0.665 ms. Some intervals crossed missing events, including apparent API times longer than the worker's lifetime maximum. Three native-associated queue contexts provided 12,542 matched submission/completion pairs with a 53.0 ms p95 and 92.3 ms maximum. These queue intervals overlap. This recording did not reproduce or attribute the nearly one-second freeze. A separate partial trace had no independent worker identity.
+
+The next diagnostic is a rolling capture triggered by a stalled last-submitted frame. Preserve device/decoder identity, requested and available PTS on all three layers, packet and device-lock ownership and GPU scheduling immediately before the stalled frame. End the capture after recovery. Keep the existing protected run, including its endpoint and observer, as the acceptance control. The 976.93 ms gap failed a prerequisite for the 600-second playback and 30-minute editing tests.
+
+### Matched untraced native trials
+
+Each row used a fresh process, original media, active GPU performance counters, AC power and a visible preview. The standard surface was 356 × 200. GPU execution and UMA residency have distinct accounting. Process working sets can contain overlapping mappings.
+
+| Workload and trial | Distinct FPS | Distinct pictures after drain | Skips (after source wait) | Active p95 / p99 / maximum gap (ms) | Peak summed working set (MiB) | Gate |
+|---|---:|---:|---:|---:|---:|---|
+| Frozen 60 s, 1 | 59.648 | 3,595 | 5 (0) | 18.4 / 35.1 / 58.38 | 2,993.2 | passed |
+| Frozen 60 s, 2 | 59.404 | 3,584 | 16 (0) | 18.6 / 34.1 / 51.05 | 3,097.4 | failed |
+| Frozen 60 s, 3 | 59.608 | 3,597 | 3 (0) | 18.3 / 35.1 / 61.81 | 3,251.7 | passed |
+| Revised 60 s, 1 | 56.020 | 3,378 | 222 (184) | 18.7 / 50.1 / 976.93 | 3,194.0 | failed |
+| Revised 60 s, 2 | 59.824 | 3,600 | 0 (0) | 18.0 / 19.0 / 33.86 | 2,920.8 | passed |
+| Revised 60 s, 3 | 59.728 | 3,599 | 1 (0) | 18.0 / 19.1 / 38.91 | 3,116.0 | passed |
+| Frozen 125 s, 1 | 41.789 | 5,228 | 2,272 (2,248) | 99.5 / 255.4 / 255.42 | 3,097.0 | failed |
+| Frozen 125 s, 2 | 41.805 | 5,232 | 2,268 (2,237) | 277.8 / 277.8 / 277.76 | 3,093.4 | failed |
+| Frozen 125 s, 3 | 41.677 | 5,218 | 2,282 (2,255) | 99.1 / 245.6 / 245.61 | 3,056.9 | failed |
+| Revised 125 s, 1 | 59.921 | 7,500 | 0 (0) | 17.8 / 18.4 / 30.81 | 2,816.2 | passed |
+| Revised 125 s, 2 | 59.913 | 7,500 | 0 (0) | 17.9 / 18.6 / 34.85 | 2,851.2 | passed |
+| Revised 125 s, 3 | 59.718 | 7,500 | 0 (0) | 17.9 / 18.6 / 35.19 | 2,865.9 | passed |
+
+The 60- and 125-second trials ended on the exact final picture with 2,880,000 and 6,000,000 audio samples respectively and zero underruns. Distinct picture totals include the final drain. FPS retains the last GUI poll and its wall interval. In the second revised switch run that poll saw 7,496 pictures and the subsequent drain confirmed 7,500. Histogram percentiles are bucket upper bounds. The frozen switch control could open only one decoder at a time. The revised switch tests used three live decoders, two cold preparations and 249 resumes, with at most four pictures per source queue. The maximum standby payload was 870,912,000 bytes within a 939,524,096-byte reservation. Full process-role private commit and GPU allocations are in the measurement record. The traced and intermediate cohorts retain their own identities and results.
+
+### Packaged Windows qualification
+
+The earlier handoff candidate at `40e43da66797f70c57691b734effafcb34bc552a` used MSI SHA-256 `9a06324bb5ed51e49ba9fc44637f45e11321dd861c2771a4edb576799c590e0f` (286,261,349 bytes). It passed 48/48 image checks after a long-target extraction failed (Windows Installer 1603 / 1320). Its playback trials are retained separately; the 150-second editing pair compares frozen Phase 3B and the subsequent synchronized-rewind build. The checks below apply only to the subsequent synchronized-rewind candidate.
+
+The development MSI was 286,269,541 bytes (SHA-256 `4513cef410ffe7d2fe775b0b1eec8dc86732f82dcbe9cf5d7ae30d055dd76fa0`). The x64 build produced 6 verified binaries at source `7fb4a7208e26d23e6ae6a0e15284cf48145d33a1`. The isolated administrative image passed 48/48 source, runtime and icon checks.
+
+The packaged GPU worker held the 300 ms picture at a request of 499.5 ms, switched to the 500 ms picture at 500.0 ms and retained it at 500.5 ms. An adjacent backward cut to 400 ms returned to the red 300 ms picture. The frozen worker failed both the just-before and backward cuts. FFprobe timestamps and FP16 center-pixel readbacks independently verified these results.
+
+The four-source seek and handoff fixture passed 23 physical color checks, verified exact held timestamps, cancelled during a pending seek and completed 115,200 PCM samples with 0 underruns. It observed at most 3 live decoders and 4 queued pictures per producer.
+
+The packaged simultaneous-rewind fixture compared 117 active source-frame selections against independent VFR timestamps, confirmed an exact seek during pending rewind and closed the worker in 31.0 ms while another rewind was pending.
+
+Packaged transport passed playing seeks, pause/resume, physical resize and modal visibility. An owned process failure and an unsupported effect both selected the whole reference program. This transport fixture recorded 86,486 samples after its final reposition and 0 underruns. The maximum measured window-alignment error was 0 physical pixels.
+
+The mixed edit linked all three recordings and combined two tagged PQ originals in three one-second clips, a generated still and two scale keyframes. Its picture clips used an explicit square-pixel interpretation. The third recording has unknown primaries and transfer and remained in the library. Its 3840 × 2160 HDR project used the explicit 960 × 540 SDR Composited monitor in a 666 × 374 physical stage. The derivative contained 180 independently decoded pictures. The browser reported 179 callbacks, 0 drops and a 25.30 ms maximum callback gap. Initial import-to-ready cost was 149.75 seconds.
+
+A separate 3-second real-camera PQ clip reached the native scRGB surface with 144,000 exact samples, 0 underruns and 0 skips. Dynamic HDR10+ data was present at decode. This checks an HDR-capable surface, with calibrated monitoring still open.
+
+Live Layers measured browser callback delivery in separate four-second arms. The completed case checked the requested asset, proxy URL flag and decoded dimensions. Active-generation samples show how much of each observation overlapped the encoder.
+
+| Proxy condition | Browser source | Active job samples | Callbacks | Decoded / dropped | p95 / max gap (ms) |
+|---|---:|---:|---:|---:|---:|
+| Idle | 3840 × 2160 | 0 (0%) | 241 | 245 / 0 | 25.20 / 209.30 |
+| Active | 3840 × 2160 | 6 (43%) | 220 | 255 / 31 | 41.90 / 276.30 |
+| Completed | 1280 × 720 | 0 (0%) | 253 | 253 / 0 | 17.00 / 75.40 |
+
+Packaged WebView faults restored 80 undo states after the renderer fault (7.27 s) and 80 undo states after the browser fault (8.22 s). Each recovery checked the exact full history, tracks and output settings, unsaved draft, paused position and undo/redo.
+
+The offline packaged first export completed in 45.521 s. Independent decoding verified 48 pictures, 48 conforming and correctly associated HDR10+ blocks, exact video PTS, static HDR declarations and 38,400 exact PCM samples (55.63 dB PQ). Active cancellation and confirmed shutdown left 0 owned survivors. The representative 60-second mixed UHD60 HDR10+ export is still a separate gate.
+
+Regression results were loopback-only Python 191/192 passed, 1 skipped, separate WARP/export 9/9 passed, 0 skipped, JavaScript 32/32 passed.
+
+All 3 originals matched the pre-existing hashes and modification times before and after the final camera retry. There were 0 matching Git media objects, 0 matching text objects and 0 matches in publishable working files.
+
+The 150-second ownership diagnostic used unforced natural idle. Frozen Phase 3B observed 15 batches and 0 underruns, with final active / natural-idle renderer private commit 540.6 / 504.6 MiB. Final follow-up failed its visibility control when the preview center was covered at 132.473 s. Final follow-up (failed visibility) observed 15 batches and 0 underruns, with final active / natural-idle renderer private commit 538.1 / 480.0 MiB. Final follow-up repeat observed 15 batches and 0 underruns, with final active / natural-idle renderer private commit 541.1 / 478.1 MiB. This scope cannot establish a leak or long-session stability. Working set, private commit and potentially overlapping UMA or shared GPU allocations are distinct measurements.
+
+Median private commit over the last 30 seconds of each 150-second editing diagnostic (MiB). A dash indicates missing owner samples.
+
+| Build | Host | Native | WebView family | FFmpeg |
+|---|---:|---:|---:|---:|
+| Frozen Phase 3B | 881.3 | 2,385.8 | 1,031.1 | 1,454.1 |
+| Final follow-up (failed visibility) | 886.0 | 2,396.2 | 1,035.5 | 1,350.5 |
+| Final follow-up repeat | 872.9 | 2,369.9 | 1,035.1 | 1,430.9 |
+
+Retained failed trials include final2/mixed, final2-mixed-retry/mixed, final2-mixed-geometry/mixed. The editor rejected the initial default SDR encoder for the HDR10 project and subsequently rejected an unspecified source pixel aspect. Both refusals preceded playback. With those settings corrected, a third run failed while publishing its rendered preview. Windows returned error 3 when replacing a 226-character temporary file path with a 268-character cache path. The frozen Phase 3B and the follow-up contain identical cache-publication and preview-serving code. Deep project paths remain an open Windows compatibility issue.

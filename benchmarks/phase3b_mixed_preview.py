@@ -24,31 +24,44 @@ def qualify(executable, manifest, results):
     Image.new('RGB', (160, 90), (48, 96, 144)).save(still)
     with session(executable, results, offline=True) as (page, process, _, errors):
         started = time.monotonic()
-        page.evaluate("""async paths=>{
+        coverage = page.evaluate("""async paths=>{
           const imported=await request('import','POST',{paths,autoProxy:false});
           if (imported.errors.length||imported.assets.length!==4) throw Error('Fixture import failed');
           state=await request('state');
           const sources=imported.assets.slice(0,3),photo=imported.assets[3];
-          if (!sources.every(a=>a.kind==='video'&&a.duration>=2)||photo.kind!=='image')
+          const tagged=sources.filter(a=>a.colorPrimaries==='bt2020'&&a.colorTransfer==='smpte2084'&&
+            a.colorSpace==='bt2020nc'&&a.colorRange==='tv');
+          if (!sources.every(a=>a.kind==='video'&&a.duration>=4)||photo.kind!=='image'||tagged.length!==2)
             throw Error('Fixture media contract differs');
           const picture={id:uid(),name:'Picture',type:'video',volume:1,clips:[]};
           const sound={id:uid(),name:'Audio',type:'audio',volume:1,clips:[]};
-          for (const [i,a] of sources.entries()){
-            const clip={...clipFromAsset(a,i),start:.5,end:1.5,audioDetached:true};
+          // The remaining camera has unknown primaries/transfer. Keep it linked with its imported
+          // metadata. For picture, return to a later interval in the first tagged source.
+          for (const [i,a] of [tagged[0],tagged[1],tagged[0]].entries()){
+            const start=i===2?2.5:.5;
+            const clip={...clipFromAsset(a,i),start,end:start+1,audioDetached:true,
+              inputColor:{profile:'source',range:'auto',pixelAspect:'square'}};
             picture.clips.push(clip);
-            if(a.hasAudio) sound.clips.push({...clipFromAsset(a,i,'audio'),start:.5,end:1.5});
+            if(a.hasAudio) sound.clips.push({...clipFromAsset(a,i,'audio'),start,end:start+1});
           }
           const overlay={...clipFromAsset(photo,.5),end:2,scale:.4,x:.2,opacity:.65,
             keys:{scale:[{time:0,value:.4,mode:'linear'},{time:1.9,value:.55,mode:'linear'}]}};
           state.tracks=[{id:uid(),name:'Still',type:'video',volume:1,clips:[overlay]},picture,sound];
-          Object.assign(state.output,{width:3840,height:2160,fps:60,color:{
+          Object.assign(state.output,{width:3840,height:2160,fps:60,encoder:'libx265',color:{
             version:1,workingSpace:'linear-rec2020-100nits',output:'hdr10',sdrWhiteNits:100}});
           stopPlayback();useProxies=false;$('previewSource').value='original';playhead=0;
           $('playbackEngine').value='rendered';$('programResolution').value='960';
           redraw();save();await flushSave();$('playbackEngine').onchange();
+          return {imported_recordings:sources.length,pictured_recordings:tagged.length,
+            picture_edits:picture.clips.length,explicit_square_pixels:true};
         }""", [str(path) for path in [*sources, still]])
-        page.wait_for_function("""renderedCurrent?.media?.readyState>=2 &&
-            $('programPreviewStatus').textContent.includes('SDR tone-mapped monitor')""",timeout=300000)
+        page.wait_for_function("""()=>{
+          const message=$('programPreviewStatus').textContent;
+          if(renderedCurrent?.media?.readyState>=2 && message.includes('SDR tone-mapped monitor')) return true;
+          if(!renderedLoading && !renderedCurrent && message && !message.startsWith('Compositing'))
+            throw Error(message);
+          return false;
+        }""",timeout=300000)
         first_picture = time.monotonic() - started
         with WindowVisibility(process, 'visible') as visible:
             page.evaluate("""()=>{
@@ -92,7 +105,8 @@ def qualify(executable, manifest, results):
                   and sample['monitor']==[decoded['width'],decoded['height']]==[960,540]
                   and len(times)>1 and times[-1][1]>times[0][1])
         receipt = dict(scope='Three-second explicit Composited SDR monitor of a UHD60 HDR project',
-                       passed=bool(passed),sources=3,generated_stills=1,first_ready_including_import_seconds=first_picture,
+                       passed=bool(passed),sources=coverage['pictured_recordings'],generated_stills=1,
+                       first_ready_including_import_seconds=first_picture,**coverage,
                        first_source_to_last_media_seconds=times[-1][1]-times[0][1] if times else None,
                        callback_count=len(times),max_callback_gap_ms=max(gaps,default=None),
                        median_callback_gap_ms=statistics.median(gaps) if gaps else None,

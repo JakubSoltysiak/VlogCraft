@@ -4,7 +4,15 @@
 
 The packaged worker reproduced the intended VFR holds across four sources. Twenty-three physical picture checks matched the independent reference, with 115,200 audio samples, zero underruns and zero surviving owned processes. A separate fractional seek at 499.5 ms and an adjacent backward cut both failed on the frozen worker and passed on the new worker.
 
-The matched twelve-seek median and p95 were 437.3 / 596.8 ms on the frozen Phase 3B editor and 442.0 / 600.2 ms on the new package. Median paused scrub release improved from 521.6 to 489.5 ms. Playing release improved from 541.0 to 482.3 ms. These measurements supplement the earlier Phase 3A comparisons below.
+The matched twelve-seek median and p95 were 437.3 / 596.8 ms on frozen Phase 3B, 442.0 / 600.2 ms with bounded source reuse, and 437.1 / 567.8 ms with early rewind. Paused and playing median ruler releases were 521.6 / 541.0 ms frozen, 489.5 / 482.3 ms with reuse, and 488.9 / 498.3 ms with early rewind. The last package verified 117 additional layer/frame timestamp pairs and closed during a pending rewind in 31 ms.
+
+All three final 125-second original-source switching runs delivered 7,500 distinct pictures, 6,000,000 exact audio samples and zero underruns. Wall rates were 59.921, 59.913 and 59.718 FPS, with maximum active gaps of 30.81, 34.85 and 35.19 ms.
+
+Two of three final three-layer runs met all short gates. All three reached the exact final frame with 2,880,000 PCM samples and zero underruns. One still lost 222 frames and recorded a 976.93 ms presentation gap. During that trial the last submitted frame stayed at 2343 for at least 778.3 ms while source waits increased. Full three-layer endurance and long editing memory remain unqualified.
+
+The realistic 958 × 539 physical preview improved from 30 to 11 skips, with a 102.26 ms final maximum gap. Fifteen editing batches with a 60-second natural idle completed with zero underruns in each arm. The visible repeat ended at 541.1 MiB WebView renderer private commit and idled at 478.1 MiB, versus 540.6 and 504.6 MiB frozen. The first candidate attempt lost one visibility sample and is retained. The failing three-layer run gates the 600-second playback and 30-minute editing tests.
+
+The isolated Windows image passed all 48 bundle checks. The loopback-only suite passed 191 of 192 collected Python tests, with one environment-dependent skip. The separate nine-test WARP/export suite and all 32 JavaScript cases passed. Renderer and browser loss restored all 80 undo entries. The packaged 48-picture HDR10+ export passed independent decoded PQ (55.63 dB), exact PCM and PTS, static signaling and every metadata association. All three original recordings retained their hashes and timestamps. The camera/still Composited monitor independently decoded all 180 pictures in the short-path project. The 268-character cache publication failure remains open. [Full local trials, scope and limitations](docs/STUDIO_3_6_0_PHASE3B_PLAYBACK.md#follow-up-acceptance-protocol).
 
 ## Earlier 3.6.0 Phase 3B playback development
 

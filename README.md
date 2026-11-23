@@ -2,7 +2,7 @@
 
 > **[MASTER TO-DO LIST & PRODUCT ROADMAP](TODO.md)** — shared living backlog for the owner, Codex and ChatGPT. Check priorities and update it with each feature PR.
 
-The current 3.6.0 development branch tests native playback across frequent cuts. It reuses compatible decoders and prepares upcoming sources within a fixed texture budget. The Windows comparison records individual trials, exact audio completion, visible preview timing and remaining qualification gates. [Phase 3B playback report](docs/STUDIO_3_6_0_PHASE3B_PLAYBACK.md) · [Draft PR #21](https://github.com/JakubSoltysiak/VlogCraft/pull/21).
+The current 3.6.0 development branch tests native playback across frequent cuts. It reuses compatible decoders and prepares upcoming sources within a fixed texture budget. On the Radeon workstation, all three 125-second rapid-cut trials delivered every UHD60 sequence frame and audio sample. Three simultaneous UHD layers still stalled in one of three protected runs. [Phase 3B playback report](docs/STUDIO_3_6_0_PHASE3B_PLAYBACK.md) · [Draft PR #21](https://github.com/JakubSoltysiak/VlogCraft/pull/21).
 
 The **P0 HDR color foundation** is a development draft on [PR #8](https://github.com/JakubSoltysiak/VlogCraft/pull/8), stacked on unmerged PR #7. It adds explicit source/working/output color contracts, float32 linear composition and a first supported HDR10 HEVC workflow. Supported operations and measured precision, display, export and recovery limits are in the [color report](docs/HDR_COLOR_FOUNDATION.md). HLG, Samsung Log, HDR10+ authoring, calibrated monitoring and complete HDR effect parity remain unfinished. This is not a stable release or Kenya-project readiness approval.
 
