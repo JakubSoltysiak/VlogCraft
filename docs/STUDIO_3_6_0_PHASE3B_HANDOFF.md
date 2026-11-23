@@ -1,10 +1,10 @@
 # Phase 3B qualification handoff
 
-Use [draft PR #21](https://github.com/JakubSoltysiak/VlogCraft/pull/21) and its published head on `codex/studio-3.6.0-phase3b`. The [current playback report](STUDIO_3_6_0_PHASE3B_PLAYBACK.md) gives the diagnosis and short-gate status. The [benchmark record](benchmarks/studio-3.6.0-phase3b.json) records the build commit, native-source digest, development MSI hash and extracted host and playback worker hashes for the tested candidate in `freeze_investigation.candidate_identity`.
+Use [draft PR #21](https://github.com/JakubSoltysiak/VlogCraft/pull/21) and its published head on `codex/studio-3.6.0-phase3b`. The [current playback report](STUDIO_3_6_0_PHASE3B_PLAYBACK.md) gives the diagnosis and short-gate status. The [benchmark record](benchmarks/studio-3.6.0-phase3b.json) records the build commit, native-source digest, development MSI hash and extracted host and playback worker hashes for the tested candidate in `readiness_investigation.candidate_identity`. The previous tests remain in `freeze_investigation`.
 
-**Qualification is blocked on the tested MSI.** Its three protected trials missed the 59.5 FPS floor. Two exceeded the 100 ms maximum gap. Leave the 600-second playback and 30-minute editing commands below for a subsequent candidate that passes the short prerequisites.
+**Long qualification remains blocked.** The revised MSI missed 59.5 FPS in all three protected trials. The third also exceeded the 100 ms active-gap cap. Preserve every attempt and the existing wall-time definition. Begin with an onset-centered comparison at the ordinary 958 × 539 preview, which also failed on both revised MSI candidates. Compare Present duration, the refill-hold state and each acquired successor. Test a bounded refill deferral only if it addresses the observed interval and protects existing VFR, rewind and audio semantics.
 
-Start from the published head of PR #21. The packaged implementation is `893dc6e23af419a69591bdbe5386f0db3f97cceb`. The MSI SHA-256 is `4d82887f41389b458278056970e12a49319850b0fb13df281c1f36fe947e9bd4` and the playback worker SHA-256 is `1717545bd55170d5299b524fd4a94bd12cb1564e6c31ff3f7cd3a9ab313746e0`. The tested source and later evidence commits can be distinguished from the Git history and artifact receipt. The first unqualified revised capture to inspect is the recovered frame-55 interval in `fix1-diag60-on3`. All 13 samples after GPU completion showed source retry. Capture the first missing successor for each layer while the target moves. Also measure the end acknowledgement independently without changing the existing wall-time denominator.
+The packaged implementation for this follow-up is `7086ed380d279855b2d81f87d4d2105e268b6335`. Its MSI SHA-256 is `2f9de210fe88a2e4903e679bb61e081201973b073f20bba2bce3cf14bc0b8266` and playback worker SHA-256 is `2251ac360af922971b0fbcde1a08eb2b4693e7f994e8bf77bf44d1897c0f36a6`. For comparing to the previous published checkpoint, use `cand1` and its MSI `4d82887f41389b458278056970e12a49319850b0fb13df281c1f36fe947e9bd4`. The older `b817372` image is a separate historical control.
 
 ## Decision and fixtures
 
@@ -16,7 +16,7 @@ The local QA scripts and receipts are in the worktree's ignored `build/qa/phase3
 $commonGit = git rev-parse --path-format=absolute --git-common-dir
 $py = Join-Path (Split-Path -Parent $commonGit) '.venv/Scripts/python.exe'
 $handoff = 'build/qa/phase3b-watch/handoff.py'
-$candidate = 'cand1'
+$candidate = 'cand3'
 & $py $handoff plan --candidate $candidate
 ```
 
@@ -35,7 +35,7 @@ Use a fresh campaign label or an unused slot in a retained diagnostic cohort for
 
 ## Recorder campaign from a fresh checkout
 
-Point `$frozenMsi` to the development MSI with SHA-256 `4513cef410ffe7d2fe775b0b1eec8dc86732f82dcbe9cf5d7ae30d055dd76fa0`. Point `$media` to the established generated fixture directory and `$py` to the QA Python environment. Build the diagnostic worker at the implementation under review. The command uses the pinned Zig 0.17.1 and FFmpeg 9.0.2 shared SDK from the existing architecture tool setup.
+Point `$frozenMsi` to the development MSI with SHA-256 `4d82887f41389b458278056970e12a49319850b0fb13df281c1f36fe947e9bd4`. Point `$media` to the established generated fixture directory and `$py` to the QA Python environment. Build the diagnostic worker at the implementation under review. The command uses the pinned Zig 0.17.1 and FFmpeg 9.0.2 shared SDK from the existing architecture tool setup.
 
 ```powershell
 # Set up the pinned toolchain if the checkout does not have it.
@@ -82,7 +82,7 @@ if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 On a fresh checkout, use the tracked drivers directly after reviewing every short prerequisite in the published record. Point `$candidateMsi` and `$exe` to the retained MSI and the corresponding verified administrative image executable.
 
 ```powershell
-$evidence = (Get-Content -Raw 'docs/benchmarks/studio-3.6.0-phase3b.json' | ConvertFrom-Json).freeze_investigation
+$evidence = (Get-Content -Raw 'docs/benchmarks/studio-3.6.0-phase3b.json' | ConvertFrom-Json).readiness_investigation
 $identity = $evidence.candidate_identity
 $native = Join-Path (Split-Path $exe) '_internal/engine/native/VlogCraftNative.exe'
 if ((Get-FileHash -Algorithm SHA256 -LiteralPath $candidateMsi).Hash -ne $identity.msi_sha256 -or

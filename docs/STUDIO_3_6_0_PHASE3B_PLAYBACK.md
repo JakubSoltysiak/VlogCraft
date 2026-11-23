@@ -2,7 +2,7 @@
 
 The starting point was Phase 3A at [f4a852b](https://github.com/JakubSoltysiak/VlogCraft/commit/f4a852ba36d9cd6e417c2cbfd1dc90af1ad2d630). [Draft PR #21](https://github.com/JakubSoltysiak/VlogCraft/pull/21) targets the Phase 3A branch. Windows results use the development MSI applications on the Radeon 890M workstation. Administrative MSI images and test projects were local and isolated from the user's active installation and projects.
 
-Current results are in the [triggered freeze investigation](#triggered-freeze-investigation). The preceding [follow-up qualification](#follow-up-acceptance-protocol) established the comparison package. Three 125-second rapid-switch runs completed with zero skips. Two of three 60-second three-layer runs met all timing screens. The third lost 222 frames.
+Current results are in the [source-readiness follow-up](#source-readiness-and-terminal-acknowledgement-follow-up). The earlier [triggered freeze investigation](#triggered-freeze-investigation) preserves the first stall diagnosis. The preceding [follow-up qualification](#follow-up-acceptance-protocol) established the comparison package. Three 125-second rapid-switch runs completed with zero skips. Two of three 60-second three-layer runs met all timing screens. The third lost 222 frames.
 
 ## Playback architecture and reproduced problems
 
@@ -327,3 +327,85 @@ For the next diagnostic, trigger on the *first* presentation deadline missed wit
 | Private originals | Three of three hashes and modification times matched the recorded manifest before and after the media checks. Zero tracked paths, history-path hits, matching binary/text objects or publishable text matches. |
 
 The MSI and native worker above identify the locally tested bytes. Later evidence commits bind the complete set of observations to the source and benchmark protocol. The hosted Windows regression and MSI lifecycle jobs run on the published PR revision. [Draft PR and exact-head checks](https://github.com/JakubSoltysiak/VlogCraft/pull/21/checks).
+
+## Source-readiness and terminal-acknowledgement follow-up
+
+The primary comparison for this follow-up is the immediately preceding development MSI published at `28c0abf221c87e1b7c673a36abe70fac594cdc27`, with packaged source `893dc6e23af419a69591bdbe5386f0db3f97cceb`. The older `b817372` package and original Phase 3B and 3A results remain separate historical controls.
+
+Before inspecting the new recorder output, the diagnostic budget is three recorder-enabled protected runs and one recorder-off run on the same observation worker, plus an instrumented completion run if the same trace cannot supply both timelines. Retain every result. Read each capture before scheduling the next. Finish this campaign early only if the initial unavailable interval and its preceding transition are clear enough to motivate a specific testable correction. After any correction, freeze and test the packaged implementation in three unchanged protected 60-second runs and the separate editor-size and rapid-switch controls. Keep the existing wall-time FPS denominator.
+
+The first observation worker found an early miss before any rewind. The last successful request selected frame 13 with two queued successors per source, after a stretch of renderer queries waiting on the device. Frame 16 then asked for tick 4096 (timebase 1/15360). All three floor pictures exactly matched the target, but each FIFO had zero successors. No exact frame-16 composite became ready, and the first all-ready request was frame 17. Other retained incidents began with both missing floors and missing successors, including after rewinds.
+
+The candidate tests one ordering change. When playing with a free render slot, source selection runs before an optional completion-poll acquisition. If the same request has all intervals, existing completion queries run under the same device lock as composition. At capacity, paused and terminal states still poll normally. This removes a standalone acquisition from source lookups, preserves query-before-release and uses the existing slot count. The remaining required test is whether the changed order protects the short gates without losing handoff or seek correctness.
+
+The second pre-change capture showed a different precursor. Frame 39 had three queued successors per source and was followed by an approximately 69 ms interval between complete source observations. During that interval the watchdog repeatedly saw Present. At the first inspection of frame 43, all three queues were empty, each floor was tick 10752, and the target was tick 11008. All three recovered for that same requested frame 2.969 ms later. These observations isolate missing usable intervals, preceding render-side waits, and later catch-up, without identifying a single driver operation common to every miss.
+
+The recorder publishes each completed source request as one revision-checked tuple. The three guarded observations have their own entry and inspection times, and share a sequence frame, transport generation and rational targets. Source IDs, seek epochs, first four queued PTS values, selection reasons and decode counters belong to these guarded observations. Packet counters are separate progress snapshots. A device or owner observation in the independently sampled rolling rows can precede or follow any of the three selections. The two streams are correlated by monotonic time and are not a global atomic snapshot. No renderer or producer writes files. At most 256 requests can await collection, 96 precede a capture and 256 are retained per incident, plus the first deadline capture. The first deadline also preserves up to 160 sampled rows. Sequence gaps, torn rows and overwritten requests remain visible.
+
+### Completion timing under the unchanged observer
+
+The retained four-skip run used 3,595 distinct pictures over 61.0007 s. The native status sampled at frame 3584 was at native wall 61.8106 s. The next sampled status was terminal at 62.9814 s, a 1.1708 s sampling gap. The observed preterminal native-wall and frame relationship places the nominal end near 62.077 s. The historical receipt did not capture when the first terminal status or GUI stop occurred, so it cannot allocate the excess 904 ms precisely.
+
+Instrumented runs kept the same protected driver and denominator. Relative to its start, the candidate's projected final-picture deadline was 60.042619 s. The final draw returned 0.872 ms later and GPU completion and full drain were observed 5.549 ms after the draw. The final PCM worklet acknowledgement was at 60.009300 s. The output-timestamp estimate put the audible endpoint at 60.056260 s, with GUI Stop 1.940 ms later. The native clock reached EOS at 60.060175 s and its regular terminal status followed 97.364 ms later. Host receipt and publication took 0.071 and 0.060 ms. The GUI received terminal status 14.330 ms after publication. That status was separate from the already completed GUI Stop. Producer join was recorded at close only, at 61.227988 s.
+
+The candidate's protected observer first saw the stopped UI and endpoint at 60.293800 s, **235.6 ms after GUI Stop**. Its final pair of observations was 803 ms apart. The nominal 250 ms Playwright wait RPC took 526.027 ms, and delivery of the previous evaluate result added approximately 276 ms. The old verified MSI repeated the observer tail. Its audible endpoint estimate was 60.048536 s, GUI Stop was 60.052300 s, and the observer first saw that state at 60.766700 s, **714.4 ms after Stop**. That unchanged binary has no host or native completion stamps. The reproduced tail identifies a material observation delay. The retained 61.0007 s result still fails the original FPS screen. No change was made to the denominator, EOS cadence or audio timing.
+
+The same candidate endpoint run preserved source request observations. Its first post-deadline source miss was frame 11, while all three exact floors were present and their successors absent. It recovered all three intervals for frame 11 in 4.654 ms. The preceding sampled Present held three decoder refills. One row of the run's watchdog sampling was flagged torn, with zero request overwrites and no 100 ms watchdog incident. The combined diagnostic measured 59.608 FPS, five skips and a 51.44 ms maximum gap. It remains separate from the three uninstrumented MSI trials.
+
+### First candidate and correctness regression
+
+The pre-change diagnostic worker without capture recorded 56.807 FPS, 181 skips and a 1,562.80 ms active gap. With capture it recorded 54.143 FPS, 319 skips and 1,431.30 ms, then 58.012 FPS, 106 skips and 323.61 ms. Both retained full PCM with zero underruns, zero request loss and visible AC operation. The same-worker off result falls between the on results by FPS and skips. The data do not isolate a small recorder effect.
+
+The first candidate MSI's three protected runs recorded 58.326/87/944.44 ms, 59.389/14/98.17 ms and 59.667/5/52.34 ms (FPS/skips/maximum gap). All finished frame 3599 with 2,880,000 PCM samples, zero underruns and visible AC operation. The first exceeded all three timing thresholds. The second met the skip and gap screens and missed the unchanged FPS floor. The third passed. Device-lock acquisitions fell from 12,748–12,818 in the preceding package's three protected trials to 3,572–3,644. Its first run still accumulated 630 source-wait iterations and zero GPU-slot waits. Its skip median was 14 and worst was 87, against the historical 3.5/16 targets.
+
+The ordinary editor preview measured 958 × 539 physical pixels. The candidate missed the screen at 58.757 FPS, 68 skips and 963.11 ms. The rapid-cut control passed with all 7,500 pictures, zero skips, 6,000,000 PCM samples, zero underruns, final frame 7499 and a 29.92 ms maximum gap. The 600-second and 30-minute runs were blocked for that package.
+
+
+The first MSI passed 23 paused VFR colors and exact PCM, but failed the active cut observer. Its completed-frame counter was often one frame behind the selected picture because the completion poll moved into the next draw. The revised candidate keeps eager polling on the single-layer/VFR control and around periodic status publication. The combined lock acquisition remains in ordinary multitrack playback between status reports. Paused and end-of-sequence completion paths still poll eagerly. The first MSI remains identified as `a7b81d18ff5d4a71f043c4d108babb238b133da1`, SHA-256 `6950250c453df0ac2944e61e0c2a80a999d255d385888d125e3581d59eca457e`.
+
+An extra guarded trace on the first MSI completed at 59.519 FPS, two skips and 36.08 ms. It recorded 3,603 complete selection requests, zero lost requests, one torn polling row and no first-source miss or 100 ms incident. That run did not reproduce the 944.44 ms failure and does not replace it.
+
+### Revised package identity
+
+The revised build used source `7086ed380d279855b2d81f87d4d2105e268b6335` and native input SHA-256 `2b64013979934da70095dca25a0e6a9fdafa5c68b87a24d6b71bcc14d8e6f11d`. The extracted package and its native files were compared to the isolated build outputs.
+
+| Artifact | SHA-256 |
+|---|---|
+| Development MSI | `2f9de210fe88a2e4903e679bb61e081201973b073f20bba2bce3cf14bc0b8266` |
+| Desktop host | `23e85f11a30e6f885f00220aa9966fbf6545389b9c61d0ef4f22e49d6cfca490` |
+| Native playback worker | `2251ac360af922971b0fbcde1a08eb2b4693e7f994e8bf77bf44d1897c0f36a6` |
+
+
+### Final packaged result
+
+All new performance trials used fresh processes and projects. The controls used synchronized original source offsets, as before. The desktop was 2880 × 1800 at 120 Hz with 175% scaling. The protected preview was 356 × 200 and the program composition stayed UHD60. Individual resource and ownership results are in the [sanitized benchmark record](benchmarks/studio-3.6.0-phase3b.json). File-system caches were unmanaged.
+
+| Package and workload | Distinct FPS | Skips | Active gap maximum (ms) | Screen |
+|---|---:|---:|---:|---|
+| Previous MSI, protected, recorder on | 59.218 | 6 | 56.59 | Fail (FPS) |
+| Previous MSI, protected, recorder off | 59.595 | 0 | 32.61 | Pass |
+| Previous MSI, ordinary editor | 59.817 | 0 | 32.58 | Pass |
+| Final MSI, protected A | 58.980 | 11 | 75.45 | Fail (FPS) |
+| Final MSI, protected B | 59.295 | 6 | 52.55 | Fail (FPS) |
+| Final MSI, protected C | 59.347 | 29 | 132.82 | Fail (FPS, gap) |
+| Final MSI, 125-second rapid cuts | 59.806 | 0 | 32.83 | Pass |
+| Final MSI, ordinary editor | 58.820 | 47 | 502.27 | Fail (FPS, skips, gap) |
+| Final MSI, protected, recorder on | 59.509 | 0 | 32.99 | Pass |
+
+The three final short trials missed 59.5 FPS. All three met the PCM, final frame, visibility, AC and cleanup gates. Final protected median/worst skips were 11/29, compared with historical thresholds of 3.5/16. The ordinary preview above is 958 × 539 physical pixels. The 600-second playback and 30-minute editing trials were not started.
+
+The final controlled seek comparison measured 432.69/549.69 ms p50/p95. Paused ruler release median was 472.70 ms, with a playing release at 458.00 ms. Each measured commit fetched PCM and wrote one recovery checkpoint. The recorded interaction times are distinct from immediate UI work.
+
+### Final package correctness
+
+- The final package passed the active VFR handoff, 23 physical picture checks, the independent 499.5 ms boundary and backward cut, and exact seek during pending rewind. Another rewind test matched 117 picture/timestamp pairs and closed in 31 ms. The VFR handoff consumed 115,200 PCM samples with zero underruns. Peak simultaneous decoders and source queue depth were 3 and 4.
+- Native fault recovery, visibility through resize and modals, and whole-project FFmpeg fallback passed. Injected WebView renderer and browser faults restored the exact 80-entry history and unsaved project state in 7.29 and 7.21 s, including undo/redo and preview alignment. All owned children were released.
+- Offline HDR10+ first export reached terminal success in 41.60 s. Independent verification decoded 48 pictures and 38,400 exact PCM samples. It matched video PTS, static HDR signals and all 48 picture-associated HDR10+ blocks. Decoded PQ PSNR was 55.63 dB. Cancellation and confirmed shutdown passed. FFmpeg stays the default, with native first export experimental and restricted.
+- The full loopback-only Python suite passed 200 tests with one skip. Packaged WARP/export passed 9/9, JavaScript passed 33/33, and the development MSI matched all 48 bundle checks including its approved icon. The local images were administrative extracts, with actual Windows MSI lifecycle checked by hosted validation.
+- All three original private media hashes and modification times matched before and after testing. No private media objects or identifying paths were found in publication scope.
+
+### Remaining work
+
+The final recorder-only rerun produced 3,606 request observations without loss or torn rows and captured neither a source deadline miss nor a 100 ms presentation incident. It passed with zero skips in contrast with the uninstrumented failures. Repeated ordinary editor geometry misses are a stronger remaining concern than the protected observer tail alone. Use the ordinary 958 × 539 surface with the previous and revised verified packages to capture the interval immediately before loss of decode-ahead. In particular, measure refill-hold duration during costs of Present and required GPU work, alongside the first missing successor. Try a time-bounded hold only if the recorded sequence supports it. Keep the protected fixture and wall-time series as the acceptance reference. [Executable handoff](STUDIO_3_6_0_PHASE3B_HANDOFF.md).
+
+The 226-to-268-character Windows cache publication failure, 149.75-second cold mixed monitor preparation, physical GPU recovery, calibrated HDR display and representative full 60-second mixed UHD60 HDR10+ export remain separate gates. [Exact-head hosted checks](https://github.com/JakubSoltysiak/VlogCraft/pull/21/checks).

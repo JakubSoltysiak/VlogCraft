@@ -18,6 +18,39 @@ NATIVE_STAMPS = (
     'sequence_end_deadline_qpc', 'last_picture_deadline_qpc', 'final_draw_return_qpc',
     'final_gpu_observed_qpc', 'first_clock_eos_qpc', 'gpu_drained_qpc', 'producer_join_qpc',
 )
+PUBLISHED_BROWSER_PROBE = """()=>{
+    if(typeof nativeTraceAudio==='function')throw Error('Use the built-in probe on this package');
+    nativeState.completionTrace={};
+    const play=nativePlayPause, audio=nativeAudio, stop=stopPlayback;
+    nativePlayPause=function(...args){
+        if(!isPlaying)nativeState.completionTrace={generation:nativeState.generation,play_call_ms:performance.now()};
+        return play.apply(this,args);
+    };
+    nativeAudio=async function(...args){
+        const result=await audio.apply(this,args),port=nativeState.node?.port;
+        const receive=port?.onmessage;
+        if(!receive)return result;
+        port.onmessage=function(event){
+            receive.call(this,event);
+            const trace=nativeState.completionTrace,ack=event.data;
+            if(trace.generation!==ack.generation||nativeState.ack!==ack)return;
+            const name=ack.finished?'pcm_finished_ack':ack.samples>0?'pcm_started_ack':null;
+            if(!name||trace[name])return;
+            const received=performance.now(),output=mixer.getOutputTimestamp?.();
+            trace[name]={received_ms:received,samples:ack.samples,underruns:ack.underruns,context_end:ack.contextEnd,
+                context_start:ack.segments?.[0]?.[0],output_context:output?.contextTime,output_ms:output?.performanceTime};
+        };
+        return result;
+    };
+    stopPlayback=function(...args){
+        const trace=nativeState.completionTrace;
+        const terminal=isPlaying&&nativeSelected()&&trace.generation===nativeState.generation&&playhead>=nativeDuration();
+        if(terminal)trace.gui_stop_invoked_ms=performance.now();
+        const result=stop.apply(this,args);
+        if(terminal)trace.gui_stopped_ms=performance.now();
+        return result;
+    };
+}"""
 
 
 def save(path, data):
@@ -39,15 +72,18 @@ def calibration(evaluate):
             'sample_bounds_ms': candidates}
 
 
-def observe_session(session, results):
+def observe_session(session, results, published_browser_probe=False):
     @contextmanager
     def observe(*args, **kwargs):
         with session(*args, **kwargs) as items:
             page = items[0]
             evaluate = page.evaluate
-            trace = {'before': calibration(evaluate)}
-            evaluate('nativeState.completionTrace = {}')
+            wait = page.wait_for_timeout
+            trace = {'before': calibration(evaluate),
+                     'browser_probe_source': 'published browser runtime wrappers' if published_browser_probe else 'built-in milestones'}
+            evaluate(PUBLISHED_BROWSER_PROBE if published_browser_probe else 'nativeState.completionTrace = {}')
             recent = deque(maxlen=8)
+            recent_waits = deque(maxlen=8)
             max_gap_ms = None
             max_call_ms = None
 
@@ -66,12 +102,20 @@ def observe_session(session, results):
                                    'before_ns': before, 'after_ns': after})
                 return data
 
+            def observed_wait(timeout):
+                before = time.perf_counter_ns()
+                result = wait(timeout)
+                after = time.perf_counter_ns()
+                if timeout == 250:
+                    recent_waits.append({'requested_ms': timeout, 'before_ns': before, 'after_ns': after})
+                return result
+
             try:
-                with patch.object(page, 'evaluate', observed_evaluate):
+                with patch.object(page, 'evaluate', observed_evaluate), patch.object(page, 'wait_for_timeout', observed_wait):
                     yield items
             finally:
                 trace.update(observer_tail=list(recent), max_observer_gap_ms=max_gap_ms,
-                             max_observer_call_ms=max_call_ms)
+                             max_observer_call_ms=max_call_ms, observer_wait_tail=list(recent_waits))
                 try:
                     trace['browser'] = evaluate("""()=>({bench_start_ms:window.nativeBench?.start,
                         milestones:nativeState.completionTrace,last_metrics:{
@@ -119,12 +163,14 @@ def summarize(browser_trace, host_trace, receipt):
     first_audio = estimate_audio_ms(ui.get('pcm_started_ack', {}), 'context_start')
     timing = {
         'gui_play_requested': since_start(ui.get('play_requested_ms')),
+        'gui_play_invoked': since_start(ui.get('play_call_ms')),
         'pcm_audible_start_estimate': since_start(first_audio),
         'pcm_audible_end_estimate': since_start(endpoint_audio),
         'pcm_first_samples_ack': since_start(ui.get('pcm_started_ack', {}).get('received_ms')),
         'pcm_finished_ack': since_start(ui.get('pcm_finished_ack', {}).get('received_ms')),
         'gui_audio_clock_endpoint': since_start(ui.get('audio_clock_endpoint', {}).get('observed_ms')),
         'gui_endpoint': since_start(ui.get('gui_endpoint_ms')),
+        'gui_stop_invoked': since_start(ui.get('gui_stop_invoked_ms')),
         'gui_stopped': since_start(ui.get('gui_stopped_ms')),
         'gui_first_final_picture_status': since_start(ui.get('final_picture_status', {}).get('received_ms')),
         'gui_first_final_native_status': since_start(ui.get('terminal_status', {}).get('received_ms')),
@@ -167,23 +213,33 @@ def summarize(browser_trace, host_trace, receipt):
         ('gui_status_after_host_update', 'host_first_terminal_status_published', 'gui_first_final_native_status'),
     ):
         deltas[key] = round(timing[later] - timing[earlier], 3) if None not in (timing.get(earlier), timing.get(later)) else None
-    observer_last_gap = observer_between_calls = observer_last_call = None
+    observer_last_gap = observer_between_calls = observer_last_call = previous_result_delivery = None
+    terminal_poll_wait = None
     if len(observer) >= 2:
         previous, last = observer[-2:]
         observer_last_gap = round(last['elapsed_ms'] - previous['elapsed_ms'], 3)
         observer_between_calls = round((last['before_ns'] - previous['after_ns']) / 1e6, 3)
         observer_last_call = round((last['after_ns'] - last['before_ns']) / 1e6, 3)
+        previous_python_return = host_since_start(previous['after_ns'] / 1e6)
+        if previous_python_return is not None:
+            previous_result_delivery = round(previous_python_return - previous['elapsed_ms'], 3)
+        for waited in browser_trace.get('observer_wait_tail', []):
+            if previous['after_ns'] <= waited['before_ns'] <= waited['after_ns'] <= last['before_ns']:
+                terminal_poll_wait = round((waited['after_ns'] - waited['before_ns']) / 1e6, 3)
     return {
         'measurement': {k: receipt.get(k) for k in ('seconds', 'measured_seconds', 'distinct_sequence_fps', 'samples',
                         'expected_samples', 'underruns', 'reached_end', 'failed')},
         'endpoint': {k: receipt.get('last', {}).get(k) for k in ('completed_sequence_frame', 'skipped_sequence_frames', 'eos')},
         'relative_ms_from_protected_start': timing, 'elapsed_ms': deltas,
         'browser_host_clock_bound_ms': round((upper - lower) / 2, 3) if offset is not None else None,
+        'browser_probe_source': browser_trace.get('browser_probe_source'),
         'browser_completion_trace': ui.get('generation') is not None, 'host_completion_trace': bool(host),
         'native_completion_trace': bool(stamps),
         'last_observer_gap_ms': observer_last_gap,
         'last_observer_between_cdp_calls_ms': observer_between_calls,
         'last_observer_cdp_call_ms': observer_last_call,
+        'previous_observer_result_delivery_ms': previous_result_delivery,
+        'last_observer_wait_for_timeout_250_ms': terminal_poll_wait,
         'maximum_observer_gap_ms': browser_trace.get('max_observer_gap_ms'),
         'maximum_observer_cdp_call_ms': browser_trace.get('max_observer_call_ms'),
     }
@@ -205,7 +261,7 @@ def run(args):
         legacy_focus_emulation=False, actual_display=False, large_surface=False, diagnostic_no_gpu_counters=False)
     try:
         with patch.dict(os.environ, {HOST_TRACE: str(host_trace)}), \
-             patch.object(protected, 'session', observe_session(protected.session, results)):
+             patch.object(protected, 'session', observe_session(protected.session, results, args.published_browser_probe)):
             protected.main(options)
     finally:
         def read(path):
@@ -222,6 +278,8 @@ def main():
     parser.add_argument('executable', type=Path)
     parser.add_argument('media', type=Path)
     parser.add_argument('results', type=Path)
+    parser.add_argument('--published-browser-probe', action='store_true',
+                        help='Observe PCM receipt and GUI Stop on older packaged builds without built-in timing')
     args = parser.parse_args()
     if os.name != 'nt':
         parser.error('The protected fixture requires Windows')

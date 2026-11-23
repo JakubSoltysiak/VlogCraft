@@ -1,5 +1,17 @@
 # VlogCraft Studio development qualification
 
+## 3.6.0 Phase 3B source-readiness follow-up
+
+The new recorder attributed the first unavailable source intervals to empty successor queues in two protected runs. In one the target and all three floor pictures matched at PTS 4096, timebase 1/15360. A second observed empty queues after a long Present. The revised worker retains exact half-open selection, reports completed pictures on the existing single-layer path and combines optional completion queries with multitrack composition when a slot is free. It preserves eager polling around status, pause and the terminal frame.
+
+The revised MSI failed all three protected wall-time FPS gates at 58.980, 59.295 and 59.347 FPS, with 11, 6 and 29 skips and maximum gaps of 75.45, 52.55 and 132.82 ms. All three completed frame 3599 with exactly 2,880,000 PCM samples, zero underruns and visibility held on AC. At the ordinary 958 × 539 monitor it measured 58.820 FPS, 47 skips and a 502.27 ms gap. The directly matched previous MSI measured 59.817 FPS, zero skips and 32.58 ms there. The 600-second playback and 30-minute editing tests remain blocked.
+
+The matched completion traces separated the audio/GUI and native/host endpoints from the benchmark observer. The verified previous MSI stopped its GUI within 3.76 ms of estimated audible completion. Its observer saw that stop 714.4 ms later. An instrumented intermediate package measured a 235.6 ms observer tail and 97.36 ms until native terminal status from EOS. The old 61.0007-second run lacks first-terminal timestamps for an exact split. Its original denominator and result are preserved.
+
+The final 125-second rapid-cut fixture delivered all 7,500 pictures and 6,000,000 PCM samples, zero skips or underruns, and final frame 7499. The revised package passed 23 physical VFR checks, 117 additional pending-rewind source-frame pairs, the 499.5 ms selection boundary and a 31 ms close during pending rewind. Seek median/p95 were 432.69/549.69 ms, with 472.7 ms median paused ruler release and 458.0 ms playing release. Recovery, independent short HDR10+ validation, reference fallback and the approved icon passed. Loopback-only Python passed 200 with one skip, packaged WARP passed 9/9, JavaScript passed 33/33 and the development MSI passed all 48 bundle checks. All three private originals matched their recorded hashes and timestamps.
+
+[Full evidence and identities](docs/STUDIO_3_6_0_PHASE3B_PLAYBACK.md#source-readiness-and-terminal-acknowledgement-follow-up) · [Executable handoff](docs/STUDIO_3_6_0_PHASE3B_HANDOFF.md).
+
 ## 3.6.0 Phase 3B triggered freeze investigation
 
 The protected recorder caught a 1,039.31 ms native presentation gap on the visible, AC-powered workstation. While frame 2307 remained last, each source read another 68 video packets. In 65 of 66 coherent stalled samples the renderer was waiting for the shared device lock in its GPU completion poll. In 55 the submitted and completed GPU counts were equal. The MSI built from `893dc6e23af419a69591bdbe5386f0db3f97cceb` skips those empty polls and reuses a free slot within a render iteration.

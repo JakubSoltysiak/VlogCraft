@@ -219,6 +219,9 @@ def request_window(raw, *, generation, frame, exact_frame=False):
         "missing_request_sequences": sum(max(0, b["sequence"] - a["sequence"] - 1) for a, b in pairs),
         "nonincreasing_request_sequences": sum(b["sequence"] <= a["sequence"] for a, b in pairs),
         "largest_retained_request_gap_us": max((b["observed_us"] - a["observed_us"] for a, b in pairs), default=None),
+        "retained_watchdog_samples": len(samples),
+        "torn_watchdog_samples": sum(bool(sample[1]) for sample in samples),
+        "largest_retained_watchdog_gap_us": max((b[0] - a[0] for a, b in zip(samples, samples[1:])), default=None),
     }
     miss_index = next((i for i, row in enumerate(requests)
                        if row["generation"] == generation and row["playing"] and row["layer_mask"] and
@@ -236,6 +239,8 @@ def request_window(raw, *, generation, frame, exact_frame=False):
     matched = [row for row in following if row["layer_mask"] == miss["layer_mask"]]
     ready = next((row for row in matched if row["all_layers_selected"]), None)
     verified = next((row for row in matched if row["all_source_intervals_verified"]), None)
+    first_inspection = min((layer["entered_us"] for layer in miss["layers"] if "entered_us" in layer),
+                           default=miss["observed_us"])
     result.update(
         requests_before_miss=miss_index,
         first_missing_request=miss,
@@ -247,6 +252,7 @@ def request_window(raw, *, generation, frame, exact_frame=False):
         last_unready_before_first_ready=next((row for row in reversed(following)
                                              if not row["all_layers_selected"] and
                                              (ready is None or row["sequence"] < ready["sequence"])), None),
+        watchdog_near_first_layer_inspection=watchdog_observations(samples, first_inspection),
         watchdog_near_first_missing_request=watchdog_observations(samples, miss["observed_us"]),
         watchdog_near_first_ready_request=watchdog_observations(samples, ready["observed_us"]) if ready else [],
     )
@@ -302,6 +308,10 @@ def reduce_record(raw):
             **counts(miss, "frame generation"),
             **request_window(miss, generation=miss["generation"], frame=miss["frame"], exact_frame=True),
         }
+        result["source_request_scope"] = (
+            "One renderer selection request per tuple with separate guarded layer inspection times. "
+            "Adjacent watchdog observations are sampled independently. Repeated equal selection outcomes may be coalesced."
+        )
     return result
 
 
