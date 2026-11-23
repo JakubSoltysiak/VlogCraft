@@ -28,6 +28,14 @@ struct Clip {
   }return v.back().value;
  }
 };
+inline void watchSelected(const std::vector<std::pair<const Clip*,Frame>>& selected){
+ WatchTuple<10>::Values values{stallWatch->now()};
+ for(size_t n=0;n<selected.size()&&n<3;n++){
+  auto picture=watchFrame(selected[n].second.get());
+  std::copy(picture.begin(),picture.end(),values.begin()+1+3*n);
+ }
+ stallWatch->selected.set(values);
+}
 struct Plan {
  AVRational rate={60,1};int width=960,height=540;int64_t end=0;bool hdr=false;
  std::vector<Clip> clips;
@@ -103,6 +111,20 @@ struct Producer {
              queue.empty()?AV_NOPTS_VALUE:queue.front()->best_effort_timestamp,
              (int)queue.size(),(int)warm.size(),(int)cutTail.size(),epoch,
              opened&&current&&(eof||!queue.empty()),holdRefill,eof);
+  int64_t untracked=0;
+  auto sliceMask=[&](const Frame& frame)->uint64_t{
+   if(!frame||frame->format!=AV_PIX_FMT_D3D11)return 0;
+   auto slice=(intptr_t)frame->data[1];
+   if(frame->data[0]!=(uint8_t*)lastPool||slice<0||slice>=64||slice>=poolFrames){++untracked;return 0;}
+   return uint64_t{1}<<slice;
+  };
+  auto mask=[&](const auto& frames){
+   uint64_t slices=0;
+   for(const auto& frame:frames)slices|=sliceMask(frame);
+   return (int64_t)slices;
+  };
+  stallWatch->lanes[watch.lane].pool.set({watchPoolKey(lastPool),poolFrames,(int64_t)sliceMask(current),
+      mask(queue),mask(warm),mask(cutTail),untracked,stallWatch->now()});
  }
  // Called with guard held, as are the CV predicate and decoded queue updates.
  void setRefillLocked(bool hold,int reason){

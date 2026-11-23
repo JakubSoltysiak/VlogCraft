@@ -39,6 +39,21 @@ template<class T> struct Com {
     T* p=nullptr;~Com(){if(p)p->Release();}T** out(){if(p){p->Release();p=nullptr;}return &p;}
     T* operator->()const{return p;}operator T*()const{return p;}
 };
+inline int64_t watchPoolKey(const void* texture){
+    return texture?(int64_t)(reinterpret_cast<uintptr_t>(texture)^static_cast<uintptr_t>(stallWatch->qpc)):0;
+}
+inline std::array<int64_t,3> watchFrame(const AVFrame* frame){
+    if(!frame)return {0,-1,AV_NOPTS_VALUE};
+    const bool hardware=frame->format==AV_PIX_FMT_D3D11&&frame->data[0];
+    return {hardware?watchPoolKey(frame->data[0]):0,hardware?(intptr_t)frame->data[1]:-1,frame->best_effort_timestamp};
+}
+inline void watchDecoderPicture(const AVFrame* frame){
+    if(!stallWatch||watchLane<=0)return;
+    auto picture=watchFrame(frame);
+    auto& observed=stallWatch->lanes[watchLane].picture;
+    const auto received=observed.fields[4].load(std::memory_order_relaxed)+(frame!=nullptr);
+    observed.set({picture[0],picture[1],picture[2],stallWatch->now(),received});
+}
 // A speculative decoder reserves its complete fixed texture array before the
 // first packet. On a format change it retries as foreground work. Active
 // decoders always use libav's existing automatic allocation.
@@ -107,9 +122,10 @@ struct Decoder {
     }
     bool next(){
         auto start=Clock::now();av_frame_unref(frame);
+        watchDecoderPicture(nullptr);
         while(true){
             int r;{SourceStage timer("receive_picture");WatchStage watch("receive_picture");r=avcodec_receive_frame(codec,frame);}
-            if(r==0){decode_s+=seconds(start);frames++;return true;}
+            if(r==0){watchDecoderPicture(frame);decode_s+=seconds(start);frames++;return true;}
             if(r==AVERROR_EOF){decode_s+=seconds(start);return false;}
             if(r!=AVERROR(EAGAIN))avcheck(r,"receive frame");
             if(eof){if(!drained){SourceStage timer("drain_codec");WatchStage watch("drain_codec");avcheck(avcodec_send_packet(codec,nullptr),"flush decoder");drained=true;}else throw std::runtime_error("decoder made no progress");}

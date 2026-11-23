@@ -38,6 +38,9 @@ int main(int argc,char** argv){
   const bool deferRefill=!flight||!noRefillHold||std::strcmp(noRefillHold,"1")!=0;
   const char* legacyRefillHold=std::getenv("VLOGCRAFT_DIAGNOSTIC_LEGACY_REFILL_HOLD");
   const bool legacyRefill=flight&&legacyRefillHold&&std::strcmp(legacyRefillHold,"1")==0;
+  const char* pollOverride=std::getenv("VLOGCRAFT_DIAGNOSTIC_LEGACY_POLL_ORDER");
+  const bool eagerPolling=flight&&pollOverride&&std::strcmp(pollOverride,"1")==0;
+  uint64_t combinedPollOpportunities=0,sourceWaitPollBypasses=0;
   CompletionStamps completion;
   const char* tracePath=std::getenv("VLOGCRAFT_NATIVE_TRACE_FILE");
   std::unique_ptr<SourceTrace> trace;if(tracePath){trace=std::make_unique<SourceTrace>();sourceTrace=trace.get();}
@@ -87,6 +90,8 @@ int main(int argc,char** argv){
    WatchStage status("write_status");SourceStage timer("status_report");observeStandby();if(renderer.display)renderer.display->stats();
    std::cout<<"{\"event\":\""<<event<<"\",\"sequence_frame\":"<<frame<<",\"generation\":"<<generation
     <<",\"submitted_frames\":"<<renderer.submitted<<",\"completed_frames\":"<<renderer.completed
+    <<",\"completion_poll_policy\":\""<<(eagerPolling?"eager":"source_first")<<"\",\"refill_policy\":\""<<(!deferRefill?"disabled":legacyRefill?"unlimited":"bounded")<<"\""
+    <<",\"stall_recording\":"<<(flight?"true":"false")<<",\"combined_poll_opportunities\":"<<combinedPollOpportunities<<",\"source_wait_poll_bypasses\":"<<sourceWaitPollBypasses
     <<",\"surface_parented\":"<<(renderer.display&&renderer.display->parent?"true":"false")<<",\"surface_visible\":"<<(renderer.display&&IsWindowVisible(renderer.display->window)?"true":"false")<<",\"surface_width\":"<<(renderer.display?renderer.display->width:0)<<",\"surface_height\":"<<(renderer.display?renderer.display->height:0)
     <<",\"completed_sequence_frame\":"<<renderer.completedFrame<<",\"completed_generation\":"<<renderer.completedGeneration<<",\"present_calls\":"<<(renderer.display?renderer.display->calls:0)<<",\"dxgi_statistics_available\":"<<(renderer.display&&renderer.display->statistics?"true":"false")
     <<",\"dxgi_present_count\":"<<(renderer.display?renderer.display->displayed:0)<<",\"waiting\":"<<(!ready?"true":"false")
@@ -159,7 +164,7 @@ int main(int argc,char** argv){
    // The completion query shares the decoder device lock. During live
    // playback with a free slot, inspect the exact source request before
    // competing for that lock. Paused and terminal acknowledgements poll eagerly.
-   const bool sourcesFirst=playing&&frame<plan.end-1&&drawnGeneration==epoch&&lastActive.size()>1&&seconds(lastReport)<=.1;
+   const bool sourcesFirst=!eagerPolling&&playing&&frame<plan.end-1&&drawnGeneration==epoch&&lastActive.size()>1&&seconds(lastReport)<=.1;
    Slot* slot=sourcesFirst?renderer.freeSlot():nullptr;
    const bool retireWithDraw=sourcesFirst&&slot;
    if(!retireWithDraw){SourceStage timer("gpu_available");slot=renderer.available();}
@@ -247,6 +252,7 @@ int main(int argc,char** argv){
     parked=std::move(keep);observeStandby();
    }
    maxDecoders=std::max(maxDecoders,producers.size());selected.clear();ready=true;
+   if(flight)watchSelected(selected);
    WatchRequest observed;
    size_t watchIndex=0;
    if(flight){
@@ -284,7 +290,7 @@ int main(int argc,char** argv){
     if(available){c->sourceRotation=p.rotation;retryOnFailure.erase(c->asset);}
     {std::lock_guard<std::mutex> lock(p.guard);maxQueue=std::max(maxQueue,p.peak);}
     if(!available){ready=false;continue;}selected.push_back({c,f});
-    if(flight)observed.fields[8]|=1LL<<index;
+    if(flight){observed.fields[8]|=1LL<<index;watchSelected(selected);}
    }
    double sourceMs=seconds(selectionStart)*1000;selectTime.add(sourceMs);
    // Source selection may drain slots, but only draw() can occupy one.
@@ -294,6 +300,7 @@ int main(int argc,char** argv){
    if(flight){
     if(slot)observed.fields[8]|=8;
     flight->publishRequest(observed);
+    if(!ready&&retireWithDraw&&renderer.submitted!=renderer.completed)sourceWaitPollBypasses++;
    }
    if(!ready||!slot){releaseRefills();waiting++;if(!ready){sourceWait++;sawSourceWait=true;}else{gpuWait++;sawGpuWait=true;}if(seconds(lastReport)>.1){report("status",frame);lastReport=Clock::now();}WatchStage stage(!ready?"wait_source_retry":"wait_gpu_slot");deadline.wait(1000);continue;}
    // A seek can arrive while a playing source handoff is unlocking or opening.
@@ -306,6 +313,7 @@ int main(int argc,char** argv){
    sawSourceWait=sawGpuWait=false;
    if(drawnGeneration!=generation){highest=frame;distinctFrames++;}else if(frame>highest){highest=frame;distinctFrames++;}else redraws++;
    if(trace)trace->submitStart();
+   if(flight&&retireWithDraw&&renderer.submitted!=renderer.completed)combinedPollOpportunities++;
    {SourceStage timer("draw_and_present");renderer.draw(*slot,plan,frame,generation,selected,playing,retireWithDraw);}
    if(flight&&(previous!=frame||drawnGeneration!=epoch))flight->submit.set({frame,epoch,flight->now()});
    if(traceCompletion&&epoch==completion.generation&&frame==plan.end-1&&!completion.draw)completion.draw=CompletionStamps::now();
@@ -339,7 +347,7 @@ int main(int argc,char** argv){
    }
   }
   report("closed",previous);
-  selected.clear();producers.clear();
+  selected.clear();if(flight)watchSelected(selected);producers.clear();
   if(traceCompletion&&completion.draw){
    completion.joined=CompletionStamps::now();
    std::cout<<"{\"event\":\"completion_diagnostic\",\"generation\":"<<completion.generation;

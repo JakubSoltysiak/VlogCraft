@@ -47,10 +47,23 @@ struct WatchChannel {
  WatchTuple<6> selection;
  WatchTuple<3> packet,device;
  WatchTuple<7> pacing; // source refill edge or renderer Present interval
+ WatchTuple<8> pool; // actual array capacity and producer-held slice masks
+ WatchTuple<5> picture; // decoder output AVFrame, observed independently of commit
  std::atomic<int64_t> sent{0};
+};
+struct WatchSlot {
+ WatchTuple<13> holds;
+ WatchTuple<5> query;
+ WatchTuple<3> retired;
+ struct Sample{
+  WatchTuple<13>::Values holds{};
+  WatchTuple<5>::Values query{};
+  WatchTuple<3>::Values retired{};
+ };
 };
 struct StallWatch {
  using I=int64_t;
+ static constexpr size_t maxGpuSlots=6;
  struct Lane {
   DWORD thread=0;bool live=false;const char* stage="idle";const char* slow="idle";
   // lane array order is defined in write().
@@ -58,12 +71,17 @@ struct StallWatch {
   WatchTuple<4>::Values source{};WatchTuple<11>::Values queue{};
   WatchTuple<6>::Values selection{};WatchTuple<3>::Values packet{},device{};
   WatchTuple<7>::Values pacing{};
+  WatchTuple<8>::Values pool{};
+  WatchTuple<5>::Values picture{};
  };
  struct Sample{
   I t=0;unsigned torn=0;
   WatchTuple<4>::Values transport{};WatchTuple<5>::Values loop{};
   WatchTuple<3>::Values submit{};WatchTuple<4>::Values gpu{};
   I flips=0,modeSince=0;std::array<Lane,4> lanes{};
+  std::array<WatchSlot::Sample,maxGpuSlots> gpuSlots{};
+  WatchTuple<10>::Values selected{};
+  WatchTuple<4>::Values textureCache{};
  };
  struct Incident{
   I last=-1,gen=-1,age=0;bool recovered=false,transition=false,truncated=false;
@@ -75,6 +93,9 @@ struct StallWatch {
  WatchTuple<5> loop;      // requested frame, generation, clock, next deadline (audio us), heartbeat
  WatchTuple<3> submit;    // last returned distinct draw: frame, generation, time
  WatchTuple<4> gpu;       // submitted/completed counts, completed frame and generation
+ std::array<WatchSlot,maxGpuSlots> gpuSlots;
+ WatchTuple<10> selected;
+ WatchTuple<4> textureCache;
  std::atomic<I> flips{0},exitWatch{0};
  I oldMode=-1,oldGeneration=-1,modeSince=0; // reader-thread only
  const std::string path;Clock::time_point origin=Clock::now();
@@ -159,6 +180,12 @@ struct StallWatch {
   std::copy_n(clock.begin(),4,s.transport.begin());s.modeSince=clock[4];
   stable &= loop.get(s.loop);stable &= submit.get(s.submit);stable &= gpu.get(s.gpu);
   if(!stable)s.torn|=1;
+  bool ownership=selected.get(s.selected);ownership &= textureCache.get(s.textureCache);
+  for(size_t n=0;n<gpuSlots.size();n++){
+   auto& slot=gpuSlots[n];auto& value=s.gpuSlots[n];
+   ownership &= slot.holds.get(value.holds);ownership &= slot.query.get(value.query);ownership &= slot.retired.get(value.retired);
+  }
+  if(!ownership)s.torn|=32;
   for(size_t n=0;n<4;n++){
    auto& c=lanes[n];auto& l=s.lanes[n];auto generation=c.leaseGeneration.load();
    l.live=c.leased;l.thread=c.threadId;l.stage=c.stage;l.slow=c.lastSlow;
@@ -166,6 +193,8 @@ struct StallWatch {
    bool valid=c.source.get(l.source);valid &= c.queue.get(l.queue);valid &= c.selection.get(l.selection);
    valid &= c.packet.get(l.packet);valid &= c.device.get(l.device);valid &= c.pacing.get(l.pacing);
    if(!valid||(generation&1)||generation!=c.leaseGeneration.load())s.torn|=2u<<n;
+   bool sourceOwnership=c.pool.get(l.pool);sourceOwnership &= c.picture.get(l.picture);
+   if(!sourceOwnership||generation!=c.leaseGeneration.load())s.torn|=64u<<n;
   }
   if(s.torn)tornSamples++;return s;
  }
@@ -175,16 +204,24 @@ struct StallWatch {
  static void row(std::ostream& out,const Sample& s){
   out<<'['<<s.t<<','<<s.torn<<','<<s.modeSince<<',';ints(out,s.transport);out<<',';ints(out,s.loop);out<<',';ints(out,s.submit);out<<',';ints(out,s.gpu);out<<','<<s.flips;
   for(const auto& l:s.lanes){
-   out<<",[\""<<l.stage<<"\",\""<<l.slow<<"\",";ints(out,l.activity);out<<',';ints(out,l.source);out<<',';ints(out,l.queue);out<<',';ints(out,l.selection);out<<',';ints(out,l.packet);out<<',';ints(out,l.device);out<<',';ints(out,l.pacing);out<<']';
-  }out<<']';
+   out<<",[\""<<l.stage<<"\",\""<<l.slow<<"\",";ints(out,l.activity);out<<',';ints(out,l.source);out<<',';ints(out,l.queue);out<<',';ints(out,l.selection);out<<',';ints(out,l.packet);out<<',';ints(out,l.device);out<<',';ints(out,l.pacing);
+   out<<',';ints(out,l.pool);out<<',';ints(out,l.picture);out<<']';
+  }
+  out<<",[";ints(out,s.selected);out<<',';ints(out,s.textureCache);out<<",[";
+  for(size_t n=0;n<s.gpuSlots.size();n++){
+   if(n)out<<',';
+   auto& slot=s.gpuSlots[n];out<<'[';ints(out,slot.holds);out<<',';ints(out,slot.query);out<<',';ints(out,slot.retired);out<<']';
+  }
+  out<<"]]]";
  }
  bool write(const Incident* live=nullptr){
   auto target=std::filesystem::u8path(path+(live?".live":""));auto temp=target;temp+=L".tmp";
   std::ofstream out(temp,std::ios::trunc);if(!out)return false;
   out<<"{\"version\":1,\"start_filetime_100ns\":"<<utc100ns<<",\"qpc_anchor\":"<<qpc<<",\"qpc_frequency\":"<<freq
      <<",\"shared_device_ordinal\":0,\"sample_bytes\":"<<sizeof(Sample)<<",\"polls\":"<<pollCount<<",\"max_poll_gap_us\":"<<maxPollGap<<",\"torn_samples\":"<<tornSamples<<",\"trigger_count\":"<<triggerCount<<",\"live_write_failures\":"<<liveWriteFailures
-     <<",\"sample_schema\":\"us,torn_mask,mode_since,clock(us,gen,playing,arrival),loop(frame,gen,audio_us,next_audio_deadline_us,heartbeat_us),last_return(frame,gen,us),gpu(submits,completions,frame,gen),presents,render_lane,source_lanes_1_2_3\""
-     <<",\"lane_schema\":\"stage,last_slow,activity(stage_since,entries,exits,slow_begin,slow_end,slow_count,cpu_us,leased,tid),source(id,decoder,tb_num,tb_den),queue(target,floor,next,depth,warm,tail,epoch,ready,held,eof,observed_us),selection(frame,gen,target,floor,next,path),packet(pts,dts,count),device(waiting,owned,transition_us),pacing\""
+     <<",\"sample_schema\":\"us,torn_mask,mode_since,clock(us,gen,playing,arrival),loop(frame,gen,audio_us,next_audio_deadline_us,heartbeat_us),last_return(frame,gen,us),gpu(submits,completions,frame,gen),presents,render_lane,source_lanes_1_2_3,renderer_ownership\""
+     <<",\"lane_schema\":\"stage,last_slow,activity(stage_since,entries,exits,slow_begin,slow_end,slow_count,cpu_us,leased,tid),source(id,decoder,tb_num,tb_den),queue(target,floor,next,depth,warm,tail,epoch,ready,held,eof,observed_us),selection(frame,gen,target,floor,next,path),packet(pts,dts,count),device(waiting,owned,transition_us),pacing,pool,picture\""
+     <<",\"ownership_schema\":\"Torn bits 32 renderer ownership and 64<<lane source ownership. pool(key,capacity,current_mask,queue_mask,warm_mask,tail_mask,untracked_frames,observed_us); picture(pool_key,slice,pts,observed_us,received_count); renderer_ownership(selected(observed_us,three pictures as key/slice/pts),texture_cache(slot_count,views,pools,observed_us),slots). Slot is [holds(pending,frame,generation,observed_us,three pictures as key/slice/pts),query(frame,generation,entered_us,returned_us,hresult),retired(frame,generation,released_us)]. Key zero means no D3D11 surface. Masks cover slices 0-63. Pool keys are process-local. Tuples sample independently. Codec/driver-internal references are outside this observation.\""
      <<",\"pacing_schema\":\"render(current_begin_us,current_frame,current_generation,last_begin_us,last_end_us,last_frame,last_generation); source(hold_begin_us,hold_end_us,reason,target_pts,farthest_pts,hold_epoch,hold_count); reason 0 active,1 selection,2 renderer,3 reset,4 cancel,5 eof,6 expired,7 error\""
      <<",\"source_request_schema\":\"sequence,observed_us,frame,generation,playing,clock_us,due_us,layer_mask,outcome,last_returned_frame,last_returned_generation,gpu_pending; repeat lane,source,decoder,epoch,clip_tick,clip_tb_num,clip_tb_den,stream_tick,stream_tb_num,stream_tb_den,floor,successor,reason,entered_us,inspected_us,queue_depth,queued_pts_0_to_3,warm_count,tail_count,eof,refill_held,packet_reads,packet_submits,decoded_pictures,rewind_generation,worker_epoch\""
      <<",\"source_request_counts\":["<<publishedRequests<<','<<readRequests<<','<<lostRequests<<"],\"first_source_miss\":{\"frame\":"<<firstSourceFrame<<",\"generation\":"<<firstSourceGeneration<<",\"overwritten\":"<<firstSourceDropped<<",\"requests\":[";
@@ -252,6 +289,7 @@ struct WatchLease{
    c.threadId=0;c.stage="idle";c.lastSlow="idle";c.since=0;c.calls=0;c.exits=0;c.slowStart=0;c.slowEnd=0;c.slowCount=0;c.sent=0;
    c.source.set({-1,-1,0,0});c.queue.set({0,INT64_MIN,INT64_MIN,0,0,0,0,0,0,0,0});
    c.selection.set({-1,-1,INT64_MIN,INT64_MIN,INT64_MIN,0});c.packet.set({INT64_MIN,INT64_MIN,0});c.device.set({});c.pacing.set({});
+   c.pool.set({});c.picture.set({});
    c.leased=true;++c.leaseGeneration;lane=n;break;
   }
  }

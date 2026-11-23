@@ -187,6 +187,15 @@ struct Renderer {
   for(auto& slot:slots)if(!slot.pending)return &slot;
   return nullptr;
  }
+ WatchSlot& watched(Slot& slot){return stallWatch->gpuSlots[(size_t)(&slot-slots.data())];}
+ void watchHolds(Slot& slot){
+  WatchTuple<13>::Values values{slot.pending,slot.frame,slot.generation,stallWatch->now()};
+  for(size_t n=0;n<slot.holds.size()&&n<3;n++){
+   auto picture=watchFrame(slot.holds[n].get());
+   std::copy(picture.begin(),picture.end(),values.begin()+4+3*n);
+  }
+  watched(slot).holds.set(values);
+ }
  Slot* available(){
   // Slot ownership and both counters are confined to the render thread.
   // With no outstanding query there is no D3D context work to synchronize.
@@ -196,11 +205,21 @@ struct Renderer {
  }
  Slot* pollLocked(){
   Slot* free=nullptr;for(auto& slot:slots){
-   if(slot.pending){BOOL done=false;HRESULT result=context->GetData(slot.query,&done,sizeof(done),D3D11_ASYNC_GETDATA_DONOTFLUSH);check(result,"Native GPU completion");
+   if(slot.pending){
+    WatchSlot* observation=stallWatch?&watched(slot):nullptr;
+    int64_t began=observation?stallWatch->now():0;
+    if(observation)observation->query.set({slot.frame,slot.generation,began,0,0});
+    BOOL done=false;HRESULT result=context->GetData(slot.query,&done,sizeof(done),D3D11_ASYNC_GETDATA_DONOTFLUSH);
+    if(observation)observation->query.set({slot.frame,slot.generation,began,stallWatch->now(),result});
+    check(result,"Native GPU completion");
     if(result==S_OK){completionAge.add(seconds(slot.queuedAt)*1000);
      D3D11_QUERY_DATA_TIMESTAMP_DISJOINT data={};UINT64 begin=0,end=0;
      if(context->GetData(slot.disjoint,&data,sizeof(data),D3D11_ASYNC_GETDATA_DONOTFLUSH)==S_OK&&!data.Disjoint&&data.Frequency&&context->GetData(slot.beginStamp,&begin,sizeof(begin),D3D11_ASYNC_GETDATA_DONOTFLUSH)==S_OK&&context->GetData(slot.endStamp,&end,sizeof(end),D3D11_ASYNC_GETDATA_DONOTFLUSH)==S_OK)gpuTime.add(1000.*(end-begin)/data.Frequency);
      slot.pending=false;slot.holds.clear();completed++;
+     if(observation){
+      observation->retired.set({slot.frame,slot.generation,stallWatch->now()});
+      watchHolds(slot);
+     }
      if(slot.generation>completedGeneration){completedGeneration=slot.generation;completedFrame=slot.frame;}else if(slot.generation==completedGeneration)completedFrame=std::max(completedFrame,slot.frame);
      watchGPU(submitted,completed,completedFrame,completedGeneration);}}
    if(!slot.pending&&!free)free=&slot;
@@ -238,6 +257,10 @@ struct Renderer {
   if(display)display->present(context,slot.view);
   context->End(slot.query);{WatchStage flushing("flush_gpu");context->Flush();}slot.queuedAt=Clock::now();slot.pending=true;slot.frame=frame;slot.generation=gen;submitted++;
   watchGPU(submitted,completed,completedFrame,completedGeneration);
+  if(stallWatch){
+   watchHolds(slot);
+   stallWatch->textureCache.set({(int64_t)slots.size(),(int64_t)textures.views.size(),(int64_t)textures.pools.size(),stallWatch->now()});
+  }
   size_t pending=0;for(auto& s:slots)pending+=s.pending;peakPending=std::max(peakPending,pending);}
   submitTime.add(seconds(began)*1000);if(display)display->flip(playing,frame,gen);
  }
