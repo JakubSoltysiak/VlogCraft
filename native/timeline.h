@@ -78,7 +78,8 @@ struct Producer {
  uint64_t surfacePoolBytes=0;int poolFrames=0,codecThreads=0,threadType=0;
  DecodeReservation reservation;
  std::unique_ptr<Decoder> decoder;AVRational base{0,1};int64_t origin=0;double rotation=0;
- bool opened=false,decoding=false,singlePool=true;
+ bool opened=false,decoding=false,singlePool=true,holdRefill=false;
+ uint64_t deferredRefills=0;
  ID3D11Texture2D* lastPool=nullptr;
  int64_t requestedTick=0;AVRational requestedBase{1,1};
  int64_t streamTick(int64_t tick,AVRational sourceBase)const{
@@ -119,7 +120,7 @@ struct Producer {
  }
  ~Producer(){cancel();if(worker.joinable())worker.join();}
  void reset(int64_t tick,AVRational sourceBase){
-  std::lock_guard<std::mutex> lock(guard);epoch++;requestedTick=tick;requestedBase=sourceBase;
+  std::lock_guard<std::mutex> lock(guard);holdRefill=false;epoch++;requestedTick=tick;requestedBase=sourceBase;
   if(opened){
    seekTick=streamTick(tick,sourceBase);wantedPTS=seekTick+origin;
    if(warmTarget!=seekTick){warm.clear();warmTarget=seekTick;}
@@ -140,7 +141,7 @@ struct Producer {
   try{
    while(!stop){
     int64_t generation,target;{
-     std::unique_lock<std::mutex> lock(guard);changed.wait(lock,[&]{return stop||workerEpoch!=epoch||(!eof&&queue.size()<4);});
+     std::unique_lock<std::mutex> lock(guard);changed.wait(lock,[&]{return stop||workerEpoch!=epoch||(!eof&&!holdRefill&&queue.size()<4);});
      if(stop)return;decoding=true;generation=epoch;target=seekTick;
      if(sourceTrace){sourceContext=request;sourceContext.decodeEpoch=generation;sourceContext.depth=(int)queue.size();}
      if(workerEpoch!=generation){workerEpoch=generation;lock.unlock();
@@ -175,8 +176,12 @@ struct Producer {
    }
   }catch(const std::exception&){std::lock_guard<std::mutex> lock(guard);failure="Native source decode or seek failed";changed.notify_all();}
  }
+ void releaseRefill(){
+  std::lock_guard<std::mutex> lock(guard);
+  if(holdRefill){holdRefill=false;changed.notify_one();}
+ }
  // Returns the source picture whose half-open PTS interval contains the target.
- Frame at(int64_t tick,AVRational sourceBase,bool& ready){
+ Frame at(int64_t tick,AVRational sourceBase,bool& ready,bool coordinateRefill){
   std::lock_guard<std::mutex> lock(guard);if(!failure.empty())throw std::runtime_error(failure);
   if(!opened){ready=false;return nullptr;}
   if(eof&&queue.empty()&&!current)throw std::runtime_error("No decodable source picture");
@@ -184,9 +189,13 @@ struct Producer {
   int64_t target=streamTick(tick,sourceBase)+origin;
   wantedPTS=target;
   while(!queue.empty()&&(!current||queue.front()->best_effort_timestamp<=target)){
-   current=queue.front();queue.pop_front();changed.notify_all();
+   current=queue.front();queue.pop_front();
   }
   ready=current&&(eof||!queue.empty());
+  // With two future pictures already decoded, the next refill can wait for
+  // this multitrack Present to return. A source below this mark runs immediately.
+  holdRefill=coordinateRefill&&ready&&queue.size()>=2&&queue.size()<4&&!eof;
+  if(holdRefill)deferredRefills++;else changed.notify_one();
   if(!ready&&warm.size()>1){
    for(size_t i=1;i<warm.size();i++)if(warm[i-1]->best_effort_timestamp<=target&&target<warm[i]->best_effort_timestamp){ready=true;warmHits++;return warm[i-1];}
   }

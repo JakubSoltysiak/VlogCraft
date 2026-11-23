@@ -64,7 +64,7 @@ int main(int argc,char** argv){
    if(renderer.display){std::cout<<",\"present_call\":";renderer.display->presentTime.json();std::cout<<",\"present_call_interval\":";renderer.display->presentIntervals.json();std::cout<<",\"playback_present_interval\":";renderer.display->playIntervals.json();}
    std::cout<<",\"source_selection\":";selectTime.json();std::cout<<",\"wake_overshoot\":";deadline.overshoot.json();std::cout<<"},\"high_resolution_wait\":"<<(deadline.timer?"true":"false")<<",\"decoder_statistics\":[";bool dc=false;
    for(auto& entry:producers){auto& p=*entry.second;std::lock_guard<std::mutex> lock(p.guard);if(dc)std::cout<<",";dc=true;
-    std::cout<<"{\"decoded_frames\":"<<p.decoded<<",\"decode_wall_seconds\":"<<p.decodedSeconds<<",\"seeks\":"<<p.seeks<<",\"queued_frames\":"<<p.queue.size()<<",\"warm_cache_frames\":"<<p.warm.size()<<",\"warm_cache_hits\":"<<p.warmHits<<",\"warm_budget_frames\":"<<p.warmBudget<<",\"decoder_threads\":"<<p.codecThreads<<",\"active_thread_type\":"<<p.threadType<<",\"hardware_pool_frames\":"<<p.poolFrames<<"}";}
+    std::cout<<"{\"decoded_frames\":"<<p.decoded<<",\"decode_wall_seconds\":"<<p.decodedSeconds<<",\"seeks\":"<<p.seeks<<",\"queued_frames\":"<<p.queue.size()<<",\"warm_cache_frames\":"<<p.warm.size()<<",\"warm_cache_hits\":"<<p.warmHits<<",\"deferred_refills\":"<<p.deferredRefills<<",\"warm_budget_frames\":"<<p.warmBudget<<",\"decoder_threads\":"<<p.codecThreads<<",\"active_thread_type\":"<<p.threadType<<",\"hardware_pool_frames\":"<<p.poolFrames<<"}";}
    std::cout<<"]";input.clockStats();std::cout<<",\"retained_surface_views\":"<<renderer.textures.views.size()<<",\"retained_texture_pools\":"<<renderer.textures.pools.size()<<",\"retained_texture_estimated_MiB\":"<<renderer.textures.estimatedBytes()/1048576.<<"}"<<std::endl;
   };
   // Prepare unseen sources only after an exact paused picture has been
@@ -181,11 +181,13 @@ int main(int argc,char** argv){
     parked=std::move(keep);observeStandby();
    }
    maxDecoders=std::max(maxDecoders,producers.size());selected.clear();ready=true;
+   const bool coordinateRefill=playing&&active.size()>1;
+   auto releaseRefills=[&]{if(coordinateRefill)for(auto* clip:active)producers.at(clip->asset)->releaseRefill();};
    for(auto* c:active){
     auto& p=*producers[c->asset];
     if(trace){sourceContext.decoder=p.request.decoder;sourceContext.source=sourceIds.at(c->asset);sourceContext.tick=plan.sourceTick(*c,frame);sourceContext.num=c->timebase.num;sourceContext.den=c->timebase.den;}
     bool available=false;Frame f;
-    try{SourceStage timer("select_picture");f=p.at(plan.sourceTick(*c,frame),c->timebase,available);}
+    try{SourceStage timer("select_picture");f=p.at(plan.sourceTick(*c,frame),c->timebase,available,coordinateRefill);}
     catch(const std::runtime_error&){
      if(!retryOnFailure.erase(c->asset))throw;
      // Oversized/changed-format speculative decoding never removes a source
@@ -202,8 +204,10 @@ int main(int argc,char** argv){
    }
    double sourceMs=seconds(selectionStart)*1000;selectTime.add(sourceMs);
    Slot* slot=renderer.available();
-   if(!ready||!slot){waiting++;if(!ready){sourceWait++;sawSourceWait=true;}else{gpuWait++;sawGpuWait=true;}if(seconds(lastReport)>.1){report("status",frame);lastReport=Clock::now();}deadline.wait(1000);continue;}
-   if(!playing&&!limit&&!input.isGeneration(epoch))continue;
+   if(!ready||!slot){releaseRefills();waiting++;if(!ready){sourceWait++;sawSourceWait=true;}else{gpuWait++;sawGpuWait=true;}if(seconds(lastReport)>.1){report("status",frame);lastReport=Clock::now();}deadline.wait(1000);continue;}
+   // A seek can arrive while a playing source handoff is unlocking or opening.
+   // Fence it at the same submission boundary as a paused seek.
+   if(!limit&&!input.isGeneration(epoch)){releaseRefills();continue;}
    if(previous>=0&&drawnGeneration==generation&&frame>previous+1){auto lost=frame-previous-1;if(trace)trace->miss(frame,lost);skipped+=lost;if(sawSourceWait)sourceSkipped+=lost;else if(sawGpuWait)gpuSkipped+=lost;else clockSkipped+=lost;
     if(misses.size()==256)misses.pop_front();misses.push_back({frame,lost,adjustment,loopGap,sourceMs,clockAge,renderer.display?renderer.display->lastPresentMs:0,renderer.contextWait.last,sawSourceWait,sawGpuWait});}
    if(drawnGeneration==generation&&frame<previous)clockBackwards++;
@@ -212,6 +216,7 @@ int main(int argc,char** argv){
    if(drawnGeneration!=generation){highest=frame;distinctFrames++;}else if(frame>highest){highest=frame;distinctFrames++;}else redraws++;
    if(trace)trace->submitStart();
    {SourceStage timer("draw_and_present");renderer.draw(*slot,plan,frame,generation,selected,playing);}
+   releaseRefills();
    if(!first)first=seconds(launch);
    previous=frame;drawnGeneration=generation;
    if(!capture.empty()&&(renderer.submitted==1||(limit&&renderer.submitted==(uint64_t)limit)))renderer.capture(*slot,capture+"-"+std::to_string(frame)+".rgba16f");
