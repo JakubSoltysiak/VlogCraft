@@ -92,7 +92,8 @@ void run(const char* fixture) {
         int64_t peerTick;
         {
             std::lock_guard<std::mutex> lock(peer.guard);
-            peerTick = peer.queue.back()->best_effort_timestamp - peer.origin + 1;
+            peerTick = peer.queue.back()->best_effort_timestamp - peer.origin +
+                av_rescale_q(1, {1, 1}, peer.base);
         }
         auto serviceStalledPeer = [&](int64_t frame) {
             bool ready = false;
