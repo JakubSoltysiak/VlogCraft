@@ -211,7 +211,7 @@ int64_t usage(IDXGIAdapter3* a, DXGI_MEMORY_SEGMENT_GROUP segment) {
     return static_cast<int64_t>(info.CurrentUsage);
 }
 
-enum class Mode { Verify, Memory, Publication };
+enum class Mode { Verify, Fenced, Memory, Publication };
 
 void run(const char* fixture, Mode mode) {
     HW device;
@@ -219,7 +219,7 @@ void run(const char* fixture, Mode mode) {
     auto* hw = reinterpret_cast<AVD3D11VADeviceContext*>(reinterpret_cast<AVHWDeviceContext*>(device.ref->data)->hwctx);
     hw->BindFlags |= D3D11_BIND_SHADER_RESOURCE;
     std::vector<FramePtr> reference;
-    if (mode == Mode::Verify) {
+    if (mode == Mode::Verify || mode == Mode::Fenced) {
         Decoder baseline(fixture, device.ref, true, 15);
         for (int i = 0; i < pictureCount; ++i) {
             require(baseline.next(), "short reference");
@@ -247,7 +247,9 @@ void run(const char* fixture, Mode mode) {
     reinterpret_cast<ID3D11Texture2D*>(decoded.frame->data[0])->GetDesc(&desc);
     const auto localBefore = usage(memory.Get(), DXGI_MEMORY_SEGMENT_GROUP_LOCAL);
     const auto nonlocalBefore = usage(memory.Get(), DXGI_MEMORY_SEGMENT_GROUP_NON_LOCAL);
-    PictureHandoff ring(hw, consumer.Get(), decoded.frame, 1);
+    const bool fenced = mode == Mode::Fenced;
+    PictureHandoff ring(hw, consumer.Get(), decoded.frame, 1, fenced);
+    require(ring.usingFence() == fenced, "requested handoff synchronization path is unavailable");
     const auto localDelta = usage(memory.Get(), DXGI_MEMORY_SEGMENT_GROUP_LOCAL) - localBefore;
     const auto nonlocalDelta = usage(memory.Get(), DXGI_MEMORY_SEGMENT_GROUP_NON_LOCAL) - nonlocalBefore;
     std::printf("{\"type\":\"resources\",\"format\":%u,\"width\":%u,\"height\":%u,\"pool\":%u,"
@@ -325,9 +327,14 @@ void run(const char* fixture, Mode mode) {
     for (int n = 0; n < pictureCount; n += 2) {
         if (n) require(decoded.next(), "short fixture");
         int64_t begin = tick();
-        const int a = submit(); ready(a);
-        const auto published = tick();
+        const int a = submit();
         const bool block = n == 0;
+        const bool publishWhileBlocked = block && fenced;
+        int64_t published = 0;
+        if (!publishWhileBlocked) {
+            ready(a);
+            published = tick();
+        }
         boundary.arm(block);
         auto next = std::async(std::launch::async, [&] {
             const auto t = tick(); require(decoded.next(), "missing subsequent picture");
@@ -336,6 +343,12 @@ void run(const char* fixture, Mode mode) {
         std::pair<int64_t,int64_t> render;
         try {
             boundary.waitEntered();
+            if (publishWhileBlocked) {
+                require(ring.slotState(a) == State::CopyPending && !ring.tryAcquire(generation,a),
+                        "fenced handoff exposed an unobserved copy");
+                ready(a);
+                published = tick();
+            }
             if (n < 4) render = consume(a,n);
             boundary.release();
         } catch (...) { boundary.release(); throw; }
@@ -343,6 +356,14 @@ void run(const char* fixture, Mode mode) {
         boundary.armed = false;
         require(!boundary.expired, "decoder control expired");
         if (block) require(render.first >= boundary.entered && render.second < boundary.released, "controlled overlap failed");
+        if (publishWhileBlocked) {
+            require(boundary.entered <= published && published <= render.first,
+                    "fenced copy did not publish during the controlled decoder lock");
+            std::printf("{\"type\":\"fenced_publication\",\"format\":%u,\"published_while_decoder_locked\":true,"
+                        "\"verified_while_decoder_locked\":true,\"retired_while_decoder_locked\":true,"
+                        "\"publication_from_lock_ms\":%.8f,\"retirement_from_lock_ms\":%.8f}\n",
+                        static_cast<unsigned>(desc.Format), ms(published-boundary.entered), ms(render.second-boundary.entered));
+        }
         const int b = submit();
         if (n >= 4) {
             require(a != b && ring.trySubmit(decoded.frame,generation) < 0, "backpressure failed");
@@ -401,7 +422,8 @@ int main(int argc, char** argv) {
     if (argc < 2 || argc > 3) return 2;
     Mode mode = Mode::Verify;
     if (argc == 3) {
-        if (!std::strcmp(argv[2], "--memory-only")) mode = Mode::Memory;
+        if (!std::strcmp(argv[2], "--fenced")) mode = Mode::Fenced;
+        else if (!std::strcmp(argv[2], "--memory-only")) mode = Mode::Memory;
         else if (!std::strcmp(argv[2], "--publication")) mode = Mode::Publication;
         else return 2;
     }
