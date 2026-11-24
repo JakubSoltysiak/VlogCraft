@@ -20,6 +20,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("media", type=Path)
     parser.add_argument("out", type=Path)
+    parser.add_argument("--memory-only", action="store_true", help="Measure the two populated slots without draw-verification allocations")
     args = parser.parse_args()
     out = args.out.resolve()
     sdk = ROOT / "build/tools/architecture/ffmpeg-shared/ffmpeg-9.0.2-full_build-shared"
@@ -41,7 +42,8 @@ def main():
         for label, name in (("nv12","h264-4k60-0.mp4"), ("p010","hevc10-4k5994.mp4")):
             fixture = args.media.resolve() / name
             result = subprocess.run([sys.executable, ROOT / "benchmarks/run_qa.py", "--timeout","60",
-                "--results",out / label, "--status",out / "status.json","--",worker,fixture], env=env)
+                "--results",out / label, "--status",out / "status.json","--",worker,fixture,
+                *(["--memory-only"] if args.memory_only else [])], env=env)
             print((out / label / "supervisor.log").read_text(encoding="utf8",errors="replace"),flush=True)
             failed |= result.returncode != 0
         return int(failed)

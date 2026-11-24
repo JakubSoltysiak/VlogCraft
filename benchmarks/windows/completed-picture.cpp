@@ -94,13 +94,13 @@ int64_t usage(IDXGIAdapter3* a, DXGI_MEMORY_SEGMENT_GROUP segment) {
     return static_cast<int64_t>(info.CurrentUsage);
 }
 
-void run(const char* fixture) {
+void run(const char* fixture, bool memoryOnly) {
     HW device;
     avcheck(av_hwdevice_ctx_create(&device.ref, AV_HWDEVICE_TYPE_D3D11VA, nullptr, nullptr, 0), "FFmpeg device");
     auto* hw = reinterpret_cast<AVD3D11VADeviceContext*>(reinterpret_cast<AVHWDeviceContext*>(device.ref->data)->hwctx);
     hw->BindFlags |= D3D11_BIND_SHADER_RESOURCE;
     std::vector<FramePtr> reference;
-    {
+    if (!memoryOnly) {
         Decoder baseline(fixture, device.ref, true, 15);
         for (int i = 0; i < pictureCount; ++i) {
             require(baseline.next(), "short reference");
@@ -134,6 +134,26 @@ void run(const char* fixture) {
     std::printf("{\"type\":\"resources\",\"format\":%u,\"width\":%u,\"height\":%u,\"pool\":%u,"
                 "\"local_delta\":%lld,\"nonlocal_delta\":%lld}\n", desc.Format, desc.Width, desc.Height,
                 desc.ArraySize, (long long)localDelta, (long long)nonlocalDelta);
+    if (memoryOnly) {
+        // Isolate both handoff images from CPU reference/staging and shader verification.
+        // Fill with the same already materialized decoder slice, holding both slots.
+        int64_t localPeak = localBefore, nonlocalPeak = nonlocalBefore;
+        for (int i = 0; i < 2; ++i) {
+            int slot = ring.trySubmit(decoded.frame,1);
+            require(slot >= 0,"memory probe missing slot");
+            until([&]{ring.pollProducer(); return ring.slotState(slot)==PictureHandoff::State::Ready;},
+                  "memory probe copy deadline");
+            localPeak = (std::max)(localPeak,usage(memory.Get(),DXGI_MEMORY_SEGMENT_GROUP_LOCAL));
+            nonlocalPeak = (std::max)(nonlocalPeak,usage(memory.Get(),DXGI_MEMORY_SEGMENT_GROUP_NON_LOCAL));
+        }
+        require(ring.snapshot().peakSlots == 2, "memory probe did not touch both slots");
+        std::printf("{\"type\":\"memory\",\"visible_bytes_per_image\":%llu,\"storage_bytes_per_image\":%llu,"
+                    "\"local_before\":%lld,\"nonlocal_before\":%lld,\"local_peak\":%lld,\"nonlocal_peak\":%lld}\n",
+                    (unsigned long long)ring.visiblePayloadBytes(),(unsigned long long)ring.storagePayloadBytes(),
+                    (long long)localBefore,(long long)nonlocalBefore,(long long)localPeak,(long long)nonlocalPeak);
+        require(ring.drain(std::chrono::seconds(3)), "memory probe teardown deadline");
+        return;
+    }
     HandoffPixels pixels(consumer.Get(), decoded.frame->width, decoded.frame->height, desc.Format);
     ComPtr<ID3D11Query> verified;
     D3D11_QUERY_DESC query{D3D11_QUERY_EVENT,0};
@@ -255,8 +275,8 @@ void run(const char* fixture) {
 }
 }
 int main(int argc, char** argv) {
-    if (argc != 2) return 2;
-    try { run(argv[1]); }
+    if (argc != 2 && !(argc==3 && !std::strcmp(argv[2],"--memory-only"))) return 2;
+    try { run(argv[1],argc==3); }
     catch (const std::exception& e) { std::fprintf(stderr,"%s\n", e.what()); return 1; }
     return 0;
 }
