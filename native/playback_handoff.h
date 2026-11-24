@@ -2,45 +2,61 @@
 #include "picture_handoff.h"
 #include "timeline.h"
 
-// Each active layer has a bounded copy endpoint. The render loop never takes
-// the decoder's FFmpeg mutex, including when a source advances during a copy.
+// The source selector owns PTS interval decisions. Copies may be prepared
+// before that decision; only its exact retained frame can acquire a lease.
 class PlaybackPictureLane {
     PictureHandoff ring_;
     std::mutex guard_;
     std::condition_variable changed_;
-    Frame request_;
-    uint64_t serial_ = 0;
-    int64_t epoch_ = -1;
+    std::array<std::weak_ptr<AVFrame>,2> desired_, contents_;
+    uint64_t generation_ = 0;
+    int64_t transport_ = -1;
     bool stopping_ = false;
     std::exception_ptr failure_;
     PictureHandoff::Picture lease_;
     std::thread worker_;
 
+    Frame missing() const {
+        auto state = ring_.snapshot();
+        if (state.slots[0].state != PictureHandoff::State::Free &&
+            state.slots[1].state != PictureHandoff::State::Free) return {};
+        for (const auto& weak : desired_) {
+            auto frame = weak.lock();
+            if (!frame) continue;
+            bool prepared = false;
+            for (int i = 0; i < 2; ++i) {
+                const auto& slot = state.slots[i];
+                prepared |= slot.state != PictureHandoff::State::Free &&
+                    slot.generation == generation_ && contents_[i].lock() == frame;
+            }
+            if (!prepared) return frame;
+        }
+        return {};
+    }
     void transfer() {
         try {
-            uint64_t copied = 0;
             std::unique_lock<std::mutex> lock(guard_);
-            while (!stopping_) {
-                changed_.wait(lock,[&]{return stopping_ || copied != serial_;});
-                if (stopping_) break;
-                auto frame = request_;
-                auto serial = serial_;
+            for (;;) {
+                Frame frame;
+                changed_.wait(lock,[&]{return stopping_ || bool(frame = missing());});
+                if (stopping_) return;
+                const auto generation = generation_;
                 lock.unlock();
-                const int slot = ring_.trySubmit(frame.get(),serial);
-                if (slot >= 0) {
-                    // Finish each accepted GPU copy, including superseded copies.
-                    // The ring tests its generation again before publication.
-                    const auto deadline = Clock::now() + std::chrono::seconds(5);
-                    while (ring_.slotState(slot) == PictureHandoff::State::CopyPending) {
-                        if (Clock::now() >= deadline) throw std::runtime_error("handoff copy timed out");
-                        ring_.pollProducer();
-                        if (ring_.slotState(slot) == PictureHandoff::State::CopyPending) SwitchToThread();
-                    }
-                    copied = serial;
+                int slot = ring_.trySubmit(frame.get(),generation);
+                lock.lock();
+                if (slot < 0) {
+                    changed_.wait_for(lock,std::chrono::milliseconds(1));
+                    continue;
+                }
+                contents_[slot] = frame;
+                lock.unlock();
+                const auto deadline = Clock::now() + std::chrono::seconds(5);
+                while (ring_.slotState(slot) == PictureHandoff::State::CopyPending) {
+                    if (Clock::now() >= deadline) throw std::runtime_error("handoff copy timed out");
+                    ring_.pollProducer();
+                    if (ring_.slotState(slot) == PictureHandoff::State::CopyPending) SwitchToThread();
                 }
                 lock.lock();
-                if (slot < 0 && !stopping_ && serial == serial_)
-                    changed_.wait_for(lock,std::chrono::milliseconds(1));
             }
         } catch (...) {
             std::lock_guard<std::mutex> lock(guard_);
@@ -65,22 +81,40 @@ public:
         }
         changed_.notify_one();
         worker_.join();
-        // The ring seals any outstanding drawing lease and drains both devices
-        // before releasing its retained frames. The consumer thread owns teardown.
     }
-    PictureHandoff::Picture select(const Frame& frame, int64_t generation) {
-        ring_.pollConsumer();
-        std::lock_guard<std::mutex> lock(guard_);
-        if (failure_) std::rethrow_exception(failure_);
-        if (frame != request_ || generation != epoch_) {
-            if (lease_) ring_.finish(lease_);
-            lease_ = {};
-            request_ = frame;
-            epoch_ = generation;
-            ring_.setGeneration(++serial_);
+    void retire() {
+        if (ring_.pollConsumer()) {
+            std::lock_guard<std::mutex> lock(guard_);
             changed_.notify_one();
         }
-        if (!lease_) lease_ = ring_.tryAcquire(serial_);
+    }
+    PictureHandoff::Picture select(const Frame& selected, const Frame& floor, const Frame& next, int64_t transport) {
+        const int recycled = ring_.pollConsumer();
+        std::lock_guard<std::mutex> lock(guard_);
+        if (failure_) std::rethrow_exception(failure_);
+        bool reset = transport != transport_;
+        if (reset) {
+            transport_ = transport;
+            ring_.setGeneration(++generation_);
+        }
+        if (lease_ && (reset || contents_[lease_.slot].lock() != selected)) {
+            ring_.finish(lease_);
+            lease_ = {};
+        }
+        auto first = selected ? selected : floor;
+        bool updated = desired_[0].lock() != first || desired_[1].lock() != next;
+        desired_ = {first,next};
+        for (int i = 0; i < 2; ++i) {
+            if (ring_.slotState(i) != PictureHandoff::State::Ready) continue;
+            auto frame = contents_[i].lock();
+            if (frame && (frame == first || frame == next)) {
+                if (!lease_ && frame == selected) lease_ = ring_.tryAcquire(generation_,i);
+            } else {
+                auto obsolete = ring_.tryAcquire(generation_,i);
+                if (obsolete) ring_.finish(obsolete);
+            }
+        }
+        if (reset || updated || recycled) changed_.notify_one();
         return lease_;
     }
 };
@@ -91,22 +125,22 @@ struct PlaybackHandoff {
     void trim(const std::map<std::string,bool>& wanted) {
         for (auto& lane : lanes) if (lane && !wanted.count(lane->asset)) lane.reset();
     }
-    bool prepare(const std::vector<std::pair<const Clip*,Frame>>& selected, int64_t generation,
-                 ID3D11Device* device) {
-        bool ready = true;
-        for (size_t i = 0; i < lanes.size(); ++i) {
-            if (i >= selected.size()) { lanes[i].reset(); pictures[i] = {}; continue; }
-            const auto& frame = selected[i].second;
-            if (frame->format != AV_PIX_FMT_D3D11 || !frame->hw_frames_ctx)
+    bool service(size_t i, const Clip& clip, Frame selected, Producer& producer,
+                 int64_t generation, ID3D11Device* device) {
+        auto [floor,next] = producer.preparationWindow(clip,selected,generation);
+        const Frame& prototype = selected ? selected : floor;
+        auto& lane = lanes.at(i);
+        if (lane && lane->asset != clip.asset) lane.reset();
+        if (prototype) {
+            if (prototype->format != AV_PIX_FMT_D3D11 || !prototype->hw_frames_ctx)
                 throw std::runtime_error("independent handoff requires hardware decode");
-            auto& lane = lanes[i];
-            if (!lane || lane->pool != frame->hw_frames_ctx->data || lane->asset != selected[i].first->asset) {
+            if (!lane || lane->pool != prototype->hw_frames_ctx->data) {
                 lane.reset();
-                lane = std::make_unique<PlaybackPictureLane>(frame,selected[i].first->asset,device);
+                lane = std::make_unique<PlaybackPictureLane>(prototype,clip.asset,device);
             }
-            pictures[i] = lane->select(frame,generation);
-            ready &= bool(pictures[i]);
+            if (next && (!next->hw_frames_ctx || next->hw_frames_ctx->data != lane->pool)) next.reset();
         }
-        return ready;
+        pictures[i] = lane ? lane->select(selected,floor,next,generation) : PictureHandoff::Picture{};
+        return bool(pictures[i]);
     }
 };

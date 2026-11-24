@@ -337,6 +337,24 @@ struct Producer {
   std::lock_guard<std::mutex> lock(guard);
   if(holdRefill){setRefillLocked(false,2);watchQueueLocked();changed.notify_one();}
  }
+ // Snapshot existing decoded references without consuming a successor or
+ // changing the producer's target, epoch, queue or refill deadline.
+ std::pair<Frame,Frame> preparationWindow(const Clip& clip,const Frame& selected,int64_t generation){
+  std::lock_guard<std::mutex> lock(guard);
+  Frame floor=selected?selected:current;
+  if(cutOld==&clip&&cutGeneration==generation){
+   for(const auto& f:cutTail)if(f!=floor)return {floor,f};
+   return {floor,{}};
+  }
+  if(!floor)return {};
+  auto after=[&](const Frame& f){return f->best_effort_timestamp>floor->best_effort_timestamp;};
+  if(floor!=current){
+   auto it=std::find(warm.begin(),warm.end(),floor);
+   if(it!=warm.end()&&++it!=warm.end())return {floor,*it};
+  }
+  for(const auto& f:queue)if(after(f))return {floor,f};
+  return {floor,{}};
+ }
  // Returns the source picture whose half-open PTS interval contains the target.
  // Selection paths in the recorder are unavailable, live, warm and outgoing.
  Frame at(const Clip& clip,int64_t frame,int64_t transportGeneration,int64_t tick,bool& ready,bool coordinateRefill,
