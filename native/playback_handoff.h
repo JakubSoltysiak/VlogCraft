@@ -69,7 +69,7 @@ public:
     const std::string asset;
     PlaybackPictureLane(const Frame& prototype, const std::string& source, ID3D11Device* consumer)
         : ring_(static_cast<AVD3D11VADeviceContext*>(reinterpret_cast<AVHWFramesContext*>(
-              prototype->hw_frames_ctx->data)->device_ctx->hwctx),consumer,prototype.get(),0),
+              prototype->hw_frames_ctx->data)->device_ctx->hwctx),consumer,prototype.get(),0,true),
           pool(prototype->hw_frames_ctx->data), asset(source) {
         worker_ = std::thread([this]{transfer();});
     }
@@ -82,6 +82,7 @@ public:
         changed_.notify_one();
         worker_.join();
     }
+    bool usingFence() const { return ring_.usingFence(); }
     void retire() {
         if (ring_.pollConsumer()) {
             std::lock_guard<std::mutex> lock(guard_);

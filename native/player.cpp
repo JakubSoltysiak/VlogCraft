@@ -93,9 +93,11 @@ int main(int argc,char** argv){
   };
   auto report=[&](const char* event,int64_t frame){
    WatchStage status("write_status");SourceStage timer("status_report");observeStandby();if(renderer.display)renderer.display->stats();
+   size_t fenceLanes=0;
+   if(useHandoff)for(const auto& lane:handoff.lanes)if(lane&&lane->usingFence())++fenceLanes;
    std::cout<<"{\"event\":\""<<event<<"\",\"sequence_frame\":"<<frame<<",\"generation\":"<<generation
     <<",\"submitted_frames\":"<<renderer.submitted<<",\"completed_frames\":"<<renderer.completed
-    <<",\"picture_handoff\":"<<(useHandoff?"true":"false")<<",\"handoff_draws\":"<<handoffDraws<<",\"handoff_fallbacks\":"<<handoffFallbacks
+    <<",\"handoff_fence_lanes\":"<<fenceLanes<<",\"picture_handoff\":"<<(useHandoff?"true":"false")<<",\"handoff_draws\":"<<handoffDraws<<",\"handoff_fallbacks\":"<<handoffFallbacks
     <<",\"completion_poll_policy\":\""<<(eagerPolling?"eager":"source_first")<<"\",\"refill_policy\":\""<<(!deferRefill?"disabled":legacyRefill?"unlimited":"bounded")<<"\""
     <<",\"stall_recording\":"<<(flight?"true":"false")<<",\"combined_poll_opportunities\":"<<combinedPollOpportunities<<",\"source_wait_poll_bypasses\":"<<sourceWaitPollBypasses
     <<",\"surface_parented\":"<<(renderer.display&&renderer.display->parent?"true":"false")<<",\"surface_visible\":"<<(renderer.display&&IsWindowVisible(renderer.display->window)?"true":"false")<<",\"surface_width\":"<<(renderer.display?renderer.display->width:0)<<",\"surface_height\":"<<(renderer.display?renderer.display->height:0)

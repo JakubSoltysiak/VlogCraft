@@ -1,7 +1,7 @@
 #pragma once
 
 #include "media.h"
-#include <d3d11_1.h>
+#include <d3d11_4.h>
 #include <dxgi1_2.h>
 #include <wrl/client.h>
 #include <array>
@@ -51,7 +51,7 @@ public:
     };
 
     PictureHandoff(AVD3D11VADeviceContext* producer, ID3D11Device* consumer,
-                   const AVFrame* prototype, uint64_t generation = 1)
+                   const AVFrame* prototype, uint64_t generation = 1, bool preferFence = false)
         : producer_(producer), consumer_(consumer) {
         const auto* frames = sourceFrames(prototype);
         if (!producer_ || !consumer_ || !frames || !producer_->device ||
@@ -82,6 +82,14 @@ public:
         consumer->GetImmediateContext(&consumerContext_);
         Microsoft::WRL::ComPtr<ID3D11Device1> consumer1;
         check(consumer_.As(&consumer1), "handoff consumer device1");
+        if (preferFence) {
+            Microsoft::WRL::ComPtr<ID3D11Device5> device5;
+            if (SUCCEEDED(producer_->device->QueryInterface(IID_PPV_ARGS(&device5))) &&
+                SUCCEEDED(device5->CreateFence(0,D3D11_FENCE_FLAG_NONE,IID_PPV_ARGS(&copyFence_)))) {
+                if (FAILED(producer_->device_context->QueryInterface(IID_PPV_ARGS(&signalContext_))))
+                    copyFence_.Reset();
+            }
+        }
         for (auto& slot : slots_) createSlot(slot, consumer1.Get());
     }
 
@@ -101,6 +109,8 @@ public:
     // Per image. Texture dimensions do not tell us the driver's allocation size.
     uint64_t visiblePayloadBytes() const { return payloadBytes(width_, height_); }
     uint64_t storagePayloadBytes() const { return payloadBytes(desc_.Width, desc_.Height); }
+
+    bool usingFence() const { return bool(copyFence_) && !signalFailed_.load(); }
 
     Snapshot snapshot() const {
         std::lock_guard<std::mutex> lock(mutex_);
@@ -178,6 +188,12 @@ public:
                     context->End(slot.copyEnd.Get());
                     context->End(slot.copyDisjoint.Get());
                     context->End(slot.copyEvent.Get());
+                    slot.fencePoint = 0;
+                    if (usingFence()) {
+                        const UINT64 point = ++nextPoint_;
+                        if (SUCCEEDED(signalContext_->Signal(copyFence_.Get(),point))) slot.fencePoint = point;
+                        else signalFailed_.store(true);
+                    }
                     context->Flush();
                     submitted = Clock::now();
                 }
@@ -216,15 +232,21 @@ public:
             double gpuMs = 0;
             bool gpuValid = false;
             Clock::time_point complete{};
-            {
+            if (slot.fencePoint) {
+                // Signal was enqueued on the original serialized context. Only
+                // the CPU fence read and keyed ownership transfer happen here.
+                const UINT64 done = copyFence_->GetCompletedValue();
+                ready = done == UINT64_MAX ? DXGI_ERROR_DEVICE_REMOVED :
+                        done >= slot.fencePoint ? S_OK : S_FALSE;
+            } else {
                 ProducerLock lock(producer_);
                 auto* context = producer_->device_context;
                 ready = eventStatus(context, slot.copyEvent.Get());
-                if (ready == S_OK) {
-                    complete = Clock::now();
-                    gpuValid = copyDuration(context, slot, gpuMs);
-                    released = slot.producerKey->ReleaseSync(consumerKey);
-                }
+                if (ready == S_OK) gpuValid = copyDuration(context, slot, gpuMs);
+            }
+            if (ready == S_OK) {
+                complete = Clock::now();
+                released = slot.producerKey->ReleaseSync(consumerKey);
             }
             if (ready == S_FALSE) {
                 recordPending(i, true);
@@ -375,6 +397,7 @@ private:
         ~ProducerLock() { context->unlock(context->lock_ctx); }
     };
     struct Slot {
+        UINT64 fencePoint = 0;
         ComPtr<ID3D11Texture2D> local, opened;
         ComPtr<IDXGIKeyedMutex> producerKey, consumerKey;
         ComPtr<ID3D11ShaderResourceView> luma, chroma;
@@ -388,6 +411,10 @@ private:
     ComPtr<ID3D11DeviceContext> consumerContext_;
     D3D11_TEXTURE2D_DESC desc_{};
     int width_ = 0, height_ = 0, nextSlot_ = 0;
+    ComPtr<ID3D11Fence> copyFence_;
+    ComPtr<ID3D11DeviceContext4> signalContext_;
+    std::atomic<bool> signalFailed_{false};
+    UINT64 nextPoint_ = 0;
     uint64_t serial_ = 0;
     std::array<Slot, slotCount> slots_;
     mutable std::mutex mutex_;
