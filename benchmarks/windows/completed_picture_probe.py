@@ -23,6 +23,7 @@ def main():
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--memory-only", action="store_true", help="Measure the two populated slots without draw-verification allocations")
     mode.add_argument("--scheduler", action="store_true", help="Exercise scheduling with real hardware producers and a stalled peer")
+    mode.add_argument("--publication", action="store_true", help="Compare a producer-local fence with legacy publication under a controlled decoder lock")
     args = parser.parse_args()
     out = args.out.resolve()
     sdk = ROOT / "build/tools/architecture/ffmpeg-shared/ffmpeg-9.0.2-full_build-shared"
@@ -43,11 +44,12 @@ def main():
         (out / "build.json").write_text(json.dumps(receipt, indent=2), encoding="utf8")
         failed = False
         env = dict(os.environ, PATH=str(sdk / "bin") + os.pathsep + os.environ["PATH"])
+        worker_args = ["--memory-only"] if args.memory_only else ["--publication"] if args.publication else []
         for label, name in (("nv12","h264-4k60-0.mp4"), ("p010","hevc10-4k5994.mp4")):
             fixture = args.media.resolve() / name
             result = subprocess.run([sys.executable, ROOT / "benchmarks/run_qa.py", "--timeout","60",
                 "--results",out / label, "--status",out / "status.json","--",worker,fixture,
-                *(["--memory-only"] if args.memory_only else [])], env=env)
+                *worker_args], env=env)
             print((out / label / "supervisor.log").read_text(encoding="utf8",errors="replace"),flush=True)
             failed |= result.returncode != 0
         return int(failed)

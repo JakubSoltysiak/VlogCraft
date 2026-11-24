@@ -2,6 +2,7 @@
 #include "../../native/media.h"
 #include "../../native/picture_handoff.h"
 #include "handoff-pixels.h"
+#include <d3d11_4.h>
 #include <dxgi1_4.h>
 #include <thread>
 #include <future>
@@ -46,13 +47,19 @@ struct DecodeBoundary {
     std::mutex guard;
     std::condition_variable changed;
     bool armed = false, controlled = false, resume = false, expired = false;
-    int64_t entered = 0, released = 0;
+    int64_t entered = 0, released = 0, publicationEntered = 0;
     static thread_local int depth;
+    static thread_local bool trackPublication;
     explicit DecodeBoundary(AVD3D11VADeviceContext* d)
         : hw(d), opaque(d->lock_ctx), lock(d->lock), unlock(d->unlock) {
         d->lock_ctx = this;
         d->lock = [](void* p) {
             auto& self = *static_cast<DecodeBoundary*>(p);
+            if (trackPublication) {
+                std::lock_guard<std::mutex> lock(self.guard);
+                self.publicationEntered = tick();
+                self.changed.notify_all();
+            }
             self.lock(self.opaque);
             if (++depth == 1) {
                 std::unique_lock<std::mutex> g(self.guard);
@@ -76,17 +83,127 @@ struct DecodeBoundary {
     ~DecodeBoundary() { hw->lock = lock; hw->unlock = unlock; hw->lock_ctx = opaque; }
     void arm(bool block) {
         std::lock_guard<std::mutex> g(guard);
-        armed = true; controlled = block; resume = expired = false; entered = released = 0;
+        armed = true; controlled = block; resume = expired = false;
+        entered = released = publicationEntered = 0;
     }
     void waitEntered() {
         std::unique_lock<std::mutex> g(guard);
         require(changed.wait_for(g, timeout, [&]{ return entered != 0; }), "next picture did not enter FFmpeg device transaction");
+    }
+    void waitPublicationEntered() {
+        std::unique_lock<std::mutex> g(guard);
+        require(changed.wait_for(g, timeout, [&]{ return publicationEntered != 0; }),
+                "legacy publication did not attempt to enter the device lock");
     }
     void release() {
         std::lock_guard<std::mutex> g(guard); resume = true; changed.notify_all();
     }
 };
 thread_local int DecodeBoundary::depth = 0;
+thread_local bool DecodeBoundary::trackPublication = false;
+
+struct DeviceLock {
+    AVD3D11VADeviceContext* const hw;
+    explicit DeviceLock(AVD3D11VADeviceContext* device) : hw(device) { hw->lock(hw->lock_ctx); }
+    ~DeviceLock() { hw->unlock(hw->lock_ctx); }
+    DeviceLock(const DeviceLock&) = delete;
+    DeviceLock& operator=(const DeviceLock&) = delete;
+};
+
+void probePublication(AVD3D11VADeviceContext* hw, Decoder& decoded, PictureHandoff& ring,
+                      DecodeBoundary& boundary, DXGI_FORMAT format) {
+    using State = PictureHandoff::State;
+    constexpr uint64_t generation = 1;
+    constexpr UINT64 fenceValue = 1;
+    ComPtr<ID3D11Device5> device;
+    ComPtr<ID3D11DeviceContext4> context;
+    ComPtr<ID3D11Fence> fence;
+    const char* fenceStage = "device5";
+    HRESULT fenceResult = hw->device->QueryInterface(IID_PPV_ARGS(&device));
+    if (SUCCEEDED(fenceResult)) {
+        fenceStage = "context4";
+        fenceResult = hw->device_context->QueryInterface(IID_PPV_ARGS(&context));
+    }
+    if (SUCCEEDED(fenceResult)) {
+        fenceStage = "create_fence";
+        fenceResult = device->CreateFence(0, D3D11_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
+    }
+
+    const auto pts = decoded.frame->best_effort_timestamp;
+    int slot;
+    {
+        // This outer scope holds FFmpeg's recursive lock continuously from
+        // copy submission through the signal, with no other producer commands.
+        DeviceLock submitLock(hw);
+        slot = ring.trySubmit(decoded.frame, generation);
+        require(slot >= 0 && ring.slotState(slot) == State::CopyPending, "ring did not submit its copy");
+        if (SUCCEEDED(fenceResult)) {
+            fenceStage = "signal";
+            fenceResult = context->Signal(fence.Get(), fenceValue);
+            if (SUCCEEDED(fenceResult)) context->Flush();
+        }
+    }
+
+    auto consumeAndDrain = [&] {
+        auto picture = ring.tryAcquire(generation, slot);
+        require(picture && picture.pts == pts, "published picture did not match the submitted source PTS");
+        ring.finish(picture);
+        require(ring.drain(std::chrono::seconds(3)) && !ring.snapshot().retained, "publication probe did not drain");
+    };
+    if (FAILED(fenceResult)) {
+        check(hw->device->GetDeviceRemovedReason(), "producer device health");
+        until([&] { ring.pollProducer(); return ring.slotState(slot) == State::Ready; },
+              "legacy publication fallback did not complete");
+        consumeAndDrain();
+        std::printf("{\"type\":\"publication\",\"format\":%u,\"fence_supported\":false,"
+                    "\"failed_stage\":\"%s\",\"hresult\":\"0x%08lx\",\"legacy_fallback_drained\":true}\n",
+                    static_cast<unsigned>(format), fenceStage, static_cast<unsigned long>(fenceResult));
+        return;
+    }
+
+    const auto completedBeforeDecode = fence->GetCompletedValue();
+    boundary.arm(true);
+    auto next = std::async(std::launch::async, [&] { require(decoded.next(), "missing subsequent decoded picture"); });
+    std::future<std::pair<int, int64_t>> publication;
+    int64_t observed = 0;
+    try {
+        boundary.waitEntered();
+        publication = std::async(std::launch::async, [&] {
+            DecodeBoundary::trackPublication = true;
+            const int count = ring.pollProducer();
+            return std::make_pair(count, tick());
+        });
+        boundary.waitPublicationEntered();
+        until([&] {
+            const auto completed = fence->GetCompletedValue();
+            require(completed != UINT64_MAX, "producer fence reported device removal");
+            return completed >= fenceValue;
+        }, "copy fence did not complete during the controlled decoder lock");
+        observed = tick();
+        require(publication.wait_for(std::chrono::milliseconds(0)) == std::future_status::timeout &&
+                ring.slotState(slot) == State::CopyPending && ring.snapshot().retained == 1,
+                "legacy query published or dropped ownership while FFmpeg held the device lock");
+        require(!ring.tryAcquire(generation, slot), "producer fence alone exposed the consumer picture");
+        boundary.release();
+    } catch (...) {
+        boundary.release();
+        throw;
+    }
+    const auto [count, published] = publication.get();
+    next.get();
+    require(!boundary.expired && boundary.entered <= boundary.publicationEntered &&
+            boundary.publicationEntered <= observed && observed < boundary.released &&
+            boundary.released <= published && count == 1 && ring.slotState(slot) == State::Ready,
+            "publication and decoder lock did not overlap as required");
+    consumeAndDrain();
+    std::printf("{\"type\":\"publication\",\"format\":%u,\"fence_supported\":true,"
+                "\"fence_complete_on_predecode_sample\":%s,\"legacy_poll_blocked\":true,"
+                "\"fence_observed_inside_decoder_lock\":true,\"published_after_decoder_unlock\":true,"
+                "\"fence_observation_to_unlock_ms\":%.6f,\"fence_observation_to_publication_ms\":%.6f,"
+                "\"legacy_drained\":true}\n",
+                static_cast<unsigned>(format), completedBeforeDecode >= fenceValue ? "true" : "false",
+                ms(boundary.released - observed), ms(published - observed));
+}
 
 int64_t usage(IDXGIAdapter3* a, DXGI_MEMORY_SEGMENT_GROUP segment) {
     DXGI_QUERY_VIDEO_MEMORY_INFO info{};
@@ -94,13 +211,15 @@ int64_t usage(IDXGIAdapter3* a, DXGI_MEMORY_SEGMENT_GROUP segment) {
     return static_cast<int64_t>(info.CurrentUsage);
 }
 
-void run(const char* fixture, bool memoryOnly) {
+enum class Mode { Verify, Memory, Publication };
+
+void run(const char* fixture, Mode mode) {
     HW device;
     avcheck(av_hwdevice_ctx_create(&device.ref, AV_HWDEVICE_TYPE_D3D11VA, nullptr, nullptr, 0), "FFmpeg device");
     auto* hw = reinterpret_cast<AVD3D11VADeviceContext*>(reinterpret_cast<AVHWDeviceContext*>(device.ref->data)->hwctx);
     hw->BindFlags |= D3D11_BIND_SHADER_RESOURCE;
     std::vector<FramePtr> reference;
-    if (!memoryOnly) {
+    if (mode == Mode::Verify) {
         Decoder baseline(fixture, device.ref, true, 15);
         for (int i = 0; i < pictureCount; ++i) {
             require(baseline.next(), "short reference");
@@ -134,7 +253,11 @@ void run(const char* fixture, bool memoryOnly) {
     std::printf("{\"type\":\"resources\",\"format\":%u,\"width\":%u,\"height\":%u,\"pool\":%u,"
                 "\"local_delta\":%lld,\"nonlocal_delta\":%lld}\n", desc.Format, desc.Width, desc.Height,
                 desc.ArraySize, (long long)localDelta, (long long)nonlocalDelta);
-    if (memoryOnly) {
+    if (mode == Mode::Publication) {
+        probePublication(hw, decoded, ring, boundary, desc.Format);
+        return;
+    }
+    if (mode == Mode::Memory) {
         // Isolate both handoff images from CPU reference/staging and shader verification.
         // Fill with the same already materialized decoder slice, holding both slots.
         int64_t localPeak = localBefore, nonlocalPeak = nonlocalBefore;
@@ -275,8 +398,14 @@ void run(const char* fixture, bool memoryOnly) {
 }
 }
 int main(int argc, char** argv) {
-    if (argc != 2 && !(argc==3 && !std::strcmp(argv[2],"--memory-only"))) return 2;
-    try { run(argv[1],argc==3); }
+    if (argc < 2 || argc > 3) return 2;
+    Mode mode = Mode::Verify;
+    if (argc == 3) {
+        if (!std::strcmp(argv[2], "--memory-only")) mode = Mode::Memory;
+        else if (!std::strcmp(argv[2], "--publication")) mode = Mode::Publication;
+        else return 2;
+    }
+    try { run(argv[1], mode); }
     catch (const std::exception& e) { std::fprintf(stderr,"%s\n", e.what()); return 1; }
     return 0;
 }
