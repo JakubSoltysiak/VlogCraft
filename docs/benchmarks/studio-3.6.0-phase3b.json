@@ -6882,7 +6882,7 @@
   ],
   "source_fingerprint": "fb05a7f15db5f39ac441a3b733fde4931d7afbe55b70e86776f9fbc26850cca7",
   "fingerprint_method": "SHA256 sorted relevant relative path + NUL + LF-normalized source + NUL",
-  "benchmark_protocol_fingerprint": "142242e83f420a3edeaf4aa83f340b1e26e7a739a73bc3dcc5bcfb9c60373224",
+  "benchmark_protocol_fingerprint": "dd59cf02494396639015846b8c1444632e3729ce1674abdfa2834a7480b35344",
   "benchmark_protocol_fingerprint_method": "SHA256 sorted benchmark driver/observer relative path + NUL + LF-normalized source + NUL",
   "follow_up": {
     "status": "development checkpoint",
@@ -77818,6 +77818,1424 @@
         "GPT-6.2 Sol High",
         "GPT-6.2 Sol High"
       ]
+    }
+  },
+  "input_buffer_investigation": {
+    "starting_checkpoint": "2251870cd2f936c6f982f50432c5ec8ae4529a25",
+    "implementation_commit": "d247b6a615ae115296ff834e4214f71b186a5b64",
+    "worker_sha256": "3c2651afa4c611b81ae11f3e6b56a859e55f8716e40f3f793e69bac6314c9f1b",
+    "physically_tested_msi_source": "b42e37630810e880a38dda2b111168b9bd5d11f9",
+    "physically_tested_msi_sha256": "8047cde8308fe394abc2fa2c6543d6c02f8b5dd2dc6ed7accfdb34e76daa0cf5",
+    "packaged_worker_sha256": "152866b9a0ba6d9b4722e7e567ad1299d8a10a2cba6cd7b3160117c1178452f3",
+    "collector": {
+      "normal_token_start": "E_ACCESSDENIED (0x80070005)",
+      "elevated_collector": "succeeded",
+      "editor_privilege": "normal",
+      "scheduler_memory_buffers_MiB": 512,
+      "scheduler_deadline_s": 120,
+      "api_gpu_limit_MiB": 1536,
+      "scheduler_trace_bytes": 391118848,
+      "api_gpu_trace_bytes": 260833280,
+      "owned_sessions_stopped": true,
+      "qpc_crosscheck": {
+        "api_events": 120,
+        "scheduler_events": 28836,
+        "windows_separation_s": 55,
+        "counter_frequency_Hz": 10000000,
+        "origin_difference_ms": 906.1394,
+        "utc_vs_qpc_disagreement_ns": 0
+      }
+    },
+    "attempt": {
+      "controls": {
+        "supervisor_passed": true,
+        "exact_editor_geometry": true,
+        "ac_observed": true,
+        "visible_foreground_unobscured": true,
+        "owned_process_cleanup": true,
+        "exact_audio_and_endpoint": true,
+        "declared_workload": true,
+        "expected_hold_counters": true,
+        "matched_binary_and_flag": true,
+        "instrumented_capture_complete": true,
+        "effective_bounded_poll_policy": true,
+        "display_unchanged": true,
+        "observer_protocol": true
+      },
+      "host_sha256": "fd0fcbca279f3ce20e1bcd5d33e212e1cba88b2025c806003b39b9e9922ce4ed",
+      "worker_sha256": "3c2651afa4c611b81ae11f3e6b56a859e55f8716e40f3f793e69bac6314c9f1b",
+      "effective_policy": {
+        "completion_poll_policy": "source_first",
+        "refill_policy": "bounded",
+        "stall_recording": true,
+        "consistent_through_drain": true,
+        "combined_poll_opportunities": 3111,
+        "source_wait_poll_bypasses": 63
+      },
+      "display_before": {
+        "physical_desktop_px": [
+          2880,
+          1800
+        ],
+        "desktop_hz": 120,
+        "system_dpi": 168
+      },
+      "display_after": {
+        "physical_desktop_px": [
+          2880,
+          1800
+        ],
+        "desktop_hz": 120,
+        "system_dpi": 168
+      },
+      "measured_seconds": 60.20019999998808,
+      "distinct_sequence_fps": 59.5679084122762,
+      "active_frame_delta": {
+        "distinct_sequence_submissions": 3586,
+        "skipped_sequence_frames": 13,
+        "source_wait_iterations": 63,
+        "gpu_wait_iterations": 0,
+        "skipped_after_source_wait": 13,
+        "skipped_after_gpu_wait": 0,
+        "skipped_without_queue_wait": 0
+      },
+      "physical_preview_px": [
+        958,
+        539
+      ],
+      "timings": {
+        "playback_present_interval": {
+          "count": 3585,
+          "mean_ms": 16.7274,
+          "p50_upper_ms": 16.7,
+          "p95_upper_ms": 18,
+          "p99_upper_ms": 19.5,
+          "max_ms": 124.165,
+          "overflow_100ms": 1
+        },
+        "present_call": {
+          "count": 3587,
+          "mean_ms": 0.342848,
+          "p50_upper_ms": 0.3,
+          "p95_upper_ms": 0.6,
+          "p99_upper_ms": 1.1,
+          "max_ms": 41.4599,
+          "overflow_100ms": 0
+        }
+      },
+      "completed_sequence_frame": 3599,
+      "samples": 2880000,
+      "underruns": 0,
+      "performance_screens": {
+        "at_least_59_5_fps": true,
+        "under_30_skips": true,
+        "at_most_100ms_gap": false
+      },
+      "recorder": {
+        "polls": 4177,
+        "max_poll_gap_us": 18463,
+        "torn_samples": 0,
+        "trigger_count": 1,
+        "source_request_counts": {
+          "published": 3604,
+          "read_through_sequence": 3604,
+          "lost": 0
+        }
+      }
+    },
+    "source_requests": {
+      "first_miss": {
+        "frame": 10,
+        "generation": 2,
+        "observed_us": 2835588,
+        "layers": [
+          {
+            "layer": 1,
+            "stream_tick": 2560,
+            "stream_timebase_num": 1,
+            "stream_timebase_den": 15360,
+            "floor_pts": 1792,
+            "successor_pts": null,
+            "selected": false,
+            "packet_reads": 11,
+            "packet_submits": 10,
+            "decoded_pictures": 8
+          },
+          {
+            "layer": 2,
+            "stream_tick": 2560,
+            "stream_timebase_num": 1,
+            "stream_timebase_den": 15360,
+            "floor_pts": 1792,
+            "successor_pts": null,
+            "selected": false,
+            "packet_reads": 11,
+            "packet_submits": 10,
+            "decoded_pictures": 8
+          },
+          {
+            "layer": 3,
+            "stream_tick": 2560,
+            "stream_timebase_num": 1,
+            "stream_timebase_den": 15360,
+            "floor_pts": 1792,
+            "successor_pts": null,
+            "selected": false,
+            "packet_reads": 11,
+            "packet_submits": 10,
+            "decoded_pictures": 8
+          }
+        ]
+      },
+      "first_verified": {
+        "frame": 15,
+        "generation": 2,
+        "observed_us": 2913546,
+        "layers": [
+          {
+            "layer": 1,
+            "stream_tick": 3840,
+            "stream_timebase_num": 1,
+            "stream_timebase_den": 15360,
+            "floor_pts": 3840,
+            "successor_pts": 4096,
+            "selected": true,
+            "packet_reads": 20,
+            "packet_submits": 19,
+            "decoded_pictures": 17
+          },
+          {
+            "layer": 2,
+            "stream_tick": 3840,
+            "stream_timebase_num": 1,
+            "stream_timebase_den": 15360,
+            "floor_pts": 3840,
+            "successor_pts": 4096,
+            "selected": true,
+            "packet_reads": 20,
+            "packet_submits": 19,
+            "decoded_pictures": 17
+          },
+          {
+            "layer": 3,
+            "stream_tick": 3840,
+            "stream_timebase_num": 1,
+            "stream_timebase_den": 15360,
+            "floor_pts": 3840,
+            "successor_pts": 4096,
+            "selected": true,
+            "packet_reads": 20,
+            "packet_submits": 19,
+            "decoded_pictures": 17
+          }
+        ]
+      }
+    },
+    "correlation": [
+      {
+        "frame": 3,
+        "interval": "longest recovered watchdog incident",
+        "duration_us": 124170,
+        "lost": {
+          "Buffers": 0,
+          "Events": 0
+        },
+        "etl_header_covers_interval": true,
+        "events_bracket_interval": true,
+        "video_api_calls_overlapping_interval": [
+          {
+            "lane": "source_1",
+            "call": "DecoderBeginFrame",
+            "pairs": 1,
+            "max_wall_us": 7
+          },
+          {
+            "lane": "source_1",
+            "call": "DecoderEndFrame",
+            "pairs": 1,
+            "max_wall_us": 205
+          },
+          {
+            "lane": "source_1",
+            "call": "GetDecoderBuffer",
+            "pairs": 4,
+            "max_wall_us": 15
+          },
+          {
+            "lane": "source_1",
+            "call": "SubmitDecoderBuffers",
+            "pairs": 1,
+            "max_wall_us": 17
+          },
+          {
+            "lane": "source_2",
+            "call": "DecoderBeginFrame",
+            "pairs": 1,
+            "max_wall_us": 8
+          },
+          {
+            "lane": "source_2",
+            "call": "DecoderEndFrame",
+            "pairs": 1,
+            "max_wall_us": 157
+          },
+          {
+            "lane": "source_2",
+            "call": "GetDecoderBuffer",
+            "pairs": 4,
+            "max_wall_us": 17
+          },
+          {
+            "lane": "source_2",
+            "call": "SubmitDecoderBuffers",
+            "pairs": 1,
+            "max_wall_us": 16
+          },
+          {
+            "lane": "source_3",
+            "call": "DecoderBeginFrame",
+            "pairs": 2,
+            "max_wall_us": 464
+          },
+          {
+            "lane": "source_3",
+            "call": "DecoderEndFrame",
+            "pairs": 1,
+            "max_wall_us": 244
+          },
+          {
+            "lane": "source_3",
+            "call": "GetDecoderBuffer",
+            "pairs": 6,
+            "max_wall_us": 35196
+          },
+          {
+            "lane": "source_3",
+            "call": "SubmitDecoderBuffers",
+            "pairs": 1,
+            "max_wall_us": 23
+          }
+        ],
+        "longest_decoder_input_buffer_call": {
+          "lane": "source_3",
+          "buffer_type": 0,
+          "wall_us": 35196,
+          "bracketed_shared_device_wait_us_by_peer": {
+            "source_1": 31598,
+            "source_2": 31598,
+            "renderer": 15569
+          },
+          "call_start_relative_to_interval_start_us": 543,
+          "previous_same_thread_fence_packet_start_relative_to_call_start_us": -7511,
+          "previous_same_thread_fence_packet_stop_relative_to_call_start_us": 25454,
+          "same_thread_dxg_cpu_wait_events_inside_call": 0,
+          "get_decoder_buffer_stop_fields": [
+            "m_Ret",
+            "pBufferSize",
+            "ppBuffer"
+          ],
+          "earlier_same_decoder_type_and_stop_ppbuffer_in_window": true,
+          "earlier_same_decoder_type_and_returned_address_in_window": null,
+          "input_buffer_identity": "The provider Stop event contains an output-parameter field named ppBuffer. This trace does not resolve the returned physical buffer or a unique buffer-to-fence link.",
+          "thread_cpu_observation": {
+            "consecutive_sample_intervals": 2,
+            "bracketed_wall_us": 31598,
+            "accounted_cpu_us": 0,
+            "scope": "Sampled cumulative GetThreadTimes user and kernel CPU within the call. Sample skew and accounting resolution apply. CPU time does not distinguish waiting from ready-to-run time and excludes unsampled edges of the call."
+          },
+          "scheduler": {
+            "status": "observed",
+            "reason": null,
+            "lost": {
+              "Buffers": 0,
+              "Events": 0
+            },
+            "etl_header_covers_call": true,
+            "switch_events_bracket_call": true,
+            "running_us": 54,
+            "ready_us": 24,
+            "waiting_us": 35118,
+            "unknown_us": 0,
+            "call_relative_state_spans": [
+              {
+                "start_us": 0,
+                "end_us": 26,
+                "state": "running"
+              },
+              {
+                "start_us": 26,
+                "end_us": 27,
+                "state": "waiting",
+                "wait_reason": "UserRequest"
+              },
+              {
+                "start_us": 27,
+                "end_us": 41,
+                "state": "ready"
+              },
+              {
+                "start_us": 41,
+                "end_us": 57,
+                "state": "running"
+              },
+              {
+                "start_us": 57,
+                "end_us": 35174,
+                "state": "waiting",
+                "wait_reason": "UserRequest"
+              },
+              {
+                "start_us": 35174,
+                "end_us": 35184,
+                "state": "ready"
+              },
+              {
+                "start_us": 35184,
+                "end_us": 35196,
+                "state": "running"
+              }
+            ],
+            "decoded_event_counts": {
+              "CSwitch": 46435,
+              "ReadyThread": 29398
+            },
+            "undecodable_event_counts": {},
+            "same_thread_switches_inside_call": 4,
+            "same_thread_ready_events_inside_call": 2,
+            "wait_reason_us": {
+              "UserRequest": 35118
+            },
+            "scope": "Running measures time scheduled on a CPU. It includes possible DPC/ISR time. Scheduler wait reasons identify a state transition. The waited object and code executing on the CPU are unresolved."
+          }
+        },
+        "queue_packets_by_issuing_lane": {
+          "renderer": {
+            "starts": 9,
+            "matched_stops": 9,
+            "max_submit_to_stop_us": 22011,
+            "matched_dma_intervals": 0,
+            "max_dma_span_us": null
+          },
+          "source_1": {
+            "starts": 3,
+            "matched_stops": 3,
+            "max_submit_to_stop_us": 111741,
+            "matched_dma_intervals": 0,
+            "max_dma_span_us": null
+          },
+          "source_2": {
+            "starts": 3,
+            "matched_stops": 3,
+            "max_submit_to_stop_us": 97759,
+            "matched_dma_intervals": 0,
+            "max_dma_span_us": null
+          },
+          "source_3": {
+            "starts": 3,
+            "matched_stops": 3,
+            "max_submit_to_stop_us": 93757,
+            "matched_dma_intervals": 0,
+            "max_dma_span_us": null
+          }
+        },
+        "clock_alignment": "Native recorder construction FILETIME aligned to ETL UTC. Sub-millisecond ordering is unresolved.",
+        "scope": "Exact context, submission sequence and packet identity match. Queue lifetime includes scheduling. A GPU event query is a separate observation."
+      },
+      {
+        "frame": 10,
+        "interval": "first source miss to first ready request",
+        "duration_us": 77958,
+        "lost": {
+          "Buffers": 0,
+          "Events": 0
+        },
+        "etl_header_covers_interval": true,
+        "events_bracket_interval": true,
+        "video_api_calls_overlapping_interval": [
+          {
+            "lane": "source_1",
+            "call": "DecoderBeginFrame",
+            "pairs": 9,
+            "max_wall_us": 15
+          },
+          {
+            "lane": "source_1",
+            "call": "DecoderEndFrame",
+            "pairs": 9,
+            "max_wall_us": 16172
+          },
+          {
+            "lane": "source_1",
+            "call": "GetDecoderBuffer",
+            "pairs": 36,
+            "max_wall_us": 802
+          },
+          {
+            "lane": "source_1",
+            "call": "SubmitDecoderBuffers",
+            "pairs": 9,
+            "max_wall_us": 14527
+          },
+          {
+            "lane": "source_2",
+            "call": "DecoderBeginFrame",
+            "pairs": 8,
+            "max_wall_us": 9
+          },
+          {
+            "lane": "source_2",
+            "call": "DecoderEndFrame",
+            "pairs": 9,
+            "max_wall_us": 762
+          },
+          {
+            "lane": "source_2",
+            "call": "GetDecoderBuffer",
+            "pairs": 33,
+            "max_wall_us": 13238
+          },
+          {
+            "lane": "source_2",
+            "call": "SubmitDecoderBuffers",
+            "pairs": 9,
+            "max_wall_us": 924
+          },
+          {
+            "lane": "source_3",
+            "call": "DecoderBeginFrame",
+            "pairs": 9,
+            "max_wall_us": 13
+          },
+          {
+            "lane": "source_3",
+            "call": "DecoderEndFrame",
+            "pairs": 8,
+            "max_wall_us": 218
+          },
+          {
+            "lane": "source_3",
+            "call": "GetDecoderBuffer",
+            "pairs": 35,
+            "max_wall_us": 502
+          },
+          {
+            "lane": "source_3",
+            "call": "SubmitDecoderBuffers",
+            "pairs": 8,
+            "max_wall_us": 113
+          }
+        ],
+        "longest_decoder_input_buffer_call": {
+          "lane": "source_2",
+          "buffer_type": 6,
+          "wall_us": 13238,
+          "bracketed_shared_device_wait_us_by_peer": {},
+          "call_start_relative_to_interval_start_us": 19144,
+          "previous_same_thread_fence_packet_start_relative_to_call_start_us": -536,
+          "previous_same_thread_fence_packet_stop_relative_to_call_start_us": 60394,
+          "same_thread_dxg_cpu_wait_events_inside_call": 0,
+          "get_decoder_buffer_stop_fields": [
+            "m_Ret",
+            "pBufferSize",
+            "ppBuffer"
+          ],
+          "earlier_same_decoder_type_and_stop_ppbuffer_in_window": true,
+          "earlier_same_decoder_type_and_returned_address_in_window": null,
+          "input_buffer_identity": "The provider Stop event contains an output-parameter field named ppBuffer. This trace does not resolve the returned physical buffer or a unique buffer-to-fence link.",
+          "thread_cpu_observation": {
+            "consecutive_sample_intervals": 0,
+            "bracketed_wall_us": 0,
+            "accounted_cpu_us": null,
+            "scope": "Sampled cumulative GetThreadTimes user and kernel CPU within the call. Sample skew and accounting resolution apply. CPU time does not distinguish waiting from ready-to-run time and excludes unsampled edges of the call."
+          },
+          "scheduler": {
+            "status": "observed",
+            "reason": null,
+            "lost": {
+              "Buffers": 0,
+              "Events": 0
+            },
+            "etl_header_covers_call": true,
+            "switch_events_bracket_call": true,
+            "running_us": 37,
+            "ready_us": 8,
+            "waiting_us": 13193,
+            "unknown_us": 0,
+            "call_relative_state_spans": [
+              {
+                "start_us": 0,
+                "end_us": 19,
+                "state": "running"
+              },
+              {
+                "start_us": 19,
+                "end_us": 13212,
+                "state": "waiting",
+                "wait_reason": "WrPushLock"
+              },
+              {
+                "start_us": 13212,
+                "end_us": 13220,
+                "state": "ready"
+              },
+              {
+                "start_us": 13220,
+                "end_us": 13238,
+                "state": "running"
+              }
+            ],
+            "decoded_event_counts": {
+              "CSwitch": 43218,
+              "ReadyThread": 27366
+            },
+            "undecodable_event_counts": {},
+            "same_thread_switches_inside_call": 2,
+            "same_thread_ready_events_inside_call": 1,
+            "wait_reason_us": {
+              "WrPushLock": 13193
+            },
+            "scope": "Running measures time scheduled on a CPU. It includes possible DPC/ISR time. Scheduler wait reasons identify a state transition. The waited object and code executing on the CPU are unresolved."
+          }
+        },
+        "queue_packets_by_issuing_lane": {
+          "renderer": {
+            "starts": 0,
+            "matched_stops": 0,
+            "max_submit_to_stop_us": null,
+            "matched_dma_intervals": 0,
+            "max_dma_span_us": null
+          },
+          "source_1": {
+            "starts": 22,
+            "matched_stops": 22,
+            "max_submit_to_stop_us": 64507,
+            "matched_dma_intervals": 0,
+            "max_dma_span_us": null
+          },
+          "source_2": {
+            "starts": 21,
+            "matched_stops": 21,
+            "max_submit_to_stop_us": 67478,
+            "matched_dma_intervals": 0,
+            "max_dma_span_us": null
+          },
+          "source_3": {
+            "starts": 17,
+            "matched_stops": 17,
+            "max_submit_to_stop_us": 67780,
+            "matched_dma_intervals": 0,
+            "max_dma_span_us": null
+          }
+        },
+        "clock_alignment": "Native recorder construction FILETIME aligned to ETL UTC. Sub-millisecond ordering is unresolved.",
+        "scope": "Exact context, submission sequence and packet identity match. Queue lifetime includes scheduling. A GPU event query is a separate observation."
+      },
+      {
+        "frame": 10,
+        "interval": "up to 120 ms before first missing request",
+        "duration_us": 120000,
+        "lost": {
+          "Buffers": 0,
+          "Events": 0
+        },
+        "etl_header_covers_interval": true,
+        "events_bracket_interval": true,
+        "video_api_calls_overlapping_interval": [
+          {
+            "lane": "source_1",
+            "call": "DecoderBeginFrame",
+            "pairs": 1,
+            "max_wall_us": 7
+          },
+          {
+            "lane": "source_1",
+            "call": "DecoderEndFrame",
+            "pairs": 1,
+            "max_wall_us": 205
+          },
+          {
+            "lane": "source_1",
+            "call": "GetDecoderBuffer",
+            "pairs": 4,
+            "max_wall_us": 15
+          },
+          {
+            "lane": "source_1",
+            "call": "SubmitDecoderBuffers",
+            "pairs": 1,
+            "max_wall_us": 17
+          },
+          {
+            "lane": "source_2",
+            "call": "DecoderBeginFrame",
+            "pairs": 2,
+            "max_wall_us": 8
+          },
+          {
+            "lane": "source_2",
+            "call": "DecoderEndFrame",
+            "pairs": 1,
+            "max_wall_us": 157
+          },
+          {
+            "lane": "source_2",
+            "call": "GetDecoderBuffer",
+            "pairs": 8,
+            "max_wall_us": 17
+          },
+          {
+            "lane": "source_2",
+            "call": "SubmitDecoderBuffers",
+            "pairs": 1,
+            "max_wall_us": 16
+          },
+          {
+            "lane": "source_3",
+            "call": "DecoderBeginFrame",
+            "pairs": 1,
+            "max_wall_us": 464
+          },
+          {
+            "lane": "source_3",
+            "call": "DecoderEndFrame",
+            "pairs": 2,
+            "max_wall_us": 244
+          },
+          {
+            "lane": "source_3",
+            "call": "GetDecoderBuffer",
+            "pairs": 8,
+            "max_wall_us": 35196
+          },
+          {
+            "lane": "source_3",
+            "call": "SubmitDecoderBuffers",
+            "pairs": 2,
+            "max_wall_us": 23
+          }
+        ],
+        "longest_decoder_input_buffer_call": {
+          "lane": "source_3",
+          "buffer_type": 0,
+          "wall_us": 35196,
+          "bracketed_shared_device_wait_us_by_peer": {
+            "source_1": 31598,
+            "source_2": 31598,
+            "renderer": 15569
+          },
+          "call_start_relative_to_interval_start_us": -3896,
+          "previous_same_thread_fence_packet_start_relative_to_call_start_us": -7511,
+          "previous_same_thread_fence_packet_stop_relative_to_call_start_us": 25454,
+          "same_thread_dxg_cpu_wait_events_inside_call": 0,
+          "get_decoder_buffer_stop_fields": [
+            "m_Ret",
+            "pBufferSize",
+            "ppBuffer"
+          ],
+          "earlier_same_decoder_type_and_stop_ppbuffer_in_window": true,
+          "earlier_same_decoder_type_and_returned_address_in_window": null,
+          "input_buffer_identity": "The provider Stop event contains an output-parameter field named ppBuffer. This trace does not resolve the returned physical buffer or a unique buffer-to-fence link.",
+          "thread_cpu_observation": {
+            "consecutive_sample_intervals": 2,
+            "bracketed_wall_us": 31598,
+            "accounted_cpu_us": 0,
+            "scope": "Sampled cumulative GetThreadTimes user and kernel CPU within the call. Sample skew and accounting resolution apply. CPU time does not distinguish waiting from ready-to-run time and excludes unsampled edges of the call."
+          },
+          "scheduler": {
+            "status": "observed",
+            "reason": null,
+            "lost": {
+              "Buffers": 0,
+              "Events": 0
+            },
+            "etl_header_covers_call": true,
+            "switch_events_bracket_call": true,
+            "running_us": 54,
+            "ready_us": 24,
+            "waiting_us": 35118,
+            "unknown_us": 0,
+            "call_relative_state_spans": [
+              {
+                "start_us": 0,
+                "end_us": 26,
+                "state": "running"
+              },
+              {
+                "start_us": 26,
+                "end_us": 27,
+                "state": "waiting",
+                "wait_reason": "UserRequest"
+              },
+              {
+                "start_us": 27,
+                "end_us": 41,
+                "state": "ready"
+              },
+              {
+                "start_us": 41,
+                "end_us": 57,
+                "state": "running"
+              },
+              {
+                "start_us": 57,
+                "end_us": 35174,
+                "state": "waiting",
+                "wait_reason": "UserRequest"
+              },
+              {
+                "start_us": 35174,
+                "end_us": 35184,
+                "state": "ready"
+              },
+              {
+                "start_us": 35184,
+                "end_us": 35196,
+                "state": "running"
+              }
+            ],
+            "decoded_event_counts": {
+              "CSwitch": 46435,
+              "ReadyThread": 29398
+            },
+            "undecodable_event_counts": {},
+            "same_thread_switches_inside_call": 4,
+            "same_thread_ready_events_inside_call": 2,
+            "wait_reason_us": {
+              "UserRequest": 35118
+            },
+            "scope": "Running measures time scheduled on a CPU. It includes possible DPC/ISR time. Scheduler wait reasons identify a state transition. The waited object and code executing on the CPU are unresolved."
+          }
+        },
+        "queue_packets_by_issuing_lane": {
+          "renderer": {
+            "starts": 9,
+            "matched_stops": 9,
+            "max_submit_to_stop_us": 22011,
+            "matched_dma_intervals": 0,
+            "max_dma_span_us": null
+          },
+          "source_1": {
+            "starts": 3,
+            "matched_stops": 3,
+            "max_submit_to_stop_us": 111741,
+            "matched_dma_intervals": 0,
+            "max_dma_span_us": null
+          },
+          "source_2": {
+            "starts": 3,
+            "matched_stops": 3,
+            "max_submit_to_stop_us": 97759,
+            "matched_dma_intervals": 0,
+            "max_dma_span_us": null
+          },
+          "source_3": {
+            "starts": 6,
+            "matched_stops": 6,
+            "max_submit_to_stop_us": 93757,
+            "matched_dma_intervals": 0,
+            "max_dma_span_us": null
+          }
+        },
+        "clock_alignment": "Native recorder construction FILETIME aligned to ETL UTC. Sub-millisecond ordering is unresolved.",
+        "scope": "Exact context, submission sequence and packet identity match. Queue lifetime includes scheduling. A GPU event query is a separate observation."
+      }
+    ],
+    "retained_capture_reduction": [
+      {
+        "frame": 8,
+        "interval": "longest recovered watchdog incident",
+        "duration_us": 220275,
+        "lost": {
+          "Buffers": 0,
+          "Events": 0
+        },
+        "etl_header_covers_interval": true,
+        "events_bracket_interval": true,
+        "video_api_calls_overlapping_interval": [
+          {
+            "lane": "source_1",
+            "call": "DecoderBeginFrame",
+            "pairs": 18,
+            "max_wall_us": 240
+          },
+          {
+            "lane": "source_1",
+            "call": "DecoderEndFrame",
+            "pairs": 18,
+            "max_wall_us": 14110
+          },
+          {
+            "lane": "source_1",
+            "call": "GetDecoderBuffer",
+            "pairs": 75,
+            "max_wall_us": 12379
+          },
+          {
+            "lane": "source_1",
+            "call": "SubmitDecoderBuffers",
+            "pairs": 18,
+            "max_wall_us": 1440
+          },
+          {
+            "lane": "source_2",
+            "call": "DecoderBeginFrame",
+            "pairs": 18,
+            "max_wall_us": 13
+          },
+          {
+            "lane": "source_2",
+            "call": "DecoderEndFrame",
+            "pairs": 18,
+            "max_wall_us": 14100
+          },
+          {
+            "lane": "source_2",
+            "call": "GetDecoderBuffer",
+            "pairs": 72,
+            "max_wall_us": 930
+          },
+          {
+            "lane": "source_2",
+            "call": "SubmitDecoderBuffers",
+            "pairs": 18,
+            "max_wall_us": 984
+          },
+          {
+            "lane": "source_3",
+            "call": "DecoderBeginFrame",
+            "pairs": 18,
+            "max_wall_us": 14
+          },
+          {
+            "lane": "source_3",
+            "call": "DecoderEndFrame",
+            "pairs": 18,
+            "max_wall_us": 14444
+          },
+          {
+            "lane": "source_3",
+            "call": "GetDecoderBuffer",
+            "pairs": 72,
+            "max_wall_us": 557
+          },
+          {
+            "lane": "source_3",
+            "call": "SubmitDecoderBuffers",
+            "pairs": 18,
+            "max_wall_us": 15506
+          }
+        ],
+        "longest_decoder_input_buffer_call": {
+          "lane": "source_1",
+          "buffer_type": 6,
+          "wall_us": 12379,
+          "bracketed_shared_device_wait_us_by_peer": {},
+          "call_start_relative_to_interval_start_us": 36,
+          "previous_same_thread_fence_packet_start_relative_to_call_start_us": -1647,
+          "previous_same_thread_fence_packet_stop_relative_to_call_start_us": 106482,
+          "same_thread_dxg_cpu_wait_events_inside_call": 0,
+          "get_decoder_buffer_stop_fields": [
+            "m_Ret",
+            "pBufferSize",
+            "ppBuffer"
+          ],
+          "earlier_same_decoder_type_and_stop_ppbuffer_in_window": true,
+          "earlier_same_decoder_type_and_returned_address_in_window": null,
+          "input_buffer_identity": "The provider Stop event contains an output-parameter field named ppBuffer. This trace does not resolve the returned physical buffer or a unique buffer-to-fence link.",
+          "thread_cpu_observation": {
+            "consecutive_sample_intervals": 0,
+            "bracketed_wall_us": 0,
+            "accounted_cpu_us": null,
+            "scope": "Sampled cumulative GetThreadTimes user and kernel CPU within the call. Sample skew and accounting resolution apply. CPU time does not distinguish waiting from ready-to-run time and excludes unsampled edges of the call."
+          },
+          "scheduler": {
+            "status": "unavailable",
+            "reason": "scheduler ETL was not supplied",
+            "lost": null,
+            "etl_header_covers_call": null,
+            "switch_events_bracket_call": null,
+            "running_us": null,
+            "ready_us": null,
+            "waiting_us": null,
+            "unknown_us": 12379,
+            "call_relative_state_spans": [
+              {
+                "start_us": 0,
+                "end_us": 12379,
+                "state": "unknown"
+              }
+            ]
+          }
+        },
+        "queue_packets_by_issuing_lane": {
+          "renderer": {
+            "starts": 7,
+            "matched_stops": 7,
+            "max_submit_to_stop_us": 80318,
+            "matched_dma_intervals": 0,
+            "max_dma_span_us": null
+          },
+          "source_1": {
+            "starts": 44,
+            "matched_stops": 44,
+            "max_submit_to_stop_us": 127974,
+            "matched_dma_intervals": 0,
+            "max_dma_span_us": null
+          },
+          "source_2": {
+            "starts": 46,
+            "matched_stops": 46,
+            "max_submit_to_stop_us": 127999,
+            "matched_dma_intervals": 0,
+            "max_dma_span_us": null
+          },
+          "source_3": {
+            "starts": 44,
+            "matched_stops": 44,
+            "max_submit_to_stop_us": 128055,
+            "matched_dma_intervals": 0,
+            "max_dma_span_us": null
+          }
+        },
+        "clock_alignment": "Native recorder construction FILETIME aligned to ETL UTC. Sub-millisecond ordering is unresolved.",
+        "scope": "Exact context, submission sequence and packet identity match. Queue lifetime includes scheduling. A GPU event query is a separate observation."
+      },
+      {
+        "frame": 6,
+        "interval": "first source miss to first ready request",
+        "duration_us": 18962,
+        "lost": {
+          "Buffers": 0,
+          "Events": 0
+        },
+        "etl_header_covers_interval": true,
+        "events_bracket_interval": true,
+        "video_api_calls_overlapping_interval": [
+          {
+            "lane": "source_1",
+            "call": "DecoderBeginFrame",
+            "pairs": 2,
+            "max_wall_us": 8
+          },
+          {
+            "lane": "source_1",
+            "call": "DecoderEndFrame",
+            "pairs": 2,
+            "max_wall_us": 14441
+          },
+          {
+            "lane": "source_1",
+            "call": "GetDecoderBuffer",
+            "pairs": 8,
+            "max_wall_us": 17
+          },
+          {
+            "lane": "source_1",
+            "call": "SubmitDecoderBuffers",
+            "pairs": 2,
+            "max_wall_us": 17
+          },
+          {
+            "lane": "source_2",
+            "call": "DecoderBeginFrame",
+            "pairs": 2,
+            "max_wall_us": 9
+          },
+          {
+            "lane": "source_2",
+            "call": "DecoderEndFrame",
+            "pairs": 2,
+            "max_wall_us": 127
+          },
+          {
+            "lane": "source_2",
+            "call": "GetDecoderBuffer",
+            "pairs": 11,
+            "max_wall_us": 15614
+          },
+          {
+            "lane": "source_2",
+            "call": "SubmitDecoderBuffers",
+            "pairs": 2,
+            "max_wall_us": 19
+          },
+          {
+            "lane": "source_3",
+            "call": "DecoderBeginFrame",
+            "pairs": 2,
+            "max_wall_us": 15
+          },
+          {
+            "lane": "source_3",
+            "call": "DecoderEndFrame",
+            "pairs": 2,
+            "max_wall_us": 183
+          },
+          {
+            "lane": "source_3",
+            "call": "GetDecoderBuffer",
+            "pairs": 8,
+            "max_wall_us": 27
+          },
+          {
+            "lane": "source_3",
+            "call": "SubmitDecoderBuffers",
+            "pairs": 2,
+            "max_wall_us": 27
+          }
+        ],
+        "longest_decoder_input_buffer_call": {
+          "lane": "source_2",
+          "buffer_type": 6,
+          "wall_us": 15614,
+          "bracketed_shared_device_wait_us_by_peer": {},
+          "call_start_relative_to_interval_start_us": 18323,
+          "previous_same_thread_fence_packet_start_relative_to_call_start_us": -705,
+          "previous_same_thread_fence_packet_stop_relative_to_call_start_us": null,
+          "same_thread_dxg_cpu_wait_events_inside_call": 0,
+          "get_decoder_buffer_stop_fields": [
+            "m_Ret",
+            "pBufferSize",
+            "ppBuffer"
+          ],
+          "earlier_same_decoder_type_and_stop_ppbuffer_in_window": true,
+          "earlier_same_decoder_type_and_returned_address_in_window": null,
+          "input_buffer_identity": "The provider Stop event contains an output-parameter field named ppBuffer. This trace does not resolve the returned physical buffer or a unique buffer-to-fence link.",
+          "thread_cpu_observation": {
+            "consecutive_sample_intervals": 0,
+            "bracketed_wall_us": 0,
+            "accounted_cpu_us": null,
+            "scope": "Sampled cumulative GetThreadTimes user and kernel CPU within the call. Sample skew and accounting resolution apply. CPU time does not distinguish waiting from ready-to-run time and excludes unsampled edges of the call."
+          },
+          "scheduler": {
+            "status": "unavailable",
+            "reason": "scheduler ETL was not supplied",
+            "lost": null,
+            "etl_header_covers_call": null,
+            "switch_events_bracket_call": null,
+            "running_us": null,
+            "ready_us": null,
+            "waiting_us": null,
+            "unknown_us": 15614,
+            "call_relative_state_spans": [
+              {
+                "start_us": 0,
+                "end_us": 15614,
+                "state": "unknown"
+              }
+            ]
+          }
+        },
+        "queue_packets_by_issuing_lane": {
+          "renderer": {
+            "starts": 0,
+            "matched_stops": 0,
+            "max_submit_to_stop_us": null,
+            "matched_dma_intervals": 0,
+            "max_dma_span_us": null
+          },
+          "source_1": {
+            "starts": 6,
+            "matched_stops": 3,
+            "max_submit_to_stop_us": 137932,
+            "matched_dma_intervals": 0,
+            "max_dma_span_us": null
+          },
+          "source_2": {
+            "starts": 6,
+            "matched_stops": 3,
+            "max_submit_to_stop_us": 137684,
+            "matched_dma_intervals": 0,
+            "max_dma_span_us": null
+          },
+          "source_3": {
+            "starts": 6,
+            "matched_stops": 3,
+            "max_submit_to_stop_us": 151311,
+            "matched_dma_intervals": 0,
+            "max_dma_span_us": null
+          }
+        },
+        "clock_alignment": "Native recorder construction FILETIME aligned to ETL UTC. Sub-millisecond ordering is unresolved.",
+        "scope": "Exact context, submission sequence and packet identity match. Queue lifetime includes scheduling. A GPU event query is a separate observation."
+      },
+      {
+        "frame": 6,
+        "interval": "up to 120 ms before first missing request",
+        "duration_us": 120000,
+        "lost": {
+          "Buffers": 0,
+          "Events": 0
+        },
+        "etl_header_covers_interval": true,
+        "events_bracket_interval": true,
+        "video_api_calls_overlapping_interval": [
+          {
+            "lane": "source_1",
+            "call": "DecoderBeginFrame",
+            "pairs": 2,
+            "max_wall_us": 12
+          },
+          {
+            "lane": "source_1",
+            "call": "DecoderEndFrame",
+            "pairs": 2,
+            "max_wall_us": 173
+          },
+          {
+            "lane": "source_1",
+            "call": "GetDecoderBuffer",
+            "pairs": 8,
+            "max_wall_us": 21
+          },
+          {
+            "lane": "source_1",
+            "call": "SubmitDecoderBuffers",
+            "pairs": 2,
+            "max_wall_us": 25
+          },
+          {
+            "lane": "source_2",
+            "call": "DecoderBeginFrame",
+            "pairs": 3,
+            "max_wall_us": 256
+          },
+          {
+            "lane": "source_2",
+            "call": "DecoderEndFrame",
+            "pairs": 2,
+            "max_wall_us": 188
+          },
+          {
+            "lane": "source_2",
+            "call": "GetDecoderBuffer",
+            "pairs": 9,
+            "max_wall_us": 65951
+          },
+          {
+            "lane": "source_2",
+            "call": "SubmitDecoderBuffers",
+            "pairs": 2,
+            "max_wall_us": 90
+          },
+          {
+            "lane": "source_3",
+            "call": "DecoderBeginFrame",
+            "pairs": 2,
+            "max_wall_us": 10
+          },
+          {
+            "lane": "source_3",
+            "call": "DecoderEndFrame",
+            "pairs": 2,
+            "max_wall_us": 187
+          },
+          {
+            "lane": "source_3",
+            "call": "GetDecoderBuffer",
+            "pairs": 8,
+            "max_wall_us": 15
+          },
+          {
+            "lane": "source_3",
+            "call": "SubmitDecoderBuffers",
+            "pairs": 2,
+            "max_wall_us": 144
+          }
+        ],
+        "longest_decoder_input_buffer_call": {
+          "lane": "source_2",
+          "buffer_type": 0,
+          "wall_us": 65951,
+          "bracketed_shared_device_wait_us_by_peer": {
+            "source_1": 46182,
+            "source_3": 46182,
+            "renderer": 30920
+          },
+          "call_start_relative_to_interval_start_us": 52212,
+          "previous_same_thread_fence_packet_start_relative_to_call_start_us": -27384,
+          "previous_same_thread_fence_packet_stop_relative_to_call_start_us": 2829,
+          "same_thread_dxg_cpu_wait_events_inside_call": 0,
+          "get_decoder_buffer_stop_fields": [
+            "m_Ret",
+            "pBufferSize",
+            "ppBuffer"
+          ],
+          "earlier_same_decoder_type_and_stop_ppbuffer_in_window": true,
+          "earlier_same_decoder_type_and_returned_address_in_window": null,
+          "input_buffer_identity": "The provider Stop event contains an output-parameter field named ppBuffer. This trace does not resolve the returned physical buffer or a unique buffer-to-fence link.",
+          "thread_cpu_observation": {
+            "consecutive_sample_intervals": 3,
+            "bracketed_wall_us": 46182,
+            "accounted_cpu_us": 0,
+            "scope": "Sampled cumulative GetThreadTimes user and kernel CPU within the call. Sample skew and accounting resolution apply. CPU time does not distinguish waiting from ready-to-run time and excludes unsampled edges of the call."
+          },
+          "scheduler": {
+            "status": "unavailable",
+            "reason": "scheduler ETL was not supplied",
+            "lost": null,
+            "etl_header_covers_call": null,
+            "switch_events_bracket_call": null,
+            "running_us": null,
+            "ready_us": null,
+            "waiting_us": null,
+            "unknown_us": 65951,
+            "call_relative_state_spans": [
+              {
+                "start_us": 0,
+                "end_us": 65951,
+                "state": "unknown"
+              }
+            ]
+          }
+        },
+        "queue_packets_by_issuing_lane": {
+          "renderer": {
+            "starts": 25,
+            "matched_stops": 25,
+            "max_submit_to_stop_us": 127482,
+            "matched_dma_intervals": 0,
+            "max_dma_span_us": null
+          },
+          "source_1": {
+            "starts": 6,
+            "matched_stops": 6,
+            "max_submit_to_stop_us": 41417,
+            "matched_dma_intervals": 0,
+            "max_dma_span_us": null
+          },
+          "source_2": {
+            "starts": 6,
+            "matched_stops": 6,
+            "max_submit_to_stop_us": 30213,
+            "matched_dma_intervals": 0,
+            "max_dma_span_us": null
+          },
+          "source_3": {
+            "starts": 6,
+            "matched_stops": 6,
+            "max_submit_to_stop_us": 57153,
+            "matched_dma_intervals": 0,
+            "max_dma_span_us": null
+          }
+        },
+        "clock_alignment": "Native recorder construction FILETIME aligned to ETL UTC. Sub-millisecond ordering is unresolved.",
+        "scope": "Exact context, submission sequence and packet identity match. Queue lifetime includes scheduling. A GPU event query is a separate observation."
+      }
+    ],
+    "pointer_calibration": {
+      "probe_sha256": "a5d9e1ce4d8efbfa384dfbe6daadace2e1e111a0bd973587b579fc51b30cc4c6",
+      "successful_calls": 2,
+      "schema": "Two same-PID/TID/decoder type-0 S_OK pairs on this provider build",
+      "matched_returned_pointer_and_byte_count": 2,
+      "matched_output_parameter_addresses": 0,
+      "lost_buffers": 0,
+      "lost_events": 0,
+      "physical_allocation_or_fence_identity": false
+    },
+    "array_experiment": {
+      "adapter": "same Radeon 890M",
+      "descriptor_probe_sha256": "decb96b7d862871ac2908d353ed15d1e6fc03e857dcf3ee3696a4976021012ba",
+      "decoded_probe_sha256": "f22a6493e5c8e9ac07f674f1fb7091777d1354978d1523c1dcb6848b3800c67b",
+      "attempts": [
+        {
+          "stage": "share",
+          "format": "NV12",
+          "storage_width": 3840,
+          "storage_height": 2160,
+          "slices": 35,
+          "extended_sharing": true,
+          "both_plane_views": true,
+          "whole_array_concurrent_acquisition": "WAIT_TIMEOUT",
+          "handoff_and_return": true,
+          "matched_visible_bytes": null,
+          "matched_pts": null,
+          "owned_survivors": 0
+        },
+        {
+          "stage": "share",
+          "format": "P010",
+          "storage_width": 3840,
+          "storage_height": 2176,
+          "slices": 35,
+          "extended_sharing": true,
+          "both_plane_views": true,
+          "whole_array_concurrent_acquisition": "WAIT_TIMEOUT",
+          "handoff_and_return": true,
+          "matched_visible_bytes": null,
+          "matched_pts": null,
+          "owned_survivors": 0
+        },
+        {
+          "stage": "picture",
+          "format": "NV12",
+          "storage_width": 3840,
+          "storage_height": 2160,
+          "slices": 35,
+          "extended_sharing": true,
+          "both_plane_views": true,
+          "whole_array_concurrent_acquisition": "WAIT_TIMEOUT",
+          "handoff_and_return": true,
+          "matched_visible_bytes": 12441600,
+          "matched_pts": 0,
+          "owned_survivors": 0
+        },
+        {
+          "stage": "picture",
+          "format": "P010",
+          "storage_width": 3840,
+          "storage_height": 2176,
+          "slices": 35,
+          "extended_sharing": true,
+          "both_plane_views": true,
+          "whole_array_concurrent_acquisition": "WAIT_TIMEOUT",
+          "handoff_and_return": true,
+          "matched_visible_bytes": 24883200,
+          "matched_pts": 0,
+          "owned_survivors": 0
+        }
+      ],
+      "decision": "Reject whole-array keyed ownership for independent slice consumption; the renderer can still be excluded during a decoder transaction.",
+      "interdevice_picture_copies": 0,
+      "readback": "Two reference/consumer verification paths in the isolated decoded experiment only",
+      "pending_generations_and_concurrent_retirement": "unqualified"
+    },
+    "regression": {
+      "python_total": 221,
+      "python_passed": 220,
+      "python_skipped": 1
+    },
+    "privacy": {
+      "pre": {
+        "source_count": 3,
+        "private_folder_tracked_files": 0,
+        "private_history_path_matches": 0,
+        "private_content_objects": 0,
+        "private_text_objects": 0,
+        "private_working_text_files": 0,
+        "missing_originals": 0,
+        "original_hashes_verified": true,
+        "changed_originals": 0
+      },
+      "post": {
+        "source_count": 3,
+        "private_folder_tracked_files": 0,
+        "private_history_path_matches": 0,
+        "private_content_objects": 0,
+        "private_text_objects": 0,
+        "private_working_text_files": 0,
+        "missing_originals": 0,
+        "original_hashes_verified": true,
+        "changed_originals": 0
+      }
+    },
+    "qualification": {
+      "ordinary_result": "prior recorder-off candidate failed 104.604 ms > 100 ms",
+      "new_playback_worker": false,
+      "ordinary_reverse_pair": "withheld",
+      "new_physical_msi": "withheld",
+      "long_qualifications": "withheld until both ordinary directions and actual MSI short gates pass",
+      "default_and_whole_project_fallback": "FFmpeg"
     }
   }
 }

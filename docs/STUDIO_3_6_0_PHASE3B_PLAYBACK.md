@@ -1,8 +1,44 @@
 # VlogCraft Studio 3.6.0 Phase 3B playback and editing
 
+## Same-call scheduler evidence and decoder-array sharing
+
+The corrected worker missed the ordinary active-gap limit at the November 24 checkpoint. A subsequent instrumented run captured the decoder thread's scheduling state throughout an input-buffer acquisition. An isolated two-device experiment also established what can be shared on the Radeon 890M. Production playback retains the guarded continuous-cut rollback, source-first polling, bounded refill and shared FFmpeg device. All earlier timing failures remain in the ledger.
+
+| Three-layer UHD60, ordinary 958 × 539 surface | Wall seconds | Distinct FPS | Skips | Maximum active gap |
+|---|---:|---:|---:|---:|
+| Earlier control, recorder off, frozen MSI | 60.200 | 59.120 | 40 | 505.267 ms |
+| Earlier corrected worker, recorder off | 60.084 | 59.766 | 5 | 104.604 ms |
+| Earlier corrected worker, API and GPU tracing | 60.5635 | 58.897 | 32 | 220.293 ms |
+| Corrected worker, API, GPU and scheduler tracing | 60.2002 | 59.568 | 13 | 124.165 ms |
+
+All four observations used the same frame and PCM endpoints. The new run had zero underruns and owned survivors, frame 3599 and 2,880,000 sample frames. It held foreground visibility, AC, original fixture offsets, 120 Hz and 175% scaling. Peak live decoders, queued source pictures and in-flight compositor frames were 3, 4 and 4. The wall denominator includes the observer. Its excess over the nominal minute was 200.2 ms. The precise terminal acknowledgement delay was unmeasured with this recorder configuration. Active interval p95 and p99 histogram upper bounds were 18 and 19.5 ms. All 13 skips followed a source wait.
+
+### Inside the decoder call
+
+The same PID, thread and D3D11 API pair identified source 3 acquiring picture parameters. The 35.196 ms call began 0.543 ms into the 124.170 ms watchdog incident after frame 3. Context-switch and ready-thread edges accounted for **35.118 ms waiting** with reason `UserRequest`, **0.024 ms ready** and **0.054 ms scheduled**. The thread waited from +0.057 to +35.174 ms in the longer of two waits. Two peer decoders each waited on the shared device for at least 31.598 ms. The renderer waited at least 15.569 ms. These observations overlap. Scheduling data identifies neither the specific waited object nor a module or instruction executing during the scheduled portion.
+
+The previous same-thread fence-bearing queue packet completed at +25.454 ms, 9.720 ms before the thread became ready. No unique input-buffer/fence mapping was exposed. Frame 10, the first observed missing request, came 88.700 ms after the acquisition ended. All three source floors were 1792 for target 2560 at 1/15360 with no successor. The first fully covered request, frame 15, followed 77.958 ms later with floors of 3840 and successors of 4096. During that recovery, another decoder spent 13.193 of 13.238 ms in a scheduler wait with reason `WrPushLock`. The timing supports a contribution to lost source coverage. Other work occupied the rest of the presentation gap.
+
+Both ETLs used the same boot and performance counter and reported zero lost buffers or events. Independent raw QPC timestamps from two windows 55 seconds apart agreed with their relative UTC origins at the 100 ns resolution checked. Dumper boundaries use integer microseconds. The native sample/ETL alignment has sub-millisecond uncertainty. The recorder retained all 3,604 requests with zero torn polls. The older 65.951 ms call had zero accounted thread CPU in 46.182 ms of coherent samples. Its individual scheduler states remain unknown.
+
+Two isolated successful acquisitions on this workstation matched the Stop event's `ppBuffer` and `pBufferSize` to the **returned CPU pointer and byte count**. Distinct storage addresses for the caller's output parameters matched neither field. This calibrates the local provider schema. Reuse of that CPU pointer still does not identify a driver allocation or synchronization object. [D3D11 API contract](https://learn.microsoft.com/en-us/windows/win32/api/d3d11/nf-d3d11-id3d11videocontext-getdecoderbuffer).
+
+### Independent-device admission experiment
+
+FFmpeg 9.0.2 uses a recursive device mutex and the immediate video context. It enables D3D multithread protection when the interface is available. The frame transaction holds the shared callback across input acquisition, copy, release, submission and end-frame. The playback worker shares that device between producers and renderer. Unlocking an individual call inside the transaction would break this ownership contract. [FFmpeg device construction](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libavutil/hwcontext_d3d11va.c#L471-L501) · [FFmpeg decode transaction](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libavcodec/dxva2.c#L814-L965).
+
+The probe first decoded each generated source with the existing decoder configuration. It closed that pool and created an equally sized, shareable decoder array. A second device on the same adapter opened the array and created both shader plane views. The producer took the keyed mutex before FFmpeg decoded and retained the frame through consumer completion. The consumer compared every visible luma and chroma byte with the control, including all ten significant bits for P010. The open itself required zero inter-device copies. CPU staging and readback were confined to picture verification.
+
+| Tested first picture, PTS 0 | Decoder storage | Array slices | Visible bytes matched |
+|---|---:|---:|---:|
+| H.264 NV12 | 3840 × 2160 | 35 | 12,441,600 |
+| HEVC P010 | 3840 × 2176 | 35 | 24,883,200 |
+
+Both initial descriptor probes and both real-picture handoffs passed, with zero owned survivors. In both formats the consumer's immediate acquisition timed out while the producer held the array. Only releasing the entire array allowed the consumer to acquire it. A picture from an earlier slice therefore cannot be sampled independently through this mutex during a later decoder stall. The result rejects this design for normal playback. It establishes no FPS improvement. Cross-device generation changes, cancellation with work pending and concurrent retirement still need a viable ownership design. The existing worker, package and resource gates retain their previous status. [Extended sharing](https://learn.microsoft.com/en-us/windows/win32/direct3d11/direct3d-11-1-features#extended-support-for-shared-texture2d-resources) · [Reproduction and next decision](STUDIO_3_6_0_PHASE3B_HANDOFF.md#scheduler-and-sharing-handoff).
+
 The starting point was Phase 3A at [f4a852b](https://github.com/JakubSoltysiak/VlogCraft/commit/f4a852ba36d9cd6e417c2cbfd1dc90af1ad2d630). [Draft PR #21](https://github.com/JakubSoltysiak/VlogCraft/pull/21) targets the Phase 3A branch. Windows results use the development MSI applications on the Radeon 890M workstation. Administrative MSI images and test projects were local and isolated from the user's active installation and projects.
 
-Current results are in the [refill deferral follow-up](#refill-deferral-during-present). The [source-readiness follow-up](#source-readiness-and-terminal-acknowledgement-follow-up) documents the earlier recorder and timing changes. The earlier [triggered freeze investigation](#triggered-freeze-investigation) preserves the first stall diagnosis. The preceding [follow-up qualification](#follow-up-acceptance-protocol) established the comparison package. Three 125-second rapid-switch runs completed with zero skips. Two of three 60-second three-layer runs met all timing screens. The third lost 222 frames.
+Earlier package results are in the [refill deferral follow-up](#refill-deferral-during-present). The [source-readiness follow-up](#source-readiness-and-terminal-acknowledgement-follow-up) documents the earlier recorder and timing changes. The earlier [triggered freeze investigation](#triggered-freeze-investigation) preserves the first stall diagnosis. The preceding [follow-up qualification](#follow-up-acceptance-protocol) established the comparison package. Three 125-second rapid-switch runs completed with zero skips. Two of three 60-second three-layer runs met all timing screens. The third lost 222 frames.
 
 ## Playback architecture and reproduced problems
 

@@ -113,7 +113,16 @@ jobs:
           $refillRecord = "$phase3bRefill/docs/benchmarks/studio-3.6.0-phase3b.json"
           python "$phase3bRefill/tools/performance_record.py" $refillRecord --historical-record $readinessRecord
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          python tools/performance_record.py docs/benchmarks/studio-3.6.0-phase3b.json --historical-record $refillRecord
+          $phase3bPolling = 'build/qa/phase3b-polling-checkpoint'
+          New-Item -ItemType Directory -Force -Path $phase3bPolling | Out-Null
+          git archive --format=tar --output=build/qa/phase3b-polling-checkpoint.tar 2251870cd2f936c6f982f50432c5ec8ae4529a25
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          tar -xf build/qa/phase3b-polling-checkpoint.tar -C $phase3bPolling
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $pollingRecord = "$phase3bPolling/docs/benchmarks/studio-3.6.0-phase3b.json"
+          python "$phase3bPolling/tools/performance_record.py" $pollingRecord --historical-record $refillRecord
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tools/performance_record.py docs/benchmarks/studio-3.6.0-phase3b.json --historical-record $pollingRecord
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python tests/icon_assets.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

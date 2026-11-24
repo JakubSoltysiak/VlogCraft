@@ -1,5 +1,61 @@
 # Phase 3B qualification handoff
 
+## Scheduler and sharing handoff
+
+Resume from the published head of draft #21 on `codex/studio-3.6.0-phase3b`. The current evidence is in `input_buffer_investigation` in the [ledger](benchmarks/studio-3.6.0-phase3b.json). The preceding checkpoint is `2251870cd2f936c6f982f50432c5ec8ae4529a25`. The playback worker still comes from `d247b6a615ae115296ff834e4214f71b186a5b64`, SHA-256 `3c2651afa4c611b81ae11f3e6b56a859e55f8716e40f3f793e69bac6314c9f1b`. The last physically tested MSI comes from `b42e37630810e880a38dda2b111168b9bd5d11f9`, SHA-256 `8047cde8308fe394abc2fa2c6543d6c02f8b5dd2dc6ed7accfdb34e76daa0cf5`.
+
+**Next decision, GPT-6.2 Astra High.** The 35.196 ms input acquisition spent 35.118 ms waiting. Its operating-system wait object is unknown. A second device read exact NV12 and P010 samples from the true 35-slice decoder pool. Whole-array keyed ownership prevented simultaneous access. The next architectural question is whether an already-decoded slice can remain available while its producer enters the next slow video call. Test this in isolation with directional producer/consumer fences, a retained AVFrame through consumer completion, and documented same-adapter sharing support. Require measured resource bounds, stale-generation suppression, actual pending cancellation/teardown, and byte-exact results on both formats. If a separate GPU copy or allocation is necessary, quantify its per-layer cost and residency before changing the playback path. Preserve the shared-context fallback.
+
+The earlier R→F recorder-off pair failed the gap limit. For a changed worker run the focused floor/rewind, concurrent successor, liveness, seek, cancel and shutdown checks first. Then run one ordinary R→F pair, followed by F→R only after a pass. Keep every attempt. A passing pair and reversal unlock a new MSI and its physical package gates. The ordered 600-second playback, editing smoke and 30-minute editing tests follow those short gates. Use Sol High for bounded qualification once ownership is settled. Treat cache publication at 268 characters and cold mixed-preview preparation as independent work.
+
+### Reproducing the scheduler measurement
+
+The reviewed `inputbuf1` results are complete. A repeat requires a new question and a fresh directory. Set `$py`, the pinned SDK, generated fixtures, MSI paths and hash-verified corrected worker as below in the earlier handoff. These two shells were used for the successful capture. Only the WPR shell requires Administrator privileges. The application stays in the normal desktop session.
+
+```powershell
+# Normal shell, once for a fresh cohort. The corrected binary is reused.
+$name = 'inputbuf2'
+$run = "build/qa/phase3b-watch/$name"
+& $py benchmarks/phase3b_stall_campaign.py --results $run refill-prepare --latest-msi $cand4Msi --prior-msi $cand3Msi --diagnostic-worker $worker --media $media --comparison poll-order --hold-arm D
+if ($LASTEXITCODE -ne 0) { throw 'Preparation failed' }
+```
+
+```powershell
+# Administrator shell, at the worktree root. Start only this named collector.
+& ./benchmarks/windows/collect-decoder-scheduler.ps1 -RunName inputbuf2
+```
+
+```powershell
+# Normal shell, as soon as the collector has signalled readiness.
+if (!(Test-Path "$run/scheduler.ready")) { throw 'Scheduler has not started' }
+& $py benchmarks/phase3b_stall_campaign.py --results $run decoder-attribution
+# Wait for the Administrator command to finish saving its ETL before reduction.
+& $py benchmarks/phase3b_gpu_events.py "$run/api-gpu.private.etl" "$run/api-attribution-d-stall.private.jsonl" --scheduler-etl "$run/scheduler.private.etl" --output "$run/correlated.json"
+```
+
+WPR uses a named instance, 512 × 1024 KiB memory buffers and a 120-second deadline. It stops on the attempt receipt or timeout. The normal runner owns a separate 1536 MiB circular GPU/API trace and stops its own session on exit. Verify zero event loss and same-call coverage before interpreting results. Raw ETLs and acquisition addresses stay local. The reviewed run requires no further elevation.
+
+### Reproducing the isolated probes
+
+```powershell
+$sdk = (Resolve-Path 'build/tools/architecture/ffmpeg-shared/ffmpeg-9.0.2-full_build-shared').Path
+$zig = (Resolve-Path 'build/tools/architecture/zig/zig-x86_64-windows-0.17.1/zig.exe').Path
+$out = (New-Item -ItemType Directory 'build/qa/input-buffer-probes-next').FullName
+$env:PATH = "$sdk/bin;$env:PATH"
+& $zig c++ -std=c++17 -O2 -target x86_64-windows-gnu benchmarks/windows/decoder-buffer-probe.cpp -ld3d11 -ldxguid -o "$out/buffer-probe.exe"
+if ($LASTEXITCODE -ne 0) { throw 'Calibration build failed' }
+& $py benchmarks/windows/calibrate_decoder_buffer.py "$out/buffer-probe.exe" "$out/calibration"
+if ($LASTEXITCODE -ne 0) { throw 'Calibration failed' }
+& $zig c++ -std=c++17 -O2 -target x86_64-windows-gnu benchmarks/windows/decoder-array-sharing.cpp "-I$sdk/include" "-L$sdk/lib" -lavformat -lavcodec -lavutil -lswscale -ld3d11 -ldxgi -o "$out/array-picture.exe"
+if ($LASTEXITCODE -ne 0) { throw 'Sharing probe build failed' }
+foreach ($fixture in @('h264-4k60-0.mp4','hevc10-4k5994.mp4')) {
+    & $py benchmarks/run_qa.py --results "$out/$fixture-result" --timeout 30 --status "$out/status.json" -- "$out/array-picture.exe" (Join-Path $media $fixture)
+    if ($LASTEXITCODE -ne 0) { throw 'Sharing probe failed' }
+}
+```
+
+The following sections preserve historical campaigns and their original gates.
+
 Use [draft PR #21](https://github.com/JakubSoltysiak/VlogCraft/pull/21) and its published head on `codex/studio-3.6.0-phase3b`. The [current playback report](STUDIO_3_6_0_PHASE3B_PLAYBACK.md) gives the diagnosis and short-gate status. The [benchmark record](benchmarks/studio-3.6.0-phase3b.json) records the build commit, native-source digest, development MSI hash and extracted host and playback worker hashes for the tested candidate in `refill_investigation.candidate_identity`. Earlier tests remain in `readiness_investigation` and `freeze_investigation`.
 
 **Long qualification remains blocked.** All three protected trials missed 59.5 FPS, two exceeded the skip and active-gap limits, and the ordinary 958 × 539 preview measured a 1.193 s gap. Retain all attempts and the original wall-time definition.

@@ -1,5 +1,11 @@
 # VlogCraft Studio development qualification
 
+## Phase 3B decoder input and scheduler qualification
+
+One serial, visible three-layer run on AC captured matching API, GPU and scheduler events with zero trace loss. The corrected worker reached 59.568 wall FPS, 13 skips and a 124.165 ms active gap. Frame 3599, 2,880,000 PCM frames, zero underruns and zero owned survivors passed. The captured 35.196 ms picture-parameter call spent 35.118 ms waiting. Its operating-system wait object is unresolved. The earlier 104.604 ms recorder-off failure still controls ordinary qualification.
+
+An independent two-call calibration identified the provider's returned CPU pointer and byte count. Both generated NV12/P010 fixtures passed cross-device first-picture and PTS comparisons. All 12,441,600 and 24,883,200 visible bytes matched respectively. The second device could acquire the decoder array only after the producer released the whole pool. The shared-array experiment remains isolated. Original hashes and modification times matched before and after the work. Local Python regression ran 221 tests with 220 passes and one skip. [Measurements and limitations](docs/STUDIO_3_6_0_PHASE3B_PLAYBACK.md#same-call-scheduler-evidence-and-decoder-array-sharing) · [Executable handoff](docs/STUDIO_3_6_0_PHASE3B_HANDOFF.md#scheduler-and-sharing-handoff).
+
 ## Phase 3B polling order and decoder progress
 
 The corrected implementation `d247b6a` delivered 59.766 FPS, five skips and a 104.604 ms active gap on the recorder-off 958 × 539 workload. The matched `cand4` MSI delivered 59.120 FPS, 40 skips and 505.267 ms. Both finished frame 3599 with 2,880,000 PCM samples, zero underruns and clean shutdown. The 100 ms short prerequisite failed. The candidate remains a separately identified worker in a clone of the verified host. The last physically tested MSI is the earlier `8047cde8…` package.
