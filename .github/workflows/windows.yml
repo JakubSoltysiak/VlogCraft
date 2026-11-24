@@ -131,7 +131,12 @@ jobs:
           $schedulerRecord = "$phase3bScheduler/docs/benchmarks/studio-3.6.0-phase3b.json"
           python "$phase3bScheduler/tools/performance_record.py" $schedulerRecord --historical-record $pollingRecord
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          python tools/performance_record.py docs/benchmarks/studio-3.6.0-phase3b.json --historical-record $schedulerRecord
+          $pictureRecord = 'build/qa/phase3b-independent-picture.json'
+          git show 613f2fba56ae411943f079eafc88fab4d1fff2b1:docs/benchmarks/studio-3.6.0-phase3b.json | Set-Content -Encoding utf8 $pictureRecord
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -c "import json,sys; from tools.performance_record import check_history; check_history(json.load(open(sys.argv[1], encoding='utf8')), json.load(open(sys.argv[2], encoding='utf8')))" $pictureRecord $schedulerRecord
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tools/performance_record.py docs/benchmarks/studio-3.6.0-phase3b.json --historical-record $pictureRecord
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python tests/icon_assets.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

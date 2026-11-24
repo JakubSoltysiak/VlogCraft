@@ -54,7 +54,7 @@ PROTOCOL_FILES=(
  'benchmarks/windows/decoder-buffer-probe.cpp','benchmarks/windows/calibrate_decoder_buffer.py','tests/test_decoder_buffer_calibration.py',
  'benchmarks/windows/decoder-array-sharing.cpp',
  'benchmarks/windows/completed-picture.cpp','benchmarks/windows/handoff-pixels.h','benchmarks/windows/completed_picture_probe.py',
- 'tests/native_picture_handoff.py',
+ 'tests/native_picture_handoff.py','tests/native_handoff_scheduler.cpp',
  'tests/native_refill_liveness.cpp','tests/test_native_refill_liveness.py',
  'benchmarks/phase3b_completion.py','tests/test_native_completion_trace.py',
  'benchmarks/phase3b_mixed_preview.py','benchmarks/profile_preview_proxy.py','tests/native_source_timebase.py','tests/native_source_rewind.py',

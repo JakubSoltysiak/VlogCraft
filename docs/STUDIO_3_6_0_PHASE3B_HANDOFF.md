@@ -1,5 +1,11 @@
 # Phase 3B qualification handoff
 
+## Timestamped playback checkpoint
+
+The queue and fence changes are implemented and both ordinary first pairs failed. The evidence lives in `timestamped_handoff` in the [ledger](benchmarks/studio-3.6.0-phase3b.json). The [trial table](STUDIO_3_6_0_PHASE3B_PLAYBACK.md#timestamped-per-layer-preparation) identifies the tested workers and unchanged thresholds. Use the existing retained original-offset three-layer cohort for direct comparison. The first question after this checkpoint is which layer lacks a proved source interval versus a prepared exact copy at the missed deadline. Correlate that distinction with the 30-frame cut cadence before changing the two-slot budget or decoder transactions. A short recorder-enabled diagnostic may answer it. Retain the recorder-off gate for qualification.
+
+For changes affecting ownership, run `python benchmarks/windows/completed_picture_probe.py <media> <fresh-output> --scheduler` and `--fenced` in separate directories. The `--publication` mode reproduces the older lock dependency. Follow with the existing VFR, pending-rewind and pixel-parity checks and the ordinary pair commands below. The reference exporter runs independently of the experimental playback worker. [First vlog delivery audit](phase3b-vlog-export.md).
+
 ## Independent picture handoff
 
 The bounded two-slot contract passed on both UHD formats. The first ordinary R→F comparison failed. The opt-in worker rendered 16.697 FPS, skipped 2,595 frames and recorded a 5,531.420 ms active gap. The frozen MSI rendered 58.791 FPS, skipped 42 and recorded a 499.933 ms gap. Both arms passed the visibility, workload and audio controls. Continue from the published head of draft #21. The tested worker came from `14846b6b82b8457137960085e229ba683f2899b6` with SHA-256 `d3e65d037ee0e4576b082b620ee775e5a892c8da228d98386a6dced7fb11b637`. The two independent verifier hashes, per-picture timings, memory readings and all failed attempts are in the [playback report](STUDIO_3_6_0_PHASE3B_PLAYBACK.md#independent-completed-pictures-on-radeon-890m) and the ledger's `completed_picture_investigation` entry.

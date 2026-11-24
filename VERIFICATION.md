@@ -1,5 +1,9 @@
 # VlogCraft Studio development qualification
 
+## Phase 3B timestamped pictures and full-quality export
+
+Per-layer timestamped preparation, actual prefetched slot reuse across a blocked peer, true-seek invalidation, VFR selection and rewind passed on the physical workstation. The second candidate also published, verified and retired exact NV12 and P010 samples under a blocked decoder with a producer-local fence. Ordinary playback failed at 42.842 FPS with event queries and 42.305 FPS with fences. The default player uses the shared device. The reference export audit verified a 48-picture UHD60 HDR10+ excerpt from the saved vlog. [Playback trials and identities](docs/STUDIO_3_6_0_PHASE3B_PLAYBACK.md#timestamped-per-layer-preparation) · [Vlog export qualification](docs/phase3b-vlog-export.md).
+
 ## Phase 3B independent GPU pictures
 
 On Radeon 890M, a second device rendered and completed eight generated UHD pictures per format with exact NV12/P010 samples and timestamps. For each format, one draw completed during a controlled block inside a real subsequent FFmpeg decode. The unblocked attempts did not capture a whole draw finishing inside the natural call. Pending copy/render cancellation, two-slot backpressure and bounded teardown passed. The opt-in player passed exact VFR/rewind and FP16 parity across a backward cut. The Python suite ran 224 tests in 74.630 seconds with one skip for a separate locally compiled export worker. Hash, Git history and working-tree checks passed for all three private originals before and after the campaign.

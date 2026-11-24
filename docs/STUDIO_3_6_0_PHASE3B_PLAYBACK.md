@@ -1,5 +1,25 @@
 # VlogCraft Studio 3.6.0 Phase 3B playback and editing
 
+## Timestamped per-layer preparation
+
+| Recorder-off, original three-layer UHD workload, 958 × 539 preview | Distinct FPS | Skips | Maximum active gap (ms) | Audio underruns |
+|---|---:|---:|---:|---:|
+| Previous request-invalidating worker | 16.697 | 2,595 | 5,531.420 | 0 |
+| Frozen R paired with timestamped queues | 59.784 | 0 | 47.115 | 0 |
+| Timestamped queues F | 42.842 | 1,021 | 587.559 | 0 |
+| Frozen R paired with fence publication | 58.799 | 54 | 584.183 | 0 |
+| Timestamped queues and fence publication F | 42.305 | 1,036 | 1,289.130 | 0 |
+
+Both new pairs passed the measurement controls. All four arms reached frame 3599 with 2,880,000 sample frames and zero owned survivors. Neither candidate passed the unchanged 59.5 FPS, fewer-than-30 skips and 100 ms maximum gap requirements. The fence worker used three fence-enabled lanes, made 2,564 handoff draws through drain and had zero fallbacks. All 1,036 skips followed a source wait, with 12,652 active source-wait iterations and zero compositor-slot waits. Fence publication resolved a controlled lock dependency and demonstrated no additional throughput benefit in its ordinary trial. The combinations of decoder floor and copy availability across lanes at individual missed deadlines remain unknown. Reversal, physical package, protected and endurance gates remain pending.
+
+The timestamped/event worker was built from `bd11ee44d437a949a9f7c8b54ef53d60e5f0bcae`, SHA-256 `51acb70e7c84d9d473c9316fd5f1b3510a47d1f20570499f637eb7be7a9b09e1`. The fence worker was built from `35ea06415b5b8f89e206072ce75d5ce8cc44bba1`, SHA-256 `39eca2f412fdc1205d9bd574c3ce0da6c02b1b4ca838051ac08260bc2a36a28f`. Both ran in the same frozen host. Reference MSI SHA-256 `8047cde8308fe394abc2fa2c6543d6c02f8b5dd2dc6ed7accfdb34e76daa0cf5`. Each passed hardware VFR, exact seek during pending rewind, backwards cut and six FP16 comparisons per format. The final worker verified 120 layer/frame pairs and closed in 78 ms during another pending rewind.
+
+The experimental player offers each lane the selected decoded picture and its next available source timestamp. The producer exposes them through a read-only snapshot of its queue, warm frames or verified outgoing cut tail. Only the original source selector can authorize a picture for composition. A new picture on the same transport can reuse an existing copy. A seek invalidates all old leases, including copies with the same PTS. The ring still has two images per layer and retires each after its last consumer GPU use. The default player uses the shared device. [Upstream implementation comparison](phase3b-upstream.md).
+
+On both UHD formats, a real producer-lock challenge advanced the clock during a blocked transfer, kept a peer unavailable, acquired the exact prefetched successor, retired and reused the old slot, then rejected the previous lease on a same-PTS seek. A separate local GPU fence confirmed that the initial version could finish a copy while its publication thread still waited for the FFmpeg device lock. In the revised implementation, the producer signals a fence and releases the image key within the original serialized transaction. Publication reads the completed value without entering the decoder context. An unavailable fence or failed signal uses the event-query path. Consumer completion and source retention remain in force. [D3D11 Signal](https://learn.microsoft.com/en-us/windows/win32/api/d3d11_3/nf-d3d11_3-id3d11devicecontext4-signal) · [DXGI keyed surface ownership](https://learn.microsoft.com/en-us/windows/win32/api/dxgi/nf-dxgi-idxgikeyedmutex-releasesync).
+
+The independent compositor published, verified and retired the fenced NV12 picture 8.919 ms after the controlled block began. The P010 picture retired at 11.994 ms. All eight pictures per format matched the reference. Tests observed both pending-copy and pending-consumer cancellation, capacity backpressure, two retained sources at peak and zero retained after cancellation. GPU copy-duration timestamps were unavailable in the fence-only observation path. The earlier query measurement applies to the earlier worker.
+
 ## Independent completed pictures on Radeon 890M
 
 The compositor finished a verified UHD draw while the next real FFmpeg decode call held its device lock in a controlled block. The same ownership mechanism in the opt-in three-layer player failed the first ordinary comparison. The shared-device player remains the default. The previously tested corrected shared-device worker came from `d247b6a`; its previously recorded 104.604 ms gap still exceeds the 100 ms limit.

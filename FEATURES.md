@@ -4,6 +4,7 @@ Tested means the specific check in VERIFICATION.md passed. Implemented means cod
 
 | 3.6.0 Phase 3B editing transport | Status | Verified scope and remaining limits |
 |---|---|---|
+| Independent GPU picture queues | Experimental | Exact NV12/P010, bounded retirement, seek fencing and independent preparation passed. Ordinary three-layer playback reached 42.305 FPS with fenced publication. [Physical trials](docs/STUDIO_3_6_0_PHASE3B_PLAYBACK.md#timestamped-per-layer-preparation). |
 | Native timeline ruler | Tested subset | Coalesced transient seeks, exact released frame, a single committed recovery checkpoint and PCM preparation, and no stale playhead movement on the tested ruler drag. The final matched ruler repeat improved release-to-picture latency. Cold seek latency and broader workloads remain under qualification. |
 | Native source handoff | Tested subset | Reuses compatible decoders across cuts. An independent four-source Windows fixture verified source identity on the visible surface, held VFR timestamps, bounded queues, exact PCM and cancellation. The packaged timestamp check verified 117 layer/frame selections across backward cuts, including seek and shutdown while preparation was pending. Two of three 60-second three-layer runs met all timing gates. |
 | Interactive priority during proxy generation | Implemented | Windows proxy FFmpeg starts below normal priority. Installed Live Layers controls measure active proxy contention and still use original media. Longer proxy concurrency, completed-proxy playback and HDR source coverage remain open. |

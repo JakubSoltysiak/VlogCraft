@@ -1,0 +1,23 @@
+# First vlog export audit
+
+## Saved project and delivery settings
+
+The latest desktop revision of the vlog loaded through the normal project validator. Its four-track timeline runs for 21 minutes 47.117 seconds and contains 10 video clips, 18 PNG or JPEG stills and four standalone audio clips. All 24 used media files were present. The camera material includes HEVC SDR and Main10 PQ, rotated and upright clips, variable source cadence, source audio, and repeated trims from the HDR recording. A probe of the HDR camera recording found mastering-display and content-light declarations and HDR10+ dynamic metadata. The audit pinned a private copy of the saved revision, its SHA-256, and the identities and modification times of the linked media files.
+
+The revision requests 3840 × 2160 at 60 fps, HEVC AMF and a 60 Mb/s target. The user confirmed a full-quality edited HDR10+ master. The reference exporter renders the entire edit to Main10 PQ and authors new HDR10+ metadata from the final decoded pictures. The old AMF setting has no managed color contract. Original HDR10+ stream copy requires a single unedited recording and its original cadence. The experimental first-export mode admits up to 120 frames and one or two opaque contiguous video clips. Its full-master comparison mode requires an existing verified master. See the [Phase 3A export scope](STUDIO_3_6_0_PHASE3A_EXPORT.md#first-export-without-a-prebuilt-master).
+
+The managed path requires libx265 and a known source pixel aspect. The five linked camera files omit sample aspect ratio in the saved inventory and in a fresh stream and decoded-picture probe. Preflight rejected the saved geometry. With VlogCraft’s existing explicit square-pixel override and a complete PQ settings contract supplied in memory, every picture layer passed preflight. The resulting full-project clock is 78,427 pictures and an expected 62,741,600 samples per channel at 48 kHz.
+
+## Representative reference export
+
+The 48-picture preflight used the actual project’s still with standalone audio and a contiguous HDR-to-SDR camera cut with source audio and a change in orientation. It preserved 3840 × 2160 at 60 fps. The isolated project copy used the square-pixel override, the saved Slow setting and 60 Mb/s target, HEVC Main10 and 100-nit SDR white. The reference path carried the recording’s P3-D65 mastering primaries and 0.005–1,000 cd/m² mastering range, plus MaxCLL 1,000 and MaxFALL 200 cd/m², in the Rec.2020/PQ stream. It authored new HDR10+ dynamic metadata for the edited output.
+
+The production reference export finished in **136.190 seconds**, including 8.650 seconds of HDR10+ authoring and verification after final muxing. The output was 679,781 bytes. Separate checks confirmed 48 Main10 Rec.2020 PQ pictures with exact PTS and duration, 48 conforming HDR10+ blocks, matching static declarations, and 38,400 samples per channel of 48 kHz AAC. The decoded PCM matched a separately rendered audio graph.
+
+The first visual check timed out while seeking beyond the HDR source's video endpoint. The authored clip extends six output frames beyond that endpoint. A retry traced the reference cadence and matched all 36 camera picture selections to the corresponding packet PTS floor, including the six held pictures. The verifier decoded the selected source pictures directly for its raw composition, then compared the first, middle, and last output picture of each section. The nine decoded-to-raw PQ scores ranged from 51.90 to 58.53 dB. The last picture before the HDR-to-SDR cut scored 58.53 dB against the final HDR source picture. The independent retry took 54.552 seconds and left zero owned child processes. The original project and all 24 linked media signatures matched after the run.
+
+The 60-second measurement uses one contiguous range from the pinned revision. It covers five original camera cuts across rotated VFR Main10 PQ trims into upright VFR SDR HEVC with camera audio. The 48-picture preflight also covered a still and standalone audio. The original edit uses straight cuts and contains no saved transitions or creative effects. The output clock is 3,600 pictures and 2,880,000 samples per channel at 48 kHz.
+
+## Full export status
+
+The preflight wall time gives an initial budget of 2.84 hours for 60 seconds and 61.8 hours for the full project at equivalent frame cost. Those projections are approximate because source, still and audio proportions differ across the timeline. The saved nominal bitrate implies a 9.8 GB (decimal) full output. At that size, reserve about 50 GB for the segment copies, base encode and the author’s free-space check. The measured free space was 185 GiB on the local volume. The full export depends on the 60-second check and remains unmeasured.
