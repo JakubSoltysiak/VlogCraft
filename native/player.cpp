@@ -1,6 +1,7 @@
 #include "media.h"
 #include "timeline.h"
 #include "renderer.h"
+#include "playback_handoff.h"
 #include "timing_wait.h"
 #include <set>
 struct CompletionStamps {
@@ -48,6 +49,10 @@ int main(int argc,char** argv){
   if(flight)flight->start(plan.end,plan.rate.num,plan.rate.den);
   std::unique_ptr<Reader> reader;if(!limit)reader=std::make_unique<Reader>(input);
   std::map<std::string,std::unique_ptr<Producer>> producers;
+  const char* handoffOption=std::getenv("VLOGCRAFT_EXPERIMENTAL_PICTURE_HANDOFF");
+  bool useHandoff=!software&&handoffOption&&std::strcmp(handoffOption,"1")==0;
+  PlaybackHandoff handoff;
+  uint64_t handoffDraws=0,handoffFallbacks=0;
   std::map<std::string,std::string> currentClip;std::map<std::string,const Clip*> clipLookup;for(auto& c:plan.clips)clipLookup[c.id]=&c;
   std::map<std::string,int> sourceIds;int nextDecoderId=0;
   if(trace||flight)for(auto& c:plan.clips)if(!sourceIds.count(c.asset))sourceIds.emplace(c.asset,(int)sourceIds.size());
@@ -90,6 +95,7 @@ int main(int argc,char** argv){
    WatchStage status("write_status");SourceStage timer("status_report");observeStandby();if(renderer.display)renderer.display->stats();
    std::cout<<"{\"event\":\""<<event<<"\",\"sequence_frame\":"<<frame<<",\"generation\":"<<generation
     <<",\"submitted_frames\":"<<renderer.submitted<<",\"completed_frames\":"<<renderer.completed
+    <<",\"picture_handoff\":"<<(useHandoff?"true":"false")<<",\"handoff_draws\":"<<handoffDraws<<",\"handoff_fallbacks\":"<<handoffFallbacks
     <<",\"completion_poll_policy\":\""<<(eagerPolling?"eager":"source_first")<<"\",\"refill_policy\":\""<<(!deferRefill?"disabled":legacyRefill?"unlimited":"bounded")<<"\""
     <<",\"stall_recording\":"<<(flight?"true":"false")<<",\"combined_poll_opportunities\":"<<combinedPollOpportunities<<",\"source_wait_poll_bypasses\":"<<sourceWaitPollBypasses
     <<",\"surface_parented\":"<<(renderer.display&&renderer.display->parent?"true":"false")<<",\"surface_visible\":"<<(renderer.display&&IsWindowVisible(renderer.display->window)?"true":"false")<<",\"surface_width\":"<<(renderer.display?renderer.display->width:0)<<",\"surface_height\":"<<(renderer.display?renderer.display->height:0)
@@ -137,7 +143,7 @@ int main(int argc,char** argv){
     sourceContext.tick=next->inTick;sourceContext.num=next->timebase.num;sourceContext.den=next->timebase.den;
    }
    producers[next->asset]=std::make_unique<Producer>(*next,next->inTick,renderer.hw,false,
-       8+(int)renderer.slots.size()-3,Renderer::cacheBudget(),standbyBudget-reserved,flight?sourceIds.at(next->asset):-1,sourceContext.decoder);
+       8+(int)renderer.slots.size()-3,Renderer::cacheBudget(),standbyBudget-reserved,flight?sourceIds.at(next->asset):-1,sourceContext.decoder,useHandoff);
    currentClip[next->asset]=next->id;parked[next->asset]=next;decoderOpens++;coldPrepares++;
    maxDecoders=std::max(maxDecoders,producers.size());observeStandby();
   };
@@ -188,6 +194,7 @@ int main(int argc,char** argv){
    bool changed=reset||active.size()!=lastActive.size();
    for(auto* c:active)if(!lastActive.count(c->id))changed=true;
    if(changed){
+    if(useHandoff)handoff.trim(wanted);
     std::vector<std::pair<const Clip*,uint64_t>> candidates;
     for(auto& entry:producers){
      if(wanted.count(entry.first)||reset||!playing)continue;
@@ -229,7 +236,7 @@ int main(int argc,char** argv){
      if(!producers.count(c->asset)){
       if(trace||flight)sourceContext.decoder=nextDecoderId++;
       SourceStage timer("create_decoder");
-      producers[c->asset]=std::make_unique<Producer>(*c,tick,renderer.hw,software,8+(int)renderer.slots.size()-3,Renderer::cacheBudget(),0,flight?sourceIds.at(c->asset):-1,sourceContext.decoder);
+      producers[c->asset]=std::make_unique<Producer>(*c,tick,renderer.hw,software,8+(int)renderer.slots.size()-3,Renderer::cacheBudget(),0,flight?sourceIds.at(c->asset):-1,sourceContext.decoder,useHandoff);
       decoderOpens++;
      }else{
       auto& outgoing=*clipLookup.at(currentClip.at(c->asset));
@@ -287,7 +294,7 @@ int main(int argc,char** argv){
      renderer.drain();renderer.textures.clear();producers.erase(c->asset);
      if(trace||flight)sourceContext.decoder=nextDecoderId++;
      producers[c->asset]=std::make_unique<Producer>(*c,plan.sourceTick(*c,frame),renderer.hw,software,
-         8+(int)renderer.slots.size()-3,Renderer::cacheBudget(),0,flight?sourceIds.at(c->asset):-1,sourceContext.decoder);
+         8+(int)renderer.slots.size()-3,Renderer::cacheBudget(),0,flight?sourceIds.at(c->asset):-1,sourceContext.decoder,useHandoff);
      decoderOpens++;prepareRetries++;ready=false;continue;
     }
     if(available){c->sourceRotation=p.rotation;retryOnFailure.erase(c->asset);}
@@ -296,6 +303,16 @@ int main(int argc,char** argv){
     if(flight){observed.fields[8]|=1LL<<index;watchSelected(selected);}
    }
    double sourceMs=seconds(selectionStart)*1000;selectTime.add(sourceMs);
+   if(useHandoff&&ready){
+    try { ready=handoff.prepare(selected,epoch,renderer.device); }
+    catch(const std::runtime_error&){
+     // Re-open this transport at the current clock on the established shared
+     // device. Never render a CPU download or a stale isolated picture here.
+     releaseRefills();renderer.drain();handoff.trim({});selected.clear();
+     producers.clear();currentClip.clear();parked.clear();lastActive.clear();retryOnFailure.clear();
+     useHandoff=false;++handoffFallbacks;continue;
+    }
+   }
    // Source selection may drain slots, but only draw() can occupy one.
    if(ready&&!slot){
     SourceStage timer("gpu_available");slot=renderer.available();
@@ -317,7 +334,9 @@ int main(int argc,char** argv){
    if(drawnGeneration!=generation){highest=frame;distinctFrames++;}else if(frame>highest){highest=frame;distinctFrames++;}else redraws++;
    if(trace)trace->submitStart();
    if(flight&&retireWithDraw&&renderer.submitted!=renderer.completed)combinedPollOpportunities++;
-   {SourceStage timer("draw_and_present");renderer.draw(*slot,plan,frame,generation,selected,playing,retireWithDraw);}
+   {SourceStage timer("draw_and_present");renderer.draw(*slot,plan,frame,generation,selected,playing,retireWithDraw,
+      useHandoff?&handoff.pictures:nullptr);}
+   if(useHandoff&&!selected.empty())++handoffDraws;
    if(flight&&(previous!=frame||drawnGeneration!=epoch))flight->submit.set({frame,epoch,flight->now()});
    if(traceCompletion&&epoch==completion.generation&&frame==plan.end-1&&!completion.draw)completion.draw=CompletionStamps::now();
    if(coordinateRefill&&!software){

@@ -27,6 +27,9 @@ LEGACY_REFILL_KEY = "VLOGCRAFT_DIAGNOSTIC_LEGACY_REFILL_HOLD"
 LEGACY_POLL_KEY = "VLOGCRAFT_DIAGNOSTIC_LEGACY_POLL_ORDER"
 DIAGNOSTIC_KEYS = (REFILL_KEY, LEGACY_REFILL_KEY, LEGACY_POLL_KEY)
 WORKER_OVERRIDE_KEY = "VLOGCRAFT_NATIVE_BINARY"
+PICTURE_HANDOFF_KEY = "VLOGCRAFT_EXPERIMENTAL_PICTURE_HANDOFF"
+CONTROLLED_ENV_KEYS = (CAPTURE_KEY, COMPLETION_KEY, "VLOGCRAFT_NATIVE_TRACE_FILE", WORKER_OVERRIDE_KEY,
+                       *DIAGNOSTIC_KEYS, PICTURE_HANDOFF_KEY)
 REFILL_IMAGE = "refill-image.private.json"
 EDITOR_PREVIEW = [958, 539]
 PROTECTED_FIXTURE_SHA256 = [
@@ -214,9 +217,15 @@ def prepare(results, msi, worker, media, baseline):
     })
 
 
-def refill_plan(comparison, hold_arm, legacy_refill_supported):
+def refill_plan(comparison, hold_arm, legacy_refill_supported, *, candidate_picture_handoff=False):
+    if candidate_picture_handoff and comparison != "ordinary":
+        raise ValueError("--candidate-picture-handoff requires --comparison ordinary")
     if comparison == "ordinary":
-        return ORDINARY_ORDER, {arm: dict.fromkeys(DIAGNOSTIC_KEYS) for arm in ORDINARY_ORDER[0]}
+        environment = {arm: dict.fromkeys(DIAGNOSTIC_KEYS) for arm in ORDINARY_ORDER[0]}
+        if candidate_picture_handoff:
+            environment["R"][PICTURE_HANDOFF_KEY] = None
+            environment["F"][PICTURE_HANDOFF_KEY] = "1"
+        return ORDINARY_ORDER, environment
     legacy_refill = {LEGACY_REFILL_KEY: "1"} if legacy_refill_supported else {}
     if comparison == "refill":
         return REFILL_ORDER, {"A": {REFILL_KEY: None, **legacy_refill}, "B": {REFILL_KEY: "1", **legacy_refill}}
@@ -243,17 +252,24 @@ def refill_baselines(comparison, hold_arm):
     return "cand3", "cand1"
 
 
-def prepare_refill(results, worker, media, packages, *, comparison="refill", hold_arm="B", candidate_poll_policy="source_first"):
+def prepare_refill(results, worker, media, packages, *, comparison="refill", hold_arm="B",
+                   candidate_poll_policy="source_first", candidate_picture_handoff=False):
     results.mkdir(parents=True, exist_ok=True)
     if (results / REFILL_IMAGE).exists():
         raise FileExistsError("Use a fresh refill campaign name")
     worker_sha = digest(worker)
     worker_bytes = worker.read_bytes()
     legacy_refill_supported = LEGACY_REFILL_KEY.encode() in worker_bytes
+    order, arm_environment = refill_plan(comparison, hold_arm, legacy_refill_supported,
+                                         candidate_picture_handoff=candidate_picture_handoff)
+    if candidate_picture_handoff:
+        if candidate_poll_policy != "source_first":
+            raise ValueError("The picture-handoff comparison requires source-first polling")
+        if PICTURE_HANDOFF_KEY.encode() not in worker_bytes:
+            raise ValueError("Supply a candidate worker with support for picture handoff")
     required = {"refill": REFILL_KEY, "bounded": LEGACY_REFILL_KEY, "poll-order": LEGACY_POLL_KEY}
     if comparison in required and required[comparison].encode() not in worker_bytes:
         raise ValueError(f"Supply an instrumented worker with support for the {comparison} comparison")
-    order, arm_environment = refill_plan(comparison, hold_arm, legacy_refill_supported)
     build_path = worker.with_name("build-diagnostic.json")
     build = read(build_path) if build_path.is_file() else None
     if build is not None and build["worker"]["sha256"] != worker_sha:
@@ -299,6 +315,7 @@ def prepare_refill(results, worker, media, packages, *, comparison="refill", hol
         "declared_trial_seconds": 60, "physical_preview_px": EDITOR_PREVIEW,
         "comparison": comparison, "reference_hold_arm": "D" if comparison == "ordinary" else hold_arm,
         "candidate_poll_policy": candidate_poll_policy if comparison == "ordinary" else None,
+        **({"candidate_picture_handoff": True} if candidate_picture_handoff else {}),
         "order": order, "arm_environment": arm_environment,
         "reverse_review_required": review_candidate,
         "stopping_rule": PAIR_STOPPING_RULES.get(rule_key, "Stop after the single declared pair. Retain both attempts."),
@@ -339,7 +356,7 @@ def run(results, arm, slot, capture=False):
     if media_stats(media) != image["media_stats"]:
         raise ValueError("Generated fixture media changed after campaign preparation")
     env = dict(os.environ)
-    for key in (CAPTURE_KEY, COMPLETION_KEY, "VLOGCRAFT_NATIVE_TRACE_FILE", WORKER_OVERRIDE_KEY, *DIAGNOSTIC_KEYS):
+    for key in CONTROLLED_ENV_KEYS:
         env.pop(key, None)
     if recording:
         env[CAPTURE_KEY] = str(results / (name + "-stall.private.json"))
@@ -385,7 +402,7 @@ def run_refill_trial(results, image, label, slot, position, arm):
     if capture.exists() or capture.with_suffix(capture.suffix + ".live").exists():
         raise FileExistsError(capture)
     env = dict(os.environ)
-    for key in (CAPTURE_KEY, COMPLETION_KEY, "VLOGCRAFT_NATIVE_TRACE_FILE", WORKER_OVERRIDE_KEY, *DIAGNOSTIC_KEYS):
+    for key in CONTROLLED_ENV_KEYS:
         env.pop(key, None)
     if recording:
         env[CAPTURE_KEY] = str(capture)
@@ -497,6 +514,21 @@ def effective_policy(raw):
     return observed
 
 
+def effective_picture_handoff(raw):
+    initial, active, drained = (raw.get(key) or {} for key in ("base", "last", "drained_last"))
+    enabled = active.get("picture_handoff")
+    consistent = (type(enabled) is bool and initial.get("picture_handoff") is enabled
+                  and drained.get("picture_handoff") is enabled)
+    start, stop, final = (status.get("handoff_draws") for status in (initial, active, drained))
+    counters_valid = all(type(value) is int for value in (start, stop, final)) and 0 <= start <= stop <= final
+    return {
+        "enabled": enabled,
+        "consistent_through_drain": consistent,
+        "active_draws": stop - start if counters_valid else None,
+        "drained_draws": final if counters_valid else None,
+    }
+
+
 def attempt_json(path):
     if not path.is_file():
         return {}
@@ -582,6 +614,12 @@ def summarize_refill_attempt(results, attempt, image):
             policy["consistent_through_drain"] and policy["completion_poll_policy"] == image["candidate_poll_policy"]
             and policy["refill_policy"] == "bounded"
         )
+        if image.get("candidate_picture_handoff") and not original_worker:
+            handoff = effective_picture_handoff(raw)
+            policy["picture_handoff"] = handoff
+            controls["effective_picture_handoff"] = (
+                handoff["enabled"] is True and handoff["consistent_through_drain"] and (handoff["active_draws"] or 0) > 0
+            )
     else:
         controls["instrumented_capture_complete"] = kept == capture and "pacing_schema" in recorded and reduced_capture is not None
     display = display_settings(receipt.get("conditions", {}))
@@ -703,6 +741,7 @@ def export_refill(results, output):
     save(output, {
         "comparison": image["comparison"], "reference_hold_arm": image["reference_hold_arm"],
         "candidate_poll_policy": image.get("candidate_poll_policy"),
+        **({"candidate_picture_handoff": True} if image.get("candidate_picture_handoff") else {}),
         "diagnostic_host_baseline": image["diagnostic_host_baseline"],
         "diagnostic_worker_sha256": image["diagnostic_worker_sha256"], "diagnostic_build": diagnostic_build,
         "packages": {label: {key: package[key] for key in (*BASELINES[label], "published_commit")}
@@ -737,6 +776,8 @@ def main():
     refill.add_argument("--hold-arm", choices=("A", "B", "D"), default="B", help="Refill behavior for the poll-order comparison")
     refill.add_argument("--candidate-poll-policy", choices=("source_first", "eager"), default="source_first",
                         help="Expected default in the ordinary candidate's native status")
+    refill.add_argument("--candidate-picture-handoff", action="store_true",
+                        help="Enable experimental picture handoff only in the ordinary candidate arm")
     pair = commands.add_parser("refill-pair", help="Run one declared matched pair at 958 × 539")
     pair.add_argument("--slot", type=int, choices=(1, 2), required=True)
     pair.add_argument("--reverse-reviewed", action="store_true", help="Confirm the first pair's causal review supports reversal")
@@ -761,7 +802,8 @@ def main():
             latest, prior = refill_baselines(args.comparison, args.hold_arm)
             prepare_refill(results, args.diagnostic_worker.resolve(), args.media.resolve(), {
                 latest: (args.latest_msi.resolve(), None), prior: (args.prior_msi.resolve(), None),
-            }, comparison=args.comparison, hold_arm=args.hold_arm, candidate_poll_policy=args.candidate_poll_policy)
+            }, comparison=args.comparison, hold_arm=args.hold_arm, candidate_poll_policy=args.candidate_poll_policy,
+                candidate_picture_handoff=args.candidate_picture_handoff)
             return 0
         if args.command == "refill-pair":
             return run_refill_pair(results, args.slot, args.reverse_reviewed)

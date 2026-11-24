@@ -138,17 +138,22 @@ struct Producer {
   stallWatch->lanes[watch.lane].pacing.set(refillEdge);
  }
  Producer(const Clip& c,int64_t initialTick,AVBufferRef* device,bool software,int extraHardwareFrames,size_t cacheFrames,
-          uint64_t speculativeBytes=0,int watchSourceId=-1,int watchDecoderId=-1):
+          uint64_t speculativeBytes=0,int watchSourceId=-1,int watchDecoderId=-1,bool independentDevice=false):
           watchSourceId(watchSourceId),watchDecoderId(watchDecoderId),request(sourceContext),
           warmBudget(cacheFrames),requestedTick(initialTick),requestedBase(c.timebase){
   reservation.bytes=speculativeBytes;
   watchSource(watch.lane,watchSourceId,watchDecoderId,c.timebase.num,c.timebase.den);
-  auto open=[this,clip=&c,device,software,extraHardwareFrames,watchSourceId,watchDecoderId]{
+  auto open=[this,clip=&c,device,software,extraHardwareFrames,watchSourceId,watchDecoderId,independentDevice]{
    if(sourceTrace)sourceContext=request;
    SourceStage timer("open_producer");
    WatchStage stage("open_producer");
    AVIOInterruptCB cancel{[](void* p){return static_cast<Producer*>(p)->stop.load()?1:0;},this};
-   decoder=std::make_unique<Decoder>(clip->path,device,!software,extraHardwareFrames+(int)warmBudget,&reservation,cancel);
+   struct LocalDevice { AVBufferRef* ref=nullptr; ~LocalDevice(){av_buffer_unref(&ref);} } local;
+   if(independentDevice&&!software&&av_hwdevice_ctx_create(&local.ref,AV_HWDEVICE_TYPE_D3D11VA,nullptr,nullptr,0)>=0){
+    auto* hd=static_cast<AVD3D11VADeviceContext*>(reinterpret_cast<AVHWDeviceContext*>(local.ref->data)->hwctx);
+    hd->BindFlags|=D3D11_BIND_SHADER_RESOURCE;
+   }
+   decoder=std::make_unique<Decoder>(clip->path,local.ref?local.ref:device,!software,extraHardwareFrames+(int)warmBudget,&reservation,cancel);
    auto* stream=decoder->file->streams[decoder->stream];
    auto* parameters=stream->codecpar;
    auto* matrix=av_packet_side_data_get(parameters->coded_side_data,parameters->nb_coded_side_data,AV_PKT_DATA_DISPLAYMATRIX);

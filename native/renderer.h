@@ -1,6 +1,7 @@
 #pragma once
 #include <dxgi1_6.h>
 #include "sampler.h"
+#include "picture_handoff.h"
 #include "telemetry.h"
 const char* nativeShader=R"HLSL(
 Texture2DArray<float> Y:register(t0);Texture2DArray<float2> UV:register(t1);SamplerState S:register(s0);
@@ -226,13 +227,15 @@ struct Renderer {
   }return free;
  }
  void drain(){auto start=Clock::now();while(true){available();bool pending=false;for(auto& s:slots)pending|=s.pending;if(!pending)return;if(seconds(start)>5)throw std::runtime_error("Native GPU completion timeout");Sleep(1);}}
- void draw(Slot& slot,const Plan& plan,int64_t frame,int64_t gen,const std::vector<std::pair<const Clip*,Frame>>& layers,bool playing=false,bool retirePending=false){
+ void draw(Slot& slot,const Plan& plan,int64_t frame,int64_t gen,const std::vector<std::pair<const Clip*,Frame>>& layers,bool playing=false,bool retirePending=false,
+           const std::array<PictureHandoff::Picture,3>* handoff=nullptr){
   auto began=Clock::now();{WatchStage watch("compose_gpu");DeviceLock lock(hd,&contextWait);
   if(retirePending&&completed!=submitted){WatchStage polling("poll_gpu");pollLocked();}
   context->Begin(slot.disjoint);context->End(slot.beginStamp);float clear[4]={plan.hdr?0.f:16.f/255,plan.hdr?0.f:19.f/255,plan.hdr?0.f:26.f/255,1};context->ClearRenderTargetView(slot.target,clear);
   ID3D11RenderTargetView* rt=slot.target;context->OMSetRenderTargets(1,&rt,nullptr);context->OMSetBlendState(blend,nullptr,0xffffffff);
   D3D11_VIEWPORT vp={0,0,(float)plan.width,(float)plan.height,0,1};context->RSSetViewports(1,&vp);context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
   context->VSSetShader(vertex,nullptr,0);context->PSSetShader(pixel,nullptr,0);ID3D11SamplerState* samp=sampler;context->PSSetSamplers(0,1,&samp);ID3D11Buffer* cb=constants;context->PSSetConstantBuffers(0,1,&cb);
+  size_t layerIndex=0;
   for(auto& layer:layers){
    auto& c=*layer.first;AVFrame* f=layer.second.get();
    bool pq=f->color_trc==AVCOL_TRC_SMPTE2084&&f->colorspace==AVCOL_SPC_BT2020_NCL;
@@ -247,11 +250,19 @@ struct Renderer {
    Parameters p={};p.geometry[0]=.5f+c.value("x",src,c.x);p.geometry[1]=.5f+c.value("y",src,c.y);
    p.geometry[2]=codedW*fit*scale/plan.width;p.geometry[3]=codedH*fit*scale/plan.height;
    p.effect[0]=cos(angle);p.effect[1]=sin(angle);p.effect[2]=c.value("opacity",src,c.opacity)*std::min(c.fadeIn>0?std::min(1.,local/c.fadeIn):1.,c.fadeOut>0?std::min(1.,remaining/c.fadeOut):1.);
-   auto view=textures.texture(f,device,context,false,p.source,p.range);p.source[2]=plan.hdr?1:0;p.source[3]=(float)plan.width/plan.height;
+   std::pair<ID3D11ShaderResourceView*,ID3D11ShaderResourceView*> view;
+   if(handoff){
+    const auto& picture=handoff->at(layerIndex++);
+    D3D11_TEXTURE2D_DESC desc;picture.texture->GetDesc(&desc);
+    Sampler::planeParameters(f,desc,p.source,p.range);
+    view={picture.luma,picture.chroma};
+   }else view=textures.texture(f,device,context,false,p.source,p.range);
+   p.source[2]=plan.hdr?1:0;p.source[3]=(float)plan.width/plan.height;
    const float a[4]={1.5748f,.187324f,.468124f,1.8556f},b[4]={1.402f,.344136f,.714136f,1.772f},h[4]={1.4746f,.164553f,.571353f,1.8814f};
    memcpy(p.matrix,plan.hdr?h:f->colorspace==AVCOL_SPC_BT709?a:b,sizeof(p.matrix));
    ID3D11ShaderResourceView* srv[2]={view.first,view.second};context->PSSetShaderResources(0,2,srv);context->UpdateSubresource(constants,0,nullptr,&p,0,0);context->Draw(3,0);
-   ID3D11ShaderResourceView* empty[2]={};context->PSSetShaderResources(0,2,empty);slot.holds.push_back(layer.second);
+   ID3D11ShaderResourceView* empty[2]={};context->PSSetShaderResources(0,2,empty);
+   if(!handoff)slot.holds.push_back(layer.second);
   }
   context->End(slot.endStamp);context->End(slot.disjoint);
   if(display)display->present(context,slot.view);
