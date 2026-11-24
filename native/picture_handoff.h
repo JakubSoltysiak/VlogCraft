@@ -194,6 +194,11 @@ public:
                         if (SUCCEEDED(signalContext_->Signal(copyFence_.Get(),point))) slot.fencePoint = point;
                         else signalFailed_.store(true);
                     }
+                    // Transfer the key on the serialized producer context.
+                    // The consumer cannot acquire this slot until CPU-side
+                    // fence observation separately publishes Ready.
+                    if (slot.fencePoint) check(slot.producerKey->ReleaseSync(consumerKey),
+                                                "handoff fenced producer key release");
                     context->Flush();
                     submitted = Clock::now();
                 }
@@ -233,8 +238,8 @@ public:
             bool gpuValid = false;
             Clock::time_point complete{};
             if (slot.fencePoint) {
-                // Signal was enqueued on the original serialized context. Only
-                // the CPU fence read and keyed ownership transfer happen here.
+                // Signal was enqueued on the original serialized context. The key was
+                // released in that transaction. Only observe completion here.
                 const UINT64 done = copyFence_->GetCompletedValue();
                 ready = done == UINT64_MAX ? DXGI_ERROR_DEVICE_REMOVED :
                         done >= slot.fencePoint ? S_OK : S_FALSE;
@@ -242,12 +247,12 @@ public:
                 ProducerLock lock(producer_);
                 auto* context = producer_->device_context;
                 ready = eventStatus(context, slot.copyEvent.Get());
-                if (ready == S_OK) gpuValid = copyDuration(context, slot, gpuMs);
+                if (ready == S_OK) {
+                    gpuValid = copyDuration(context, slot, gpuMs);
+                    released = slot.producerKey->ReleaseSync(consumerKey);
+                }
             }
-            if (ready == S_OK) {
-                complete = Clock::now();
-                released = slot.producerKey->ReleaseSync(consumerKey);
-            }
+            if (ready == S_OK) complete = Clock::now();
             if (ready == S_FALSE) {
                 recordPending(i, true);
                 continue;
