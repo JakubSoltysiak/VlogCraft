@@ -197,8 +197,7 @@ public:
                     // Transfer the key on the serialized producer context.
                     // The consumer cannot acquire this slot until CPU-side
                     // fence observation separately publishes Ready.
-                    if (slot.fencePoint) check(slot.producerKey->ReleaseSync(consumerKey),
-                                                "handoff fenced producer key release");
+                    slot.keyReleaseResult = slot.fencePoint ? slot.producerKey->ReleaseSync(consumerKey) : S_OK;
                     context->Flush();
                     submitted = Clock::now();
                 }
@@ -240,6 +239,7 @@ public:
             if (slot.fencePoint) {
                 // Signal was enqueued on the original serialized context. The key was
                 // released in that transaction. Only observe completion here.
+                released = slot.keyReleaseResult;
                 const UINT64 done = copyFence_->GetCompletedValue();
                 ready = done == UINT64_MAX ? DXGI_ERROR_DEVICE_REMOVED :
                         done >= slot.fencePoint ? S_OK : S_FALSE;
@@ -403,6 +403,7 @@ private:
     };
     struct Slot {
         UINT64 fencePoint = 0;
+        HRESULT keyReleaseResult = S_OK;
         ComPtr<ID3D11Texture2D> local, opened;
         ComPtr<IDXGIKeyedMutex> producerKey, consumerKey;
         ComPtr<ID3D11ShaderResourceView> luma, chroma;
