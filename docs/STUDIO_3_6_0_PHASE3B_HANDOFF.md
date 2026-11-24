@@ -1,5 +1,44 @@
 # Phase 3B qualification handoff
 
+## Independent picture handoff
+
+The bounded two-slot contract passed on both UHD formats. The first ordinary R→F comparison failed. The opt-in worker rendered 16.697 FPS, skipped 2,595 frames and recorded a 5,531.420 ms active gap. The frozen MSI rendered 58.791 FPS, skipped 42 and recorded a 499.933 ms gap. Both arms passed the visibility, workload and audio controls. Continue from the published head of draft #21. The tested worker came from `14846b6b82b8457137960085e229ba683f2899b6` with SHA-256 `d3e65d037ee0e4576b082b620ee775e5a892c8da228d98386a6dced7fb11b637`. The two independent verifier hashes, per-picture timings, memory readings and all failed attempts are in the [playback report](STUDIO_3_6_0_PHASE3B_PLAYBACK.md#independent-completed-pictures-on-radeon-890m) and the ledger's `completed_picture_investigation` entry.
+
+**Switch to GPT‑6.2 Sol — High reasoning,** for this bounded attribution task.
+
+> Continue VlogCraft Studio 3.6.0 Phase 3B on draft #21 from its published head. Read this section and the completed-picture ledger first. Preserve the shared-device default, exact VFR/seek semantics, FFmpeg locks, audio clock, queue and two-slot budgets. Attribute the 35,702 active source-wait iterations and 2,595 skips in the failed three-layer recorder-off candidate. Count source-floor unavailability separately from waiting for a copied picture. Per layer, count submissions, superseded requests before and after submission, successful publications, acquisitions and stale retirements. Record bounded distributions from source availability through copy submission, readiness and actual consumption, linked by generation and PTS. Keep instrumentation opt-in, aggregate results without private paths, and identify any interval that remains unobserved. Start with the existing receipts and one serial, bounded diagnostic. Verify counter conservation through cancellation and drain. Change scheduling only if those measurements identify an actionable delay under the existing ownership contract. Compare corrected code in the original recorder-off protocol. Retain all failed attempts. If progress requires a different ownership or synchronization contract, report that architectural decision for Astra High before expanding scope. Keep PR #21 draft and preserve earlier history.
+
+The following commands use the retained private manifest on the same qualification workstation. It resolves both frozen MSIs and the generated fixtures without publishing machine-specific paths. Run from the worktree root with the QA virtual environment's Python in `$py`. The native worker requires its packaged FFmpeg DLLs beside it. Prepare the host clone before running the native checks. Use a fresh results directory for each changed source or diagnostic cohort.
+
+```powershell
+$campaign = 'benchmarks/phase3b_stall_campaign.py'
+$old = Get-Content 'build/qa/phase3b-watch/image-ring-ordinary1/refill-image.private.json' -Raw | ConvertFrom-Json
+$media = $old.media
+$run = 'build/qa/phase3b-watch/image-ring-attribution-next'
+if (Test-Path $run) { throw 'Choose a fresh cohort' }
+& $py $campaign --results $run refill-build
+if ($LASTEXITCODE) { throw 'Build failed' }
+& $py $campaign --results $run refill-prepare --latest-msi $old.packages.cand4.msi --prior-msi $old.packages.cand3.msi --diagnostic-worker "$run/VlogCraftNative.exe" --media $media --comparison ordinary --candidate-picture-handoff
+if ($LASTEXITCODE) { throw 'Prepare failed' }
+$image = Get-Content "$run/refill-image.private.json" -Raw | ConvertFrom-Json
+$worker = Join-Path (Split-Path -Parent $image.diagnostic_executable) '_internal/engine/native/VlogCraftNative.exe'
+& $py benchmarks/run_qa.py --results "$run/parity-supervisor" --timeout 120 --status "$run/status.json" -- $py tests/native_picture_handoff.py $worker $media "$run/parity"
+if ($LASTEXITCODE) { throw 'Frame parity failed' }
+```
+
+Use the existing VFR/rewind, exact seek, cancellation and close checks on the changed worker. Use `benchmarks/windows/completed_picture_probe.py $media <fresh-directory>` only if a change affects the isolated ownership proof. Its `--memory-only` mode separately samples process-level DXGI usage after populating each slot. A corrected worker must first pass focused checks, then the ordinary editor at 958 × 539, three UHD sources and original offsets. Run the following in a fresh ordinary cohort with extra diagnostics disabled.
+
+```powershell
+& $py $campaign --results $run refill-pair --slot 1
+& $py $campaign --results $run refill-review --slot 1
+if ($LASTEXITCODE) { throw 'Retain the first pair and stop qualification' }
+& $py $campaign --results $run refill-pair --slot 2 --reverse-reviewed
+& $py $campaign --results $run refill-review --slot 2
+if ($LASTEXITCODE) { throw 'Retain the reversal and stop qualification' }
+```
+
+Both orders require at least 59.5 distinct FPS, fewer than 30 skipped frames, an active gap of at most 100 ms, exact frame/audio endpoints, zero underruns and all original controls. Only then qualify a new physical MSI, short package gates, 600-second playback, editing smoke and 30-minute editing/memory. CI packaging does not qualify the physical GPU.
+
 ## Scheduler and sharing handoff
 
 Resume from the published head of draft #21 on `codex/studio-3.6.0-phase3b`. The current evidence is in `input_buffer_investigation` in the [ledger](benchmarks/studio-3.6.0-phase3b.json). The preceding checkpoint is `2251870cd2f936c6f982f50432c5ec8ae4529a25`. The playback worker still comes from `d247b6a615ae115296ff834e4214f71b186a5b64`, SHA-256 `3c2651afa4c611b81ae11f3e6b56a859e55f8716e40f3f793e69bac6314c9f1b`. The last physically tested MSI comes from `b42e37630810e880a38dda2b111168b9bd5d11f9`, SHA-256 `8047cde8308fe394abc2fa2c6543d6c02f8b5dd2dc6ed7accfdb34e76daa0cf5`.

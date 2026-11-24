@@ -1,5 +1,11 @@
 # VlogCraft Studio development qualification
 
+## Phase 3B independent GPU pictures
+
+On Radeon 890M, a second device rendered and completed eight generated UHD pictures per format with exact NV12/P010 samples and timestamps. For each format, one draw completed during a controlled block inside a real subsequent FFmpeg decode. The unblocked attempts did not capture a whole draw finishing inside the natural call. Pending copy/render cancellation, two-slot backpressure and bounded teardown passed. The opt-in player passed exact VFR/rewind and FP16 parity across a backward cut. The Python suite ran 224 tests in 74.630 seconds with one skip for a separate locally compiled export worker. Hash, Git history and working-tree checks passed for all three private originals before and after the campaign.
+
+The matched recorder-off frozen and candidate workers achieved 58.791 and 16.697 FPS. They skipped 42 and 2,595 frames, with maximum active gaps of 499.933 and 5,531.420 ms. Both reached frame 3599 with exact audio and zero underruns. The failed candidate remains opt-in. The reversal, new physical MSI and endurance gates remain pending. [Source and binary identities, timings and limitations](docs/STUDIO_3_6_0_PHASE3B_PLAYBACK.md#independent-completed-pictures-on-radeon-890m).
+
 ## Phase 3B decoder input and scheduler qualification
 
 One serial, visible three-layer run on AC captured matching API, GPU and scheduler events with zero trace loss. The corrected worker reached 59.568 wall FPS, 13 skips and a 124.165 ms active gap. Frame 3599, 2,880,000 PCM frames, zero underruns and zero owned survivors passed. The captured 35.196 ms picture-parameter call spent 35.118 ms waiting. Its operating-system wait object is unresolved. The earlier 104.604 ms recorder-off failure still controls ordinary qualification.

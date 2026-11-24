@@ -122,7 +122,16 @@ jobs:
           $pollingRecord = "$phase3bPolling/docs/benchmarks/studio-3.6.0-phase3b.json"
           python "$phase3bPolling/tools/performance_record.py" $pollingRecord --historical-record $refillRecord
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          python tools/performance_record.py docs/benchmarks/studio-3.6.0-phase3b.json --historical-record $pollingRecord
+          $phase3bScheduler = 'build/qa/phase3b-scheduler-checkpoint'
+          New-Item -ItemType Directory -Force -Path $phase3bScheduler | Out-Null
+          git archive --format=tar --output=build/qa/phase3b-scheduler-checkpoint.tar 2a6e8cb3862cd972119d323e61b558fade9bf635
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          tar -xf build/qa/phase3b-scheduler-checkpoint.tar -C $phase3bScheduler
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $schedulerRecord = "$phase3bScheduler/docs/benchmarks/studio-3.6.0-phase3b.json"
+          python "$phase3bScheduler/tools/performance_record.py" $schedulerRecord --historical-record $pollingRecord
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tools/performance_record.py docs/benchmarks/studio-3.6.0-phase3b.json --historical-record $schedulerRecord
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python tests/icon_assets.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

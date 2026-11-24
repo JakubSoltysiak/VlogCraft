@@ -1,5 +1,41 @@
 # VlogCraft Studio 3.6.0 Phase 3B playback and editing
 
+## Independent completed pictures on Radeon 890M
+
+The compositor finished a verified UHD draw while the next real FFmpeg decode call held its device lock in a controlled block. The same ownership mechanism in the opt-in three-layer player failed the first ordinary comparison. The shared-device player remains the default. The previously tested corrected shared-device worker came from `d247b6a`; its previously recorded 104.604 ms gap still exceeds the 100 ms limit.
+
+| Recorder off, ordinary 958 × 539, R then F | Wall seconds | Distinct FPS | Skips | Active interval mean / max | Intervals over 100 ms | Audio underruns |
+|---|---:|---:|---:|---:|---:|---:|
+| Frozen physical MSI image | 60.503 | 58.791 | 42 | 16.864 / 499.933 ms | 2 | 0 |
+| Same host with experimental worker | 60.131 | 16.697 | 2,595 | 59.783 / 5,531.420 ms | 55 | 0 |
+
+Both arms met the protocol controls, reached frame 3599 and delivered 2,880,000 sample frames. Both missed all three performance limits. The experiment submitted 1,005 handoff draws through drain, with zero fallbacks. All 2,595 skips followed a source wait. Active source-wait iterations rose from 318 to 35,702, with zero compositor-slot waits in both arms. The longest candidate Present API call took 17.599 ms. Source-wait accounting includes waiting for a usable copied picture. It cannot identify which layer, copy, or decoder missed the deadline. The current player requests a copy after all source floors are available and replaces the request when the selected frame changes. Measure where requests are delayed or superseded before changing that scheduling policy. Reversal, physical MSI qualification and both endurance stages remain gated.
+
+### Ownership and measured cost
+
+Each producer copies one selected decoder-array slice into a free, single-image NV12 or P010 texture. The constructor checks distinct devices on the same adapter, extended sharing and format support, and opens and validates both plane views. Each of the two textures owns a separate keyed mutex. One temporary NT handle is open during setup and closes after import. A producer completion query precedes publication. Consumer acquisition is nonblocking. A second query covers all consumer draws before key release, frame unpinning and slot reuse. The source pool and FFmpeg locking contract are unchanged. The real player uses a decoder device per source, separating the three producers as well as the renderer. The one-producer proof establishes only renderer/producer independence. Individual producer isolation in this model also removes the application-level device lock shared between peer decoders. Driver scheduling remains common to the adapter.
+
+| Eight UHD pictures per format, isolated run | NV12 | P010 |
+|---|---:|---:|
+| GPU copy min / median / max, ms | 1.203 / 1.294 / 1.461 | 0.969 / 1.374 / 1.778 |
+| Submit to observed publication median / max, ms | 2.784 / 18.496 | 3.561 / 22.983 |
+| Consumer end/flush to observed completion median / max, ms | 1.737 / 6.150 | 4.138 / 9.513 |
+| Observed consumer completion to reusable median / max, ms | 0.052 / 0.112 | 0.068 / 0.111 |
+| Visible / storage payload per image, bytes | 12,441,600 / 12,441,600 | 24,883,200 / 25,067,520 |
+| Two populated slots, sampled process-local DXGI usage increase | 26.25 MiB | 50.25 MiB |
+
+The P010 allocation descriptor is 3840 × 2176 for a visible 3840 × 2160 picture. Storage payload uses descriptor dimensions and excludes driver padding and allocation metadata. DXGI readings cover the whole process before creation and after touching each slot, with zero sampled nonlocal growth. Verification draw/readback targets were excluded from that separate measurement. Publication and completion include polling and the probe's schedule. Each isolated ring reached two occupied slots and two retained source references, rejected two submissions at capacity, and ended with zero retained references. The 35-slice probe decoder pool stayed intact. The three-layer configuration permits six additional images, separate from decoder pools, source queues and compositor slots.
+
+For NV12 the consumer completed 8.122 ms into a 38.067 ms controlled FFmpeg device-lock interval. For P010 it completed 9.659 ms into 30.992 ms. In the unblocked concurrent attempt for each format, the actual subsequent decode completed before the entire consumer draw finished. The earlier 35.196 ms input acquisition spent 35.118 ms waiting, with its underlying object still unidentified. No additional elevated trace was needed.
+
+Every visible luma and chroma sample and the source PTS matched the independent reference for all 16 pictures, including significant P010 bits. The two slots were repeatedly reused. A pending B stayed unavailable while A could draw. Both formats suppressed stale publication on a generation change after observing an incomplete copy query and safely drained after cancellation with an incomplete consumer query. Both pending conditions occurred on the first attempt. The verification harness initially failed to link the shader compiler, then hit a transient busy verification readback on both formats. Loading the system compiler and bounding the verification-only staging retry fixed those attempts. The ledger retains their outcomes.
+
+The same real worker passed VFR floor/successor checks on both sides of 500 ms, a backwards cut, an exact seek during pending rewind, and shutdown during another pending rewind (109 ms, zero owned survivors). The rewind check verified 117 layer/frame pairs. Across six positions per format including a backwards cut, the default and opt-in workers selected identical timestamps and produced identical FP16 captures. Both parity fixtures used SDR transfer. The initial parity reader expected intermediate capture files the worker only emits at a run endpoint. Six bounded prefixes verified every position through the existing capture interface.
+
+The experiment borrows mpv's GPU copy from a decoder array slice into a renderable texture. mpv uses its D3D11 renderer context and multithread protection. VlogCraft additionally transfers ownership between devices and retains its source through consumer completion. OpenShot provides a precedent for per-reader hardware devices. Its ordinary download to software frames crosses a different transfer boundary. Staging is confined to the independent VlogCraft verifier. [mpv D3D11VA implementation](https://github.com/mpv-player/mpv/blob/35efcf53d59470b3941e61a50c8a3133035a093d/video/out/d3d11/hwdec_d3d11va.c#L207-L270) · [OpenShot hardware devices](https://github.com/OpenShot/libopenshot/blob/c23ef4ad9a4893092ddea78fa140c81838738721/src/FFmpegReader.cpp#L480-L493) · [OpenShot frame transfer](https://github.com/OpenShot/libopenshot/blob/c23ef4ad9a4893092ddea78fa140c81838738721/src/FFmpegReader.cpp#L1788-L1805).
+
+Worker source `14846b6b82b8457137960085e229ba683f2899b6`, SHA-256 `d3e65d037ee0e4576b082b620ee775e5a892c8da228d98386a6dced7fb11b637`. Ownership verifier at that source `c44ad391030de9ef7f05f1ba1eb6d4ac36ccc83e095860566d6a2cfde8c6b400`. Populated-memory verifier at `b9699284c61694c1d50cb4ab8c8ff0ce0588cbd8`, SHA-256 `db7f8e83501099e53c9e0ada92a13bfdac853ce763d2647bd89f391838832ad3`. The ledger contains every picture timing, attempt outcome and ordinary comparison control. Physical device-loss recovery and unsupported-driver fallback remain unqualified. [Benchmark ledger](benchmarks/studio-3.6.0-phase3b.json) · [Executable handoff](STUDIO_3_6_0_PHASE3B_HANDOFF.md#independent-picture-handoff).
+
 ## Same-call scheduler evidence and decoder-array sharing
 
 The corrected worker missed the ordinary active-gap limit at the November 24 checkpoint. A subsequent instrumented run captured the decoder thread's scheduling state throughout an input-buffer acquisition. An isolated two-device experiment also established what can be shared on the Radeon 890M. Production playback retains the guarded continuous-cut rollback, source-first polling, bounded refill and shared FFmpeg device. All earlier timing failures remain in the ledger.
