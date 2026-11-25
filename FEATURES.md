@@ -2,6 +2,14 @@
 
 Tested means the specific check in VERIFICATION.md passed. Implemented means code is available with further acceptance coverage needed. Partial identifies implemented behavior with material gaps. Missing identifies an unavailable capability. A test result qualifies its fixture and environment.
 
+| 3.6.0 Phase 3B editing transport | Status | Verified scope and remaining limits |
+|---|---|---|
+| Independent GPU picture queues | Experimental | Exact NV12/P010, bounded retirement, seek fencing and independent preparation passed. The latest ordinary three-layer worker reached 43.860 FPS with 947 skips and a 660.611 ms maximum gap after protecting outgoing frames. Production playback still uses the shared device. [Physical trials](docs/STUDIO_3_6_0_PHASE3B_PLAYBACK.md#exact-incoming-picture-after-a-backward-cut). |
+| Native timeline ruler | Tested subset | Coalesced transient seeks, exact released frame, a single committed recovery checkpoint and PCM preparation, and no stale playhead movement on the tested ruler drag. The final matched ruler repeat improved release-to-picture latency. Cold seek latency and broader workloads remain under qualification. |
+| Native source handoff | Tested subset | Reuses compatible decoders across cuts. An independent four-source Windows fixture verified source identity on the visible surface, held VFR timestamps, bounded queues, exact PCM and cancellation. The packaged timestamp check verified 117 layer/frame selections across backward cuts, including seek and shutdown while preparation was pending. Two of three 60-second three-layer runs met all timing gates. |
+| Interactive priority during proxy generation | Implemented | Windows proxy FFmpeg starts below normal priority. Installed Live Layers controls measure active proxy contention and still use original media. Longer proxy concurrency, completed-proxy playback and HDR source coverage remain open. |
+| Native UHD60 playback and editing memory | Qualification open | Short packaged playback with exact PCM passed on the generated tracks. Visible multitrack presentation can still stall under load. Paired 150-second editing showed natural reclaim and zero observed underruns. Longer editing memory, physical recovery and production acceptance remain open. |
+
 | 3.6.0 Phase 3A GPU export | Status | Verified scope and remaining limits |
 |---|---|---|
 | Full-master GPU plus bounded GOP repair | Tested subset | Isolated 300-picture dissolve repaired with the unchanged reference settings. Final candidate passed all pictures, timestamps, audio samples, and HDR10+ associations. Whole-project fallback remains available. |

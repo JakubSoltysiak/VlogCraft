@@ -250,7 +250,12 @@ function positionPlayhead(){
  const head=$('playheadTime'),total=$('totalTime'),value=timecode(playhead),end=timecode(duration());
  if(head.textContent!==value)head.textContent=value;if(total.textContent!==end)total.textContent=end;
 }
-function seek(t){playhead=clamp(frameTime(t),0,Math.max(0,duration()));if(isPlaying){playAt=playhead;playStart=transportNow();}positionPlayhead();syncPreview(true);recoveryCheckpoint(false);}
+function seek(t,{scrubbing=false}={}){
+ playhead=clamp(frameTime(t),0,Math.max(0,duration()));
+ if(isPlaying){playAt=playhead;playStart=transportNow();}
+ positionPlayhead();syncPreview(true,scrubbing);
+ if(!scrubbing)recoveryCheckpoint(false);
+}
 function snapTo(value,ignore=null,{bypass=false,guide=false,skipPlayhead=false}={}){
  value=Math.max(0,value);
  let nearest=0;
@@ -281,28 +286,40 @@ function showSnapGuide(time){
 }
 function startRulerGesture(event){
  if(event.button!==0)return;
- let queued=null,raf=null;
+ let queued=event,raf=null,moved=false;
+ const targetAt=ev=>{
+  const ruler=document.querySelector('[data-ruler]');
+  if(!ruler)return playhead;
+  return clamp(snapTo((ev.clientX-ruler.getBoundingClientRect().left)/zoom,null,
+                  {bypass:ev.shiftKey,guide:true,skipPlayhead:true}),0,duration());
+ };
  const update=()=>{
   raf=null;
-  const ruler=document.querySelector('[data-ruler]');
-  if(!queued||!ruler)return;
-  const target=snapTo((queued.clientX-ruler.getBoundingClientRect().left)/zoom,null,
-                      {bypass:queued.shiftKey,guide:true,skipPlayhead:true});
-  queued=null;
-  if(frameIndex(target)!==frameIndex(playhead))seek(target);
+  const target=targetAt(queued);
+  if(frameIndex(target)===frameIndex(playhead))return;
+  moved=true;seek(target,{scrubbing:true});
  };
- const move=ev=>{queued=ev;if(raf===null)raf=requestAnimationFrame(update);};
+ const move=ev=>{
+  if(ev.pointerId!==event.pointerId)return;
+  queued=ev;if(raf===null)raf=requestAnimationFrame(update);
+ };
  const finish=ev=>{
+  if(ev.type!=='blur'&&ev.pointerId!==event.pointerId)return;
   if(raf!==null)cancelAnimationFrame(raf);
-  queued=ev.type==='pointerup'?ev:null;update();showSnapGuide(null);
   window.removeEventListener('pointermove',move);
   window.removeEventListener('pointerup',finish);
   window.removeEventListener('pointercancel',finish);
+  window.removeEventListener('blur',finish);
+  const target=ev.type==='pointerup'?targetAt(ev):playhead;
+  showSnapGuide(null);
+  if(frameIndex(target)!==frameIndex(playhead)||(moved&&nativeSelected()))seek(target);
+  else if(moved)recoveryCheckpoint(false);
  };
- queued=event;update();
+ update();
  window.addEventListener('pointermove',move);
  window.addEventListener('pointerup',finish);
  window.addEventListener('pointercancel',finish);
+ window.addEventListener('blur',finish);
 }
 function startClipGesture(e){if(e.button!==0)return;const el=e.currentTarget,cid=el.dataset.clip,t=trackById(el.dataset.parent),c=t.clips.find(c=>c.id===cid);if(!c||t.locked||c.locked)return;
  e.stopPropagation();
@@ -381,7 +398,7 @@ function makePlayer(c,t,z){const a=assetById(c.assetId);if(!a)return null;const 
  const prepared=waitingPlayers.get(c.id);waitingPlayers.delete(c.id);
  const media=a.kind==='image'?document.createElement('img'):(prepared?.media||sourceVideo(c));
  if(a.kind==='image')media.src='/media/'+a.id;if(media.tagName==='VIDEO'){media.preload='metadata';media.playsInline=true;media.autoplay=false;media.muted=false;media.disablePictureInPicture=true;}media.style.objectFit=c.fit==='cover'?'cover':'contain';wrap.appendChild(media);$('previewLayers').appendChild(wrap);return {media,wrap,clipId:c.id,aId:a.id};}
-function syncPreview(force=false){if(!state)return;if(transitionsOnTimeline()||state.output.color&&$('playbackEngine').value==='interactive')$('playbackEngine').value='rendered';if(nativePreview(force))return;if(renderedPreview(force))return;if(force)referenceChanged();const active=getActiveClips();$('emptyPreview').hidden=state.tracks.some(t=>t.clips.length);
+function syncPreview(force=false,scrubbing=false){if(!state)return;if(transitionsOnTimeline()||state.output.color&&$('playbackEngine').value==='interactive')$('playbackEngine').value='rendered';if(nativePreview(force,scrubbing))return;if(renderedPreview(force))return;if(force)referenceChanged();const active=getActiveClips();$('emptyPreview').hidden=state.tracks.some(t=>t.clips.length);
  const activeIds=new Set(active.map(x=>x.c.id));
  for(const [id,p] of activePlayers)if(!activeIds.has(id)||p.type!=='video'){
   recycleVideo(p);p.wrap?.remove();activePlayers.delete(id);
@@ -425,7 +442,17 @@ function syncAudio(force=false){const active=[];
 function stopPlayback(){isPlaying=false;recoveryCheckpoint(false);updateMeter.peak=0;updateMeter.lastPaint=undefined;nativePause();pauseRendered();$('masterMeter').value=-60;referenceChanged();$('playBtn').innerHTML=svg('play');for(const p of activePlayers.values())p.media?.pause?.();for(const p of audioPlayers.values())p.pause();}
 async function playPause(){if(nativeSelected())return nativePlayPause();if(isPlaying){stopPlayback();return;}if(duration()<=0)return toast('Add footage first',true);if(playhead>=duration()-.001)playhead=0;try{await initializeMixer();transportClock=mixer.state==='running'?mixer:null;}catch{transportClock=null;}
  isPlaying=true;playAt=playhead;playStart=transportNow();$('playBtn').innerHTML=svg('pause');syncPreview(true);requestAnimationFrame(animate);}
-function animate(){if(!isPlaying)return;updateMeter();playhead=nativeSelected()?nativeClock():renderedEnabled()?renderedClock():playAt+(transportNow()-playStart)/1000;if(nativeSelected()&&playhead>=nativeDuration()){playhead=nativeDuration();positionPlayhead();stopPlayback();return;}if(!nativeSelected()&&playhead>=duration()){seek(duration());stopPlayback();return;}positionPlayhead();syncPreview(false);followTimelinePlayhead();requestAnimationFrame(animate);}
+function animate(){if(!isPlaying)return;updateMeter();playhead=nativeSelected()?nativeClock():renderedEnabled()?renderedClock():playAt+(transportNow()-playStart)/1000;
+ if(nativeSelected()&&playhead>=nativeDuration()){
+  const trace=nativeState.completionTrace;
+  if(trace?.generation===nativeState.generation)trace.gui_endpoint_ms=performance.now();
+  playhead=nativeDuration();positionPlayhead();stopPlayback();
+  if(trace?.generation===nativeState.generation)trace.gui_stopped_ms=performance.now();
+  return;
+ }
+ if(!nativeSelected()&&playhead>=duration()){seek(duration());stopPlayback();return;}
+ positionPlayhead();syncPreview(false);followTimelinePlayhead();requestAnimationFrame(animate);
+}
 
 function followTimelinePlayhead(){
  const mode=$('timelineFollow').value;

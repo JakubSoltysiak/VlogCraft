@@ -6,6 +6,7 @@
 #include <d3dcompiler.h>
 #include <dxgi.h>
 #include <chrono>
+#include <atomic>
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
@@ -27,6 +28,9 @@ extern "C" {
 #include <libswscale/swscale.h>
 }
 using Clock=std::chrono::steady_clock;
+#include <algorithm>
+#include "stall_watch.h"
+#include "source_trace.h"
 double seconds(Clock::time_point a){return std::chrono::duration<double>(Clock::now()-a).count();}
 thread_local HRESULT nativeHResult=S_OK;thread_local int nativeAVError=0;
 void check(HRESULT h,const char* label){if(FAILED(h)){nativeHResult=h;char b[200];snprintf(b,sizeof(b),"%s HRESULT=0x%08lx",label,(unsigned long)h);throw std::runtime_error(b);}}
@@ -35,7 +39,51 @@ template<class T> struct Com {
     T* p=nullptr;~Com(){if(p)p->Release();}T** out(){if(p){p->Release();p=nullptr;}return &p;}
     T* operator->()const{return p;}operator T*()const{return p;}
 };
-enum AVPixelFormat hardware_format(AVCodecContext*,const enum AVPixelFormat* choices){
+inline int64_t watchPoolKey(const void* texture){
+    return texture?(int64_t)(reinterpret_cast<uintptr_t>(texture)^static_cast<uintptr_t>(stallWatch->qpc)):0;
+}
+inline std::array<int64_t,3> watchFrame(const AVFrame* frame){
+    if(!frame)return {0,-1,AV_NOPTS_VALUE};
+    const bool hardware=frame->format==AV_PIX_FMT_D3D11&&frame->data[0];
+    return {hardware?watchPoolKey(frame->data[0]):0,hardware?(intptr_t)frame->data[1]:-1,frame->best_effort_timestamp};
+}
+inline void watchDecoderPicture(const AVFrame* frame){
+    if(!stallWatch||watchLane<=0)return;
+    auto picture=watchFrame(frame);
+    auto& observed=stallWatch->lanes[watchLane].picture;
+    const auto received=observed.fields[4].load(std::memory_order_relaxed)+(frame!=nullptr);
+    observed.set({picture[0],picture[1],picture[2],stallWatch->now(),received});
+}
+// A speculative decoder reserves its complete fixed texture array before the
+// first packet. On a format change it retries as foreground work. Active
+// decoders always use libav's existing automatic allocation.
+struct DecodeReservation{
+ std::atomic<uint64_t> bytes{0};
+ std::atomic<bool> hasPool{false};
+};
+enum AVPixelFormat hardware_format(AVCodecContext* codec,const enum AVPixelFormat* choices){
+    WatchStage watch("hardware_format");
+    auto* reservation=static_cast<DecodeReservation*>(codec->opaque);
+    uint64_t limit=reservation?reservation->bytes.load():0;
+    if(limit){
+        if(reservation->hasPool.load())return AV_PIX_FMT_NONE;
+        auto* format=choices;
+        while(*format!=AV_PIX_FMT_NONE&&*format!=AV_PIX_FMT_D3D11)++format;
+        if(*format!=AV_PIX_FMT_D3D11)return AV_PIX_FMT_NONE;
+        AVBufferRef* ref=nullptr;
+        if(avcodec_get_hw_frames_parameters(codec,codec->hw_device_ctx,AV_PIX_FMT_D3D11,&ref)<0)return AV_PIX_FMT_NONE;
+        auto* frames=reinterpret_cast<AVHWFramesContext*>(ref->data);
+        bool supported=frames->initial_pool_size>0&&frames->width>0&&frames->height>0&&
+            (frames->sw_format==AV_PIX_FMT_NV12||frames->sw_format==AV_PIX_FMT_P010);
+        // Same three extra work surfaces as libav's automatic fixed-pool path.
+        frames->initial_pool_size+=3;
+        uint64_t bytes=(uint64_t)frames->width*frames->height*frames->initial_pool_size*3/
+            (frames->sw_format==AV_PIX_FMT_P010?1:2);
+        if(!supported||bytes>limit||av_hwframe_ctx_init(ref)<0){av_buffer_unref(&ref);return AV_PIX_FMT_NONE;}
+        codec->hw_frames_ctx=ref;
+        reservation->hasPool=true;
+        return AV_PIX_FMT_D3D11;
+    }
     for(auto p=choices;*p!=AV_PIX_FMT_NONE;p++)if(*p==AV_PIX_FMT_D3D11)return *p;
     return AV_PIX_FMT_NONE;
 }
@@ -46,41 +94,59 @@ struct Decoder {
     std::vector<unsigned char> packed;Com<ID3D11Texture2D> uploaded;
     std::map<std::pair<ID3D11Texture2D*,int>,std::pair<ID3D11ShaderResourceView*,ID3D11ShaderResourceView*>> views;
     double decode_s=0,transfer_s=0,upload_s=0;int frames=0;bool direct=false;
-    Decoder(const std::string& path,AVBufferRef* hw,bool useHardware,int extraHardwareFrames=8){
+    Decoder(const std::string& path,AVBufferRef* hw,bool useHardware,int extraHardwareFrames=8,
+            DecodeReservation* reservation=nullptr,AVIOInterruptCB interrupt={}){
+      try{
         int workers=1;if(const char* value=std::getenv("VLOGCRAFT_NATIVE_DECODE_THREADS")){char* end=nullptr;long n=std::strtol(value,&end,10);if(*end||n<1||n>4)throw std::runtime_error("Invalid native decoder worker budget");workers=(int)n;}
+        if(!packet||!frame||!host)throw std::bad_alloc();
         if(!std::filesystem::is_regular_file(std::filesystem::u8path(path)))throw std::runtime_error("A local media file is required");
+        file=avformat_alloc_context();if(!file)throw std::bad_alloc();file->interrupt_callback=interrupt;
         AVDictionary* options=nullptr;av_dict_set(&options,"protocol_whitelist","file",0);
-        int opened=avformat_open_input(&file,path.c_str(),nullptr,&options);av_dict_free(&options);avcheck(opened,"open");
-        avcheck(avformat_find_stream_info(file,nullptr),"stream info");
+        int opened;{SourceStage timer("open_file");WatchStage watch("open_file");opened=avformat_open_input(&file,path.c_str(),nullptr,&options);}av_dict_free(&options);avcheck(opened,"open");
+        {SourceStage timer("probe_stream");WatchStage watch("probe_stream");avcheck(avformat_find_stream_info(file,nullptr),"stream info");}
         stream=av_find_best_stream(file,AVMEDIA_TYPE_VIDEO,-1,-1,nullptr,0);avcheck(stream,"video stream");
         auto decoder=avcodec_find_decoder(file->streams[stream]->codecpar->codec_id);
-        codec=avcodec_alloc_context3(decoder);avcheck(avcodec_parameters_to_context(codec,file->streams[stream]->codecpar),"parameters");
+        codec=avcodec_alloc_context3(decoder);if(!codec)throw std::bad_alloc();
+        avcheck(avcodec_parameters_to_context(codec,file->streams[stream]->codecpar),"parameters");
         codec->thread_count=workers;codec->extra_hw_frames=extraHardwareFrames;
-        if(useHardware){codec->hw_device_ctx=av_buffer_ref(hw);codec->get_format=hardware_format;}
-        avcheck(avcodec_open2(codec,decoder,nullptr),"codec open");
+        if(useHardware){codec->hw_device_ctx=av_buffer_ref(hw);codec->opaque=reservation;codec->get_format=hardware_format;}
+        {SourceStage timer("open_codec");WatchStage watch("open_codec");avcheck(avcodec_open2(codec,decoder,nullptr),"codec open");}
+      }catch(...){release();throw;}
     }
-    ~Decoder(){
+    ~Decoder(){release();}
+    void release(){
+        WatchStage watch("close_decoder");
         for(auto& v:views){v.second.first->Release();v.second.second->Release();}
         sws_freeContext(scaler);av_frame_free(&host);av_frame_free(&frame);av_packet_free(&packet);
         avcodec_free_context(&codec);avformat_close_input(&file);
     }
     bool next(){
         auto start=Clock::now();av_frame_unref(frame);
+        watchDecoderPicture(nullptr);
         while(true){
-            int r=avcodec_receive_frame(codec,frame);
-            if(r==0){decode_s+=seconds(start);frames++;return true;}
+            int r;{SourceStage timer("receive_picture");WatchStage watch("receive_picture");r=avcodec_receive_frame(codec,frame);}
+            if(r==0){watchDecoderPicture(frame);decode_s+=seconds(start);frames++;return true;}
             if(r==AVERROR_EOF){decode_s+=seconds(start);return false;}
             if(r!=AVERROR(EAGAIN))avcheck(r,"receive frame");
-            if(eof){if(!drained){avcheck(avcodec_send_packet(codec,nullptr),"flush decoder");drained=true;}else throw std::runtime_error("decoder made no progress");}
+            if(eof){if(!drained){SourceStage timer("drain_codec");WatchStage watch("drain_codec");avcheck(avcodec_send_packet(codec,nullptr),"flush decoder");drained=true;}else throw std::runtime_error("decoder made no progress");}
             else {
-                while(true){r=av_read_frame(file,packet);if(r<0){eof=true;break;}if(packet->stream_index==stream)break;av_packet_unref(packet);}
-                if(!eof){avcheck(avcodec_send_packet(codec,packet),"send packet");av_packet_unref(packet);}
+                {SourceStage timer("read_demux");while(true){
+                    {WatchStage watch("read_demux");r=av_read_frame(file,packet);}
+                    if(r==AVERROR_EOF){
+                        if(file->pb&&file->pb->error<0&&file->pb->error!=AVERROR_EOF)avcheck(file->pb->error,"read source file");
+                        eof=true;break;
+                    }
+                    avcheck(r,"read source packet");
+                    if(packet->stream_index==stream){watchPacket(packet->pts,packet->dts);break;}
+                    av_packet_unref(packet);
+                }}
+                if(!eof){SourceStage timer("send_packet");{WatchStage watch("send_packet");avcheck(avcodec_send_packet(codec,packet),"send packet");}watchPacketSent();av_packet_unref(packet);}
             }
         }
     }
     void seek(double at){
-        avcheck(av_seek_frame(file,stream,(int64_t)(at/av_q2d(file->streams[stream]->time_base)),AVSEEK_FLAG_BACKWARD),"seek");
-        avcodec_flush_buffers(codec);eof=drained=false;
+        {WatchStage watch("seek_demux");avcheck(av_seek_frame(file,stream,(int64_t)(at/av_q2d(file->streams[stream]->time_base)),AVSEEK_FLAG_BACKWARD),"seek");}
+        {WatchStage watch("flush_codec");avcodec_flush_buffers(codec);}eof=drained=false;
         while(next()){if(frame->best_effort_timestamp*av_q2d(file->streams[stream]->time_base)+1e-9>=at)return;}
         throw std::runtime_error("seek past end");
     }

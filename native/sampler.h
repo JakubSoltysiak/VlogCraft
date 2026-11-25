@@ -1,5 +1,13 @@
 #pragma once
 struct Sampler {
+static void planeParameters(const AVFrame* frame,const D3D11_TEXTURE2D_DESC& desc,float* uvscale,float* range){
+        uvscale[0]=(float)frame->width/desc.Width;uvscale[1]=(float)frame->height/desc.Height;
+        bool ten=desc.Format==DXGI_FORMAT_P010;
+        if(desc.Format!=DXGI_FORMAT_NV12&&!ten)throw std::runtime_error("only NV12/P010 implemented");
+        range[0]=ten?4096.f/65535:16.f/255;range[1]=ten?65535.f/56064:255.f/219;
+        range[2]=ten?32768.f/65535:128.f/255;range[3]=ten?65535.f/57344:255.f/224;
+        if(frame->color_range==AVCOL_RANGE_JPEG){range[0]=0;range[1]=ten?65535.f/65472:1.f;range[3]=range[1];}
+}
 AVFrame* host=av_frame_alloc();SwsContext* scaler=nullptr;std::vector<unsigned char> packed;Com<ID3D11Texture2D> uploaded;bool direct=false;double transfer_s=0,upload_s=0;
 std::map<std::pair<ID3D11Texture2D*,int>,std::pair<ID3D11ShaderResourceView*,ID3D11ShaderResourceView*>> views;
 std::map<ID3D11Texture2D*,uint64_t> pools;
@@ -29,12 +37,8 @@ void clear(){for(auto& v:views){v.second.first->Release();v.second.second->Relea
             upload_s+=seconds(start);
         }
         D3D11_TEXTURE2D_DESC desc;tex->GetDesc(&desc);
-        uvscale[0]=(float)frame->width/desc.Width;uvscale[1]=(float)frame->height/desc.Height;
+        planeParameters(frame,desc,uvscale,range);
         bool ten=desc.Format==DXGI_FORMAT_P010;
-        if(desc.Format!=DXGI_FORMAT_NV12&&!ten)throw std::runtime_error("only NV12/P010 implemented");
-        range[0]=ten?4096.f/65535:16.f/255;range[1]=ten?65535.f/56064:255.f/219;
-        range[2]=ten?32768.f/65535:128.f/255;range[3]=ten?65535.f/57344:255.f/224;
-        if(frame->color_range==AVCOL_RANGE_JPEG){range[0]=0;range[1]=ten?65535.f/65472:1.f;range[3]=range[1];}
         auto key=std::make_pair(tex,slice);auto old=views.find(key);if(old!=views.end())return old->second;
         D3D11_SHADER_RESOURCE_VIEW_DESC d={};d.Format=ten?DXGI_FORMAT_R16_UNORM:DXGI_FORMAT_R8_UNORM;
         d.ViewDimension=D3D11_SRV_DIMENSION_TEXTURE2DARRAY;d.Texture2DArray.MipLevels=1;d.Texture2DArray.ArraySize=1;d.Texture2DArray.FirstArraySlice=slice;

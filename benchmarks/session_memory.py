@@ -51,12 +51,16 @@ def main(a):
      page.evaluate('nativePlayPause()');edit_batches.append({'iteration':iteration,'seconds':time.perf_counter()-started,'wall_ms':1000*(time.perf_counter()-edit_started)})
     if elapsed>=next_sample:sample('active');next_sample+=30
    sample('end');observed_underruns=page.evaluate('(window.memoryEditingUnderruns||0)+(nativeState.ack?.underruns||0)');page.evaluate('stopPlayback()');page.wait_for_timeout(1000);sample('stopped')
-   cdp.send('HeapProfiler.collectGarbage');page.wait_for_timeout(1000);sample('diagnostic_GC')
+   if a.natural_idle_seconds is None:
+    cdp.send('HeapProfiler.collectGarbage');page.wait_for_timeout(1000);sample('diagnostic_GC')
+   else:
+    page.wait_for_timeout(a.natural_idle_seconds*1000);sample('natural_idle')
    page.evaluate('nativeStop()');page.wait_for_timeout(1000);sample('native_released')
   except Exception as exc:failure=exc
   result={'diagnostic_only':True,'full_status_diagnostic':a.full_status,'mode':a.mode,'seconds':measured,'timeline_seconds':a.seconds if a.mode=='continuous' else 125,'rows':rows,'clock_wire':wire,'runtime_trace':trace.finish(),'conditions':conditions.finish(),
           'failure_type':type(failure).__name__ if failure else None,'browser_errors':errors,'audio_underruns_observed':locals().get('observed_underruns'),'editing_batches':edit_batches,
-          'window_condition':visibility.finish(),'scope':'GC only after stopping; counters/heap observer enabled, not acceptance FPS; RSS may double-count UMA mappings; private commit is separate.'}
+          'window_condition':visibility.finish(),'forced_gc':a.natural_idle_seconds is None,
+          'scope':'Counters and heap observer enabled. Use the separate FPS benchmark for acceptance. RSS may double-count UMA mappings. Private commit is separate.'}
   (a.results/'memory.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf8')
   if failure:raise failure
   assert not errors
@@ -66,4 +70,4 @@ def main(a):
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('executable',type=Path);p.add_argument('media',type=Path);p.add_argument('results',type=Path)
  p.add_argument('--window-mode',choices=('uncontrolled','visible','preview-covered','editor-covered'),default='visible')
- p.add_argument('--seconds',type=int,default=600);p.add_argument('--measure-seconds',type=int);p.add_argument('--full-status',action='store_true');p.add_argument('--mode',choices=('continuous','editing'),default='continuous');main(p.parse_args())
+ p.add_argument('--seconds',type=int,default=600);p.add_argument('--measure-seconds',type=int);p.add_argument('--full-status',action='store_true');p.add_argument('--natural-idle-seconds',type=int);p.add_argument('--mode',choices=('continuous','editing'),default='continuous');main(p.parse_args())

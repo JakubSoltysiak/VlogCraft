@@ -44,6 +44,20 @@ PROTOCOL_FILES=(
  'benchmarks/phase2d_project_export.py','tests/test_native_project_render.py','tests/windows_native_project_export.py',
  'benchmarks/check_phase2d_preview.py','benchmarks/check_phase2d_source_clock.py',
  'benchmarks/resume_phase2d_reference.py',
+ 'benchmarks/phase3b_scrub.py','benchmarks/native_seek.py','benchmarks/program_seek.py',
+ 'benchmarks/phase3b_handoff_evidence.py','tests/windows_phase3b_handoff.py','tests/test_phase3b_handoff_evidence.py',
+ 'benchmarks/phase3b_stall_campaign.py','benchmarks/phase3b_stall_evidence.py','benchmarks/phase3b_gpu_events.py',
+ 'benchmarks/phase3b_editing_qualification.py','tests/native_stall_watch.cpp',
+ 'tests/test_native_stall_watch.py','tests/test_phase3b_stall_evidence.py','tests/test_phase3b_stall_campaign.py',
+ 'tests/test_phase3b_gpu_events.py',
+ 'benchmarks/windows/decoder-scheduler.wprp','benchmarks/windows/collect-decoder-scheduler.ps1',
+ 'benchmarks/windows/decoder-buffer-probe.cpp','benchmarks/windows/calibrate_decoder_buffer.py','tests/test_decoder_buffer_calibration.py',
+ 'benchmarks/windows/decoder-array-sharing.cpp',
+ 'benchmarks/windows/completed-picture.cpp','benchmarks/windows/handoff-pixels.h','benchmarks/windows/completed_picture_probe.py',
+ 'tests/native_picture_handoff.py','tests/native_handoff_scheduler.cpp',
+ 'tests/native_refill_liveness.cpp','tests/test_native_refill_liveness.py',
+ 'benchmarks/phase3b_completion.py','tests/test_native_completion_trace.py',
+ 'benchmarks/phase3b_mixed_preview.py','benchmarks/profile_preview_proxy.py','tests/native_source_timebase.py','tests/native_source_rewind.py',
  'benchmarks/phase3a_encoder_probe.py','benchmarks/phase3a_first_project.py',
  'tests/test_phase3a_export.py','tests/windows_phase3a_export.py',
  'tests/verify_bundle.py','tools/setup_architecture_lab.py',
@@ -58,9 +72,22 @@ def fingerprint(files=None):
  for name in sorted(FILES if files is None else files):
   data=(ROOT/name).read_bytes().replace(b'\r\n',b'\n');h.update(name.encode()+b'\0'+data+b'\0')
  return h.hexdigest()
+def check_history(current, historical):
+ # These two bindings identify the implementation and observer used for the latest qualification.
+ # The archive independently checks the original bindings against its own source.
+ for field, value in historical.items():
+  if field in ('source_fingerprint','benchmark_protocol_fingerprint'):
+   continue
+  if field not in current or current[field] != value:
+   raise ValueError(f'Historical performance evidence changed in field {field!r}')
+
 def main():
- p=argparse.ArgumentParser();p.add_argument('record',type=Path);p.add_argument('--stamp',action='store_true');a=p.parse_args()
+ p=argparse.ArgumentParser();p.add_argument('record',type=Path);p.add_argument('--stamp',action='store_true')
+ p.add_argument('--historical-record',type=Path,help='Preserve prior measurements and failures in a continued record')
+ a=p.parse_args()
  data=json.loads(a.record.read_text('utf8'))
+ if a.historical_record:
+  check_history(data,json.loads(a.historical_record.read_text('utf8')))
  if a.stamp:
   data['source_fingerprint']=fingerprint();data['fingerprint_method']='SHA256 sorted relevant relative path + NUL + LF-normalized source + NUL'
   data['benchmark_protocol_fingerprint']=fingerprint(PROTOCOL_FILES)

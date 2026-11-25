@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WindowsPerformanceRecorder Version="1.0">
+  <Profiles>
+    <SystemCollector Id="Scheduler" Name="VlogCraft decoder scheduling">
+      <BufferSize Value="1024"/>
+      <Buffers Value="512"/>
+    </SystemCollector>
+    <SystemProvider Id="Switches">
+      <Keywords>
+        <Keyword Value="ProcessThread"/>
+        <Keyword Value="CSwitch"/>
+        <Keyword Value="ReadyThread"/>
+      </Keywords>
+    </SystemProvider>
+    <Profile Id="VlogCraftDecoder.Verbose.Memory" Name="VlogCraftDecoder" Description="Decoder thread scheduling" LoggingMode="Memory" DetailLevel="Verbose">
+      <Collectors>
+        <SystemCollectorId Value="Scheduler"><SystemProviderId Value="Switches"/></SystemCollectorId>
+      </Collectors>
+    </Profile>
+  </Profiles>
+</WindowsPerformanceRecorder>

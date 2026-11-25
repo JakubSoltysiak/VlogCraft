@@ -1,13 +1,63 @@
 """Local experimental child process, native panel and cancellable bounded PCM streams."""
 from copy import deepcopy
 from pathlib import Path
-import json,os,subprocess,tempfile,threading,time
+import json,logging,os,subprocess,tempfile,threading,time
 import native_plan,render_engine,timing,sequences
+
+
+class CompletionTrace:
+ """Keep one worker's endpoint milestones in memory until desktop teardown."""
+ def __init__(self,path):
+  self.path=Path(path);self.worker=None;self.owner=None
+
+ def start(self,process,plan,started_ns):
+  self.owner=process
+  self.worker={'launch_requested_ns':started_ns,'end_frame':plan['endFrame']-1,
+               'end_microseconds':round(plan['endFrame']/timing.rate(plan['rate'])*1000000),'events':{}}
+
+ def status(self,status,received_ns,published_ns):
+  events=self.worker['events'];generation=status.get('generation')
+  terminal=status.get('completed_sequence_frame')==self.worker['end_frame'] and status.get('completed_generation')==generation
+  names=['first_status'] if 'first_status' not in events else []
+  if generation is not None and generation==self.worker.get('playing_generation'):
+   if terminal and 'first_final_picture_status' not in events:names.append('first_final_picture_status')
+   if status.get('eos') and 'first_eos_status' not in events:names.append('first_eos_status')
+   if terminal and status.get('eos') and 'first_terminal_status' not in events:names.append('first_terminal_status')
+  if names:
+   row={'received_ns':received_ns,'published_ns':published_ns,
+        **{k:status.get(k) for k in ('event','wall_seconds','generation','sequence_frame','completed_sequence_frame','completed_generation','eos','completion_stamps_us')}}
+   for name in names:events[name]=row
+
+ def teardown(self,process,status,received_ns):
+  if process is self.owner and status.get('event')=='completion_diagnostic':
+   self.worker['events']['producer_teardown']={'received_ns':received_ns,'generation':status.get('generation'),
+                                             'completion_stamps_us':status.get('completion_stamps_us')}
+
+ def clock(self,microseconds,playing,generation):
+  if self.worker is None:return
+  events=self.worker['events']
+  if playing and generation!=self.worker.get('playing_generation'):
+   self.worker['playing_generation']=generation
+   for name in ('first_playing_clock','first_endpoint_clock','first_final_picture_status','first_eos_status','first_terminal_status'):
+    events.pop(name,None)
+   events['first_playing_clock']={'sent_ns':time.perf_counter_ns(),'microseconds':microseconds}
+  if generation==self.worker.get('playing_generation') and microseconds>=self.worker['end_microseconds'] and 'first_endpoint_clock' not in events:
+   events['first_endpoint_clock']={'sent_ns':time.perf_counter_ns(),'microseconds':microseconds,'playing':bool(playing)}
+
+ def save(self):
+  try:
+   self.path.write_text(json.dumps({'clock':'Windows QPC via perf_counter_ns','worker':self.worker},indent=2)+'\n',encoding='utf8')
+  except OSError:
+   logging.exception('Could not retain native completion timing')
+
+
 class Controller:
  def __init__(self,window,cache,bundle):
   self.window=window;self.cache=Path(cache)/'native-preview';self.cache.mkdir(exist_ok=True)
   self.bundle=Path(bundle);self.guard=threading.RLock();self.process=None;self.panel=None;self.latest={};self.generation=0;self.snapshot=None
   self.audio_processes=set();self.closed=False;self.reader_thread=None;self.clock_position=0
+  completion_path=os.environ.get('VLOGCRAFT_COMPLETION_TRACE')
+  self.completion_trace=CompletionTrace(completion_path) if completion_path else None
  def runtime(self):
   override=os.environ.get('VLOGCRAFT_NATIVE_BINARY')
   if override:
@@ -39,10 +89,14 @@ class Controller:
  def _read(self,process):
   try:
    for line in process.stdout:
+    received_ns=time.perf_counter_ns() if self.completion_trace else None
     try:status=json.loads(line)
     except (ValueError,TypeError):continue
     with self.guard:
-     if process is self.process:self.latest=status
+     if process is self.process:
+      self.latest=status
+      if self.completion_trace:self.completion_trace.status(status,received_ns,time.perf_counter_ns())
+     elif self.completion_trace:self.completion_trace.teardown(process,status,received_ns)
   finally:
    with self.guard:
     if process is self.process and self.latest.get('event')!='error':self.latest={'event':'error','reason':'Native renderer exited; use reference fallback'}
@@ -65,8 +119,10 @@ class Controller:
    target=self.cache/'sequence.plan';target.write_text(plan['text'],encoding='utf8')
    log=(self.cache/'native-errors.log').open('w',encoding='utf8')
    env=dict(os.environ,PATH=str(dll)+os.pathsep+os.environ['PATH'])
+   started_ns=time.perf_counter_ns() if self.completion_trace else None
    process=subprocess.Popen([str(exe),'--plan',str(target),'--parent',str(parent)],env=env,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=log,text=True,encoding='utf8',creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
    log.close();self.process=process;self.latest={'event':'starting'}
+   if self.completion_trace:self.completion_trace.start(process,plan,started_ns)
    self.reader_thread=threading.Thread(target=self._read,args=(process,),daemon=True);self.reader_thread.start()
   self.clock(data.get('microseconds',0),False,generation)
   return {k:v for k,v in plan.items() if k!='text'}|{'generation':generation}
@@ -75,7 +131,9 @@ class Controller:
    if generation!=self.generation:return {'stale':True}
    self.clock_position=int(microseconds)
    if self.process and self.process.poll() is None:
-    try:self.process.stdin.write(f'CLOCK {int(microseconds)} {int(bool(playing))} {generation}\n');self.process.stdin.flush()
+    try:
+     self.process.stdin.write(f'CLOCK {int(microseconds)} {int(bool(playing))} {generation}\n');self.process.stdin.flush()
+     if self.completion_trace:self.completion_trace.clock(self.clock_position,playing,generation)
     except (BrokenPipeError,OSError):self.latest={'event':'error','reason':'Native renderer stopped; reference fallback is available'}
    return dict(self.latest)
  def seek(self,frame,generation=None):
@@ -83,8 +141,8 @@ class Controller:
    if generation is not None and generation!=self.generation:return {'stale':True,'generation':self.generation}
    if self.snapshot is None:raise ValueError('Native preview is not prepared')
    fps=timing.rate(self.snapshot['output']['fps']);self.generation+=1;generation=self.generation;audio=list(self.audio_processes)
-  for p in audio:self._terminate(p)
   self.clock(round(int(frame)/fps*1000000),False,generation)
+  for p in audio:self._terminate(p)
   return {'generation':generation}
  def status(self):
   with self.guard:return dict(self.latest)|{'generation':self.generation,'running':bool(self.process and self.process.poll() is None)}
@@ -111,6 +169,7 @@ class Controller:
  def close(self):
   with self.guard:self.closed=True
   self.stop()
+  if self.completion_trace:self.completion_trace.save()
  def audio(self,generation,frame):
   with self.guard:
    if self.closed or generation!=self.generation or self.snapshot is None:raise ValueError('Obsolete native audio request')

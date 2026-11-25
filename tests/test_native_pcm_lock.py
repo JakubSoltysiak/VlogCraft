@@ -40,6 +40,25 @@ class PCMPreparationLockTests(unittest.TestCase):
     def test_clock_delivery_is_independent_of_slow_pcm_graph_preparation(self):self.run_case()
     def test_stop_fences_inflight_preparation_before_encoder_launch(self):self.run_case(stop=True)
     def test_seek_fences_preparation_while_the_snapshot_identity_is_unchanged(self):self.run_case(seek=True)
+    def test_seek_dispatches_picture_target_before_reaping_pcm(self):
+        with tempfile.TemporaryDirectory() as folder:
+            controller=native_playback.Controller(None,Path(folder),Path(folder))
+            controller.generation=1
+            controller.snapshot={'output':{'fps':60}}
+            child=mock.Mock()
+            controller.audio_processes.add(child)
+
+            def reap(process):
+                self.assertIs(process,child)
+                self.assertEqual(controller.clock_position,500000)
+                self.assertEqual(controller.generation,2)
+
+            with mock.patch.object(controller,'_terminate',side_effect=reap) as terminate:
+                self.assertEqual(controller.seek(30,1),{'generation':2})
+                terminate.assert_called_once_with(child)
+            controller.audio_processes.clear()
+            controller.close()
+
     def test_concurrent_graphs_cannot_overadmit_the_two_process_budget(self):
         with tempfile.TemporaryDirectory() as folder:
             c=native_playback.Controller(None,Path(folder),Path(folder));c.generation=1

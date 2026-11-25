@@ -60,7 +60,88 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python "$phase2d/tools/performance_record.py" "$phase2d/docs/benchmarks/studio-3.6.0-phase2d.json"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          python tools/performance_record.py docs/benchmarks/studio-3.6.0-phase3a.json
+          $phase3a = 'build/qa/phase3a-evidence'
+          New-Item -ItemType Directory -Force -Path $phase3a | Out-Null
+          git archive --format=tar --output=build/qa/phase3a-evidence.tar f4a852ba36d9cd6e417c2cbfd1dc90af1ad2d630
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          tar -xf build/qa/phase3a-evidence.tar -C $phase3a
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python "$phase3a/tools/performance_record.py" "$phase3a/docs/benchmarks/studio-3.6.0-phase3a.json"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $phase3b = 'build/qa/phase3b-checkpoint'
+          New-Item -ItemType Directory -Force -Path $phase3b | Out-Null
+          git archive --format=tar --output=build/qa/phase3b-checkpoint.tar f2f871ea439a9d6aa1f6323219d796004e8c4f03
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          tar -xf build/qa/phase3b-checkpoint.tar -C $phase3b
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $priorRecord = "$phase3b/docs/benchmarks/studio-3.6.0-phase3b.json"
+          python "$phase3b/tools/performance_record.py" $priorRecord
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $phase3bFollowUp = 'build/qa/phase3b-follow-up-checkpoint'
+          New-Item -ItemType Directory -Force -Path $phase3bFollowUp | Out-Null
+          git archive --format=tar --output=build/qa/phase3b-follow-up-checkpoint.tar b817372de67569d6fd0e2439a04147d93c27dba0
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          tar -xf build/qa/phase3b-follow-up-checkpoint.tar -C $phase3bFollowUp
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $followUpRecord = "$phase3bFollowUp/docs/benchmarks/studio-3.6.0-phase3b.json"
+          python "$phase3bFollowUp/tools/performance_record.py" $followUpRecord --historical-record $priorRecord
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $phase3bStallFix = 'build/qa/phase3b-stall-fix-checkpoint'
+          New-Item -ItemType Directory -Force -Path $phase3bStallFix | Out-Null
+          git archive --format=tar --output=build/qa/phase3b-stall-fix-checkpoint.tar 28c0abf221c87e1b7c673a36abe70fac594cdc27
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          tar -xf build/qa/phase3b-stall-fix-checkpoint.tar -C $phase3bStallFix
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $stallFixRecord = "$phase3bStallFix/docs/benchmarks/studio-3.6.0-phase3b.json"
+          python "$phase3bStallFix/tools/performance_record.py" $stallFixRecord --historical-record $followUpRecord
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $phase3bReadiness = 'build/qa/phase3b-readiness-checkpoint'
+          New-Item -ItemType Directory -Force -Path $phase3bReadiness | Out-Null
+          git archive --format=tar --output=build/qa/phase3b-readiness-checkpoint.tar 59008494539a3a622ebc92f85fd072c39f527dcc
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          tar -xf build/qa/phase3b-readiness-checkpoint.tar -C $phase3bReadiness
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $readinessRecord = "$phase3bReadiness/docs/benchmarks/studio-3.6.0-phase3b.json"
+          python "$phase3bReadiness/tools/performance_record.py" $readinessRecord --historical-record $stallFixRecord
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $phase3bRefill = 'build/qa/phase3b-refill-checkpoint'
+          New-Item -ItemType Directory -Force -Path $phase3bRefill | Out-Null
+          git archive --format=tar --output=build/qa/phase3b-refill-checkpoint.tar d11445a467e10a8757a672256d7975977d47522a
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          tar -xf build/qa/phase3b-refill-checkpoint.tar -C $phase3bRefill
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $refillRecord = "$phase3bRefill/docs/benchmarks/studio-3.6.0-phase3b.json"
+          python "$phase3bRefill/tools/performance_record.py" $refillRecord --historical-record $readinessRecord
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $phase3bPolling = 'build/qa/phase3b-polling-checkpoint'
+          New-Item -ItemType Directory -Force -Path $phase3bPolling | Out-Null
+          git archive --format=tar --output=build/qa/phase3b-polling-checkpoint.tar 2251870cd2f936c6f982f50432c5ec8ae4529a25
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          tar -xf build/qa/phase3b-polling-checkpoint.tar -C $phase3bPolling
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $pollingRecord = "$phase3bPolling/docs/benchmarks/studio-3.6.0-phase3b.json"
+          python "$phase3bPolling/tools/performance_record.py" $pollingRecord --historical-record $refillRecord
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $phase3bScheduler = 'build/qa/phase3b-scheduler-checkpoint'
+          New-Item -ItemType Directory -Force -Path $phase3bScheduler | Out-Null
+          git archive --format=tar --output=build/qa/phase3b-scheduler-checkpoint.tar 2a6e8cb3862cd972119d323e61b558fade9bf635
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          tar -xf build/qa/phase3b-scheduler-checkpoint.tar -C $phase3bScheduler
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $schedulerRecord = "$phase3bScheduler/docs/benchmarks/studio-3.6.0-phase3b.json"
+          python "$phase3bScheduler/tools/performance_record.py" $schedulerRecord --historical-record $pollingRecord
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $pictureRecord = 'build/qa/phase3b-independent-picture.json'
+          git show 613f2fba56ae411943f079eafc88fab4d1fff2b1:docs/benchmarks/studio-3.6.0-phase3b.json | Set-Content -Encoding utf8 $pictureRecord
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -c "import json,sys; from tools.performance_record import check_history; check_history(json.load(open(sys.argv[1], encoding='utf8')), json.load(open(sys.argv[2], encoding='utf8')))" $pictureRecord $schedulerRecord
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $timestampedRecord = 'build/qa/phase3b-timestamped.json'
+          git show 0c5ff329c3e8eac45b520b2161817cea291ab3fc:docs/benchmarks/studio-3.6.0-phase3b.json | Set-Content -Encoding utf8 $timestampedRecord
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -c "import json,sys; from tools.performance_record import check_history; check_history(json.load(open(sys.argv[1], encoding='utf8')), json.load(open(sys.argv[2], encoding='utf8')))" $timestampedRecord $pictureRecord
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tools/performance_record.py docs/benchmarks/studio-3.6.0-phase3b.json --historical-record $timestampedRecord
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python tests/icon_assets.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
@@ -93,7 +174,7 @@ jobs:
         run: node --test tests/timeline_commands.test.js tests/native_audio_worklet.test.js tests/native_clock.test.js tests/meter.test.js tests/recovery.test.js tests/flight_recorder.test.js tests/color_controls.test.js tests/motion_presets.test.js
   native-compile:
     runs-on: windows-2022
-    timeout-minutes: 20
+    timeout-minutes: 35
     needs: regression
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
@@ -102,14 +183,25 @@ jobs:
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: "3.11"
+      - name: Cache pinned SDK archives
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: |
+            build/tools/architecture/zig-*.zip
+            build/tools/architecture/ffmpeg-*.7z
+          key: windows-native-archives-${{ hashFiles('tools/setup_architecture_lab.py') }}
       - name: Compile isolated native experiment (no GPU execution)
         run: python tools/setup_architecture_lab.py --component zig --component ffmpeg-shared --build-native
+      - name: Verify native stall watchdog without a GPU
+        run: python tests/test_native_stall_watch.py
       - name: Install Phase 2 lab dependencies
         shell: pwsh
         run: |
           python -m pip install -r packaging/requirements.txt
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           .github/scripts/setup-ffmpeg.ps1
+      - name: Verify producer refill expiry without a GPU
+        run: python tests/test_native_refill_liveness.py
       - name: Verify compositor kernels and HDR fallback in software
         shell: pwsh
         run: |
@@ -177,6 +269,13 @@ jobs:
           New-Item -ItemType Directory -Force build/tools/wix | Out-Null
           Invoke-WebRequest https://github.com/wixtoolset/wix3/releases/download/wix3141rtm/wix314-binaries.zip -OutFile build/tools/wix.zip
           Expand-Archive build/tools/wix.zip build/tools/wix -Force
+      - name: Cache pinned SDK archives
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: |
+            build/tools/architecture/zig-*.zip
+            build/tools/architecture/ffmpeg-*.7z
+          key: windows-native-archives-${{ hashFiles('tools/setup_architecture_lab.py') }}
       - name: Build optional native runtime for packaging (no GPU execution)
         run: python tools/setup_architecture_lab.py --component zig --component ffmpeg-shared --build-native --build-project-export
       - name: Build Windows installer

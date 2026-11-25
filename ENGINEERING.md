@@ -1,5 +1,16 @@
 # Architecture and continuation
 
+## 3.6.0 Phase 3B editing transport
+
+The playback worker owns up to three decoders. After acknowledging an exact paused picture it can prepare an upcoming source within two sequence seconds. At most two inactive decoders share a 896 MiB budget for decoded texture arrays. Only one unopened source starts preparation at a time. A compatible source returning at the same media boundary can continue from its queued pictures. A discontinuous source resets to its requested timestamp. The compositor retains submitted pictures until its GPU queries complete. The presentation loop services every active layer while waiting for an exact picture.
+
+The opt-in local trace records monotonic decoder, D3D11 lock and presentation intervals above 2 ms. Its fixed storage retains recent events, the longest calls and the neighborhoods of three large missed-frame events. A source number identifies a stream within the test session. Concurrent call durations can overlap. The active GPU allocation, estimated standby texture payload, and OS working set measure different resources.
+
+Ruler movement paints the playhead at the animation-frame cadence. Transient native seeks keep the latest target, pace decoder resets while a target is in flight, and hold the target while awaiting its generation. Only the committed position prepares PCM and writes recovery. A release on the same frame reuses its seek generation. The worker reports the first completed paused target and fences obsolete GPU submissions. The full playback clock and existing FFmpeg fallback remain available. Windows background proxy encoding runs at below-normal process priority with its existing output and cancellation contract. [Phase 3B measurements](docs/STUDIO_3_6_0_PHASE3B_PLAYBACK.md).
+
+On three-layer backward cuts the worker may begin a source rewind up to three sequence frames early when each remaining outgoing selection has a decoded PTS bracket. The old tail and incoming queue share the four-picture budget. A generation change drops the pending handoff. The ordinary seek path handles unproven intervals. This preserves continuous playback timing and limits extra ownership to references to already allocated surfaces.
+
+
 ## 3.6.0 Phase 3A GPU export verification
 
 The full-master path can rebuild one bounded failed GOP with the managed graph, reuse the remaining closed segments, reauthor from decoded pictures and rerun the complete acceptance gate. The first-export path has independent software source-clock checks, a separately rendered audio graph and selected managed PQ picture checks. The optional Radeon runtime limits that policy to short straight-cut projects using the qualified output profile. [Phase 3A architecture and measurements](docs/STUDIO_3_6_0_PHASE3A_EXPORT.md).
