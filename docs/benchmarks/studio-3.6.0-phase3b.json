@@ -86077,6 +86077,17 @@
     "through_independent_check_seconds": 713.132
   },
   "measurement_files": {
-    "docs/benchmarks/studio-3.6.0-camera-raster.json": "6eb2476c405ef5eda9f9b51e3d81bbf36dee990428a7ea72cbeb416d2de4e7f2"
+    "docs/benchmarks/studio-3.6.0-camera-raster.json": "c0ec5e0ebe5f7231bdb620c6bf16f8edde56b2c88b3d982e3c21c022aa0ec693"
+  },
+  "camera_raster_corrected3600": {
+    "implementation": "5638eb8",
+    "attempt": "corrected3600",
+    "measurement_file": "docs/benchmarks/studio-3.6.0-camera-raster.json",
+    "passed": true,
+    "frames": 3600,
+    "below_50": 0,
+    "identical_decoded_pictures": 3600,
+    "dynamic_equals_reference": 3600,
+    "through_independent_check_seconds": 4018.685
   }
 }

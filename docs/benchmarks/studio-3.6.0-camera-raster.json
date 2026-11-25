@@ -245,7 +245,180 @@
       "source_identities_match": true,
       "worker_peak_mib": 364.0,
       "peak_local_gpu_mib": 361.3,
-      "tree_peak_gib": 4.322
+      "tree_peak_gib": 4.322,
+      "encoder_input_comparison": {
+        "checked_encoder_input_clocks": 600,
+        "managed_input_span": [
+          103,
+          600
+        ],
+        "compared_input_pictures": 497,
+        "byte_identical_input_pictures": 497
+      },
+      "coded_picture_comparison": {
+        "pictures": 600,
+        "identical_coded_pictures": 600,
+        "equal_coded_size_timing_and_key": 600
+      },
+      "file_comparison": {
+        "same_size": true,
+        "identical_file": false,
+        "differing_byte_count": 4,
+        "iso_bmff_box_counts": {
+          "moov/trak/mdia/minf/stbl/stsd": 1,
+          "mdat": 3
+        },
+        "x265_log_verbosity_only": true,
+        "occurrences": 4
+      },
+      "spans": [
+        [
+          0,
+          103
+        ],
+        [
+          103,
+          600
+        ]
+      ],
+      "sampled_raw_checks": 6,
+      "minimum_sampled_decoded_to_uncompressed_psnr_db": 53.3084,
+      "maximum_sampled_decoded_to_uncompressed_psnr_db": 56.0358,
+      "whole_qualification_wall_seconds": 714.289,
+      "ac_all_samples": true
+    },
+    "corrected3600": {
+      "frames": 3600,
+      "passed": true,
+      "delivered_backend": "d3d11-zimg",
+      "raster": "indexed-d3d11-decode-zimg",
+      "decoded_source_pictures": 3773,
+      "decode_seconds": 3.577,
+      "seek_seconds": 0.041,
+      "visible_source_plane_bytes": 71850240000,
+      "stage_seconds": {
+        "prepare_seconds": 3.811,
+        "render_seconds": 3320.261,
+        "encoder_feed_and_wait_seconds": 3318.09,
+        "encoder_cpu_seconds": 7618.811,
+        "author_seconds": 90.446,
+        "verification_seconds": 445.896,
+        "total_seconds": 3860.448
+      },
+      "median_ms": {
+        "source_normalization_ms": 0.0,
+        "readback_ms": 7.6025,
+        "write_ms": 859.38
+      },
+      "encoders": [
+        {
+          "frames": 103,
+          "seconds": 97.51,
+          "fps": 1.06
+        },
+        {
+          "frames": 564,
+          "seconds": 513.46,
+          "fps": 1.1
+        },
+        {
+          "frames": 85,
+          "seconds": 80.97,
+          "fps": 1.05
+        },
+        {
+          "frames": 750,
+          "seconds": 662.92,
+          "fps": 1.13
+        },
+        {
+          "frames": 812,
+          "seconds": 714.19,
+          "fps": 1.14
+        },
+        {
+          "frames": 1286,
+          "seconds": 1240.43,
+          "fps": 1.04
+        }
+      ],
+      "encoder_combined_fps": 1.088,
+      "independent_comparison_seconds": 158.236,
+      "through_independent_check_seconds": 4018.685,
+      "minimum_psnr_db": "inf",
+      "overall_psnr_db": "inf",
+      "identical_decoded_pictures": 3600,
+      "below_50": 0,
+      "original_requests": 3600,
+      "verified_source_pictures": 3600,
+      "exact_video_pts": true,
+      "pcm_matches": true,
+      "end_samples": 2880000,
+      "dynamic_records": 3600,
+      "dynamic_equals_reference": 3600,
+      "static_hdr_matches": true,
+      "source_identities_match": true,
+      "worker_peak_mib": 493.5,
+      "peak_local_gpu_mib": 429.1,
+      "tree_peak_gib": 4.443,
+      "encoder_input_comparison": {
+        "checked_encoder_input_clocks": 3600,
+        "managed_input_span": [
+          103,
+          600
+        ],
+        "compared_input_pictures": 497,
+        "byte_identical_input_pictures": 497
+      },
+      "coded_picture_comparison": {
+        "pictures": 3600,
+        "identical_coded_pictures": 3600,
+        "equal_coded_size_timing_and_key": 3600
+      },
+      "file_comparison": {
+        "same_size": true,
+        "identical_file": false,
+        "differing_byte_count": 19,
+        "iso_bmff_box_counts": {
+          "moov/trak/mdia/minf/stbl/stsd": 1,
+          "mdat": 18
+        },
+        "x265_log_verbosity_only": true,
+        "occurrences": 19
+      },
+      "spans": [
+        [
+          0,
+          103
+        ],
+        [
+          103,
+          667
+        ],
+        [
+          667,
+          752
+        ],
+        [
+          752,
+          1502
+        ],
+        [
+          1502,
+          2314
+        ],
+        [
+          2314,
+          3600
+        ]
+      ],
+      "sampled_raw_checks": 18,
+      "minimum_sampled_decoded_to_uncompressed_psnr_db": 50.2168,
+      "maximum_sampled_decoded_to_uncompressed_psnr_db": 58.4121,
+      "whole_qualification_wall_seconds": 4019.713,
+      "ac_all_samples": true
     }
-  }
+  },
+  "original_recordings_sha256_unchanged": 2,
+  "legacy_packed_output_byte_identical_pictures": 600
 }
