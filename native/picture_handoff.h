@@ -6,6 +6,7 @@
 #include <wrl/client.h>
 #include <array>
 #include <exception>
+#include <memory>
 #include <mutex>
 
 // One producer and one consumer, each using its own immediate context. Generation
@@ -33,7 +34,9 @@ public:
     struct SlotSnapshot {
         State state = State::Free;
         uint64_t generation = 0, serial = 0;
+        UINT64 fencePoint = 0;
         int64_t pts = AV_NOPTS_VALUE;
+        std::weak_ptr<AVFrame> sourceIdentity;
         bool retained = false, gpuCopyValid = false;
         double copyCpuMs = 0, gpuCopyMs = 0;
         unsigned copyPendingPolls = 0, consumerPendingPolls = 0;
@@ -144,7 +147,8 @@ public:
 
     // No capacity wait and no GPU-completion wait. The producer still takes
     // FFmpeg's recursive lock to use the immediate context.
-    int trySubmit(const AVFrame* frame, uint64_t generation) {
+    int trySubmit(const AVFrame* frame, uint64_t generation,
+                  const std::weak_ptr<AVFrame>& sourceIdentity = {}) {
         {
             std::lock_guard<std::mutex> lock(mutex_);
             if (!current(generation)) return -1;
@@ -155,7 +159,7 @@ public:
         {
             std::lock_guard<std::mutex> lock(mutex_);
             if (!current(generation)) return -1;
-            index = reserve(frame, generation);
+            index = reserve(frame, generation, sourceIdentity);
             if (index < 0) return -1;
         }
         auto& slot = slots_[index];
@@ -173,6 +177,7 @@ public:
 
         HRESULT acquired = S_FALSE;
         double cpuMs = 0;
+        UINT64 fencePoint = 0;
         Clock::time_point submitted{};
         {
             ProducerLock lock(producer_);
@@ -188,16 +193,15 @@ public:
                     context->End(slot.copyEnd.Get());
                     context->End(slot.copyDisjoint.Get());
                     context->End(slot.copyEvent.Get());
-                    slot.fencePoint = 0;
                     if (usingFence()) {
                         const UINT64 point = ++nextPoint_;
-                        if (SUCCEEDED(signalContext_->Signal(copyFence_.Get(),point))) slot.fencePoint = point;
+                        if (SUCCEEDED(signalContext_->Signal(copyFence_.Get(),point))) fencePoint = point;
                         else signalFailed_.store(true);
                     }
                     // Transfer the key on the serialized producer context.
                     // The consumer cannot acquire this slot until CPU-side
                     // fence observation separately publishes Ready.
-                    slot.keyReleaseResult = slot.fencePoint ? slot.producerKey->ReleaseSync(consumerKey) : S_OK;
+                    slot.keyReleaseResult = fencePoint ? slot.producerKey->ReleaseSync(consumerKey) : S_OK;
                     context->Flush();
                     submitted = Clock::now();
                 }
@@ -217,6 +221,7 @@ public:
             std::lock_guard<std::mutex> lock(mutex_);
             auto& status = state_.slots[index];
             status.copyCpuMs = cpuMs;
+            status.fencePoint = fencePoint;
             status.submitted = submitted;
             status.state = State::CopyPending;
             ++state_.submissions;
@@ -225,25 +230,47 @@ public:
         return index;
     }
 
-    // Query the producer before releasing any picture to the other device.
-    // Calling this with a busy producer's context is never required on the consumer.
+    // Use pollFencedProducer and pollProducerQueries on separate endpoints when
+    // needed. Each path has a single observer and handles disjoint slots.
     int pollProducer() {
+        const int fenced = pollFencedProducer();
+        return fenced + pollProducerQueries();
+    }
+
+    int pollFencedProducer() {
+        if (!copyFence_) return 0;
+        int count = 0;
+        const auto done = copyFence_->GetCompletedValue();
+        for (int i = 0; i < slotCount; ++i) {
+            UINT64 point;
+            {
+                std::lock_guard<std::mutex> lock(mutex_);
+                const auto& status = state_.slots[i];
+                if (status.state != State::CopyPending || !status.fencePoint) continue;
+                point = status.fencePoint;
+            }
+            // Signal and key release were enqueued on the producer context.
+            // Their observation can progress while it is busy submitting a peer slot.
+            const HRESULT ready = done == UINT64_MAX ? DXGI_ERROR_DEVICE_REMOVED :
+                                  done >= point ? S_OK : S_FALSE;
+            count += observeCopy(i, ready, slots_[i].keyReleaseResult);
+        }
+        return count;
+    }
+
+    int pollProducerQueries() {
         int count = 0;
         for (int i = 0; i < slotCount; ++i) {
-            if (slotState(i) != State::CopyPending) continue;
+            {
+                std::lock_guard<std::mutex> lock(mutex_);
+                const auto& status = state_.slots[i];
+                if (status.state != State::CopyPending || status.fencePoint) continue;
+            }
             auto& slot = slots_[i];
             HRESULT ready, released = S_OK;
             double gpuMs = 0;
             bool gpuValid = false;
-            Clock::time_point complete{};
-            if (slot.fencePoint) {
-                // Signal was enqueued on the original serialized context. The key was
-                // released in that transaction. Only observe completion here.
-                released = slot.keyReleaseResult;
-                const UINT64 done = copyFence_->GetCompletedValue();
-                ready = done == UINT64_MAX ? DXGI_ERROR_DEVICE_REMOVED :
-                        done >= slot.fencePoint ? S_OK : S_FALSE;
-            } else {
+            {
                 ProducerLock lock(producer_);
                 auto* context = producer_->device_context;
                 ready = eventStatus(context, slot.copyEvent.Get());
@@ -252,35 +279,18 @@ public:
                     released = slot.producerKey->ReleaseSync(consumerKey);
                 }
             }
-            if (ready == S_OK) complete = Clock::now();
-            if (ready == S_FALSE) {
-                recordPending(i, true);
-                continue;
-            }
-            if (ready != S_OK) {
-                recoverQuery(i, producer_->device, ready, "handoff producer completion query");
-                continue;
-            }
-            if (released != S_OK) {
-                markFailed();
-                recycle(i);
-                throwStatus(released, "handoff producer key release");
-            }
-            std::lock_guard<std::mutex> lock(mutex_);
-            auto& status = state_.slots[i];
-            status.copyCompleted = complete;
-            status.gpuCopyValid = gpuValid;
-            status.gpuCopyMs = gpuMs;
-            if (current(status.generation)) {
-                status.published = Clock::now();
-                status.state = State::Ready;
-                ++state_.publications;
-            } else {
-                status.state = State::DiscardReady;
-            }
-            ++count;
+            count += observeCopy(i, ready, released, gpuValid, gpuMs);
         }
         return count;
+    }
+
+    // The consumer can return an image that was never sampled without
+    // queuing a consumer completion event.
+    void discardReady(uint64_t generation, int index) {
+        std::lock_guard<std::mutex> lock(mutex_);
+        auto& status = state_.slots.at(index);
+        if (status.state == State::Ready && status.generation == generation)
+            status.state = State::DiscardReady;
     }
 
     // Requesting a specific slot never queues a consumer dependency for an
@@ -338,7 +348,7 @@ public:
         for (int i = 0; i < slotCount; ++i) {
             const State state = slotState(i);
             if (state == State::DiscardReady) {
-                if (!takeConsumerKey(i)) continue;
+                if (!takeConsumerKey(i, true)) continue;
                 returnToProducer(i, true);
                 ++count;
             } else if (state == State::ConsumerPending) {
@@ -402,7 +412,6 @@ private:
         ~ProducerLock() { context->unlock(context->lock_ctx); }
     };
     struct Slot {
-        UINT64 fencePoint = 0;
         HRESULT keyReleaseResult = S_OK;
         ComPtr<ID3D11Texture2D> local, opened;
         ComPtr<IDXGIKeyedMutex> producerKey, consumerKey;
@@ -559,7 +568,7 @@ private:
         }
     }
 
-    int reserve(const AVFrame* frame, uint64_t generation) {
+    int reserve(const AVFrame* frame, uint64_t generation, const std::weak_ptr<AVFrame>& sourceIdentity) {
         for (int offset = 0; offset < slotCount; ++offset) {
             const int i = (nextSlot_ + offset) % slotCount;
             auto& status = state_.slots[i];
@@ -569,6 +578,7 @@ private:
             status.generation = generation;
             status.serial = ++serial_;
             status.pts = frame->best_effort_timestamp;
+            status.sourceIdentity = sourceIdentity;
             unsigned inUse = 0;
             for (const auto& entry : state_.slots) inUse += entry.state != State::Free;
             state_.peakSlots = (std::max)(state_.peakSlots, inUse);
@@ -597,18 +607,48 @@ private:
         }
     }
 
+    bool observeCopy(int index, HRESULT ready, HRESULT released, bool gpuValid = false, double gpuMs = 0) {
+        if (ready == S_FALSE) {
+            recordPending(index, true);
+            return false;
+        }
+        if (ready != S_OK) {
+            recoverQuery(index, producer_->device, ready, "handoff producer completion query");
+            return false;
+        }
+        const auto complete = Clock::now();
+        if (released != S_OK) {
+            markFailed();
+            recycle(index);
+            throwStatus(released, "handoff producer key release");
+        }
+        std::lock_guard<std::mutex> lock(mutex_);
+        auto& status = state_.slots[index];
+        status.copyCompleted = complete;
+        status.gpuCopyValid = gpuValid;
+        status.gpuCopyMs = gpuMs;
+        if (current(status.generation)) {
+            status.published = Clock::now();
+            status.state = State::Ready;
+            ++state_.publications;
+        } else {
+            status.state = State::DiscardReady;
+        }
+        return true;
+    }
+
     void recordKeyTimeout() {
         std::lock_guard<std::mutex> lock(mutex_);
         ++state_.keyTimeouts;
     }
 
-    bool takeConsumerKey(int index) {
+    bool takeConsumerKey(int index, bool discard = false) {
         const HRESULT acquired = slots_[index].consumerKey->AcquireSync(consumerKey, 0);
         if (acquired == S_OK) return true;
         if (acquired == WAIT_TIMEOUT) {
             std::lock_guard<std::mutex> lock(mutex_);
             auto& status = state_.slots[index];
-            status.state = current(status.generation) ? State::Ready : State::DiscardReady;
+            status.state = !discard && current(status.generation) ? State::Ready : State::DiscardReady;
             ++state_.keyTimeouts;
             return false;
         }

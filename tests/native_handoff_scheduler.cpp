@@ -62,7 +62,7 @@ void run(const char* fixture) {
         bool ready = false;
         auto selected = primary.at(primaryClip, frame, generation, tick, ready, false);
         require(ready && selected, "primary source interval is unproved");
-        handoff.service(0, primaryClip, selected, primary, generation, consumer.Get());
+        handoff.service(0, primaryClip, selected, primary, frame, generation, consumer.Get());
         return handoff.pictures[0];
     };
     auto acquire = [&](int64_t frame, int64_t tick, int64_t generation) {
@@ -99,7 +99,7 @@ void run(const char* fixture) {
             bool ready = false;
             auto selected = peer.at(peerClip, frame, playing, peerTick, ready, false);
             require(!ready && !selected, "peer unexpectedly proved its interval");
-            require(!handoff.service(1, peerClip, selected, peer, playing, consumer.Get()),
+            require(!handoff.service(1, peerClip, selected, peer, frame, playing, consumer.Get()),
                     "unproved peer picture reached composition");
         };
         const auto halfway = first + (second - first) / 2;
@@ -110,7 +110,25 @@ void run(const char* fixture) {
             serviceStalledPeer(1);
             require(!service(1, halfway, playing), "blocked copy published after clock advanced");
         }
-        auto a = acquire(1, halfway, playing);
+        // Withhold consumer polling. Both independent slots must submit from
+        // the already decoded floor/successor window on their own.
+        auto& primaryLane = *handoff.lanes[0];
+        auto deadline = Clock::now() + 5s;
+        while (primaryLane.snapshot().submissions < 2) {
+            require(Clock::now() < deadline, "the first copy blocked submission of the second slot");
+            Sleep(1);
+        }
+        PictureHandoff::Picture a;
+        if (primaryLane.usingFence()) {
+            const auto state = primaryLane.snapshot();
+            require(state.slots[0].state == PictureHandoff::State::CopyPending &&
+                    state.slots[1].state == PictureHandoff::State::CopyPending,
+                    "the fenced slots were published before the consumer observed them");
+            DeviceLock blockFurtherSubmit(primary);
+            a = acquire(1, halfway, playing);
+        } else {
+            a = acquire(1, halfway, playing);
+        }
         require(a.pts == first + primary.origin, "playback clock advancement lost the exact floor");
         allowPrefetch(1, halfway);
 
@@ -143,6 +161,7 @@ void run(const char* fixture) {
     // with an outstanding or freshly prepared copy. Ring teardown owns drain.
     handoff.trim({});
     std::cout << "{\"scheduler\":\"passed\",\"clock_advanced_while_copy_blocked\":true,"
+                 "\"two_slots_submitted_before_consumer_poll\":true,"
                  "\"successor_prepared_while_peer_unavailable\":true,\"slot_reused\":true,"
                  "\"seek_invalidated_picture\":true,\"teardown_completed\":true}\n";
 }

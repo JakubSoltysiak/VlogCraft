@@ -339,11 +339,19 @@ struct Producer {
  }
  // Snapshot existing decoded references without consuming a successor or
  // changing the producer's target, epoch, queue or refill deadline.
- std::pair<Frame,Frame> preparationWindow(const Clip& clip,const Frame& selected,int64_t generation){
+ std::pair<Frame,Frame> preparationWindow(const Clip& clip,const Frame& selected,int64_t frame,int64_t generation){
   std::lock_guard<std::mutex> lock(guard);
   Frame floor=selected?selected:current;
   if(cutOld==&clip&&cutGeneration==generation){
-   for(const auto& f:cutTail)if(f!=floor)return {floor,f};
+   auto offset=frame-tailFirstFrame;
+   if(offset<0||offset>=(int64_t)cutTail.size())return {selected,{}};
+   floor=cutTail[(size_t)offset];
+   for(auto i=(size_t)offset+1;i<cutTail.size();++i)
+    if(cutTail[i]!=floor)return {floor,cutTail[i]};
+   // Once the outgoing clip has no later distinct picture, the other slot
+   // can prepare the incoming floor from the decoder's primed epoch.
+   if(epoch==workerEpoch&&failure.empty())
+    return {floor,current?current:queue.empty()?Frame{}:queue.front()};
    return {floor,{}};
   }
   if(!floor)return {};
