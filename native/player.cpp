@@ -77,6 +77,7 @@ int main(int argc,char** argv){
   uint64_t peakStandbyBytes=0,peakReservedBytes=0,decoderOpens=0,resumedDecoders=0,coldPrepares=0,prepareRetries=0;
   std::set<std::string> retryOnFailure;
   std::vector<std::pair<const Clip*,Frame>> selected;bool ready=false,eos=false;double first=0;
+  bool selectedForDrawnFrame=false,retrySharedPicture=false;
   struct Miss {int64_t frame,lost,adjustment;double loopGap,sourceMs,clockAge,presentMs,contextMs;bool source,gpu;};
   std::deque<Miss> misses;auto lastLoop=Clock::now();Distribution selectTime;double clockAge=0;int64_t adjustment=0;
   // Reservations cover in-flight opens. Once a pool exists its exact texture
@@ -149,6 +150,12 @@ int main(int argc,char** argv){
    currentClip[next->asset]=next->id;parked[next->asset]=next;decoderOpens++;coldPrepares++;
    maxDecoders=std::max(maxDecoders,producers.size());observeStandby();
   };
+  auto fallbackFromHandoff=[&]{
+   // Re-open the current clock on the established shared device.
+   renderer.drain();handoff.trim({});selected.clear();
+   producers.clear();currentClip.clear();parked.clear();lastActive.clear();retryOnFailure.clear();
+   useHandoff=false;ready=false;retrySharedPicture=true;++handoffFallbacks;
+  };
   while(!input.stop){
    double loopGap=seconds(lastLoop)*1000;lastLoop=Clock::now();
    {WatchStage stage("dispatch_messages");MSG message;while(PeekMessageW(&message,nullptr,0,0,PM_REMOVE)){TranslateMessage(&message);DispatchMessageW(&message);}}
@@ -188,7 +195,20 @@ int main(int argc,char** argv){
    }
    if(!limit&&!playing&&reportedPausedGeneration==epoch&&previous==frame)prepareWhilePaused(frame);
    if(playing&&drawnGeneration==epoch&&frame<previous){clockHolds++;frame=previous;}
-   if(drawnGeneration==epoch&&frame==previous&&!(renderer.display&&renderer.display->needsResize())){if(useHandoff)for(auto& lane:handoff.lanes)if(lane)lane->retire();if(seconds(lastReport)>.1){report("status",frame);lastReport=Clock::now();}WatchStage stage("wait_clock_deadline");deadline.wait(playing?std::clamp<int64_t>(av_rescale_q(previous+1,av_inv_q(plan.rate),AV_TIME_BASE_Q)-us,100,5000):20000);continue;}
+   if(drawnGeneration==epoch&&frame==previous&&!retrySharedPicture&&!(renderer.display&&renderer.display->needsResize())){
+    if(useHandoff&&selectedForDrawnFrame){
+     try{
+      for(size_t i=0;i<selected.size();++i){
+       const auto& [clip,picture]=selected[i];
+       handoff.service(i,*clip,picture,*producers.at(clip->asset),frame,epoch,renderer.device);
+      }
+     }catch(const std::runtime_error&){fallbackFromHandoff();continue;}
+    }
+    if(seconds(lastReport)>.1){report("status",frame);lastReport=Clock::now();}
+    WatchStage stage("wait_clock_deadline");
+    deadline.wait(playing?std::clamp<int64_t>(av_rescale_q(previous+1,av_inv_q(plan.rate),AV_TIME_BASE_Q)-us,100,5000):20000);
+    continue;
+   }
    auto selectionStart=Clock::now();bool reset=generation!=epoch;generation=epoch;
    std::vector<Clip*> active;std::map<std::string,bool> wanted;
    for(auto& c:plan.clips)if(c.position<=frame&&frame<c.end){active.push_back(&c);wanted[c.asset]=true;}
@@ -263,7 +283,7 @@ int main(int argc,char** argv){
     lastActive.clear();for(auto* c:active)lastActive.insert(c->id);
     parked=std::move(keep);observeStandby();
    }
-   maxDecoders=std::max(maxDecoders,producers.size());selected.clear();ready=true;
+   maxDecoders=std::max(maxDecoders,producers.size());selected.clear();selectedForDrawnFrame=false;ready=true;
    if(flight)watchSelected(selected);
    WatchRequest observed;
    size_t watchIndex=0;
@@ -304,7 +324,7 @@ int main(int argc,char** argv){
     if(available){c->sourceRotation=p.rotation;retryOnFailure.erase(c->asset);}
     {std::lock_guard<std::mutex> lock(p.guard);maxQueue=std::max(maxQueue,p.peak);}
     if(useHandoff){
-     try { if(!handoff.service(index,*c,f,p,epoch,renderer.device)) ready=false; }
+     try { if(!handoff.service(index,*c,f,p,frame,epoch,renderer.device)) ready=false; }
      catch(const std::runtime_error&){handoffFailed=true;break;}
     }
     if(!available){ready=false;continue;}selected.push_back({c,f});
@@ -312,11 +332,7 @@ int main(int argc,char** argv){
    }
    double sourceMs=seconds(selectionStart)*1000;selectTime.add(sourceMs);
    if(handoffFailed){
-     // Re-open this transport at the current clock on the established shared
-     // device. Never render a CPU download or a stale isolated picture here.
-     releaseRefills();renderer.drain();handoff.trim({});selected.clear();
-     producers.clear();currentClip.clear();parked.clear();lastActive.clear();retryOnFailure.clear();
-     useHandoff=false;++handoffFallbacks;continue;
+     releaseRefills();fallbackFromHandoff();continue;
    }
    // Source selection may drain slots, but only draw() can occupy one.
    if(ready&&!slot){
@@ -341,6 +357,7 @@ int main(int argc,char** argv){
    if(flight&&retireWithDraw&&renderer.submitted!=renderer.completed)combinedPollOpportunities++;
    {SourceStage timer("draw_and_present");renderer.draw(*slot,plan,frame,generation,selected,playing,retireWithDraw,
       useHandoff?&handoff.pictures:nullptr);}
+   selectedForDrawnFrame=true;retrySharedPicture=false;
    if(useHandoff&&!selected.empty())++handoffDraws;
    if(flight&&(previous!=frame||drawnGeneration!=epoch))flight->submit.set({frame,epoch,flight->now()});
    if(traceCompletion&&epoch==completion.generation&&frame==plan.end-1&&!completion.draw)completion.draw=CompletionStamps::now();

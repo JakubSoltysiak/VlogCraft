@@ -1,5 +1,9 @@
 # Phase 3B qualification handoff
 
+## Two-slot qualification
+
+The recorder-off R→F campaign `two-slot-overlap1` failed its first pair, with all controls valid. The build, scheduler, fence, VFR, rewind and pixel checks passed on the same worker. Keep the failed pair and start a fresh cohort only for an identified change. For reproducing the physical workflow below, load the frozen package and fixture paths from `build/qa/phase3b-watch/timestamp-fence-ordinary1/refill-image.private.json`, use a fresh results directory and supply `--comparison ordinary --candidate-picture-handoff`. Never reuse a previous hardware result for a changed binary. [Trial and gate](STUDIO_3_6_0_PHASE3B_PLAYBACK.md#two-outstanding-picture-copies-on-radeon-890m).
+
 ## Timestamped playback checkpoint
 
 The queue and fence changes are implemented and both ordinary first pairs failed. The evidence lives in `timestamped_handoff` in the [ledger](benchmarks/studio-3.6.0-phase3b.json). The [trial table](STUDIO_3_6_0_PHASE3B_PLAYBACK.md#timestamped-per-layer-preparation) identifies the tested workers and unchanged thresholds. Use the existing retained original-offset three-layer cohort for direct comparison. The first question after this checkpoint is which layer lacks a proved source interval versus a prepared exact copy at the missed deadline. Correlate that distinction with the 30-frame cut cadence before changing the two-slot budget or decoder transactions. A short recorder-enabled diagnostic may answer it. Retain the recorder-off gate for qualification.

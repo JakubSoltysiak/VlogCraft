@@ -136,7 +136,12 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python -c "import json,sys; from tools.performance_record import check_history; check_history(json.load(open(sys.argv[1], encoding='utf8')), json.load(open(sys.argv[2], encoding='utf8')))" $pictureRecord $schedulerRecord
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          python tools/performance_record.py docs/benchmarks/studio-3.6.0-phase3b.json --historical-record $pictureRecord
+          $timestampedRecord = 'build/qa/phase3b-timestamped.json'
+          git show 0c5ff329c3e8eac45b520b2161817cea291ab3fc:docs/benchmarks/studio-3.6.0-phase3b.json | Set-Content -Encoding utf8 $timestampedRecord
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -c "import json,sys; from tools.performance_record import check_history; check_history(json.load(open(sys.argv[1], encoding='utf8')), json.load(open(sys.argv[2], encoding='utf8')))" $timestampedRecord $pictureRecord
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tools/performance_record.py docs/benchmarks/studio-3.6.0-phase3b.json --historical-record $timestampedRecord
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python tests/icon_assets.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

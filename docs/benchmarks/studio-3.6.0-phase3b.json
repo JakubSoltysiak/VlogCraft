@@ -6880,9 +6880,9 @@
       "cause": "The old binding checked the historical Phase 3A measurement against changed Phase 3B source. CI now verifies Phase 3A using its archived commit, then checks the new record."
     }
   ],
-  "source_fingerprint": "974caf3c6fcc84c271f08dd970c9627da166b21751fe97c677c5ac395bf7a53e",
+  "source_fingerprint": "0206a37cdb1b30e4dce9c21b60cc371699d7d3f743596cd21fd434d38aa4cc6f",
   "fingerprint_method": "SHA256 sorted relevant relative path + NUL + LF-normalized source + NUL",
-  "benchmark_protocol_fingerprint": "d153ba961009f567218ef875d1fa0253d639c41348835a89a9f5266f8b7067f7",
+  "benchmark_protocol_fingerprint": "2b6e85a8099a1bf1155daaab87e90a25157e7910c554cfaeddaa8a2012a09227",
   "benchmark_protocol_fingerprint_method": "SHA256 sorted benchmark driver/observer relative path + NUL + LF-normalized source + NUL",
   "follow_up": {
     "status": "development checkpoint",
@@ -82333,5 +82333,555 @@
     "measured_free_bytes": 191915241472,
     "full_project_pictures": 78427,
     "full_export_gate": "passed and full encoder started; final file verification pending"
+  },
+  "two_slot_overlap": {
+    "ordinary": {
+      "comparison": "ordinary",
+      "reference_hold_arm": "D",
+      "candidate_poll_policy": "source_first",
+      "candidate_picture_handoff": true,
+      "diagnostic_host_baseline": "cand4",
+      "diagnostic_worker_sha256": "7bcfee70017e9234ba4aa597b51c0a9731b07c8c6d793312acd07c57b6d0ce35",
+      "diagnostic_build": {
+        "head_at_build": "57309c174955d061f72649f4f4de3347cb68c89d",
+        "native_build_inputs_sha256": "df7cc8b918e56d6b3a5a1a5f53508303d667c9b76fa0ae0330ed77c62df29997",
+        "worker": {
+          "bytes": 1194496,
+          "sha256": "7bcfee70017e9234ba4aa597b51c0a9731b07c8c6d793312acd07c57b6d0ce35",
+          "machine": "AMD64"
+        },
+        "toolchain_archive_sha256": {
+          "zig": "b03f477a1943673e02aca0f570e8030dffd536ce1f45cbc4d3326ec31159562e",
+          "ffmpeg-shared": "4d2060a8b34a940aa47d785142055bb92a63053781e55f2ace4546edd519a8f5"
+        }
+      },
+      "packages": {
+        "cand4": {
+          "msi_sha256": "8047cde8308fe394abc2fa2c6543d6c02f8b5dd2dc6ed7accfdb34e76daa0cf5",
+          "host_sha256": "fd0fcbca279f3ce20e1bcd5d33e212e1cba88b2025c806003b39b9e9922ce4ed",
+          "worker_sha256": "152866b9a0ba6d9b4722e7e567ad1299d8a10a2cba6cd7b3160117c1178452f3",
+          "head_at_build": "b42e37630810e880a38dda2b111168b9bd5d11f9",
+          "native_build_inputs_sha256": "9e6bf0b5004e074e02cfca62aa154e2c5d251b4eb646ba87e1c8586d62d7df99",
+          "published_commit": "d11445a467e10a8757a672256d7975977d47522a"
+        },
+        "cand3": {
+          "msi_sha256": "2f9de210fe88a2e4903e679bb61e081201973b073f20bba2bce3cf14bc0b8266",
+          "host_sha256": "23e85f11a30e6f885f00220aa9966fbf6545389b9c61d0ef4f22e49d6cfca490",
+          "worker_sha256": "2251ac360af922971b0fbcde1a08eb2b4693e7f994e8bf77bf44d1897c0f36a6",
+          "head_at_build": "7086ed380d279855b2d81f87d4d2105e268b6335",
+          "native_build_inputs_sha256": "2b64013979934da70095dca25a0e6a9fdafa5c68b87a24d6b71bcc14d8e6f11d",
+          "published_commit": "59008494539a3a622ebc92f85fd072c39f527dcc"
+        }
+      },
+      "fixture_sha256": [
+        "b9afde2760e3fdbcc551d0f15563e3cd2f88f5ea96d5484d91b39c7bfb5a8b8c",
+        "135a23fe7a9160719d52c0048b0da5c5023dddef1f965b3a9f79db34c8361d9f",
+        "9e5eb133025e13f751ff7094868d6cfca64611c7d6f65569c4f9c6de0fead75a"
+      ],
+      "declared_trial_seconds": 60,
+      "physical_preview_px": [
+        958,
+        539
+      ],
+      "order": [
+        [
+          "R",
+          "F"
+        ],
+        [
+          "F",
+          "R"
+        ]
+      ],
+      "arm_environment": {
+        "R": {
+          "VLOGCRAFT_DIAGNOSTIC_NO_REFILL_HOLD": null,
+          "VLOGCRAFT_DIAGNOSTIC_LEGACY_REFILL_HOLD": null,
+          "VLOGCRAFT_DIAGNOSTIC_LEGACY_POLL_ORDER": null,
+          "VLOGCRAFT_EXPERIMENTAL_PICTURE_HANDOFF": null
+        },
+        "F": {
+          "VLOGCRAFT_DIAGNOSTIC_NO_REFILL_HOLD": null,
+          "VLOGCRAFT_DIAGNOSTIC_LEGACY_REFILL_HOLD": null,
+          "VLOGCRAFT_DIAGNOSTIC_LEGACY_POLL_ORDER": null,
+          "VLOGCRAFT_EXPERIMENTAL_PICTURE_HANDOFF": "1"
+        }
+      },
+      "stopping_rule": "Review the initial recorder-off comparison. Reverse only if the candidate meets the short timing screens. Retain every attempt.",
+      "pairs": [
+        {
+          "pair": 1,
+          "attempts": [
+            {
+              "trial": "pair-1-1-r",
+              "arm": "R",
+              "supervisor_exit": 0,
+              "display_after": {
+                "physical_desktop_px": [
+                  2880,
+                  1800
+                ],
+                "desktop_hz": 120,
+                "system_dpi": 168
+              },
+              "controls": {
+                "supervisor_passed": true,
+                "exact_editor_geometry": true,
+                "ac_observed": true,
+                "visible_foreground_unobscured": true,
+                "owned_process_cleanup": true,
+                "exact_audio_and_endpoint": true,
+                "declared_workload": true,
+                "expected_hold_counters": true,
+                "matched_binary_and_flag": true,
+                "native_recorders_off": true,
+                "effective_bounded_poll_policy": true,
+                "display_unchanged": true,
+                "observer_protocol": true
+              },
+              "valid_comparison_arm": true,
+              "physical_preview_px": [
+                958,
+                539
+              ],
+              "native_surface_px": [
+                958,
+                539
+              ],
+              "host_sha256": "fd0fcbca279f3ce20e1bcd5d33e212e1cba88b2025c806003b39b9e9922ce4ed",
+              "worker_sha256": "152866b9a0ba6d9b4722e7e567ad1299d8a10a2cba6cd7b3160117c1178452f3",
+              "diagnostic_flag": {
+                "VLOGCRAFT_DIAGNOSTIC_NO_REFILL_HOLD": null,
+                "VLOGCRAFT_DIAGNOSTIC_LEGACY_REFILL_HOLD": null,
+                "VLOGCRAFT_DIAGNOSTIC_LEGACY_POLL_ORDER": null,
+                "VLOGCRAFT_EXPERIMENTAL_PICTURE_HANDOFF": null
+              },
+              "effective_policy": {
+                "completion_poll_policy": null,
+                "refill_policy": null,
+                "stall_recording": null,
+                "consistent_through_drain": false,
+                "combined_poll_opportunities": null,
+                "source_wait_poll_bypasses": null
+              },
+              "display_before": {
+                "physical_desktop_px": [
+                  2880,
+                  1800
+                ],
+                "desktop_hz": 120,
+                "system_dpi": 168
+              },
+              "policy_basis": "identified cand4 default and scrubbed environment",
+              "measured_seconds": 60.3595,
+              "distinct_sequence_fps": 59.4438323710435,
+              "frames": {
+                "distinct_sequence_submissions": 3589,
+                "skipped_sequence_frames": 11,
+                "source_wait_iterations": 191,
+                "gpu_wait_iterations": 0,
+                "skipped_after_source_wait": 6,
+                "skipped_after_gpu_wait": 0,
+                "skipped_without_queue_wait": 5,
+                "peak_source_queue_frames": 4,
+                "peak_inflight_gpu_frames": 4
+              },
+              "active_frame_delta": {
+                "distinct_sequence_submissions": 3588,
+                "skipped_sequence_frames": 11,
+                "source_wait_iterations": 22,
+                "gpu_wait_iterations": 0,
+                "skipped_after_source_wait": 6,
+                "skipped_after_gpu_wait": 0,
+                "skipped_without_queue_wait": 5
+              },
+              "performance_screens": {
+                "at_least_59_5_fps": false,
+                "under_30_skips": true,
+                "at_most_100ms_gap": true
+              },
+              "timings": {
+                "playback_present_interval": {
+                  "count": 3587,
+                  "mean_ms": 16.7179,
+                  "p50_upper_ms": 16.7,
+                  "p95_upper_ms": 18.1,
+                  "p99_upper_ms": 22.1,
+                  "max_ms": 79.721,
+                  "overflow_100ms": 0
+                },
+                "present_call": {
+                  "count": 3589,
+                  "mean_ms": 0.501974,
+                  "p50_upper_ms": 0.3,
+                  "p95_upper_ms": 0.6,
+                  "p99_upper_ms": 7.2,
+                  "max_ms": 68.4478,
+                  "overflow_100ms": 0
+                }
+              },
+              "deferred_refills_by_decoder": [
+                3502,
+                3580,
+                3541
+              ],
+              "completed_sequence_frame": 3599,
+              "samples": 2880000,
+              "expected_samples": 2880000,
+              "underruns": 0,
+              "capture_sha256": null,
+              "capture_finalized": false,
+              "capture_reduced": false,
+              "recorder": null,
+              "seeks_by_decoder": [
+                40,
+                40,
+                40
+              ],
+              "decoder_warm_cache_budget_by_layer": [
+                2,
+                2,
+                2
+              ],
+              "decoder_pool_by_layer": [
+                31,
+                31,
+                31
+              ],
+              "handoff_fallbacks": null,
+              "handoff_fence_lanes": null
+            },
+            {
+              "trial": "pair-1-2-f",
+              "arm": "F",
+              "supervisor_exit": 0,
+              "display_after": {
+                "physical_desktop_px": [
+                  2880,
+                  1800
+                ],
+                "desktop_hz": 120,
+                "system_dpi": 168
+              },
+              "controls": {
+                "supervisor_passed": true,
+                "exact_editor_geometry": true,
+                "ac_observed": true,
+                "visible_foreground_unobscured": true,
+                "owned_process_cleanup": true,
+                "exact_audio_and_endpoint": true,
+                "declared_workload": true,
+                "expected_hold_counters": true,
+                "matched_binary_and_flag": true,
+                "native_recorders_off": true,
+                "effective_bounded_poll_policy": true,
+                "effective_picture_handoff": true,
+                "display_unchanged": true,
+                "observer_protocol": true
+              },
+              "valid_comparison_arm": true,
+              "physical_preview_px": [
+                958,
+                539
+              ],
+              "native_surface_px": [
+                958,
+                539
+              ],
+              "host_sha256": "fd0fcbca279f3ce20e1bcd5d33e212e1cba88b2025c806003b39b9e9922ce4ed",
+              "worker_sha256": "7bcfee70017e9234ba4aa597b51c0a9731b07c8c6d793312acd07c57b6d0ce35",
+              "diagnostic_flag": {
+                "VLOGCRAFT_DIAGNOSTIC_NO_REFILL_HOLD": null,
+                "VLOGCRAFT_DIAGNOSTIC_LEGACY_REFILL_HOLD": null,
+                "VLOGCRAFT_DIAGNOSTIC_LEGACY_POLL_ORDER": null,
+                "VLOGCRAFT_EXPERIMENTAL_PICTURE_HANDOFF": "1"
+              },
+              "effective_policy": {
+                "completion_poll_policy": "source_first",
+                "refill_policy": "bounded",
+                "stall_recording": false,
+                "consistent_through_drain": true,
+                "combined_poll_opportunities": 0,
+                "source_wait_poll_bypasses": 0,
+                "picture_handoff": {
+                  "enabled": true,
+                  "consistent_through_drain": true,
+                  "active_draws": 2533,
+                  "drained_draws": 2534
+                }
+              },
+              "display_before": {
+                "physical_desktop_px": [
+                  2880,
+                  1800
+                ],
+                "desktop_hz": 120,
+                "system_dpi": 168
+              },
+              "policy_basis": "native status",
+              "measured_seconds": 60.5925,
+              "distinct_sequence_fps": 41.80385361224574,
+              "frames": {
+                "distinct_sequence_submissions": 2534,
+                "skipped_sequence_frames": 1066,
+                "source_wait_iterations": 12849,
+                "gpu_wait_iterations": 0,
+                "skipped_after_source_wait": 1066,
+                "skipped_after_gpu_wait": 0,
+                "skipped_without_queue_wait": 0,
+                "peak_source_queue_frames": 4,
+                "peak_inflight_gpu_frames": 2
+              },
+              "active_frame_delta": {
+                "distinct_sequence_submissions": 2533,
+                "skipped_sequence_frames": 1066,
+                "source_wait_iterations": 12775,
+                "gpu_wait_iterations": 0,
+                "skipped_after_source_wait": 1066,
+                "skipped_after_gpu_wait": 0,
+                "skipped_without_queue_wait": 0
+              },
+              "performance_screens": {
+                "at_least_59_5_fps": false,
+                "under_30_skips": false,
+                "at_most_100ms_gap": false
+              },
+              "timings": {
+                "playback_present_interval": {
+                  "count": 2532,
+                  "mean_ms": 23.6854,
+                  "p50_upper_ms": 16.7,
+                  "p95_upper_ms": 19.9,
+                  "p99_upper_ms": 1427.33,
+                  "max_ms": 1427.33,
+                  "overflow_100ms": 40
+                },
+                "present_call": {
+                  "count": 2534,
+                  "mean_ms": 0.333242,
+                  "p50_upper_ms": 0.3,
+                  "p95_upper_ms": 0.7,
+                  "p99_upper_ms": 0.9,
+                  "max_ms": 15.4181,
+                  "overflow_100ms": 0
+                }
+              },
+              "deferred_refills_by_decoder": [
+                3535,
+                3538,
+                3503
+              ],
+              "completed_sequence_frame": 3599,
+              "samples": 2880000,
+              "expected_samples": 2880000,
+              "underruns": 0,
+              "capture_sha256": null,
+              "capture_finalized": false,
+              "capture_reduced": false,
+              "recorder": null,
+              "seeks_by_decoder": [
+                40,
+                40,
+                40
+              ],
+              "decoder_warm_cache_budget_by_layer": [
+                2,
+                2,
+                2
+              ],
+              "decoder_pool_by_layer": [
+                31,
+                31,
+                31
+              ],
+              "handoff_fallbacks": 0,
+              "handoff_fence_lanes": 3
+            }
+          ],
+          "matching_display": true,
+          "comparison_valid": true,
+          "candidate_passed": false,
+          "order": [
+            "R",
+            "F"
+          ],
+          "reverse_reviewed": false,
+          "first_pair_review_sha256": null,
+          "review_sha256": "c3685b7bfa83917633e1e74f9bb1dfad7509a5ac9dcb751017a7faad8905d05d"
+        }
+      ]
+    },
+    "focused_checks": {
+      "scheduler": {
+        "binary_sha256": "72e248afebbd91de56113ac8b78948930345f72d42b3603f058be88c884c59e7",
+        "formats": {
+          "nv12": {
+            "scheduler": "passed",
+            "clock_advanced_while_copy_blocked": true,
+            "two_slots_submitted_before_consumer_poll": true,
+            "successor_prepared_while_peer_unavailable": true,
+            "slot_reused": true,
+            "seek_invalidated_picture": true,
+            "teardown_completed": true
+          },
+          "p010": {
+            "scheduler": "passed",
+            "clock_advanced_while_copy_blocked": true,
+            "two_slots_submitted_before_consumer_poll": true,
+            "successor_prepared_while_peer_unavailable": true,
+            "slot_reused": true,
+            "seek_invalidated_picture": true,
+            "teardown_completed": true
+          }
+        }
+      },
+      "fenced": {
+        "binary_sha256": "748d4bc501566eb0906367c9459b29f77d68f1ed769a5851ac1826ae1180c84e",
+        "formats": {
+          "nv12": {
+            "verified_pictures": 8,
+            "publication_from_lock_ms": 0.9943,
+            "retirement_from_lock_ms": 6.9027,
+            "pending_copy_cancelled": true,
+            "pending_consumer_cancelled": true,
+            "peak_slots": 2,
+            "peak_retained": 2,
+            "retained_after_cancel": 0
+          },
+          "p010": {
+            "verified_pictures": 8,
+            "publication_from_lock_ms": 2.67,
+            "retirement_from_lock_ms": 11.039,
+            "pending_copy_cancelled": true,
+            "pending_consumer_cancelled": true,
+            "peak_slots": 2,
+            "peak_retained": 2,
+            "retained_after_cancel": 0
+          }
+        }
+      },
+      "vfr": {
+        "passed": true,
+        "source_timebase": "1/1000",
+        "plan_timebase": "1/2000",
+        "independent_pts": [
+          0,
+          100,
+          200,
+          300,
+          500,
+          600,
+          700,
+          800
+        ],
+        "samples": [
+          {
+            "plan_tick": 999,
+            "expected_stream_tick": 499,
+            "worker_tick": 499,
+            "expected_pts": 300,
+            "worker_pts": 300,
+            "center_color_matches": true
+          },
+          {
+            "plan_tick": 1000,
+            "expected_stream_tick": 500,
+            "worker_tick": 500,
+            "expected_pts": 500,
+            "worker_pts": 500,
+            "center_color_matches": true
+          },
+          {
+            "plan_tick": 1001,
+            "expected_stream_tick": 500,
+            "worker_tick": 500,
+            "expected_pts": 500,
+            "worker_pts": 500,
+            "center_color_matches": true
+          }
+        ],
+        "adjacent_backwards_boundary": {
+          "selected_pts": 300,
+          "target_tick": 400,
+          "colors_match": true
+        },
+        "scope": "Local generated VFR fixture, D3D11 offscreen, actual FP16 readback"
+      },
+      "pending_rewind": {
+        "passed": true,
+        "source_frame_pairs": 117,
+        "exact_seek_during_pending_rewind": true,
+        "closed_during_another_pending_rewind": true,
+        "close_ms": 109.0
+      },
+      "fp16_parity": [
+        {
+          "format": "nv12",
+          "color": "SDR",
+          "matched_draws": 6,
+          "bytes_per_draw": 460800,
+          "last_pts": 512,
+          "fallbacks": 0
+        },
+        {
+          "format": "p010",
+          "color": "SDR",
+          "matched_draws": 6,
+          "bytes_per_draw": 460800,
+          "last_pts": 1001,
+          "fallbacks": 0
+        }
+      ]
+    },
+    "coarse_cut_observation": {
+      "genuine_backward_cuts": 39,
+      "genuine_backward_cut_spacing_frames": 90,
+      "sampled_frame_span": 3596,
+      "sampled_frame_span_in_windows_crossing_a_backward_cut": 1865,
+      "windows_with_skip_counter_increase": 41,
+      "windows_crossing_a_backward_cut_with_skip_counter_increase": 19,
+      "skips_charged_in_sampled_windows": 1066,
+      "skips_charged_in_sampled_windows_crossing_a_backward_cut": 486,
+      "scope": "The GUI samples status intermittently. The status frame can be an unsubmitted clock target and a skip counter rises only when the renderer submits a later picture. These windows cannot place individual gaps or associate them with a decoder or transfer."
+    }
+  },
+  "reference_minute_stage_audit": {
+    "source_checkpoint": "0c5ff329c3e8eac45b520b2161817cea291ab3fc",
+    "video_spans_seconds": [
+      187.784,
+      925.484,
+      155.208,
+      1220.711,
+      1278.919,
+      1933.179
+    ],
+    "all_video_stages_seconds": 5701.284,
+    "audio_segments_seconds": 0.611,
+    "segment_mux_seconds": 0.753,
+    "final_mux_seconds": 1.009,
+    "author_analysis_seconds": 616.796,
+    "metadata_attach_seconds": 0.522,
+    "final_internal_check_seconds": 0.405,
+    "video_bps": 4755352,
+    "audio_bps": 192946,
+    "container_bps": 4961194,
+    "x265_rate_control": "CRF 20.0",
+    "x265_pool_workers": 2,
+    "x265_frame_threads": 2,
+    "full_master_observation": {
+      "state": "interrupted",
+      "last_completed_progress_frames": 3489,
+      "total_frames": 78427,
+      "segment": 9,
+      "segments": 30,
+      "elapsed_seconds": 2875.099,
+      "sequence_seconds": 58.15,
+      "supervisor_present": false,
+      "worker_present": false,
+      "destination_present": false,
+      "worker_exit_status_recorded": false,
+      "full_master_verified": false,
+      "system_observation": "Power-off request and subsequent kernel power transition after last progress receipt."
+    }
   }
 }
