@@ -208,10 +208,9 @@ function updateExportWorkflow(){
   $('exportProfileNote').hidden=!profile;
   $('exportProfileNote').textContent=samsung
     ? '3840 × 2160 at 60 fps · HEVC Main10 HDR10+ · CRF 17 · Samsung device playback is pending.'
-    : youtube ? '3840 × 2160 at 60 fps · HEVC Main10 HDR10 · 75 Mb/s target · AAC stereo. YouTube processes its own HDR versions.' : '';
+    : youtube ? '3840 × 2160 at 60 fps · HEVC Main10 HDR10 · CRF 20 · AAC stereo. YouTube processes its own HDR versions.' : '';
   $('exportResolution').closest('label').hidden=profile;
   $('exportFps').closest('label').hidden=profile;
-  $('outputBitrate').closest('label').hidden=profile;
   $('customDimensions').hidden=profile||$('exportResolution').value!=='custom';
   $('applyColorSetup').hidden=managed;
   $('colorOutput').disabled=managed;
@@ -280,10 +279,11 @@ function updateEncoderControls(){
   const cpu=hdr || ['libx264','libx265','libsvtav1'].includes($('encoderChoice').value);
   $('cpuExportPreset').hidden=!cpu;
   const fixed=['samsung-hdr10plus','youtube-hdr'].includes($('exportWorkflow').value);
+  $('outputBitrate').closest('label').hidden=hdr || fixed;
   $('cpuExportQuality').hidden=fixed || !cpu || (!hdr && $('outputBitrate').valueAsNumber>0);
   $('exportBitrateNote').hidden=fixed;
   $('exportBitrateNote').textContent=hdr
-    ? 'HDR10 uses the HEVC CPU encoder. CRF controls quality. A nonzero bitrate also sets an encoder target.'
+    ? 'HDR10 uses HEVC Main10 constant-quality encoding. CRF sets quality and the picture content determines file size.'
     : cpu ? 'Set 0 to use CRF quality mode. A nonzero value sets the target bitrate instead.'
           : 'Hardware encoding uses a target bitrate. Set 0 to use 35 Mb/s.';
 }
