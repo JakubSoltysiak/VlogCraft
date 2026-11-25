@@ -16,6 +16,22 @@ The 12-second diagnostic of `4313b88` missed the last outgoing picture at all se
 
 The warm cache has no source-sample identity across a seek. With two different pictures at the same PTS, its strictly increasing cache can keep the earlier picture while the live selector returns the later one. Reusing an old texture on timestamps alone can display the wrong pixels. The next targeted experiment is to tie one incoming selected frame's decoder epoch and pool/slice to its two slot serials through enqueue, fence observation, acquisition, last sampling draw and recycling. Keep the existing ordinary gate. Reversal, physical package, 600-second playback and 30-minute editing remain gated. [Full receipts including every arm](benchmarks/studio-3.6.0-phase3b.json).
 
+### What delayed the incoming copy
+
+A 12-second trace on source `ddfc832` followed each requested frame by its process-local identity, lane, slot and transfer serial. The recorder retained 37,985 ordered events and 2,047 slot lifetimes, with zero dropped events and zero lost watchdog requests. Across seven backward cuts, 18 of 21 exact incoming live copies were already enqueued when requested. All 21 became ready after their deadline and were discarded before acquisition.
+
+| Observation | Result |
+|---|---:|
+| Enqueue to observed fence completion for the 21 late copies, min / median / max | 34.709 / 63.264 / 121.210 ms |
+| Enqueue to observed completion for acquired copies, median | 10.107 ms |
+| Producer-lock entry wait on the late incoming copies, maximum | 0.044 ms |
+| Interval between relevant polling observations, maximum | 5.707 ms |
+| Discard to slot recycling | 0.039–0.416 ms |
+
+The late interval lies after copy enqueue. The maximum gap between polls could account for only a fraction of the delay on these copies. The measurement combines time waiting in the GPU queue, copy execution, fence signaling and observation. It identifies no application-level lock wait that explains the full interval. The next measurement is to correlate the same context’s copy and signal submissions with GPU queue packet start/end and read the queued GPU timestamps after completion, outside the deadline path.
+
+The diagnostic measured 48.938 FPS, 118 skips and a 495.503 ms gap. It reached frame 719 with 576,000 PCM frames, zero underruns and zero surviving processes. Its 12-second recorder-on result is separate from the 60-second ordinary timing gate. Focused checks and trace-enabled FP16 parity passed on both source formats. The recorder runs only when explicitly enabled. [Sanitized receipt](benchmarks/studio-3.6.0-phase3b.json).
+
 ## Two outstanding picture copies on Radeon 890M
 
 Candidate source `57309c174955d061f72649f4f4de3347cb68c89d` occupies the same two transfer slots per layer as its predecessor. The original transfer thread waited for each submitted copy to complete before considering its second slot. The compositor now observes completed producer fences while the worker can submit the other picture. Query fallback stays with the producer worker. The held-clock path refreshes the decoded successor and the proved cut tail without advancing the source selector. Unused ready copies can return their keyed ownership directly. Source ranges, lease lifetime through GPU use, transport generation and the production shared-device preference are preserved. [Design precedents](phase3b-upstream.md).

@@ -2,7 +2,20 @@
 
 ## Incoming handoff at synchronized source rewinds
 
-Use the retained ordinary cohort `two-slot-rewind-admission1` and worker source `d541564` as the latest measured candidate. Its first ordinary comparison failed. The retained follow-up diagnostic distinguishes source readiness from copied-picture readiness across the three longest incidents. The next instrumented short run should record the source and transfer slot identity of the first late incoming picture. A warm/live PTS match alone is insufficient. Run the existing scheduler/fence/VFR/rewind/parity checks on any correction and start a fresh ordinary cohort using the commands below.
+Use the retained ordinary cohort `two-slot-rewind-admission1` and worker source `d541564` as the latest measured candidate. Its first ordinary comparison failed. The retained follow-up diagnostic distinguishes source readiness from copied-picture readiness across the three longest incidents. The 12-second slot trace at `ddfc832` captured all 21 incoming copies missing their deadlines after enqueue. The next instrumented comparison should link those serials to the corresponding GPU queue packet and read the existing GPU timestamps after the fence completes. A warm/live PTS match alone is insufficient. Run the existing scheduler/fence/VFR/rewind/parity checks on any correction and start a fresh ordinary cohort using the commands below.
+
+For the bounded slot trace, use the same verified host/worker clone and generated media as the focused checks. Set the private capture locations to fresh files and keep them local. Run from the qualification worktree in the same visible desktop session, on AC, with no competing media workload.
+
+```powershell
+$env:VLOGCRAFT_EXPERIMENTAL_PICTURE_HANDOFF = '1'
+$env:VLOGCRAFT_HANDOFF_TRACE_FILE = [IO.Path]::GetFullPath("$run/slots.private.csv")
+$env:VLOGCRAFT_STALL_CAPTURE = [IO.Path]::GetFullPath("$run/stall.private.jsonl")
+& $py benchmarks/run_qa.py --results "$run/supervisor" --timeout 120 --status "$run/status.json" -- $py benchmarks/native_playback.py $image.diagnostic_executable $image.media "$run/playback" --seconds 12 --width 3840 --rate 60/1 --cut .5 --layers 3 --window-mode visible --trace --actual-display --native-miss-trace
+if ($LASTEXITCODE) { throw 'Diagnostic incomplete; retain all receipts' }
+& $py benchmarks/phase3b_stall_evidence.py "$run/stall.private.jsonl" --output "$run/reduced.json"
+```
+
+Use a clean shell for an ordinary comparison. Group raw trace transitions by ring and serial before correlating them with the requested frame. Verify the capture footer or header counts, ordering and complete coverage before timing a transition.
 
 ## Two-slot qualification
 
