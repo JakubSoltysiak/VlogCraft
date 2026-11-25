@@ -40,6 +40,8 @@ The wider pool changes x265's wavefront worker count from two to eight. Frame th
 
 Both eight-worker candidates delivered every source/output picture on the checked clocks, correct Main10 Rec.2020/PQ and static HDR, one conforming HDR10+ record per picture, exact decoded stereo PCM and expected 38,400 / 96,000 sample-frame endpoints. The output sizes were 676,040 and 1,315,215 bytes respectively. All compared source identities and project bytes matched. The actual 48-picture native runs with different pool sizes produced different decoded data and both exceeded the established 50 dB floor. The byte-identical result for the 24-picture isolated CPU input does not generalize to every GOP.
 
+The eight-worker SDR and rotated PQ trials respectively reported median shader intervals of 4.042 and 4.243 ms per picture, color GPU intervals of 2.393 and 2.632 ms, and readback wall intervals of 3.455 and 4.087 ms. Source CPU-frame transfers were zero in both. The PQ worker decoded 4,610 and 4,693 pictures for its two trims, taking 48.842 s in decoder calls. The SDR worker decoded 48 pictures in 0.071 s. GPU setup took 0.568 and 0.492 s. These overlapping producer, encoder and GPU measurements explain why the wider x265 pool helps the short upright clip more than the deep rotated trims. In-band x265 declarations in all four real camera candidates confirmed the requested two/eight pool workers, two frame threads and CRF 20.
+
 The first independent comparison of the eight-worker SDR file stopped at the pinned-source identity check. Windows Python 3.11 and 3.13 reported different device numbers for the same two source files. Rechecking locally with the interpreter that recorded the original identities matched every field, the byte-identical range project and the retained managed master hash. The comparison then passed on the already delivered files. The first PQ post-run comparison had a separate relative-path failure documented below. Neither case required another encode or a reduced verification threshold.
 
 Reproduce the two eight-worker runs using the serial camera commands below with `--parallel-x265` and fresh result directories. For baseline reuse, use the same local Python runtime that recorded the pin, `--retained-reference` pointing to the prior matching run, `--pinned-sources` and the managed file's `--reference-sha256`. A successful prior native run contributes its independent `reference.mp4`. A prior fall-through contributes the managed `first-export.mp4`. For the isolated encoder/graph comparison:
@@ -99,3 +101,8 @@ The original generated Phase 3A control remains available through the existing C
 python benchmarks/phase2d_project_export.py $phase3a48 (Join-Path $run 'phase3a48.mp4') --backend d3d11 --first-time --worker $worker --runtime $runtime --author-dll $stats --report (Join-Path $run 'phase3a48.json') --resources
 python tests/windows_phase3a_export.py $developmentEditor $phase3a48 $phase3a48Reference (Join-Path $run 'packaged-phase3a48')
 ```
+
+
+## Original Phase 3A fixture regression
+
+The existing 48-picture Ultrafast CRF 15 straight-cut fixture used its original first-export policy and finished on D3D11 in 36.455 s. Against its retained managed master it measured 55.631 dB overall and 53.64 dB minimum across all pictures. All 48 dynamic metadata records, static declarations, PTS and decoded 38,400-sample/channel audio endpoint passed. This regression uses the archived quality profile and provides no Slow-preset speed comparison.

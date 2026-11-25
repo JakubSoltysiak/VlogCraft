@@ -83013,5 +83013,17 @@
       "dynamic_blocks": 120,
       "originals_match": true
     }
+  },
+  "legacy_phase3a_control_after_camera_extension": {
+    "frames": 48,
+    "policy": "Original first export, Ultrafast CRF 15",
+    "seconds": 36.455,
+    "overall_minimum_pq_psnr_db": [
+      55.631,
+      53.64
+    ],
+    "conforming_blocks": 48,
+    "exact_video_pts_and_pcm": true,
+    "samples_per_channel": 38400
   }
 }
