@@ -1,5 +1,11 @@
 # VlogCraft Studio development qualification
 
+## Indexed camera export and restart recovery, 25 November 2026
+
+The 120-picture rotated UHD60 cut decoded 225 pictures versus 9,303, with delivery in 71.333 s versus 110.166 s at the previous eight-worker checkpoint. The entire 48- and 120-picture delivered files matched those previous candidates byte for byte. The first live-reseek attempt was rejected and fell back. New H.264 IDR and HEVC CRA tests verified exact reordered VFR output at a nonzero stream start. The six-span reassembly of the verified reference minute preserved every encoded packet and independently decoded picture.
+
+**Long first export remains unqualified.** Both 600-picture encodes preserved timing, HDR10+, exact PCM and source identities but failed the minimum per-picture PSNR gate (48.07 / 48.09 dB). All 600 pre-encode native pictures matched the prefix decoder byte for byte. The native 3,600-picture first export was withheld. The complete vlog was never restarted. Editor startup now identifies interrupted exports from durable owner receipts. [Measured results and source study](docs/phase3a-indexed-export.md) · [Recovery and checkpoint design](docs/export-upstream-recovery.md).
+
 ## Saved camera range export at x265 Slow
 
 Camera-range first exports on the Radeon 890M passed independent all-picture checks, exact PCM and packet-level HDR10+ validation. With eight x265 pool workers, 48 upright HEVC SDR pictures took 51.573 s versus 105.123 s managed. A cut across 120 rotated HEVC Main10 PQ pictures took 110.166 s versus 190.193 s managed. Minimum PQ PSNR was 53.65 and 52.62 dB respectively. The earlier indexing timeout, verifier errors, two-worker trials and injected device-removal fallback remain in the report. These results cover the tested excerpts. [Reproduction and results](docs/phase3a-camera-range.md).

@@ -1,5 +1,7 @@
 # First export of a saved camera range
 
+The later [indexed camera export qualification](phase3a-indexed-export.md) measures random-access decoding, the longer range trials and HDR segment assembly. The measurements below describe the preceding checkpoint.
+
 The Windows qualification tool runs the existing Phase 3A D3D11 pipeline against a continuous excerpt from the audited minute of the saved vlog. It preserves UHD60, libx265 Slow, CRF 20, the saved 60 Mb/s field, the managed color contract, and the existing audio graph. It adds upright limited-range BT.709 HEVC Main 4:2:0 to the probed source formats for this experiment. Clockwise HEVC Main10 PQ retains its existing source support. Admission requires one or two opaque straight-cut camera clips on one visible track, at most 120 pictures, and the existing Radeon 890M delivery checks. The new policy is available through the benchmark command.
 
 A single picture span connects the native worker's binary stdout directly to FFmpeg's stdin. At UHD60 that removes the Python read/write relay for 24,883,200 bytes per frame. Two spans use the existing relay to enforce the split between their x265 encoders. The encoder, picture-clock checks, native completion receipt, independent PCM check, decoded-picture HDR10+ authoring, and the sampled 50 dB threshold still govern delivery. Rejected candidates fall back to the managed renderer. The pipeline still reads packed pictures back from the GPU and encodes them on the CPU with x265.
