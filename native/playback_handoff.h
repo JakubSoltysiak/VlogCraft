@@ -97,6 +97,22 @@ public:
     }
     bool usingFence() const { return ring_.usingFence(); }
     PictureHandoff::Snapshot snapshot() const { return ring_.snapshot(); }
+    bool coversRemaining(const std::deque<Frame>& outgoing, int64_t transport) const {
+        if (outgoing.size() < 2) return true;
+        if (transport != transport_) return false;
+        const auto state = ring_.snapshot();
+        if (state.failed || state.cancelled) return false;
+        using State = PictureHandoff::State;
+        // The front has already drawn. Future outgoing pictures must have
+        // crossed the device lock before the decoder can start its rewind.
+        return std::all_of(outgoing.begin()+1,outgoing.end(),[&](const auto& frame){
+            return std::any_of(state.slots.begin(),state.slots.end(),[&](const auto& slot){
+                return (slot.state == State::CopyPending || slot.state == State::Ready ||
+                        slot.state == State::ConsumerHeld) && slot.generation == state.generation &&
+                       slot.sourceIdentity.lock() == frame;
+            });
+        });
+    }
     void retire() {
         ring_.pollFencedProducer();
         if (ring_.pollConsumer()) {

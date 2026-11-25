@@ -228,7 +228,9 @@ struct Producer {
   wantedPTS=target;
   return true;
  }
- bool primeRewind(const Plan& plan,const Clip& outgoing,const Clip& incoming,int64_t frame,int64_t transportGeneration){
+ template<class CanPrime>
+ bool primeRewind(const Plan& plan,const Clip& outgoing,const Clip& incoming,int64_t frame,
+                  int64_t transportGeneration,CanPrime&& canPrime){
   WatchStage stage("prime_rewind");
   std::lock_guard<std::mutex> lock(guard);
   if(cutNext||!current||!singlePool||!surfacePoolBytes||decoding||!failure.empty()||epoch!=workerEpoch||
@@ -250,6 +252,7 @@ struct Producer {
    if(recordTail&&!successor)tailWatchSuccessors[(size_t)(f-frame)]=AV_NOPTS_VALUE;
    verified.push_back(floor);
   }
+  if(!canPrime(verified))return false;
   // Existing decoded surfaces stay alive through AVFrame/slot ownership.
   // Forbid allocation of a second pool until the old tail has been consumed.
   reservation.hasPool=true;reservation.bytes=surfacePoolBytes;

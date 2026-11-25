@@ -156,6 +156,24 @@ int main(int argc,char** argv){
    producers.clear();currentClip.clear();parked.clear();lastActive.clear();retryOnFailure.clear();
    useHandoff=false;ready=false;retrySharedPicture=true;++handoffFallbacks;
   };
+  auto primeRewinds=[&](int64_t frame,int64_t epoch){
+   if(software||selected.size()<2)return;
+   // Stagger the leads when same-file backwards boundaries coincide.
+   for(size_t layer=0;layer<selected.size();layer++){
+    auto* c=selected[layer].first;
+    const auto lead=c->end-frame;
+    if(lead<1||lead>3-(int64_t)layer)continue;
+    auto next=rewinds.find(c);if(next==rewinds.end())continue;
+    const bool simultaneous=std::any_of(selected.begin(),selected.end(),[&](const auto& other){
+     return other.first!=c&&other.first->end==c->end&&rewinds.count(other.first);
+    });
+    if(simultaneous&&input.stillPlaying(epoch))
+     producers.at(c->asset)->primeRewind(plan,*c,*next->second,frame,epoch,[&](const auto& outgoing){
+      const auto& lane=handoff.lanes[layer];
+      return !useHandoff||(lane&&lane->coversRemaining(outgoing,epoch));
+     });
+   }
+  };
   while(!input.stop){
    double loopGap=seconds(lastLoop)*1000;lastLoop=Clock::now();
    {WatchStage stage("dispatch_messages");MSG message;while(PeekMessageW(&message,nullptr,0,0,PM_REMOVE)){TranslateMessage(&message);DispatchMessageW(&message);}}
@@ -203,6 +221,7 @@ int main(int argc,char** argv){
        handoff.service(i,*clip,picture,*producers.at(clip->asset),frame,epoch,renderer.device);
       }
      }catch(const std::runtime_error&){fallbackFromHandoff();continue;}
+     if(playing)primeRewinds(frame,epoch);
     }
     if(seconds(lastReport)>.1){report("status",frame);lastReport=Clock::now();}
     WatchStage stage("wait_clock_deadline");
@@ -361,20 +380,7 @@ int main(int argc,char** argv){
    if(useHandoff&&!selected.empty())++handoffDraws;
    if(flight&&(previous!=frame||drawnGeneration!=epoch))flight->submit.set({frame,epoch,flight->now()});
    if(traceCompletion&&epoch==completion.generation&&frame==plan.end-1&&!completion.draw)completion.draw=CompletionStamps::now();
-   if(coordinateRefill&&!software){
-    // Only simultaneous same-file backwards boundaries qualify. The three
-    // leads are staggered and no current-source lookup waits for a new frame.
-    for(size_t layer=0;layer<active.size();layer++){
-     auto* c=active[layer];
-     const auto lead=c->end-frame;
-     if(lead<1||lead>3-(int64_t)layer)continue;
-     auto next=rewinds.find(c);if(next==rewinds.end())continue;
-     bool simultaneous=std::any_of(active.begin(),active.end(),[&](const Clip* other){
-      return other!=c&&other->end==c->end&&rewinds.count(other);
-     });
-     if(simultaneous&&input.stillPlaying(epoch))producers.at(c->asset)->primeRewind(plan,*c,*next->second,frame,epoch);
-    }
-   }
+   if(playing)primeRewinds(frame,epoch);
    releaseRefills();
    if(!first)first=seconds(launch);
    previous=frame;drawnGeneration=generation;
