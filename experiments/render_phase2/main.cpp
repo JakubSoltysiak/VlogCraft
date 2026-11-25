@@ -93,7 +93,8 @@ int wmain(int argc,wchar_t** argv) {
         if(argc!=8 && argc!=9)
             throw std::runtime_error("Use: phase2 mode plan sources output warmup workers upload [fault-frame]");
         const std::wstring mode=argv[1];
-        const bool firstExport=mode==L"gpu32-first-export";
+        const bool rawCamera=mode==L"gpu32-camera-raster";
+        const bool firstExport=mode==L"gpu32-first-export"||rawCamera;
         const bool gpu=firstExport||mode==L"gpu32"||mode==L"gpu16"||mode==L"warp32";
         const bool half=mode==L"gpu16";
         if(!gpu && mode!=L"scalar" && mode!=L"simd") throw std::runtime_error("Unknown compositor mode");
@@ -105,7 +106,9 @@ int wmain(int argc,wchar_t** argv) {
             throw std::runtime_error("Fault injection requires a GPU and an active frame");
         const std::wstring destinationMode=argv[4];
         const bool pq=destinationMode==L"@pq-stream";
-        const bool pipe=pq||destinationMode==L"@gbr-stream";
+        const bool cameraStream=destinationMode==L"@camera-stream";
+        if(cameraStream!=rawCamera) throw std::runtime_error("Mismatched camera raster mode");
+        const bool pipe=pq||cameraStream||destinationMode==L"@gbr-stream";
         const std::wstring sourceMode=argv[3];
         const bool live=sourceMode==L"@live-stdin";
         const std::wstring residentPrefix=L"@resident:";
@@ -129,7 +132,7 @@ int wmain(int argc,wchar_t** argv) {
         read_exact(plan,&input,sizeof(input));
         const bool hasPreciseGeometry=(input.images&0x80000000u)!=0;
         const bool project=(input.images&0x40000000u)!=0;
-        if(firstExport&&(!project||!resident||!pq))
+        if(firstExport&&(!project||!resident||!(pq||cameraStream)))
             throw std::runtime_error("First-export verification requires a resident Main10 project");
         input.images&=0x3fffffffu;
         if(!input.width||input.width>7680||!input.height||input.height>4320||
@@ -176,7 +179,7 @@ int wmain(int argc,wchar_t** argv) {
 
         std::vector<Pixel> result(gpu?0:count);
         std::vector<char> pixels(gpu&&save&&!pipe?count*(half?8:16):0);
-        std::vector<float> planes(pipe&&!pq?count*3:0);
+        std::vector<float> planes(pipe&&!pq&&!cameraStream?count*3:0);
         std::ofstream out;
         if(save && !pipe) {
             const std::filesystem::path destination(argv[4]);
@@ -188,7 +191,7 @@ int wmain(int argc,wchar_t** argv) {
         std::unique_ptr<GpuCompositor> accelerator;
         std::unique_ptr<CpuCompositor> cpu;
         if(gpu) accelerator=std::make_unique<GpuCompositor>(input.width,input.height,input.images,
-            resident?nullptr:texture.data(),half,save,mode==L"warp32",pq,resident);
+            resident?nullptr:texture.data(),half,save,mode==L"warp32",pq,resident,rawCamera);
         else cpu=std::make_unique<CpuCompositor>(mode==L"scalar"?0:workers);
         if(firstExport && accelerator->adapterName!="AMD Radeon(TM) 890M Graphics")
             throw std::runtime_error("First-export verification requires the qualified Radeon 890M adapter");
@@ -198,7 +201,7 @@ int wmain(int argc,wchar_t** argv) {
 #ifdef VLOGCRAFT_RESIDENT_DECODE
         std::unique_ptr<HardwareInputs> decoder;
         if(resident) decoder=std::make_unique<HardwareInputs>(*accelerator,sourceFile,
-            input.width,input.height,input.frames,input.images,project);
+            input.width,input.height,input.frames,input.images,project,rawCamera);
 #endif
         const double setupMs=milliseconds(setupStart);
 
@@ -209,6 +212,19 @@ int wmain(int argc,wchar_t** argv) {
         const auto render=[&](unsigned index,bool measured){
             Sample value{};
 #ifdef VLOGCRAFT_RESIDENT_DECODE
+            if(rawCamera) {
+                const auto& frame=frames[index];
+                const auto& l=frame.layer[0];
+                const auto& g=geometry[index*layerBudget];
+                if(frame.layers!=1||frame.dissolve!=-1||l.mask||l.reserved1||l.opacity!=1||
+                   l.reserved2!=0x3f800000u||g.scale!=1||g.cosine!=1||g.sine||g.x||g.y)
+                    throw std::runtime_error("Camera raster requires a single neutral opaque layer");
+                const auto began=Clock::now();
+                decoder->write_camera(index,l.slice,std::cout,value.readback,value.write);
+                value.work=milliseconds(began)-value.write;
+                value.color=value.copy=-1;
+                return value;
+            }
             if(resident) value.normalize=decoder->update(index);
 #endif
             if(live && index) {

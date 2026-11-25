@@ -8,6 +8,10 @@ import hdr_layers
 import timeline_transitions
 
 
+PQ_QUANTIZE = ('zscale=threads=1:agamma=0:pin=2020:tin=linear:min=gbr:rin=full:'
+               'p=2020:t=smpte2084:m=2020_ncl:r=limited:npl=100:dither=error_diffusion,format=yuv420p10le')
+
+
 def final_clock(files, fps, frames, cancelled):
  """Give the concatenated video a continuous decode clock across closed GOPs."""
  ticks=int(Fraction(120000)/fps)
@@ -148,7 +152,7 @@ def command(state,start,end,target,jobdir,quality='final'):
  tail=',sidedata=mode=delete'
  hdr=contract['output']=='hdr10' and quality=='final'
  if hdr:
-  tail+=',zscale=threads=1:agamma=0:pin=2020:tin=linear:min=gbr:rin=full:p=2020:t=smpte2084:m=2020_ncl:r=limited:npl=100:dither=error_diffusion,format=yuv420p10le'
+  tail+=','+PQ_QUANTIZE
  else:
   tail+=',zscale=threads=1:agamma=0:pin=2020:tin=linear:min=gbr:rin=full:p=709:t=linear:m=gbr:r=full,format=gbrpf32le,tonemap=hable:desat=0:peak=100,zscale=threads=1:agamma=0:pin=709:tin=linear:min=gbr:rin=full:p=709:t=709:m=709:r=limited:npl=100:dither=error_diffusion,format=yuv420p'
  filters.append(f'[{back}]trim=end_frame={last-first}{tail}[finished]')

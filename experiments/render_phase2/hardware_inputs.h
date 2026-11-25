@@ -40,10 +40,11 @@ class HardwareInputs {
         int index=-1,used=0,decoded=0;
         bool reused=false;
         double normalizationMs=0,decodeSeconds=0,seekSeconds=0;
+        std::uint64_t transferBytes=0;
     };
 
     GpuCompositor& gpu;
-    SurfaceNormalizer normalize;
+    std::unique_ptr<SurfaceNormalizer> normalize;
     std::vector<Source> sources;
     unsigned width,height;
     bool project,indexed=false;
@@ -227,8 +228,9 @@ class HardwareInputs {
 
 public:
     HardwareInputs(GpuCompositor& compositor,std::istream& file,unsigned w,unsigned h,unsigned count,
-                   unsigned slots,bool isProject)
-        :gpu(compositor),normalize(compositor,w,h),width(w),height(h),project(isProject) {
+                   unsigned slots,bool isProject,bool rawCamera=false)
+        :gpu(compositor),width(w),height(h),project(isProject) {
+        if(!rawCamera) normalize=std::make_unique<SurfaceNormalizer>(gpu,w,h);
         std::uint32_t header=0;
         read(file,&header,sizeof(header));
         indexed=project&&header==0x33445356u;
@@ -240,7 +242,7 @@ public:
             read(file,&videos,sizeof(videos));
             read(file,&stills,sizeof(stills));
         }
-        if(videos>4||stills>slots||videos+stills!=slots)
+        if((rawCamera&&(!indexed||stills))||videos>(rawCamera?8u:4u)||stills>slots||videos+stills!=slots)
             throw std::runtime_error("Resident source budget exceeded");
         if(videos) open_device();
         sources.resize(videos);
@@ -299,7 +301,7 @@ public:
                 range[1]=range[3]=surface.Format==DXGI_FORMAT_P010?65535.f/65472.f:1.f;
             }
             const bool quarterTurn=d.clockwise%180!=0;
-            const auto result=normalize.normalize(views.first,views.second,{
+            const auto result=normalize->normalize(views.first,views.second,{
                 float(d.codedWidth),float(d.codedHeight),
                 float(quarterTurn?d.codedHeight:d.codedWidth),float(quarterTurn?d.codedWidth:d.codedHeight),
                 d.fittedWidth,d.fittedHeight,(int(width)-int(d.fittedWidth))/2,(int(height)-int(d.fittedHeight))/2,
@@ -310,6 +312,50 @@ public:
             elapsed+=result;
         }
         return elapsed;
+    }
+
+    // Opaque camera qualification uses the reference zimg rasterizer. Send
+    // just the coded NV12/P010 planes, excluding D3D row and surface padding.
+    void write_camera(unsigned frame,unsigned slot,std::ostream& out,double& readback,double& write) {
+        auto it=std::find_if(sources.begin(),sources.end(),[&](const Source& s){return s.slot==slot;});
+        if(it==sources.end()||it->frames[frame]<0) throw std::runtime_error("Missing opaque camera selection");
+        auto& src=*it;
+        auto& dec=*src.playback->decoder;
+        const auto& d=src.description;
+        const int index=src.frames[frame];
+        AVFrame* host=dec.host;
+        if(src.index!=index||!host->data[0]) {
+            advance(src,index);
+            const auto* picture=dec.frame;
+            if(picture->format!=AV_PIX_FMT_D3D11||picture->width!=int(d.codedWidth)||
+               picture->height!=int(d.codedHeight)||picture->chroma_location!=AVCHROMA_LOC_LEFT||
+               picture->color_range!=AVCOL_RANGE_MPEG||
+               picture->color_primaries!=(d.pq?AVCOL_PRI_BT2020:AVCOL_PRI_BT709)||
+               picture->color_trc!=(d.pq?AVCOL_TRC_SMPTE2084:AVCOL_TRC_BT709)||
+               picture->colorspace!=(d.pq?AVCOL_SPC_BT2020_NCL:AVCOL_SPC_BT709))
+                throw std::runtime_error("Unexpected opaque camera surface");
+            auto began=Clock::now();
+            av_frame_unref(host);
+            avcheck(av_hwframe_transfer_data(host,picture,0),"Read exact coded camera planes");
+            if(host->format!=(d.pq?AV_PIX_FMT_P010LE:AV_PIX_FMT_NV12)||
+               host->width<int(d.codedWidth)||host->height<int(d.codedHeight))
+                throw std::runtime_error("Unexpected camera download layout");
+            readback=milliseconds(began);
+            src.transferBytes+=std::uint64_t(d.codedWidth)*d.codedHeight*3*(d.pq?2:1)/2;
+            ++src.used;
+        }
+        const int bytes=int(d.codedWidth)*(d.pq?2:1);
+        auto began=Clock::now();
+        for(int p=0;p<2;++p) {
+            const int rows=int(d.codedHeight)>>(p==1);
+            if(!host->data[p]||host->linesize[p]<bytes) throw std::runtime_error("Invalid camera row pitch");
+            const char* data=reinterpret_cast<const char*>(host->data[p]);
+            if(host->linesize[p]==bytes) out.write(data,std::streamsize(bytes)*rows);
+            else for(int y=0;y<rows;++y) out.write(data+std::size_t(y)*host->linesize[p],bytes);
+        }
+        if(!out) throw std::runtime_error("Camera raster pipe closed");
+        write=milliseconds(began);
+        if(frame==src.lastFrame) src.playback.reset();
     }
 
     void measurements(std::ostream& stream) const {
@@ -333,7 +379,7 @@ public:
             }
             stream<<']'
                   <<",\"normalization_ms\":"<<source.normalizationMs
-                  <<",\"source_cpu_transfer_bytes\":0,\"original_pts_verified\":true}";
+                  <<",\"source_cpu_transfer_bytes\":"<<source.transferBytes<<",\"original_pts_verified\":true}";
         }
         stream<<"]";
     }

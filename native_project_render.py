@@ -16,6 +16,8 @@ from native_project_plan import Ineligible, compile_project, run_capture, write_
 import hdr10plus_export
 from hdr10plus_index import SIDE_DATA
 import hdr10plus_master
+import hdr_layers
+import hdr_render
 import render_engine
 import sequences
 
@@ -24,9 +26,43 @@ CREATE_FLAGS = getattr(subprocess,"CREATE_NO_WINDOW",0)
 PQ_TAGS = "setparams=range=limited:color_primaries=bt2020:color_trc=smpte2084:colorspace=bt2020nc"
 
 
-def raw_input(width,height,rate):
-    return ["ffmpeg","-nostdin","-v","info","-y","-f","rawvideo","-pixel_format","yuv420p10le",
+def raw_input(width,height,rate,pixel_format="yuv420p10le"):
+    return ["ffmpeg","-nostdin","-v","info","-y","-f","rawvideo","-pixel_format",pixel_format,
             "-video_size",f"{width}x{height}","-framerate",rate,"-i","pipe:0"]
+
+
+def camera_raster_input(program, first, last):
+    """Reconstruct neutral camera pictures from the indexed decoder's visible planes."""
+    weight,layers=program.frames[first]
+    if weight!=-1 or len(layers)!=1 or any(frame!=program.frames[first] for frame in program.frames[first:last]):
+        raise Ineligible("Opaque camera raster requires a single constant layer throughout the span")
+    packed,_=layers[0]
+    if packed[:6]!=(1,1,0,0,0,1) or packed[9:]!=(0,0,1):
+        raise Ineligible("Opaque camera raster does not support creative adjustments")
+    src=program.sources[packed[8]]
+    width,height=src.asset["width"],src.asset["height"]
+    pq=src.interpretation[-1]=="pq2020"
+    if src.asset.get("pixelFormat")!=("yuv420p10le" if pq else "yuv420p"):
+        raise Ineligible("Unsupported exact camera pixel layout")
+    command=raw_input(width,height,str(program.fps),"p010le" if pq else "nv12")
+    command[1:1]=["-noauto_conversion_filters","-filter_complex_threads","4"]
+    # Planarization is lossless at the original depth and chroma position.
+    chain=("[0:v]setparams=range=limited:chroma_location=left,scale=in_range=tv:out_range=tv,"
+           f"format={src.asset['pixelFormat']},"+hdr_layers.luma_linear(*src.interpretation[:4]))
+    filters=[]
+    if src.orientation:
+        chain+=",format=gbrapf32le,"+src.orientation+",setsar=1"
+        chain=hdr_layers.canvas_fit(filters,chain,"camera",source=src.size,canvas=(program.width,program.height),
+                                    fit="contain",fps=program.fps)
+        chain+=",mergeplanes=0x000102:format=gbrpf32le"
+    else:
+        chain+=(f",format=gbrpf32le,setsar=1,zscale=threads=1:agamma=0:w={program.width}:h={program.height}:"
+                "filter=bilinear,format=gbrpf32le")
+        if src.fitted!=(program.width,program.height):
+            raise Ineligible("Upright exact camera raster requires a full-canvas fit")
+    filters.append(chain+",sidedata=mode=delete,"+hdr_render.PQ_QUANTIZE+"[finished]")
+    command+=["-filter_complex",";".join(filters),"-map","[finished]"]
+    return command,width*height*3//2*(2 if pq else 1)
 
 
 def parallel_camera_x265(command):
@@ -110,13 +146,14 @@ class ProjectVideo:
         self.reason = None
         self.thread = Thread(target=self.watch, daemon=True)
         self.parallel_x265 = parallel_x265
+        self.camera_raster = mode=="gpu32-camera-raster"
         self.direct_pipe = direct_pipe and len(program.spans)==1
         self.buffer = None if self.direct_pipe else memoryview(bytearray(1024*1024))
         self.environment = dict(os.environ)
         if runtime:
             self.environment["PATH"] = str(runtime.resolve(strict=True))+os.pathsep+self.environment.get("PATH","")
         self.command = [str(executable.resolve(strict=True)),mode,str(work/"plan.bin"),
-                        "@resident:"+str(work/"sources.bin"),"@pq-stream","0","8","0"]
+                        "@resident:"+str(work/"sources.bin"),"@camera-stream" if self.camera_raster else "@pq-stream","0","8","0"]
         if fault is not None:
             self.command.append(str(fault))
 
@@ -165,11 +202,24 @@ class ProjectVideo:
                 self.producer = subprocess.Popen(self.command,stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,
                                                  stderr=log,env=self.environment,creationflags=CREATE_FLAGS)
         width,height = self.program.width,self.program.height
-        encoder = raw_input(width,height,str(self.program.fps))
+        if self.camera_raster:
+            encoder,frame_bytes = camera_raster_input(self.program,start,end)
+        else:
+            frame_bytes = width*height*3
+            encoder = raw_input(width,height,str(self.program.fps))
+            encoder += ["-map","0:v:0","-vf","setsar=1,"+PQ_TAGS]
         encoder[1:1] = ["-benchmark","-nostats"]
         if self.direct_pipe:
             encoder.insert(1,"-xerror")
-        encoder += ["-map","0:v:0","-vf","setsar=1,"+PQ_TAGS,*command[command.index("-an",script+1):]]
+        encoder += command[command.index("-an",script+1):]
+        if self.camera_raster:
+            # The qualification receipt attests the exact planar input at the
+            # encoder boundary. The hash muxer consumes the other split pad.
+            graph_index=encoder.index("-filter_complex")+1
+            encoder[graph_index]+=";[finished]split=2[toencoder][rasterhash]"
+            encoder[encoder.index("[finished]")]="[toencoder]"
+            encoder+=["-map","[rasterhash]","-an","-frames:v",str(count),"-c:v","rawvideo","-threads:v","1",
+                      "-hash","sha256","-f","framehash",str(self.work/f"raster-{self.step}.sha256")]
         if self.parallel_x265:
             encoder = parallel_camera_x265(encoder)
         log_path = self.work/f"encoder-{self.step}.log"
@@ -183,7 +233,7 @@ class ProjectVideo:
             try:
                 self.check()
                 if not self.direct_pipe:
-                    remaining = width*height*3*count
+                    remaining = frame_bytes*count
                     while remaining:
                         self.check()
                         read = self.producer.stdout.readinto(self.buffer[:min(len(self.buffer),remaining)])
@@ -313,7 +363,7 @@ def repair_gop(state,program,work,index,static,native,cancelled):
 def export_native(state,destination,reference,executable,runtime,*,authoring=None,timeout=240,
                   cancelled=lambda:False,progress=lambda *_:None,mode="gpu32",fault=None,diagnostics=None,
                   fallback=None,record=None,scratch=None,publish=os.link,repair=True,first_time=False,
-                  camera_range=False,parallel_x265=False,keyframe_seek=True,qualification=False):
+                  camera_range=False,parallel_x265=False,keyframe_seek=True,qualification=False,camera_raster=False):
     destination = destination.resolve()
     if publish is os.link and destination.exists():
         raise FileExistsError("Choose a new output path")
@@ -324,6 +374,8 @@ def export_native(state,destination,reference,executable,runtime,*,authoring=Non
         raise ValueError("The wider x265 pool requires the explicit camera-range policy")
     if qualification and not (first_time and camera_range and diagnostics):
         raise ValueError("Long camera trials require the first-export qualification workspace")
+    if camera_raster and not (qualification and keyframe_seek and not parallel_x265):
+        raise ValueError("Exact camera raster requires indexed qualification and the reference encoder pool")
     if first_time != (reference is None) or (camera_range and not first_time):
         raise ValueError("Select either first-export verification or a comparison master")
     if reference is not None:
@@ -343,22 +395,25 @@ def export_native(state,destination,reference,executable,runtime,*,authoring=Non
     try:
         with temporary_work(scratch or destination.parent,diagnostics) as work:
             count = hdr10plus_master.preflight(state)
-            program = compile_project(state,work)
+            program = compile_project(state,work,camera_raster=camera_raster)
             if count!=len(program.frames):
                 raise NativeFailure("The planned frame count differs from the HDR10+ contract")
             if first_time:
                 from native_project_verification import eligible, source_snapshot, verify_delivery
-                flat,contract=eligible(state,program,camera_range=camera_range,qualification=qualification)
+                flat,contract=eligible(state,program,camera_range=camera_range,qualification=qualification,camera_raster=camera_raster)
                 original_sources=source_snapshot(flat)
                 if destination in original_sources or (destination.exists() and
                     any(destination.samefile(source) for source in original_sources)):
                     raise ValueError("Choose a destination different from source media")
             write_plan(work/"plan.bin",program)
             clocks=write_sources(work/"sources.bin",program,cancelled,first_time=first_time,camera_range=camera_range,
-                                 keyframe_seek=camera_range and keyframe_seek)
+                                 keyframe_seek=camera_range and keyframe_seek,camera_raster=camera_raster)
             result.update(frames=count,prepare_seconds=time.perf_counter()-started)
             static,master = work/"static.mp4",work/"master.mp4"
             worker_mode="gpu32-first-export" if first_time else mode
+            if camera_raster:
+                worker_mode="gpu32-camera-raster"
+                result["camera_raster"]="indexed-d3d11-decode-zimg"
             with ProjectVideo(program,work,executable,runtime,timeout,cancelled,worker_mode,fault,
                               direct_pipe=camera_range,parallel_x265=parallel_x265) as native:
                 if camera_range:
@@ -386,7 +441,7 @@ def export_native(state,destination,reference,executable,runtime,*,authoring=Non
                 if first_time:
                     progress(99,"Checking first-export source clocks, audio, HDR and sampled pictures")
                     result["comparison"]=verify_delivery(flat,contract,master,program,clocks,result["native"],
-                                                         work,native.run,cancelled)
+                                                         work,native.run,cancelled,camera_raster=camera_raster)
                 else:
                     progress(99,"Comparing decoded picture, audio and HDR declarations")
                     result["comparison"]=compare_project(reference,master,program,work,cancelled)
@@ -407,6 +462,8 @@ def export_native(state,destination,reference,executable,runtime,*,authoring=Non
                     logs=[work/"native.log",master]
                     if camera_range:
                         logs.extend(sorted(work.glob("encoder-*.log")))
+                    if camera_raster:
+                        logs.extend(sorted(work.glob("raster-*.sha256")))
                     if not first_time:
                         logs.append(work/"psnr.log")
                     for path in logs:
@@ -419,9 +476,12 @@ def export_native(state,destination,reference,executable,runtime,*,authoring=Non
                 native.check()
                 publishing = True
                 publish(master,destination)
-                result["delivered_backend"] = "hybrid" if "repair" in result else "d3d11"
+                if camera_raster:
+                    result["delivered_backend"]="d3d11-zimg"
+                else:
+                    result["delivered_backend"] = "hybrid" if "repair" in result else "d3d11"
     except (OSError,ValueError,AssertionError,RuntimeError,MemoryError,subprocess.SubprocessError) as error:
-        if result.get("delivered_backend") in ("d3d11","hybrid"):
+        if result.get("delivered_backend") in ("d3d11","d3d11-zimg","hybrid"):
             result["scratch_cleanup_failure"] = type(error).__name__
         else:
             result["native_failure"] = type(error).__name__

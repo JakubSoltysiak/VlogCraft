@@ -184,7 +184,7 @@ public:
     std::string adapterName;
 
     GpuCompositor(unsigned w,unsigned h,unsigned count,const Pixel* pixels,bool half,bool download,bool warp,
-                  bool pq=false,bool resident=false)
+                  bool pq=false,bool resident=false,bool decodeOnly=false)
         :width(w),height(h),sourceCount(count),outputStride(half?8:16) {
         D3D_FEATURE_LEVEL level=D3D_FEATURE_LEVEL_11_0;
         require(D3D11CreateDevice(nullptr,warp?D3D_DRIVER_TYPE_WARP:D3D_DRIVER_TYPE_HARDWARE,
@@ -200,6 +200,7 @@ public:
         WideCharToMultiByte(CP_UTF8,0,adapterInfo.Description,-1,adapterText,sizeof(adapterText),nullptr,nullptr);
         for (char c:std::string(adapterText)) if(c>=32 && c!='"' && c!='\\') adapterName+=c;
 
+        if(decodeOnly) return;
         compile(shader_source,"phase2-composite",shader);
         const D3D11_BUFFER_DESC buffer={sizeof(Frame),D3D11_USAGE_DEFAULT,D3D11_BIND_CONSTANT_BUFFER,0,0,0};
         require(device->CreateBuffer(&buffer,nullptr,constants.init()),"Create frame parameters");

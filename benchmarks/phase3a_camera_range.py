@@ -92,37 +92,63 @@ def verify_original_requests(full,program,first,last):
     return checked
 
 
-def verify_hdr10plus_packets(path,program):
+def hdr10plus_picture_records(path,program):
     video,_=media(path)
     width=length_size(video)
     time_base=Fraction(video["time_base"])
     count=len(program.frames)
-    seen=set()
+    records={}
     with packet_records(path,"v:0") as packets,path.open("rb") as source:
         for packet in packets:
             frame=hdr10plus_master.picture_number(packet,time_base,program.fps,count)
             block=sample_metadata(source,int(packet[b"pos"]),int(packet[b"size"]),width)
-            if frame in seen or block is None or conformance_issues(block):
+            if frame in records or block is None or conformance_issues(block):
                 raise ValueError("The final master contains an invalid or duplicate HDR10+ picture record")
-            seen.add(frame)
-    if len(seen)!=count:
+            records[frame]=block
+    if len(records)!=count:
         raise ValueError("The final master is missing HDR10+ picture records")
-    return count
+    return records
+
+
+def verify_hdr10plus_packets(path,program):
+    return len(hdr10plus_picture_records(path,program))
 
 
 def retained_reference(folder,project_copy,receipt,originals,pin,expected_hash):
     folder=folder.resolve(strict=True)
-    prior=json.loads((folder/"qualification.json").read_bytes())
     signatures=json.loads(pin.read_bytes())["source_signatures"]
+    if any(signatures.get(str(path))!=list(identity) for path,identity in originals.items()):
+        raise ValueError("The retained reference does not match the pinned sources")
+    if not (folder/"qualification.json").exists():
+        # The original representative minute was exported by the reference
+        # supervisor before camera-range receipts existed. Bind it to the
+        # whole unmodified edit, its independent audit and its pinned digest.
+        import server
+        original=(folder/"source-project.json").read_bytes()
+        verified=json.loads((folder/"verified.json").read_bytes())
+        state=server.validate_document(json.loads(original))
+        ranged,recovered=project_store.load(project_copy,server.validate_document)
+        n=receipt["frames"]
+        master=folder/"representative-hdr10plus.mp4"
+        checks=verified["source_floors"]
+        if (recovered or timing.encode(ranged)!=timing.encode(state) or receipt["range"]!=[0,n] or
+            sha256(original).hexdigest()!=receipt["source_project_sha256"] or
+            not all(verified.get(k) for k in ("unchanged_source_stat","unchanged_original_project",
+                                               "decoded_pcm_matches_isolated_graph")) or
+            verified["frames"]!=n or verified["metadata_blocks"]!=n or verified["samples_per_channel"]!=800*n or
+            checks["floor_mismatches"] or checks["camera_picture_selections"]!=n or
+            verified["file_bytes"]!=master.stat().st_size or sha256(master.read_bytes()).hexdigest()!=expected_hash.lower()):
+            raise ValueError("The verified complete-section master differs from the requested edit")
+        return master,{"frames":n,"seconds":verified["elapsed_seconds"]}
+    prior=json.loads((folder/"qualification.json").read_bytes())
     if (not prior.get("original_files_match") or
         any(prior.get(key)!=receipt[key] for key in ("source_project_sha256","range","frames","output")) or
-        any(signatures.get(str(path))!=list(identity) for path,identity in originals.items()) or
         (folder/"range.vlogcraft").read_bytes()!=project_copy.read_bytes()):
         raise ValueError("The retained reference does not match the pinned sources, range, or profile")
     backend=prior.get("first_export",{}).get("delivered_backend")
     if backend=="reference":
         master,timing_record=folder/"first-export.mp4",prior["fallback"]
-    elif backend=="d3d11":
+    elif backend in ("d3d11","d3d11-zimg"):
         comparison=prior.get("independent_comparison",{})
         # A picture-quality failure belongs to the candidate. A separately
         # generated managed oracle can still be reused with its pinned hash.
@@ -143,7 +169,7 @@ def retained_reference(folder,project_copy,receipt,originals,pin,expected_hash):
     return master,timing_record
 
 
-def qualify(project,folder,first,last,worker,runtime,author_dll,*,plan_only=False,fault=None,retained=None,parallel_x265=False,keyframe_seek=True):
+def qualify(project,folder,first,last,worker,runtime,author_dll,*,plan_only=False,fault=None,retained=None,parallel_x265=False,keyframe_seek=True,camera_raster=False):
     import server
 
     original=project.read_bytes()
@@ -163,8 +189,8 @@ def qualify(project,folder,first,last,worker,runtime,author_dll,*,plan_only=Fals
         state,recovered=project_store.load(path,server.validate_document)
         if recovered or state is None or hdr10plus_master.preflight(state)!=last-first:
             raise ValueError("Saved range did not reopen at the requested picture count")
-        program=compile_project(state,folder)
-        eligible(state,program,camera_range=True,qualification=True)
+        program=compile_project(state,folder,camera_raster=camera_raster)
+        eligible(state,program,camera_range=True,qualification=True,camera_raster=camera_raster)
         original_clock=verify_original_requests(full,program,first,last)
         receipt.update(planned=True,spans=program.spans,
                        selected_source_count=len(program.sources),original_source_requests_matched=original_clock,
@@ -188,9 +214,9 @@ def qualify(project,folder,first,last,worker,runtime,author_dll,*,plan_only=Fals
             receipt["fallback"]["seconds"]=time.perf_counter()-began
 
         export_native(state,candidate,None,worker,runtime,first_time=True,camera_range=True,parallel_x265=parallel_x265,
-                      authoring=options,record=record,fallback=fallback,fault=fault,progress=report,
+                      authoring=options,record=record,fallback=None if camera_raster and retained else fallback,fault=fault,progress=report,
                       diagnostics=diagnostics,timeout=max(240,3*(last-first)),keyframe_seek=keyframe_seek,
-                      qualification=True)
+                      qualification=True,camera_raster=camera_raster)
         if record["delivered_backend"]=="reference":
             candidate.rename(published)
             candidate=published
@@ -210,16 +236,20 @@ def qualify(project,folder,first,last,worker,runtime,author_dll,*,plan_only=Fals
             receipt["reference"]["seconds"]=time.perf_counter()-began
         began=time.perf_counter()
         comparison=compare_project(reference,candidate,program,folder)
-        checks={label:verify_hdr10plus_packets(path,program)
-                for label,path in (("reference",reference),("first_export",candidate))}
+        blocks=hdr10plus_picture_records(reference,program)
+        actual=hdr10plus_picture_records(candidate,program)
+        checks={"reference":len(blocks),"first_export":len(actual)}
+        same_blocks=sum(block==actual[frame] for frame,block in blocks.items())
         receipt.update(independent_comparison=comparison,comparison_seconds=time.perf_counter()-began,
                        file_bytes={"reference":reference.stat().st_size,"first_export":candidate.stat().st_size},
-                       conforming_hdr10plus_blocks=checks)
-        expected=record["delivered_backend"]==("d3d11" if fault is None else "reference")
+                       conforming_hdr10plus_blocks=checks,hdr10plus_records_matching_reference=same_blocks)
+        requested="d3d11-zimg" if camera_raster else "d3d11"
+        expected=record["delivered_backend"]==(requested if fault is None else "reference")
         if fault is not None:
             expected=expected and record.get("native_fault_injected") is True
-        passed=expected and comparison["passed"]
-        if passed and record["delivered_backend"]=="d3d11":
+        identical_pictures=all(value=="inf" for value in comparison["per_frame_psnr_db"])
+        passed=expected and comparison["passed"] and (not identical_pictures or same_blocks==len(blocks))
+        if passed and record["delivered_backend"]==requested:
             if original!=project.read_bytes() or originals!=source_snapshot(full):
                 raise ValueError("Original source identity changed before publication")
             candidate.rename(published)
@@ -243,6 +273,7 @@ if __name__=="__main__":
     parser.add_argument("--author-dll",type=Path)
     parser.add_argument("--plan-only",action="store_true")
     parser.add_argument("--linear-preroll",action="store_true",help="Use the original prefix-decoding control")
+    parser.add_argument("--camera-raster",action="store_true",help="Use indexed camera planes with the reference zimg quantizer and x265 pool")
     parser.add_argument("--parallel-x265",action="store_true",
                         help="Use eight x265 pool workers with the saved Slow preset and two frame threads")
     parser.add_argument("--fault-frame",type=int)
@@ -260,6 +291,6 @@ if __name__=="__main__":
         parser.error("Reference reuse requires its run directory, pinned source receipt and SHA-256")
     result=qualify(args.project,args.output,*args.frames,args.worker,args.runtime,args.author_dll,
                    plan_only=args.plan_only,fault=args.fault_frame,parallel_x265=args.parallel_x265,
-                   keyframe_seek=not args.linear_preroll,retained=retained if all(retained) else None)
+                   keyframe_seek=not args.linear_preroll,camera_raster=args.camera_raster,retained=retained if all(retained) else None)
     print(json.dumps(result))
     sys.exit(0 if result["original_files_match"] and (args.plan_only or result["passed"]) else 1)

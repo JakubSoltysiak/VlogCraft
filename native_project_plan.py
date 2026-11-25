@@ -103,7 +103,7 @@ def fitted_size(size,canvas,fit):
     return max(1,round(sx*ratio)),max(1,round(sy*ratio))
 
 
-def compile_project(state,work):
+def compile_project(state,work,*,camera_raster=False):
     state = sequences.playback(state)
     output = state["output"]
     contract = color_management.validate_output(output["color"])
@@ -183,7 +183,7 @@ def compile_project(state,work):
             if len(rows)>LAYER_BUDGET:
                 raise Ineligible("Project exceeds the experimental simultaneous layer budget")
             program.frames.append((weight,rows))
-    if not program.sources or sum(src.kind=="video" for src in program.sources)>4:
+    if not program.sources or sum(src.kind=="video" for src in program.sources)>(LAYER_BUDGET if camera_raster else 4):
         raise Ineligible("The native project requires between one and eight sources, with up to four videos")
     return program
 
@@ -223,10 +223,10 @@ def run_capture(command,timeout=90,*,cancelled=lambda:False,cwd=None):
                 process.kill()
 
 
-def append_video(output,slot,src,frame_count,cancelled,*,first_time=False,camera_range=False,keyframe_seek=False):
+def append_video(output,slot,src,frame_count,cancelled,*,first_time=False,camera_range=False,keyframe_seek=False,camera_raster=False):
     limit = max(src.requests.values())+2
     stream_fields = ("stream=width,height,time_base,codec_name,profile,pix_fmt,color_primaries,color_transfer,"
-                     "color_space,color_range,field_order")
+                     "color_space,color_range,field_order,nb_frames,start_pts,duration_ts")
     indexed = None
     if keyframe_seek and src.path.suffix.lower() in (".mp4",".mov",".m4v"):
         indexed = native_source_seek.probe(src.path,limit,stream_fields,run_capture,cancelled)
@@ -296,10 +296,19 @@ def append_video(output,slot,src,frame_count,cancelled,*,first_time=False,camera
     if any(a>=b for a,b in zip(stamps,stamps[1:])) or base<=0:
         raise Ineligible("Resident source has an ambiguous presentation clock")
     selected = [-1]*frame_count
+    terminal=0
     for frame,target in src.requests.items():
         tick = (target+origin)/base
         if tick>=stamps[-1]:
-            raise Ineligible("The selected range extends beyond the available source pictures")
+            end_pts=video.get("start_pts",0)
+            duration=video.get("duration_ts")
+            if not (camera_raster and indexed is not None and str(len(stamps))==video.get("nb_frames")
+                    and type(end_pts) is int and type(duration) is int and duration>0 and end_pts+duration>stamps[-1]):
+                raise Ineligible("The selected range extends beyond the available source pictures")
+            if tick>=end_pts+duration:
+                terminal+=1
+                if terminal>6 or (tick-end_pts-duration)*base>=Fraction(6,60):
+                    raise Ineligible("The camera hold exceeds the qualified video endpoint")
         selected[frame] = max(0,bisect_right(stamps,tick)-1)
     last = max(selected)+1
     access_points = [point for point in access_points if 0 < point.picture < last]
@@ -349,7 +358,7 @@ def append_still(output,slot,src,program,cancelled):
     rgba.tofile(output)
 
 
-def write_sources(path,program,cancelled=lambda:False,*,first_time=False,camera_range=False,keyframe_seek=False):
+def write_sources(path,program,cancelled=lambda:False,*,first_time=False,camera_range=False,keyframe_seek=False,camera_raster=False):
     clocks={}
     with path.open("wb") as output:
         videos = [(n,src) for n,src in enumerate(program.sources) if src.kind=="video"]
@@ -357,7 +366,8 @@ def write_sources(path,program,cancelled=lambda:False,*,first_time=False,camera_
         output.write(struct.pack("<4s2I",b"VSD3" if keyframe_seek else b"VSD2",len(videos),len(stills)))
         for slot,src in videos:
             clocks[slot]=append_video(output,slot,src,len(program.frames),cancelled,
-                                      first_time=first_time,camera_range=camera_range,keyframe_seek=keyframe_seek)
+                                      first_time=first_time,camera_range=camera_range,keyframe_seek=keyframe_seek,
+                                      camera_raster=camera_raster)
         for slot,src in stills:
             append_still(output,slot,src,program,cancelled)
     return clocks

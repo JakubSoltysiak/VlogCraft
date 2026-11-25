@@ -24,13 +24,14 @@ WRITE = re.compile(rb"Writing frame with pts (-?\d+) to pts (-?\d+)")
 CAMERA_RANGE_FRAMES = 3600
 
 
-def eligible(state,program,*,camera_range=False,qualification=False):
+def eligible(state,program,*,camera_range=False,qualification=False,camera_raster=False):
     flat=sequences.playback(state)
     output=flat["output"]
     contract=color_management.validate_output(output["color"])
     frame_limit=CAMERA_RANGE_FRAMES if camera_range and qualification else 120
+    span_limit=8 if camera_range and qualification and camera_raster else 2
     if ((program.width,program.height,program.fps)!=(3840,2160,60) or
-        not 2<=len(program.frames)<=frame_limit or len(program.spans)>2 or
+        not 2<=len(program.frames)<=frame_limit or len(program.spans)>span_limit or
         not ("mastering" in contract and "maxCLL" in contract)):
         raise Ineligible("First export requires a short UHD60 project with complete HDR mastering declarations")
     profile=(output.get("preset"),output.get("crf"),output.get("bitrate",0))
@@ -40,10 +41,10 @@ def eligible(state,program,*,camera_range=False,qualification=False):
         raise Ineligible("First export requires the qualified Ultrafast CRF 15 output profile")
     video=[(track,clip) for track in flat["tracks"] if track["type"]=="video" and not track.get("hidden")
            for clip in track["clips"]]
-    if (not 1<=len(video)<=2 or len({track["id"] for track,_ in video})!=1 or
+    if (not 1<=len(video)<=span_limit or len({track["id"] for track,_ in video})!=1 or
         len(video)!=len(program.sources) or any(clip["kind"]=="sequence" for track in state["tracks"]
                                                 for clip in track["clips"])):
-        raise Ineligible("First export supports one picture track with at most two straight-cut video clips")
+        raise Ineligible(f"First export supports one picture track with at most {span_limit} straight-cut video clips")
     neutral=hdr10plus_export.NEUTRAL.copy()
     for key in ("position","start","volume","audioDetached","bass","treble","pan","compress","hdrExposure"):
         neutral.pop(key)
@@ -53,6 +54,8 @@ def eligible(state,program,*,camera_range=False,qualification=False):
             set(clip.get("keys",{}))-{"volume"} or clip.get("hdrExposure",0) not in (0,.2) or
             clip.get("inputColor",{}).get("profile","source")!="source"):
             raise Ineligible("First export supports opaque straight cuts, with the qualified neutral or SDR exposure")
+        if camera_raster and clip.get("hdrExposure",0)!=0:
+            raise Ineligible("Exact opaque camera raster requires neutral exposure")
     for src in program.sources:
         if src.kind!="video" or src.orientation not in ("","transpose=clock") or src.interpretation[3]!="limited":
             raise Ineligible("First export requires qualified limited-range SDR/PQ video and orientation")
@@ -61,8 +64,8 @@ def eligible(state,program,*,camera_range=False,qualification=False):
     return flat,contract
 
 
-def source_ids(src,seek,rate,count,base,origin,cancelled=lambda:False):
-    command=["ffmpeg","-hide_banner","-loglevel","debug","-nostdin","-noautorotate"]
+def source_ids(src,seek,rate,count,base,origin,cancelled=lambda:False,*,terminal_pts=None):
+    command=["ffmpeg","-hide_banner","-loglevel","debug","-nostdin","-xerror","-noautorotate"]
     render_engine._media_input(command,src.path,"video",float(seek),1,count/rate,rate,"video")
     command+=["-map","0:v:0","-vf",f"setpts=PTS/1,fps={rate}:start_time=0:round=up",
               "-frames:v",str(count),"-f","null","-"]
@@ -77,12 +80,18 @@ def source_ids(src,seek,rate,count,base,origin,cancelled=lambda:False):
             if chosen is None:
                 raise Ineligible("The independent source clock returned an incomplete picture")
             selected[int(event[2])]=chosen
+    # The reference's framesync repeats the last opaque picture when the
+    # camera video ends just before its edit. Reject holes or unproven tails.
+    n=len(selected)
+    if (terminal_pts is not None and 0<count-n<=6 and set(selected)==set(range(n))
+        and n and selected[n-1]==terminal_pts and max(seen.values())==terminal_pts):
+        selected.update(dict.fromkeys(range(n,count),terminal_pts))
     if any(index not in selected for index in range(count)):
         raise Ineligible("The independent source clock returned too few pictures")
     return [selected[index] for index in range(count)]
 
 
-def verify_source_clocks(program,clocks,cancelled):
+def verify_source_clocks(program,clocks,cancelled,*,camera_raster=False):
     checked=0
     for slot,(base,origin,stamps,selected) in clocks.items():
         src=program.sources[slot]
@@ -92,7 +101,10 @@ def verify_source_clocks(program,clocks,cancelled):
                 continue
             if len(indices)!=last-first:
                 raise Ineligible("Video selection changed inside a straight-cut span")
-            expected=source_ids(src,src.requests[first],program.fps,last-first,base,origin,cancelled)
+            opts={}
+            if camera_raster and src.requests[last-1]+origin>=stamps[-1]*base:
+                opts["terminal_pts"]=stamps[-1]
+            expected=source_ids(src,src.requests[first],program.fps,last-first,base,origin,cancelled,**opts)
             if any(stamps[selected[index]]!=pts for index,pts in zip(indices,expected,strict=True)):
                 raise Ineligible("The independent decoder selected a different presentation timestamp")
             checked+=len(expected)
@@ -152,7 +164,7 @@ def verify_audio(flat,candidate,program,work,runner,cancelled):
     return decoded(candidate)==decoded(isolated)
 
 
-def compare_samples(flat,candidate,program,work,cancelled):
+def compare_samples(flat,candidate,program,work,cancelled,clocks=None):
     samples=sorted({index for first,last in program.spans for index in (first,(first+last-1)//2,last-1)})
     filters="select='"+"+".join(f"eq(n,{frame})" for frame in samples)+"'"
     data=run_capture(["ffmpeg","-v","error","-threads","2","-i",candidate,"-vf",filters,
@@ -163,6 +175,26 @@ def compare_samples(flat,candidate,program,work,cancelled):
     for index,actual in zip(samples,values,strict=True):
         fps=program.fps
         command=hdr_render.command(flat,float(index/fps),float((index+1)/fps),work/f"sample-{index}.mov",work)
+        if clocks is not None:
+            slot=program.frames[index][1][0][0][8]
+            src=program.sources[slot]
+            base,origin,stamps,selected=clocks[slot]
+            tick=stamps[selected[index]]
+            plane=work/"sample-source.yuv"
+            video=src.asset
+            # Use the independently verified exact source PTS. Seeking by
+            # timeline seconds alone cannot produce a picture beyond video EOF.
+            run_capture(["ffmpeg","-v","error","-nostdin","-y","-ss",f"{max(0.,float(tick*base-origin)-2):.9f}",
+                         "-copyts","-noaccurate_seek","-noautorotate","-threads","1","-i",src.path,
+                         "-map","0:v:0","-vf",f"settb={base},select=eq(pts\\,{tick})","-frames:v","1","-an",
+                         "-pix_fmt",video["pixelFormat"],"-c:v","rawvideo","-threads:v","1","-f","rawvideo",plane],
+                        cancelled=cancelled)
+            first=command.index("-noautorotate")
+            last=command.index("-i",first)+1
+            if Path(command[last]).resolve()!=src.path.resolve():
+                raise Ineligible("The exact sample does not match the managed camera input")
+            command[first:last+1]=["-f","rawvideo","-chroma_sample_location","left","-pixel_format",video["pixelFormat"],"-video_size",
+                                   f"{video['width']}x{video['height']}","-framerate",str(fps),"-i",str(plane)]
         raw=run_capture([*command[:command.index("-c:v")],"-c:v","rawvideo","-threads:v","1","-f","rawvideo","-"],
                         cancelled=cancelled)[0]
         desired=np.frombuffer(raw,dtype="<u2")
@@ -175,10 +207,10 @@ def compare_samples(flat,candidate,program,work,cancelled):
     return scores
 
 
-def verify_delivery(flat,contract,candidate,program,clocks,receipt,work,runner,cancelled):
+def verify_delivery(flat,contract,candidate,program,clocks,receipt,work,runner,cancelled,*,camera_raster=False):
     if receipt.get("adapter")!="AMD Radeon(TM) 890M Graphics":
         raise Ineligible("First-export delivery is qualified only on the Radeon 890M adapter")
-    clip_clocks=verify_source_clocks(program,clocks,cancelled)
+    clip_clocks=verify_source_clocks(program,clocks,cancelled,camera_raster=camera_raster)
     video,audio=hdr10plus_export.media(candidate)
     frames=json.loads(run_capture(["ffprobe","-v","error","-select_streams","v:0","-show_frames",
                                    "-show_entries","frame=pts:frame_side_data","-of","json",candidate],
@@ -195,7 +227,7 @@ def verify_delivery(flat,contract,candidate,program,clocks,receipt,work,runner,c
     if any(sum(row.get("side_data_type")==SIDE_DATA for row in frame.get("side_data_list",()))!=1 for frame in frames):
         raise Ineligible("The first-export HDR10+ metadata count did not match the picture clock")
     audio_exact=verify_audio(flat,candidate,program,work,runner,cancelled)
-    sampled=compare_samples(flat,candidate,program,work,cancelled)
+    sampled=compare_samples(flat,candidate,program,work,cancelled,clocks if camera_raster else None)
     quality=all(row["decoded_to_managed_raw_psnr_db"] is None or row["decoded_to_managed_raw_psnr_db"]>=50 for row in sampled)
     return dict(passed=audio_exact and quality,verified_source_pictures=clip_clocks,exact_video_pts=True,
                 exact_decoded_pcm=audio_exact,audio_endpoint_samples=end,static_hdr_matches=True,

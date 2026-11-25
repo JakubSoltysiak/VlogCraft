@@ -93,6 +93,40 @@ class ExportPolicyTests(unittest.TestCase):
         with self.assertRaises(plan.Ineligible):
             verification.eligible(self.state,self.program,camera_range=True,qualification=True)
 
+    def test_exact_camera_eof_needs_the_complete_original_index_and_a_bounded_hold(self):
+        src=self.program.sources[0]
+        src.requests={i:Fraction(i,60) for i in range(9)}
+        stream=dict(width=3840,height=2160,codec_name="h264",profile="High",pix_fmt="yuv420p",
+                    time_base="1/6000",color_primaries="bt709",color_transfer="bt709",color_space="bt709",
+                    color_range="tv",field_order="progressive",nb_frames="3",start_pts=0,duration_ts=300)
+        index=({"streams":[stream],"format":{"start_time":"0"}},[0,100,200],[])
+        with tempfile.TemporaryFile() as output,patch.object(plan.native_source_seek,"probe",return_value=index):
+            def prepare(exact):
+                return plan.append_video(output,0,src,len(src.requests),lambda:False,first_time=True,
+                                         camera_range=True,keyframe_seek=True,camera_raster=exact)
+            self.assertEqual(prepare(True)[3],[0,1,2,2,2,2,2,2,2])
+            with self.assertRaises(plan.Ineligible):
+                prepare(False)
+            stream["nb_frames"]="4"
+            with self.assertRaises(plan.Ineligible):
+                prepare(True)
+            stream["nb_frames"]="3"
+            src.requests[9]=Fraction(9,60)
+            with self.assertRaisesRegex(plan.Ineligible,"hold exceeds"):
+                prepare(True)
+
+    def test_software_clock_cannot_fill_a_missing_interior_picture_or_an_unobserved_eof(self):
+        trace=(b"Read frame with in pts 0, out pts 0\nWriting frame with pts 0 to pts 0\n"
+               b"Read frame with in pts 100, out pts 1\nWriting frame with pts 1 to pts 1\n")
+        args=(self.program.sources[0],0,Fraction(60),5,Fraction(1,6000),0)
+        with patch.object(verification,"run_capture",return_value=(b"",trace)):
+            self.assertEqual(verification.source_ids(*args,terminal_pts=100),[0,100,100,100,100])
+            with self.assertRaises(plan.Ineligible):
+                verification.source_ids(*args,terminal_pts=200)
+        with patch.object(verification,"run_capture",return_value=(b"",trace.replace(b"to pts 1",b"to pts 3"))):
+            with self.assertRaises(plan.Ineligible):
+                verification.source_ids(*args,terminal_pts=100)
+
     def test_camera_excerpt_keeps_source_ticks_and_the_original_document(self):
         asset=self.program.sources[0].asset
         asset["timeBase"]="1/90000"
