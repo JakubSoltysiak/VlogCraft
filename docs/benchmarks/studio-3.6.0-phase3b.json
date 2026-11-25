@@ -82975,5 +82975,43 @@
       "minimum_pq_psnr_db": 51.36,
       "decoded_pictures_equal_saved": false
     }
+  },
+  "camera_parallel_x265_delivery": {
+    "source": "0cdad7b",
+    "scope": "explicit experimental camera range, Slow CRF 20, eight pool workers, two frame threads, runtime first export plus independent all-picture qualification",
+    "sdr48": {
+      "reference_seconds": 105.123,
+      "two_workers_seconds": 84.183,
+      "eight_workers_seconds": 51.573,
+      "verify_all_seconds": 3.603,
+      "overall_minimum_psnr_db": [
+        54.591,
+        53.65
+      ],
+      "managed_bytes": 678911,
+      "candidate_bytes": 676040,
+      "exact_pcm_and_pts": true,
+      "samples_per_channel": 38400,
+      "dynamic_blocks": 48,
+      "equal_decoded_to_two_pool_first_export": false,
+      "originals_match": true,
+      "postrun": "First pin comparison rejected Windows device-number difference across Python versions. Rechecked full pin with original interpreter and compared existing masters."
+    },
+    "rotated_pq120": {
+      "reference_seconds": 190.193,
+      "two_workers_seconds": 127.513,
+      "eight_workers_seconds": 110.166,
+      "verify_all_seconds": 5.23,
+      "overall_minimum_psnr_db": [
+        56.362,
+        52.62
+      ],
+      "managed_bytes": 1300770,
+      "candidate_bytes": 1315215,
+      "exact_pcm_and_pts": true,
+      "samples_per_channel": 96000,
+      "dynamic_blocks": 120,
+      "originals_match": true
+    }
   }
 }

@@ -1,5 +1,9 @@
 # VlogCraft Studio development qualification
 
+## Saved camera range export at x265 Slow
+
+Camera-range first exports on the Radeon 890M passed independent all-picture checks, exact PCM and packet-level HDR10+ validation. With eight x265 pool workers, 48 upright HEVC SDR pictures took 51.573 s versus 105.123 s managed. A cut across 120 rotated HEVC Main10 PQ pictures took 110.166 s versus 190.193 s managed. Minimum PQ PSNR was 53.65 and 52.62 dB respectively. The earlier indexing timeout, verifier errors, two-worker trials and injected device-removal fallback remain in the report. These results cover the tested excerpts. [Reproduction and results](docs/phase3a-camera-range.md).
+
 ## 25 November 2026 — two-slot playback and the saved vlog
 
 The Radeon 890M passed two-slot ownership, VFR/rewind and FP16 parity checks. The ordinary playback gate failed at 41.804 distinct FPS, 1,066 skips and a 1,427.330 ms active gap. The matched shared-device control reached 59.444 FPS with 11 skips and a 79.721 ms gap. Both reached frame 3,599 with exact audio and zero surviving owned processes. The previous long reference export stopped during a Windows power transition after picture 3,489. No completed master exists. Its independently verified 3,600-picture section remains the reference. [Playback trial](docs/STUDIO_3_6_0_PHASE3B_PLAYBACK.md#two-outstanding-picture-copies-on-radeon-890m) · [Master status and encoder evidence](docs/phase3b-vlog-export.md#where-the-reference-minute-spent-its-time).

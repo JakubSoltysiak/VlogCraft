@@ -29,6 +29,25 @@ Writing the managed PQ graph to planar UHD Main10 took 30.805 s for pictures [23
 
 The eight-worker Slow encode reconstructed exactly the same 24 pictures as the saved profile. Medium produced different decoded pictures. Both encoder-only times exclude audio, HDR10+ authoring and delivery validation. The explicit `--parallel-x265` camera-range option retains Slow and increases only the x265 pool on this 12-core, 24-thread workstation. No preference or project migration is required. [Encoder implementation](../native_project_render.py) · [FFmpeg rate-control behavior](phase3b-vlog-export.md#effective-encoder-settings).
 
+## Eight-worker first exports
+
+The wider pool changes x265's wavefront worker count from two to eight. Frame threading, Slow, CRF 20, the mastering contract, reference renderer and application defaults stay fixed. All times include preparation, HDR10+ authoring and the runtime quality gate. The additional full decoded comparison runs after delivery.
+
+| Real 4K60 range | Managed | Native, 2 workers | Native, 8 workers | Managed / 8-worker wall | Extra full comparison | 8-worker overall / minimum PQ PSNR |
+|---|---:|---:|---:|---:|---:|---:|
+| 48 upright SDR pictures | 105.123 s | 84.183 s | 51.573 s | 2.04× | 3.603 s | 54.59 / 53.65 dB |
+| 120 rotated PQ pictures across a cut | 190.193 s | 127.513 s | 110.166 s | 1.73× | 5.230 s | 56.36 / 52.62 dB |
+
+Both eight-worker candidates delivered every source/output picture on the checked clocks, correct Main10 Rec.2020/PQ and static HDR, one conforming HDR10+ record per picture, exact decoded stereo PCM and expected 38,400 / 96,000 sample-frame endpoints. The output sizes were 676,040 and 1,315,215 bytes respectively. All compared source identities and project bytes matched. The actual 48-picture native runs with different pool sizes produced different decoded data and both exceeded the established 50 dB floor. The byte-identical result for the 24-picture isolated CPU input does not generalize to every GOP.
+
+The first independent comparison of the eight-worker SDR file stopped at the pinned-source identity check. Windows Python 3.11 and 3.13 reported different device numbers for the same two source files. Rechecking locally with the interpreter that recorded the original identities matched every field, the byte-identical range project and the retained managed master hash. The comparison then passed on the already delivered files. The first PQ post-run comparison had a separate relative-path failure documented below. Neither case required another encode or a reduced verification threshold.
+
+Reproduce the two eight-worker runs using the serial camera commands below with `--parallel-x265` and fresh result directories. For baseline reuse, use the same local Python runtime that recorded the pin, `--retained-reference` pointing to the prior matching run, `--pinned-sources` and the managed file's `--reference-sha256`. A successful prior native run contributes its independent `reference.mp4`. A prior fall-through contributes the managed `first-export.mp4`. For the isolated encoder/graph comparison:
+
+```powershell
+python benchmarks/profile_camera_encoder.py $section (Join-Path $run 'encoder24') --frames 2314 2338
+```
+
 ## 120-picture result across a rotated PQ straight cut
 
 The initial attempt reached the 90-second software source probe limit and entered the reference workflow. The managed fallback delivered in 190.193 s. The failed attempt and fallback took 280.266 s together. Late HEVC MP4 trims now have an experimental bounded packet index. The index sorts integer presentation timestamps into display order and rejects missing, duplicate, discarded or negative clock records. The resident decoder checks every decoded prefix PTS before it can use the index. The independent software cadence and picture-quality checks remain in force.
