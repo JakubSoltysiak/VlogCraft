@@ -25,3 +25,31 @@ The minute's independent receipt sampled one child before the worker exited. A l
 ## Full export status
 
 After the minute passed, the supervisor rechecked the pinned media, confirmed a new destination and recorded the estimate before starting the full reference export. The minute's measured export cost projects approximately **38 h 15 min** for all 78,427 pictures. The full project's mix of stills, camera footage, cuts and audio can change the actual rate. The saved nominal bitrate implies a 9.80 GB output and a 49.34 GB working-space budget, both decimal. The destination had 191.92 GB free before launch. The full render is encoding in a local Windows process with stage and elapsed-time receipts. Full-master timing and result remain pending.
+
+## Where the reference minute spent its time
+
+The six video-stage intervals below come from transitions in the original monotonic progress log. Each includes its source read/decode, selection, managed float graph, format conversion and x265 encode. The export ran at 0.5695 output pictures/s. Independent verification brought elapsed time for export plus audit to 6,775.497 s.
+
+| Operation | Measured wall (s) | Interpretation |
+|---|---:|---|
+| Video spans of 103, 564, 85, 750, 812 and 1,286 pictures | 187.784, 925.484, 155.208, 1,220.711, 1,278.919, 1,933.179 | 5,701.284 s together, 90.19% of delivery. The commands overlap software decode, VFR cadence selection, FP32 composition/fit, zimg PQ conversion and x265 Slow. |
+| Segment audio render, summed | 0.611 | Camera audio preparation across six spans. Final AAC coding also runs in the final mux process. |
+| Segment stream joins, summed | 0.753 | Six joins. |
+| Final MP4 mux | 1.009 | Includes concat and final audio processing. |
+| Analyze final decoded PQ pictures | 616.796 | Reconstruct the pictures and derive dynamic metadata. |
+| Attach HDR10+ blocks / internal final verification | 0.522 / 0.405 | Packet-order authoring and completion through the export return. |
+| Independent verification | 454.103 | Additional source-clock, picture, metadata and PCM checks. |
+
+The initial stage notification arrived at 0.014 s. Process startup, temporary I/O and thread contention occur inside these wall intervals. Peak observed scratch was 157,515,196 bytes. The minute contains no native GPU compositor or resident GPU-to-encoder handoff. Its log contains no isolated decode, source selection, spatial composition, linear-to-PQ or x265 timer. Subtracting separate microbenchmarks would misattribute overlapped work.
+
+Earlier four-slice CPU filter tests reduced wall time on affine and matte fixtures. The measured 24-picture Phase 2B lab split was 12.390 s for raw-I/O zimg conversion and 1.739 s for x265 with already prepared input. The graphs, presets and input pictures differ from this vlog. Phase 2C moved eligible decoder pictures onto the GPU and shortened final-picture HDR10+ analysis while retaining byte-identical verified masters on its fixtures. Phase 3A's first-export mode subsequently delivered 48 Ultrafast pictures in 37.751 s versus 64.672 s for its reference. These results establish which components can be reused. [Phase 1](STUDIO_3_6_0_RENDERING.md) · [Phase 2B](STUDIO_3_6_0_RENDERING_PHASE2B.md) · [Phase 2C](STUDIO_3_6_0_RENDERING_PHASE2C.md) · [Phase 3A](STUDIO_3_6_0_PHASE3A_EXPORT.md).
+
+### Effective encoder settings
+
+FFprobe reported a 60.000 s container at 4,961,194 bit/s, HEVC Main10 video at 4,755,352 bit/s and AAC at 192,946 bit/s. The encoded x265 build 217 user-data record declares `rc=crf crf=20.0`. The saved Slow project passed both CRF 20 and a nominal 60 Mb/s value. FFmpeg selects x265 CRF before its average-bitrate branch. The observed size follows quality-based rate control. The original 49.34 GB working-space allowance remains a conservative planning figure. This evidence does not establish a file-size forecast for the other vlogs. [FFmpeg encoder initialization](https://ffmpeg.org/doxygen/trunk/libx265_8c_source.html#l00431) · [x265 rate control](https://x265.readthedocs.io/en/stable/cli.html#quality-rate-control-and-rate-distortion-options).
+
+The Radeon 890M accepted P010 or D3D11 surfaces for AMF Main10. In a separate 24-picture transcode its D3D11 path took 0.609 s versus 1.947 s for software x265. Its CQP 20 and x265 CRF 15 results are different rate-control experiments. AMF changed two in-band mastering coordinates and the single-command mux shortened the audio. The repaired audio mux did not resolve mastering. Keep software x265 for verified HDR10+ delivery. [AMF comparison](STUDIO_3_6_0_RENDERING_PHASE2B.md#amd-amf-diagnostic).
+
+### Full master interruption, 25 November
+
+The last activity was output picture 3,489 of 78,427, 58.15 s of timeline, segment 9 of 30, at 2,875.099 s elapsed. Windows logged a power-off request six seconds after the final progress sample and a kernel power transition five seconds later. On the subsequent check the recorded supervisor, worker and encoder were absent. The intended destination contained no final master. The saved status still said running and recorded no worker exception or exit code. This is an interrupted job with no final-file verification. The job folder, source project, media, private scratch and destination were left in place. Recovery of the partial render and restart-safe segment reuse remain open.

@@ -1,5 +1,9 @@
 # VlogCraft Studio development qualification
 
+## 25 November 2026 — two-slot playback and the saved vlog
+
+The Radeon 890M passed two-slot ownership, VFR/rewind and FP16 parity checks. The ordinary playback gate failed at 41.804 distinct FPS, 1,066 skips and a 1,427.330 ms active gap. The matched shared-device control reached 59.444 FPS with 11 skips and a 79.721 ms gap. Both reached frame 3,599 with exact audio and zero surviving owned processes. The previous long reference export stopped during a Windows power transition after picture 3,489. No completed master exists. Its independently verified 3,600-picture section remains the reference. [Playback trial](docs/STUDIO_3_6_0_PHASE3B_PLAYBACK.md#two-outstanding-picture-copies-on-radeon-890m) · [Master status and encoder evidence](docs/phase3b-vlog-export.md#where-the-reference-minute-spent-its-time).
+
 ## Phase 3B timestamped pictures and full-quality export
 
 Per-layer timestamped preparation, actual prefetched slot reuse across a blocked peer, true-seek invalidation, VFR selection and rewind passed on the physical workstation. The second candidate also published, verified and retired exact NV12 and P010 samples under a blocked decoder with a producer-local fence. Ordinary playback failed at 42.842 FPS with event queries and 42.305 FPS with fences. The default player uses the shared device. The reference exporter verified a 48-picture preflight and a contiguous 3,600-picture UHD60 section of the saved vlog. All 3,600 source floors and HDR10+ associations, exact 2,880,000-sample/channel PCM, and 18 visual checks passed. The section took 6,321.394 seconds to export and 454.103 seconds to verify independently. Full-master encoding started after its disk and source checks. [Playback trials and identities](docs/STUDIO_3_6_0_PHASE3B_PLAYBACK.md#timestamped-per-layer-preparation) · [Vlog export qualification](docs/phase3b-vlog-export.md).

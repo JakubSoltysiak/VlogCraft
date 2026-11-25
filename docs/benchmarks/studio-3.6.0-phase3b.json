@@ -6880,9 +6880,9 @@
       "cause": "The old binding checked the historical Phase 3A measurement against changed Phase 3B source. CI now verifies Phase 3A using its archived commit, then checks the new record."
     }
   ],
-  "source_fingerprint": "974caf3c6fcc84c271f08dd970c9627da166b21751fe97c677c5ac395bf7a53e",
+  "source_fingerprint": "0206a37cdb1b30e4dce9c21b60cc371699d7d3f743596cd21fd434d38aa4cc6f",
   "fingerprint_method": "SHA256 sorted relevant relative path + NUL + LF-normalized source + NUL",
-  "benchmark_protocol_fingerprint": "d153ba961009f567218ef875d1fa0253d639c41348835a89a9f5266f8b7067f7",
+  "benchmark_protocol_fingerprint": "2b6e85a8099a1bf1155daaab87e90a25157e7910c554cfaeddaa8a2012a09227",
   "benchmark_protocol_fingerprint_method": "SHA256 sorted benchmark driver/observer relative path + NUL + LF-normalized source + NUL",
   "follow_up": {
     "status": "development checkpoint",
@@ -82843,6 +82843,45 @@
       "skips_charged_in_sampled_windows": 1066,
       "skips_charged_in_sampled_windows_crossing_a_backward_cut": 486,
       "scope": "The GUI samples status intermittently. The status frame can be an unsubmitted clock target and a skip counter rises only when the renderer submits a later picture. These windows cannot place individual gaps or associate them with a decoder or transfer."
+    }
+  },
+  "reference_minute_stage_audit": {
+    "source_checkpoint": "0c5ff329c3e8eac45b520b2161817cea291ab3fc",
+    "video_spans_seconds": [
+      187.784,
+      925.484,
+      155.208,
+      1220.711,
+      1278.919,
+      1933.179
+    ],
+    "all_video_stages_seconds": 5701.284,
+    "audio_segments_seconds": 0.611,
+    "segment_mux_seconds": 0.753,
+    "final_mux_seconds": 1.009,
+    "author_analysis_seconds": 616.796,
+    "metadata_attach_seconds": 0.522,
+    "final_internal_check_seconds": 0.405,
+    "video_bps": 4755352,
+    "audio_bps": 192946,
+    "container_bps": 4961194,
+    "x265_rate_control": "CRF 20.0",
+    "x265_pool_workers": 2,
+    "x265_frame_threads": 2,
+    "full_master_observation": {
+      "state": "interrupted",
+      "last_completed_progress_frames": 3489,
+      "total_frames": 78427,
+      "segment": 9,
+      "segments": 30,
+      "elapsed_seconds": 2875.099,
+      "sequence_seconds": 58.15,
+      "supervisor_present": false,
+      "worker_present": false,
+      "destination_present": false,
+      "worker_exit_status_recorded": false,
+      "full_master_verified": false,
+      "system_observation": "Power-off request and subsequent kernel power transition after last progress receipt."
     }
   }
 }

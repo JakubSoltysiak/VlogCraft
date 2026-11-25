@@ -1,5 +1,18 @@
 # VlogCraft Studio 3.6.0 Phase 3B playback and editing
 
+## Two outstanding picture copies on Radeon 890M
+
+Candidate source `57309c174955d061f72649f4f4de3347cb68c89d` occupies the same two transfer slots per layer as its predecessor. The original transfer thread waited for each submitted copy to complete before considering its second slot. The compositor now observes completed producer fences while the worker can submit the other picture. Query fallback stays with the producer worker. The held-clock path refreshes the decoded successor and the proved cut tail without advancing the source selector. Unused ready copies can return their keyed ownership directly. Source ranges, lease lifetime through GPU use, transport generation and the production shared-device preference are preserved. [Design precedents](phase3b-upstream.md).
+
+The native build and physical NV12 and P010 probes passed. Each format submitted both slots before consumer polling, reused the exact prefetched successor, retired stale work and drained with zero retained frames. Fence publication completed during an independently blocked decoder. FP16 output matched the shared-device player on six draws per format. The controlled VFR checks matched the independent floor at 499.5, 500 and 500.5 ms. The genuine backward cut selected PTS 300 for target 400. The pending-rewind run checked 117 layer/frame pairs with exact seek and 109 ms close.
+
+| Recorder-off, original three UHD60 picture and audio layers | Distinct FPS | Skips | Maximum active gap | Final frame | PCM sample frames | Underruns / owned survivors |
+|---|---:|---:|---:|---:|---:|---:|
+| Frozen shared device, R | 59.444 | 11 | 79.721 ms | 3,599 | 2,880,000 | 0 / 0 |
+| Two-slot overlap, F | 41.804 | 1,066 | 1,427.330 ms | 3,599 | 2,880,000 | 0 / 0 |
+
+Both ran visible, foreground and unobscured at a 958 × 539 physical preview on AC and a 120 Hz desktop. F recorded 12,775 active source waits and zero active compositor-slot waits. Each of its three producers sought 40 times. This counter combines waiting for a proved source interval with waiting for a matching handoff. The results reject serializing the transfer slots as a sufficient explanation for the previous 42 FPS measurements. The candidate failed all three timing screens. The ordinary reversal, physical MSI and endurance gates remain closed for this worker.
+
 ## Timestamped per-layer preparation
 
 | Recorder-off, original three-layer UHD workload, 958 × 539 preview | Distinct FPS | Skips | Maximum active gap (ms) | Audio underruns |
@@ -622,3 +635,5 @@ In both slow calls the same decoder and buffer type had previously returned the 
 This locates a dependency inside D3D11's decoder input-buffer acquisition under the FFmpeg device lock. The 220 ms episode also included ongoing decoded-picture progress and shorter buffer-submission/end-frame calls. The traces establish the wall time of those API calls, while the reason the driver delayed returning the buffers remains unresolved. Additional app-level polling cannot release a driver-owned input buffer. The next investigation should correlate the preceding submission's fence or buffer reuse with these exact calls, before changing shared-device synchronization.
 
 The corrected worker also passed the real producer test for independent refill expiry and guarded retargeting. The 499.5, 500 and 500.5 ms VFR positions matched independent decoded PTS and physical red/blue readback. A genuine backward cut selected PTS 300 for target 400. The pending-rewind test checked 120 layer/frame pairs, sought to the exact new generation and closed during another rewind in 31 ms. All three original recordings retained their hashes and modification times. Raw ETLs, thread identities and private paths stay local. [Reproduction and next investigation](STUDIO_3_6_0_PHASE3B_HANDOFF.md#decoder-input-buffer-investigation).
+
+Follow-up source `4313b88d33b2f362e547d1834dcb895d7a669ed0` rechecks whether the selected picture is still wanted after acquiring the decoder context and before enqueuing a copy. The two-slot trial above belongs to `57309c1`. Its sample windows cannot establish the exact cause of the 40 presentation gaps over 100 ms. There were 39 genuine backward cuts at 90-picture intervals, and 19 of 41 windows with increased skip counters spanned a backward cut. The ordinary measurement does not identify which layer lacked a source interval or a completed copy at those deadlines.
