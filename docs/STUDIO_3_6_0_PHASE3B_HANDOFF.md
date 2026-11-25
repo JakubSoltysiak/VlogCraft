@@ -1,5 +1,9 @@
 # Phase 3B qualification handoff
 
+## Incoming handoff at synchronized source rewinds
+
+Use the retained ordinary cohort `two-slot-rewind-admission1` and worker source `d541564` as the latest measured candidate. Its first ordinary comparison failed. The retained follow-up diagnostic distinguishes source readiness from copied-picture readiness across the three longest incidents. The next instrumented short run should record the source and transfer slot identity of the first late incoming picture. A warm/live PTS match alone is insufficient. Run the existing scheduler/fence/VFR/rewind/parity checks on any correction and start a fresh ordinary cohort using the commands below.
+
 ## Two-slot qualification
 
 The recorder-off R→F campaign `two-slot-overlap1` failed its first pair, with all controls valid. The build, scheduler, fence, VFR, rewind and pixel checks passed on the same worker. Keep the failed pair and start a fresh cohort only for an identified change. For reproducing the physical workflow below, load the frozen package and fixture paths from `build/qa/phase3b-watch/timestamp-fence-ordinary1/refill-image.private.json`, use a fresh results directory and supply `--comparison ordinary --candidate-picture-handoff`. Never reuse a previous hardware result for a changed binary. [Trial and gate](STUDIO_3_6_0_PHASE3B_PLAYBACK.md#two-outstanding-picture-copies-on-radeon-890m).

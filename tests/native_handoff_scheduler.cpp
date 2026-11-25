@@ -53,6 +53,8 @@ void checkSupersededCopy(Producer& producer, ID3D11Device* consumer, int64_t gen
             require(Clock::now() < deadline, "floor did not reach copy submission");
             Sleep(1);
         }
+        require(!lane.coversRemaining({second, first}, generation),
+                "a copy waiting for the decoder lock allowed an early rewind");
         require(!lane.select(second, second, third, generation), "new floor acquired while device lock held");
     }
     const auto deadline = Clock::now() + 5s;
@@ -66,6 +68,9 @@ void checkSupersededCopy(Producer& producer, ID3D11Device* consumer, int64_t gen
     const auto b = state.slots[1].sourceIdentity.lock();
     require(state.submissions == 2 && ((a == second && b == third) || (a == third && b == second)),
             "superseded floor was copied after the lock became available");
+    require(lane.coversRemaining({first, second, third}, generation) &&
+            !lane.coversRemaining({first, second, third}, generation + 1),
+            "rewind admission did not distinguish enqueued copies from a different transport");
 }
 
 void run(const char* fixture) {
@@ -196,6 +201,7 @@ void run(const char* fixture) {
     handoff.trim({});
     std::cout << "{\"scheduler\":\"passed\",\"clock_advanced_while_copy_blocked\":true,"
                  "\"two_slots_submitted_before_consumer_poll\":true,\"superseded_copy_suppressed\":true,"
+                 "\"outgoing_copy_admission_verified\":true,"
                  "\"successor_prepared_while_peer_unavailable\":true,\"slot_reused\":true,"
                  "\"seek_invalidated_picture\":true,\"teardown_completed\":true}\n";
 }
