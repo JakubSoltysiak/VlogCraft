@@ -15,6 +15,7 @@ import animation
 import color_management
 import hdr_layers
 import hdr_render
+import native_source_seek
 import render_engine
 import sequences
 import timeline_transitions
@@ -222,23 +223,32 @@ def run_capture(command,timeout=90,*,cancelled=lambda:False,cwd=None):
                 process.kill()
 
 
-def append_video(output,slot,src,frame_count,cancelled,*,first_time=False,camera_range=False):
+def append_video(output,slot,src,frame_count,cancelled,*,first_time=False,camera_range=False,keyframe_seek=False):
     limit = max(src.requests.values())+2
-    if limit>122:
-        raise Ineligible("Source selection exceeds the qualified resident preroll window")
+    stream_fields = ("stream=width,height,time_base,codec_name,profile,pix_fmt,color_primaries,color_transfer,"
+                     "color_space,color_range,field_order")
+    indexed = None
+    if keyframe_seek and src.path.suffix.lower() in (".mp4",".mov",".m4v"):
+        indexed = native_source_seek.probe(src.path,limit,stream_fields,run_capture,cancelled)
     # The resident decoder checks this index against every decoded PTS in its
     # prefix. An independent software trace still checks the selected pictures.
-    packet_index = (camera_range and (src.asset or {}).get("codec")=="hevc" and src.path.suffix.lower()==".mp4" and
-                    min(src.requests.values())>0)
-    clock_fields = "packet=pts,flags" if packet_index else "frame=best_effort_timestamp"
-    format_fields = "start_time,format_name" if packet_index else "start_time"
-    fields = ("stream=width,height,time_base,codec_name,profile,pix_fmt,color_primaries,color_transfer,color_space,"
-              f"color_range,field_order:{clock_fields}:format={format_fields}")
-    if camera_range:
-        fields += ":stream_side_data=rotation"
-    info = json.loads(run_capture(["ffprobe","-v","error","-read_intervals",f"%+{float(limit):.8f}",
-                                   "-select_streams","v:0","-show_entries",fields,"-of","json",src.path],
-                                  cancelled=cancelled)[0])
+    packet_index = False
+    access_points = []
+    if indexed is not None:
+        info,stamps,access_points=indexed
+    else:
+        if limit>122:
+            raise Ineligible("Source selection exceeds the qualified resident preroll window")
+        packet_index = (not keyframe_seek and camera_range and (src.asset or {}).get("codec")=="hevc" and
+                        src.path.suffix.lower()==".mp4" and min(src.requests.values())>0)
+        clock_fields = "packet=pts,flags" if packet_index else "frame=best_effort_timestamp"
+        format_fields = "start_time,format_name" if packet_index else "start_time"
+        fields = f"{stream_fields}:{clock_fields}:format={format_fields}"
+        if camera_range:
+            fields += ":stream_side_data=rotation"
+        info = json.loads(run_capture(["ffprobe","-v","error","-read_intervals",f"%+{float(limit):.8f}",
+                                       "-select_streams","v:0","-show_entries",fields,"-of","json",src.path],
+                                      cancelled=cancelled)[0])
     streams = info.get("streams",())
     if len(streams)!=1:
         raise Ineligible("The resident probe found no unambiguous video stream")
@@ -273,7 +283,7 @@ def append_video(output,slot,src,frame_count,cancelled,*,first_time=False,camera
         if any(not isinstance(row.get("flags"),str) or "D" in row["flags"] for row in packets):
             raise Ineligible("Camera trim has ambiguous or discarded packets outside the packet-index experiment")
         stamps=[row.get("pts") for row in packets]
-    else:
+    elif indexed is None:
         stamps=[row.get("best_effort_timestamp") for row in info.get("frames",())]
     if not stamps or any(type(stamp) is not int for stamp in stamps):
         raise Ineligible("The resident probe did not return integer source presentation timestamps")
@@ -292,6 +302,11 @@ def append_video(output,slot,src,frame_count,cancelled,*,first_time=False,camera
             raise Ineligible("The selected range extends beyond the available source pictures")
         selected[frame] = max(0,bisect_right(stamps,tick)-1)
     last = max(selected)+1
+    access_points = [point for point in access_points if 0 < point.picture < last]
+    if limit>122:
+        first = min(picture for picture in selected if picture>=0)
+        if not any(point.picture<=first for point in access_points):
+            raise Ineligible("A late source range requires a verified preceding random-access picture")
     angle = next(code for code,orientation in hdr_layers.VIDEO_ORIENTATION.items() if orientation==src.orientation)
     name = str(src.path.resolve()).encode("utf-8")
     output.write(struct.pack("<11I",slot,len(name),video["width"],video["height"],*src.fitted,
@@ -299,6 +314,12 @@ def append_video(output,slot,src,frame_count,cancelled,*,first_time=False,camera
     output.write(name)
     np.asarray(stamps[:last],dtype="<i8").tofile(output)
     np.asarray(selected,dtype="<i4").tofile(output)
+    if keyframe_seek:
+        output.write(struct.pack("<I",len(access_points)))
+        for point in access_points:
+            output.write(struct.pack("<qqII",point.dts,point.position,point.picture,point.kind))
+            output.write(struct.pack("<I",len(point.decodable_leading)))
+            np.asarray(point.decodable_leading,dtype="<i8").tofile(output)
     return base,origin,stamps[:last],selected
 
 
@@ -328,15 +349,15 @@ def append_still(output,slot,src,program,cancelled):
     rgba.tofile(output)
 
 
-def write_sources(path,program,cancelled=lambda:False,*,first_time=False,camera_range=False):
+def write_sources(path,program,cancelled=lambda:False,*,first_time=False,camera_range=False,keyframe_seek=False):
     clocks={}
     with path.open("wb") as output:
         videos = [(n,src) for n,src in enumerate(program.sources) if src.kind=="video"]
         stills = [(n,src) for n,src in enumerate(program.sources) if src.kind!="video"]
-        output.write(struct.pack("<4s2I",b"VSD2",len(videos),len(stills)))
+        output.write(struct.pack("<4s2I",b"VSD3" if keyframe_seek else b"VSD2",len(videos),len(stills)))
         for slot,src in videos:
             clocks[slot]=append_video(output,slot,src,len(program.frames),cancelled,
-                                      first_time=first_time,camera_range=camera_range)
+                                      first_time=first_time,camera_range=camera_range,keyframe_seek=keyframe_seek)
         for slot,src in stills:
             append_still(output,slot,src,program,cancelled)
     return clocks

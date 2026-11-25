@@ -18,7 +18,7 @@ from hdr10plus_export import media
 from hdr10plus_fast import author_options
 from native_project_plan import compile_project
 from native_project_render import compare_project, export_native
-from native_project_verification import eligible, source_snapshot
+from native_project_verification import CAMERA_RANGE_FRAMES, eligible, source_snapshot
 import hdr10plus_master
 import project_store
 import render_engine
@@ -28,8 +28,8 @@ import timing
 def camera_range(state,first,last):
     """Rebase a frame-aligned straight-cut section without rewriting its sources."""
     fps=timing.rate(state["output"]["fps"])
-    if fps!=60 or first<0 or not 2<=last-first<=120:
-        raise ValueError("Select a 2–120-picture range from a 60 FPS project")
+    if fps!=60 or first<0 or not 2<=last-first<=CAMERA_RANGE_FRAMES:
+        raise ValueError(f"Select a 2–{CAMERA_RANGE_FRAMES}-picture range from a 60 FPS project")
     if any(clip.get("transitionIn") or clip["kind"]=="sequence" for track in state["tracks"] for clip in track["clips"]):
         raise ValueError("The range tool requires a flat timeline with straight cuts")
     if not any(start==first for start,_ in render_engine.frame_spans(state,fps)):
@@ -131,7 +131,7 @@ def retained_reference(folder,project_copy,receipt,originals,pin,expected_hash):
     return master,timing_record
 
 
-def qualify(project,folder,first,last,worker,runtime,author_dll,*,plan_only=False,fault=None,retained=None,parallel_x265=False):
+def qualify(project,folder,first,last,worker,runtime,author_dll,*,plan_only=False,fault=None,retained=None,parallel_x265=False,keyframe_seek=True):
     import server
 
     original=project.read_bytes()
@@ -176,7 +176,7 @@ def qualify(project,folder,first,last,worker,runtime,author_dll,*,plan_only=Fals
 
         export_native(state,candidate,None,worker,runtime,first_time=True,camera_range=True,parallel_x265=parallel_x265,
                       authoring=options,record=record,fallback=fallback,fault=fault,progress=report,
-                      diagnostics=diagnostics)
+                      diagnostics=diagnostics,timeout=max(240,3*(last-first)),keyframe_seek=keyframe_seek)
         if record["delivered_backend"]=="reference" and fault is None:
             # A rejected encode can be compared with the managed fallback that
             # just rendered. If it failed earlier, there is no encode to compare.
@@ -220,6 +220,7 @@ if __name__=="__main__":
     parser.add_argument("--runtime",type=Path)
     parser.add_argument("--author-dll",type=Path)
     parser.add_argument("--plan-only",action="store_true")
+    parser.add_argument("--linear-preroll",action="store_true",help="Use the original prefix-decoding control")
     parser.add_argument("--parallel-x265",action="store_true",
                         help="Use eight x265 pool workers with the saved Slow preset and two frame threads")
     parser.add_argument("--fault-frame",type=int)
@@ -236,6 +237,7 @@ if __name__=="__main__":
     if any(retained) and (not all(retained) or args.fault_frame is not None or args.plan_only):
         parser.error("Reference reuse requires its run directory, pinned source receipt and SHA-256")
     result=qualify(args.project,args.output,*args.frames,args.worker,args.runtime,args.author_dll,
-                   plan_only=args.plan_only,fault=args.fault_frame,parallel_x265=args.parallel_x265,retained=retained if all(retained) else None)
+                   plan_only=args.plan_only,fault=args.fault_frame,parallel_x265=args.parallel_x265,
+                   keyframe_seek=not args.linear_preroll,retained=retained if all(retained) else None)
     print(json.dumps(result))
     sys.exit(0 if result["original_files_match"] and (args.plan_only or result["passed"]) else 1)

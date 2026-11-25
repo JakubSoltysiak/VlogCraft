@@ -17,21 +17,36 @@ class HardwareInputs {
         std::uint32_t pathBytes,codedWidth,codedHeight,fittedWidth,fittedHeight;
         std::uint32_t clockwise,pq,pictures,timeNum,timeDen;
     };
-    struct Source {
+    struct AccessPoint {
+        std::int64_t dts,position;
+        std::uint32_t picture,kind;
+        std::vector<std::int64_t> decodableLeading;
+    };
+    struct Playback {
         std::unique_ptr<::Decoder> decoder;
+        int index=-1;
+        unsigned lastFrame=0;
+    };
+    struct Source {
+        std::shared_ptr<Playback> playback;
+        std::string path;
         Description description{};
         std::vector<std::int64_t> timestamps;
         std::vector<std::int32_t> frames;
+        std::vector<AccessPoint> accessPoints;
+        std::vector<const AccessPoint*> seeks;
         unsigned slot=0;
-        int index=-1,used=0;
-        double normalizationMs=0;
+        unsigned firstFrame=0,lastFrame=0;
+        int index=-1,used=0,decoded=0;
+        bool reused=false;
+        double normalizationMs=0,decodeSeconds=0,seekSeconds=0;
     };
 
     GpuCompositor& gpu;
     SurfaceNormalizer normalize;
     std::vector<Source> sources;
     unsigned width,height;
-    bool project;
+    bool project,indexed=false;
 
     static void read(std::istream& file,void* target,std::size_t length) {
         if(!file.read(static_cast<char*>(target),std::streamsize(length)))
@@ -51,8 +66,8 @@ class HardwareInputs {
         if((quarterTurn?d.codedHeight:d.codedWidth)>2*d.fittedWidth ||
            (quarterTurn?d.codedWidth:d.codedHeight)>2*d.fittedHeight)
             throw std::runtime_error("Resident resize exceeds the tested filter support");
-        std::string path(d.pathBytes,'\0');
-        read(file,path.data(),path.size());
+        source.path.resize(d.pathBytes);
+        read(file,source.path.data(),source.path.size());
         source.timestamps.resize(d.pictures);
         source.frames.resize(count);
         read(file,source.timestamps.data(),source.timestamps.size()*sizeof(std::int64_t));
@@ -60,18 +75,143 @@ class HardwareInputs {
         if(std::adjacent_find(source.timestamps.begin(),source.timestamps.end(),std::greater_equal<>())!=source.timestamps.end())
             throw std::runtime_error("Invalid hardware frame-selection order");
         int previous=-1;
-        for(int target:source.frames) {
+        for(unsigned i=0;i<count;++i) {
+            const int target=source.frames[i];
             if(project&&target==-1) continue;
             if(target<0||target>=int(d.pictures)||target<previous)
                 throw std::runtime_error("Invalid hardware frame-selection order");
+            if(previous==-1) source.firstFrame=i;
+            source.lastFrame=i;
             previous=target;
         }
-        source.decoder=std::make_unique<::Decoder>(path,avDevice.ref,true,4);
-        auto& dec=*source.decoder;
+        if(indexed) {
+            if(previous<0) throw std::runtime_error("An indexed video has no selected pictures");
+            read_access_points(file,source);
+        }
+    }
+
+    void read_access_points(std::istream& file,Source& source) {
+        std::uint32_t count=0,previous=0;
+        read(file,&count,sizeof(count));
+        if(count>=source.timestamps.size()) throw std::runtime_error("Invalid random-access index size");
+        source.accessPoints.resize(count);
+        for(auto& point:source.accessPoints) {
+            std::uint32_t leading=0;
+            read(file,&point.dts,sizeof(point.dts));
+            read(file,&point.position,sizeof(point.position));
+            read(file,&point.picture,sizeof(point.picture));
+            read(file,&point.kind,sizeof(point.kind));
+            read(file,&leading,sizeof(leading));
+            if(point.picture<=previous||point.picture>=source.timestamps.size()||point.dts==AV_NOPTS_VALUE||
+               point.position<0||leading>32||
+               (point.kind!=5&&(point.kind<16||point.kind>21))||
+               (leading&&point.kind!=16&&point.kind!=17&&point.kind!=19&&point.kind!=21))
+                throw std::runtime_error("Invalid random-access index entry");
+            point.decodableLeading.resize(leading);
+            if(leading) {
+                auto& ticks=point.decodableLeading;
+                read(file,ticks.data(),ticks.size()*sizeof(ticks.front()));
+                if(std::adjacent_find(ticks.begin(),ticks.end(),std::greater_equal<>())!=ticks.end()||
+                   ticks.back()>=source.timestamps[point.picture]||ticks.front()==AV_NOPTS_VALUE||
+                   !std::includes(source.timestamps.begin(),source.timestamps.end(),ticks.begin(),ticks.end()))
+                    throw std::runtime_error("Invalid random-access leading pictures");
+            }
+            previous=point.picture;
+        }
+    }
+
+    void open_source(Source& source,unsigned before) {
+        if(indexed) {
+            // The slots keep distinct normalization caches. A single decode
+            // cursor can serve identical source clocks on disjoint ranges.
+            for(unsigned i=before;i>0;--i) {
+                auto& prior=sources[i-1];
+                const auto& a=prior.description;
+                const auto& b=source.description;
+                if(source.path!=prior.path || prior.playback->lastFrame!=prior.lastFrame ||
+                   prior.lastFrame>=source.firstFrame || a.timeNum!=b.timeNum || a.timeDen!=b.timeDen ||
+                   a.codedWidth!=b.codedWidth || a.codedHeight!=b.codedHeight ||
+                   prior.frames[prior.lastFrame]>source.frames[source.firstFrame]) continue;
+                if(prior.timestamps.size()>source.timestamps.size()||
+                   !std::equal(prior.timestamps.begin(),prior.timestamps.end(),source.timestamps.begin())) continue;
+                // Continue through a nearby cut on the live cursor. For a
+                // distant cut, start at an IRAP on a fresh codec context so
+                // delayed pictures from the old decode cannot enter the range.
+                const int cutStart=source.frames[source.firstFrame];
+                const int cutEnd=prior.frames[prior.lastFrame];
+                const auto opportunities=std::count_if(source.accessPoints.begin(),source.accessPoints.end(),
+                    [&](const AccessPoint& point){return int(point.picture)>cutEnd&&int(point.picture)<=cutStart;});
+                if(opportunities>2) continue;
+                source.playback=prior.playback;
+                source.reused=true;
+                break;
+            }
+        }
+        if(!source.playback) {
+            source.playback=std::make_shared<Playback>();
+            source.playback->decoder=std::make_unique<::Decoder>(source.path,avDevice.ref,true,4);
+        }
+        source.playback->lastFrame=source.lastFrame;
+        auto& dec=*source.playback->decoder;
         const auto id=dec.codec->codec_id;
         const auto time=dec.file->streams[dec.stream]->time_base;
+        const auto& d=source.description;
         if((id!=AV_CODEC_ID_H264 && id!=AV_CODEC_ID_HEVC)||time.num!=int(d.timeNum)||time.den!=int(d.timeDen))
             throw std::runtime_error("The resident decoder does not match the probed source");
+        if(indexed) {
+            for(int i=0;i<dec.stream;++i)
+                if(dec.file->streams[i]->codecpar->codec_type==AVMEDIA_TYPE_VIDEO)
+                    throw std::runtime_error("The resident decoder did not select the indexed video stream");
+            if(std::any_of(source.accessPoints.begin(),source.accessPoints.end(),[&](const AccessPoint& point){
+                return (id==AV_CODEC_ID_H264)!=(point.kind==5);
+            })) throw std::runtime_error("The indexed random-access picture does not match the codec");
+            dec.codec->err_recognition|=AV_EF_EXPLODE;
+        }
+    }
+
+    void advance(Source& source,int target) {
+        auto& cursor=*source.playback;
+        auto& decoder=*cursor.decoder;
+        const auto beganWith=decoder.frames;
+        const auto decodeAtStart=decoder.decode_s;
+        const AccessPoint* anchor=nullptr;
+        if(cursor.index<0&&!source.accessPoints.empty()) {
+            const auto after=std::upper_bound(source.accessPoints.begin(),source.accessPoints.end(),target,
+                [](int picture,const AccessPoint& point){return picture<int(point.picture);});
+            if(after!=source.accessPoints.begin()&&int((after-1)->picture)>cursor.index+1)
+                anchor=&*(after-1);
+        }
+        const auto anchorPts=anchor?source.timestamps[anchor->picture]:AV_NOPTS_VALUE;
+        if(anchor) {
+            const auto began=::Clock::now();
+            decoder.seek_indexed_packet(anchorPts,anchor->dts,anchor->position);
+            source.seekSeconds+=::seconds(began);
+            source.seeks.push_back(anchor);
+            cursor.index=int(anchor->picture)-1;
+        }
+        auto leading=AV_NOPTS_VALUE;
+        while(cursor.index<target) {
+            if(!decoder.next()) throw std::runtime_error("Hardware decoder stopped before the indexed picture");
+            const auto* frame=decoder.frame;
+            const auto pts=frame->best_effort_timestamp;
+            if(indexed&&(frame->flags&AV_FRAME_FLAG_CORRUPT||frame->decode_error_flags))
+                throw std::runtime_error("Hardware decoder reported a damaged indexed picture");
+            if(anchor&&pts<anchorPts) {
+                if(pts<=leading||
+                   !std::binary_search(anchor->decodableLeading.begin(),anchor->decodableLeading.end(),pts))
+                    throw std::runtime_error("Unverified leading picture at "+std::to_string(pts)+
+                        " (frame PTS "+std::to_string(frame->pts)+", target IRAP "+
+                        std::to_string(anchorPts)+", type "+std::to_string(anchor->kind)+")");
+                leading=pts;
+                continue;
+            }
+            if(pts!=source.timestamps[++cursor.index]||
+               (anchor&&pts==anchorPts&&!(frame->flags&AV_FRAME_FLAG_KEY)))
+                throw std::runtime_error("Hardware decoder changed the original PTS sequence");
+        }
+        source.index=target;
+        source.decoded+=decoder.frames-beganWith;
+        source.decodeSeconds+=decoder.decode_s-decodeAtStart;
     }
 
     void open_device() {
@@ -91,7 +231,8 @@ public:
         :gpu(compositor),normalize(compositor,w,h),width(w),height(h),project(isProject) {
         std::uint32_t header=0;
         read(file,&header,sizeof(header));
-        if(header!=(project?0x32445356u:0x31445356u))
+        indexed=project&&header==0x33445356u;
+        if(!indexed&&header!=(project?0x32445356u:0x31445356u))
             throw std::runtime_error("Invalid resident source manifest");
         av_log_set_level(AV_LOG_ERROR);
         std::uint32_t videos=2,stills=1;
@@ -114,6 +255,7 @@ public:
         for(unsigned i=0;i<videos;++i) {
             sources[i].slot=slot_for(i);
             source(file,sources[i],count);
+            open_source(sources[i],i);
         }
         std::vector<Pixel> overlay(stills?std::size_t(w)*h:0);
         for(unsigned i=0;i<stills;++i) {
@@ -130,11 +272,8 @@ public:
         for(auto& input:sources) {
             const auto target=int(input.frames[frame]);
             if(target<0||target==input.index) continue;
-            auto& decoder=*input.decoder;
-            while(input.index<target) {
-                if(!decoder.next()||decoder.frame->best_effort_timestamp!=input.timestamps[++input.index])
-                    throw std::runtime_error("Hardware decoder changed the original PTS sequence");
-            }
+            auto& decoder=*input.playback->decoder;
+            advance(input,target);
             AVFrame* picture=decoder.frame;
             const auto& d=input.description;
             if(picture->format!=AV_PIX_FMT_D3D11||picture->width!=int(d.codedWidth)||
@@ -178,8 +317,21 @@ public:
         for(unsigned i=0;i<sources.size();++i) {
             if(i)stream<<",";
             const auto& source=sources[i];
-            stream<<"{\"decoded_pictures\":"<<source.decoder->frames<<",\"selected_pictures\":"<<source.used
-                  <<",\"decode_wall_seconds\":"<<source.decoder->decode_s
+            stream<<"{\"decoded_pictures\":"<<source.decoded<<",\"selected_pictures\":"<<source.used
+                  <<",\"decode_wall_seconds\":"<<source.decodeSeconds
+                  <<",\"seek_wall_seconds\":"<<source.seekSeconds
+                  <<",\"decoder_reused\":"<<(source.reused?"true":"false")
+                  <<",\"seek_points\":[";
+            bool comma=false;
+            for(const auto* point:source.seeks) {
+                if(comma) stream<<',';
+                comma=true;
+                stream<<"{\"picture_index\":"<<point->picture
+                      <<",\"pts\":"<<source.timestamps[point->picture]<<",\"dts\":"<<point->dts
+                      <<",\"packet_position\":"<<point->position<<",\"nal_type\":"<<point->kind
+                      <<",\"decodable_leading_pictures\":"<<point->decodableLeading.size()<<'}';
+            }
+            stream<<']'
                   <<",\"normalization_ms\":"<<source.normalizationMs
                   <<",\"source_cpu_transfer_bytes\":0,\"original_pts_verified\":true}";
         }

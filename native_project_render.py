@@ -4,6 +4,7 @@ import json
 import os
 from pathlib import Path
 import re
+import shutil
 import subprocess
 import tempfile
 from threading import Event, Thread
@@ -47,7 +48,7 @@ def collect(path):
     samples = result.pop("samples")
     result["frames"] = len(samples)
     for key in ("work_ms","gpu_ms","upload_ms","readback_ms","write_ms","dispatch_ms",
-                "color_gpu_ms","source_normalization_ms"):
+                "color_gpu_ms","pq_copy_gpu_ms","source_normalization_ms"):
         values = [frame[key] for frame in samples if frame.get(key) is not None]
         if values:
             result[key] = {name:round(float(np.percentile(values,rank)),6) for name,rank in
@@ -67,10 +68,19 @@ def stop(process):
 
 
 @contextmanager
-def temporary_work(parent):
+def temporary_work(parent,diagnostics=None):
     temp = tempfile.TemporaryDirectory(prefix="native-project-",dir=parent)
     try:
         yield Path(temp.name)
+    except Exception:
+        # A qualification caller can inspect why its candidate fell back,
+        # even when the producer stopped before writing a complete receipt.
+        if diagnostics is not None:
+            with suppress(OSError):
+                diagnostics.mkdir(exist_ok=True)
+                for path in Path(temp.name).glob("*.log"):
+                    shutil.copyfile(path,diagnostics/path.name)
+        raise
     finally:
         for attempt in range(6):
             try:
@@ -224,18 +234,19 @@ class ProjectVideo:
         return receipt
 
 
-def probe_frames(path,cancelled=lambda:False):
+def probe_frames(path,cancelled=lambda:False,timeout=90):
     return json.loads(run_capture(["ffprobe","-v","error","-select_streams","v:0","-show_frames",
                                    "-show_entries","frame=pts:frame_side_data","-of","json",path],
-                                  cancelled=cancelled)[0])["frames"]
+                                  timeout=timeout,cancelled=cancelled)[0])["frames"]
 
 
 def compare_project(reference, candidate, program, work, cancelled=lambda:False):
     """Compare delivered masters independently of the GPU worker and encoder."""
     baseline = hdr10plus_export.media(reference)
     output = hdr10plus_export.media(candidate)
-    reference_frames = probe_frames(reference,cancelled)
-    candidate_frames = probe_frames(candidate,cancelled)
+    probe_timeout=max(90,len(program.frames)//4)
+    reference_frames = probe_frames(reference,cancelled,probe_timeout)
+    candidate_frames = probe_frames(candidate,cancelled,probe_timeout)
     video_clock = [int(frame["pts"]) for frame in candidate_frames]
     exact_pts = (len(video_clock)==len(program.frames) and video_clock==[int(f["pts"]) for f in reference_frames]
                  and all(pts*program.fps==index*120000 for index,pts in enumerate(video_clock)))
@@ -255,7 +266,7 @@ def compare_project(reference, candidate, program, work, cancelled=lambda:False)
     audio_exact = audio_declared and pcm(reference)==pcm(candidate)
     _,errors = run_capture(["ffmpeg","-v","info","-threads","2","-i",reference,"-threads","2","-i",
                             candidate,"-lavfi","psnr=stats_file=psnr.log","-an","-f","null","-"],
-                           cwd=work,timeout=180,cancelled=cancelled)
+                           cwd=work,timeout=max(180,len(program.frames)//2),cancelled=cancelled)
     average = re.search(rb"average:([\d.]+|inf)",errors)
     scores = re.findall(r"psnr_avg:([\d.]+|inf)",(work/"psnr.log").read_text(encoding="ascii"))
     if not average or not scores:
@@ -302,7 +313,7 @@ def repair_gop(state,program,work,index,static,native,cancelled):
 def export_native(state,destination,reference,executable,runtime,*,authoring=None,timeout=240,
                   cancelled=lambda:False,progress=lambda *_:None,mode="gpu32",fault=None,diagnostics=None,
                   fallback=None,record=None,scratch=None,publish=os.link,repair=True,first_time=False,
-                  camera_range=False,parallel_x265=False):
+                  camera_range=False,parallel_x265=False,keyframe_seek=True):
     destination = destination.resolve()
     if publish is os.link and destination.exists():
         raise FileExistsError("Choose a new output path")
@@ -322,12 +333,13 @@ def export_native(state,destination,reference,executable,runtime,*,authoring=Non
     result["verification_policy"] = "first-export-sampled" if first_time else "full-master"
     if camera_range:
         result["camera_range_experiment"] = True
+        result["keyframe_seek"] = keyframe_seek
         result["requested_x265_pool_workers"] = 8 if parallel_x265 else 2
     started = time.perf_counter()
     publishing = False
     native = None
     try:
-        with temporary_work(scratch or destination.parent) as work:
+        with temporary_work(scratch or destination.parent,diagnostics) as work:
             count = hdr10plus_master.preflight(state)
             program = compile_project(state,work)
             if count!=len(program.frames):
@@ -340,7 +352,8 @@ def export_native(state,destination,reference,executable,runtime,*,authoring=Non
                     any(destination.samefile(source) for source in original_sources)):
                     raise ValueError("Choose a destination different from source media")
             write_plan(work/"plan.bin",program)
-            clocks=write_sources(work/"sources.bin",program,cancelled,first_time=first_time,camera_range=camera_range)
+            clocks=write_sources(work/"sources.bin",program,cancelled,first_time=first_time,camera_range=camera_range,
+                                 keyframe_seek=camera_range and keyframe_seek)
             result.update(frames=count,prepare_seconds=time.perf_counter()-started)
             static,master = work/"static.mp4",work/"master.mp4"
             worker_mode="gpu32-first-export" if first_time else mode

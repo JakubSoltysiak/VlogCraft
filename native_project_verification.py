@@ -19,13 +19,18 @@ import timing
 READ = re.compile(rb"Read frame with in pts (-?\d+), out pts (-?\d+)")
 WRITE = re.compile(rb"Writing frame with pts (-?\d+) to pts (-?\d+)")
 
+# The physical camera-range qualification tool opts in to longer trials.
+# Application admission retains the original 120-picture fixture contract.
+CAMERA_RANGE_FRAMES = 3600
+
 
 def eligible(state,program,*,camera_range=False):
     flat=sequences.playback(state)
     output=flat["output"]
     contract=color_management.validate_output(output["color"])
+    frame_limit=CAMERA_RANGE_FRAMES if camera_range else 120
     if ((program.width,program.height,program.fps)!=(3840,2160,60) or
-        not 2<=len(program.frames)<=120 or len(program.spans)>2 or
+        not 2<=len(program.frames)<=frame_limit or len(program.spans)>2 or
         not ("mastering" in contract and "maxCLL" in contract)):
         raise Ineligible("First export requires a short UHD60 project with complete HDR mastering declarations")
     profile=(output.get("preset"),output.get("crf"),output.get("bitrate",0))
@@ -61,7 +66,7 @@ def source_ids(src,seek,rate,count,base,origin,cancelled=lambda:False):
     render_engine._media_input(command,src.path,"video",float(seek),1,count/rate,rate,"video")
     command+=["-map","0:v:0","-vf",f"setpts=PTS/1,fps={rate}:start_time=0:round=up",
               "-frames:v",str(count),"-f","null","-"]
-    _,logs=run_capture(command,timeout=120,cancelled=cancelled)
+    _,logs=run_capture(command,timeout=max(120,count//4),cancelled=cancelled)
     offset=timing.nearest((origin+seek)/base)
     seen,selected={},{}
     for line in logs.splitlines():
@@ -152,7 +157,7 @@ def compare_samples(flat,candidate,program,work,cancelled):
     filters="select='"+"+".join(f"eq(n,{frame})" for frame in samples)+"'"
     data=run_capture(["ffmpeg","-v","error","-threads","2","-i",candidate,"-vf",filters,
                       "-an","-fps_mode","passthrough","-c:v","rawvideo","-threads:v","1","-f","rawvideo","-"],
-                     cancelled=cancelled)[0]
+                     timeout=max(90,len(program.frames)//4),cancelled=cancelled)[0]
     values=np.frombuffer(data,dtype="<u2").reshape(len(samples),program.width*program.height*3//2)
     scores=[]
     for index,actual in zip(samples,values,strict=True):
@@ -177,7 +182,7 @@ def verify_delivery(flat,contract,candidate,program,clocks,receipt,work,runner,c
     video,audio=hdr10plus_export.media(candidate)
     frames=json.loads(run_capture(["ffprobe","-v","error","-select_streams","v:0","-show_frames",
                                    "-show_entries","frame=pts:frame_side_data","-of","json",candidate],
-                                  cancelled=cancelled)[0])["frames"]
+                                  timeout=max(90,len(program.frames)//4),cancelled=cancelled)[0])["frames"]
     count=len(program.frames)
     end=timing.sample_at(count,program.fps)
     if ((video["width"],video["height"],video["time_base"],video["duration_ts"])!=

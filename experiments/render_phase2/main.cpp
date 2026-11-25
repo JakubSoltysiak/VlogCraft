@@ -202,7 +202,7 @@ int wmain(int argc,wchar_t** argv) {
 #endif
         const double setupMs=milliseconds(setupStart);
 
-        struct Sample { double work, upload, dispatch, shading, readback, write, color, normalize; bool gpuValid; };
+        struct Sample { double work, upload, dispatch, shading, readback, write, color, copy, normalize; bool gpuValid; };
         std::vector<Sample> records(input.frames);
         std::vector<RowRange> coverage(input.height*layerBudget);
         std::vector<Pixel> updated(live?count:0);
@@ -239,6 +239,7 @@ int wmain(int argc,wchar_t** argv) {
                     if(pq) {
                         accelerator->stream_pq(std::cout,measured);
                         value.color=accelerator->colorMs;
+                        value.copy=accelerator->copyMs;
                         value.write=accelerator->outputMs;
                     } else if(pipe) accelerator->download_gbr(planes.data());
                     else accelerator->download(pixels.data());
@@ -320,6 +321,8 @@ int wmain(int argc,wchar_t** argv) {
             if(pq) {
                 stats<<",\"color_gpu_ms\":";
                 if(row.color>=0) stats<<row.color; else stats<<"null";
+                stats<<",\"pq_copy_gpu_ms\":";
+                if(row.copy>=0) stats<<row.copy; else stats<<"null";
             }
             if(resident) stats<<",\"source_normalization_ms\":"<<row.normalize;
             stats<<'}';
