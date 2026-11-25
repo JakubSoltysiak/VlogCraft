@@ -6880,9 +6880,9 @@
       "cause": "The old binding checked the historical Phase 3A measurement against changed Phase 3B source. CI now verifies Phase 3A using its archived commit, then checks the new record."
     }
   ],
-  "source_fingerprint": "0206a37cdb1b30e4dce9c21b60cc371699d7d3f743596cd21fd434d38aa4cc6f",
+  "source_fingerprint": "1b99bbf648915497f3cddcb53b323bea15931e7a7cd8509586ced791caa9c0bc",
   "fingerprint_method": "SHA256 sorted relevant relative path + NUL + LF-normalized source + NUL",
-  "benchmark_protocol_fingerprint": "2b6e85a8099a1bf1155daaab87e90a25157e7910c554cfaeddaa8a2012a09227",
+  "benchmark_protocol_fingerprint": "dc5b629abcb9893fc192586a2da60d292722568229a726349dcbe6ff5d9de291",
   "benchmark_protocol_fingerprint_method": "SHA256 sorted benchmark driver/observer relative path + NUL + LF-normalized source + NUL",
   "follow_up": {
     "status": "development checkpoint",
@@ -82883,5 +82883,37 @@
       "full_master_verified": false,
       "system_observation": "Power-off request and subsequent kernel power transition after last progress receipt."
     }
+  },
+  "camera_first_export_sdr48": {
+    "source_checkpoint": "20379dae9e1cedb97d3688da8828c9cad3469409",
+    "scope": "CLI-only short HEVC camera-range first export; upright SDR span on the actual edited-minute timeline",
+    "first_frame": 2314,
+    "frames": 48,
+    "canvas": [
+      3840,
+      2160
+    ],
+    "rate": "60/1",
+    "requires_reference_before_first_export": false,
+    "native_seconds": 84.183,
+    "managed_seconds": 105.123,
+    "independent_comparison_seconds": 3.59,
+    "native_preparation_seconds": 9.573,
+    "render_seconds": 58.924,
+    "encoder_feed_and_wait_seconds": 58.359,
+    "encoder_cpu_seconds": 114.703,
+    "author_seconds": 1.93,
+    "runtime_verify_seconds": 13.743,
+    "native_bytes": 675727,
+    "managed_bytes": 678911,
+    "output_pq_psnr_db": 54.585,
+    "minimum_picture_psnr_db": 53.47,
+    "exact_pts": true,
+    "exact_pcm": true,
+    "samples_per_channel": 38400,
+    "hdr10plus_picture_associations": 48,
+    "source_identities_preserved": true,
+    "source_software_frame_transfers": 0,
+    "scope_note": "Measured prior to the long-PQ-packet-index extension on the same upright SDR implementation. Health of a complete 78,427-picture project remains unverified."
   }
 }
