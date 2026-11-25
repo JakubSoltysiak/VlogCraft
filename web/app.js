@@ -562,7 +562,8 @@ async function startExport(){
  }catch(e){toast('Export: '+e.message,true);}
  finally{if(!started)$('startRender').disabled=false;}
 }
-function beginJobPoll(which,onDone){clearInterval(renderPoll);renderPoll=setInterval(async()=>{try{const d=await request('jobs');const j=d[which];if(which==='export'){
+function paintExportJob(j){
+  $('renderProgress').hidden=false;
   $('renderMessage').textContent=j.message;$('renderPercent').textContent=j.percent+'%';$('renderBar').style.width=j.percent+'%';$('renderResult').textContent=j.error||j.path||'';
   const details=[];
   if(j.segment && j.stage!=='final-mux')details.push('Segment '+j.segment+' / '+j.segments);
@@ -576,8 +577,10 @@ function beginJobPoll(which,onDone){clearInterval(renderPoll);renderPoll=setInte
   if(j.fallback)details.push(j.fallback);
   $('renderDetails').textContent=details.join(' · ');
   $('openExportFolder').hidden=j.status!=='done' || !document.documentElement.classList.contains('native-ready');
- }else{$('diskHint').textContent=j.message;}
- if(['done','error','cancelled'].includes(j.status)){clearInterval(renderPoll);renderPoll=null;$('startRender').disabled=false;$('cancelRender').hidden=true;if(which==='export'&&j.status==='done')toast('Export saved: '+j.path);if(j.status==='error')toast(j.error||'Render failed',true);onDone?.(j);}
+}
+function beginJobPoll(which,onDone){clearInterval(renderPoll);renderPoll=setInterval(async()=>{try{const d=await request('jobs');const j=d[which];if(which==='export')paintExportJob(j);
+ else $('diskHint').textContent=j.message;
+ if(['done','error','cancelled','interrupted'].includes(j.status)){clearInterval(renderPoll);renderPoll=null;$('startRender').disabled=false;$('cancelRender').hidden=true;if(which==='export'&&j.status==='done')toast('Export saved: '+j.path);if(j.status==='error')toast(j.error||'Render failed',true);onDone?.(j);}
  }catch(e){clearInterval(renderPoll);renderPoll=null;toast(e.message,true);}},900);}
 function proposalText(){let t=$('proposalJson').value.trim();if(t.startsWith('```'))t=t.replace(/^```(?:json)?\s*/,'').replace(/\s*```$/,'');return JSON.parse(t);}
 async function makeReviewPack(){try{await flushSave();$('reviewStatus').textContent='Rendering program frames locally…';const r=await request('review','POST',$('reviewCurrentFrame').checked?{frames:[Math.min(frameIndex(playhead),Math.max(0,frameIndex(duration())-1))]}:{});$('reviewPackLink').href=r.url;$('reviewPackLink').hidden=false;$('reviewStatus').textContent=`Review ZIP ready: ${r.frames} frames, ${fileSize(r.bytes)}. No full-size footage included.`;}catch(e){$('reviewStatus').textContent=e.message;}}

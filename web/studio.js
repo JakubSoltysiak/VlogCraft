@@ -177,7 +177,7 @@ async function openExport(){
   choice.disabled=true;choice.replaceChildren(new Option('Checking local encoders…',''));
   $('startRender').disabled=true;
   try{
-    const [available,nativeProject]=await Promise.all([request('encoders'),request('export/native-project')]);
+    const [available,nativeProject,jobs]=await Promise.all([request('encoders'),request('export/native-project'),request('jobs')]);
     $('exportWorkflow').dataset.nativeProjectAvailable=nativeProject.available&&available.libx265?'yes':'';
     choice.replaceChildren(...Object.entries(available).map(([id,label])=>new Option(label,id)));
     for(const option of $('exportWorkflow').options){
@@ -186,7 +186,8 @@ async function openExport(){
     choice.value=available[out.encoder]?out.encoder:'libx264';
     if(!choice.value)choice.selectedIndex=0;
     if(state.output.color?.output==='hdr10')choice.value='libx265';
-    $('startRender').disabled=!choice.value || (await request('jobs')).export.status==='rendering';
+    $('startRender').disabled=!choice.value || jobs.export.status==='rendering';
+    if(jobs.export.status==='interrupted')paintExportJob(jobs.export);
   }catch(error){toast('Encoder check failed: '+error.message,true);}
   finally{updateExportWorkflow();}
 }

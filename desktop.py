@@ -39,6 +39,7 @@ def run(project):
 
     for folder in (server.MEDIA, server.THUMBS, server.PROXIES, server.REVIEWS, server.EXPORTS):
         folder.mkdir(parents=True, exist_ok=True)
+    server.reconcile_export_jobs()
     # A window owns this cache exclusively. These are interrupted transfers.
     for part in server.MEDIA.glob('*.part'):
         if len(part.stem) == 32 and all(c in '0123456789abcdef' for c in part.stem):
