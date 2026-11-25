@@ -82883,5 +82883,119 @@
       "full_master_verified": false,
       "system_observation": "Power-off request and subsequent kernel power transition after last progress receipt."
     }
+  },
+  "two_slot_overlap_followup": {
+    "retained_cut_analysis": {
+      "scope": "Retained recorder-off status samples for the original synchronized fixture. This reconstruction groups skip charges between sampled submissions; it does not recover the order of individual skipped frames or the reason for any missing picture.",
+      "method": "For each raw sample add the change in Present calls and the change in skips to the base completed sequence frame. Count a backward cut only when it lies strictly between consecutive reconstructed submitted frames in a window with a positive skip delta.",
+      "applicability": "Each compared receipt has one active transport generation from base through drain, zero nonadvancing redraws and zero backwards draws. Its endpoint Present, submission and distinct counts are equal. Reconstructed submitted frames are nondecreasing, agree with the known 0 and 3599 endpoints, and never exceed the corresponding raw reported clock target.",
+      "backward_cut_count": 39,
+      "backward_cut_spacing_frames": 90,
+      "results": {
+        "timestamped_queues": {
+          "R": {
+            "sampler_status_rows": 106,
+            "last_submitted_frames_reconstructed": [
+              0,
+              3599
+            ],
+            "total_skips": 0,
+            "skip_windows": 0,
+            "skip_windows_with_backward_cut_strictly_inside": 0,
+            "distinct_backward_cuts_inside_skip_windows": 0,
+            "skips_in_windows_with_backward_cut_strictly_inside": 0,
+            "cut_windows_witnessed_with_clock_at_or_past_cut_while_submission_precedes_it": 0,
+            "nearest_observed_last_submission_distance_before_cut_frames": {}
+          },
+          "F": {
+            "sampler_status_rows": 88,
+            "last_submitted_frames_reconstructed": [
+              0,
+              3599
+            ],
+            "total_skips": 1021,
+            "skip_windows": 64,
+            "skip_windows_with_backward_cut_strictly_inside": 39,
+            "distinct_backward_cuts_inside_skip_windows": 39,
+            "skips_in_windows_with_backward_cut_strictly_inside": 901,
+            "cut_windows_witnessed_with_clock_at_or_past_cut_while_submission_precedes_it": 20,
+            "nearest_observed_last_submission_distance_before_cut_frames": {
+              "1": 6,
+              "2": 12,
+              "3": 1,
+              "4": 1
+            }
+          }
+        },
+        "fenced_publication": {
+          "R": {
+            "sampler_status_rows": 108,
+            "last_submitted_frames_reconstructed": [
+              0,
+              3599
+            ],
+            "total_skips": 54,
+            "skip_windows": 2,
+            "skip_windows_with_backward_cut_strictly_inside": 0,
+            "distinct_backward_cuts_inside_skip_windows": 0,
+            "skips_in_windows_with_backward_cut_strictly_inside": 0,
+            "cut_windows_witnessed_with_clock_at_or_past_cut_while_submission_precedes_it": 0,
+            "nearest_observed_last_submission_distance_before_cut_frames": {}
+          },
+          "F": {
+            "sampler_status_rows": 95,
+            "last_submitted_frames_reconstructed": [
+              0,
+              3599
+            ],
+            "total_skips": 1036,
+            "skip_windows": 42,
+            "skip_windows_with_backward_cut_strictly_inside": 39,
+            "distinct_backward_cuts_inside_skip_windows": 39,
+            "skips_in_windows_with_backward_cut_strictly_inside": 1020,
+            "cut_windows_witnessed_with_clock_at_or_past_cut_while_submission_precedes_it": 29,
+            "nearest_observed_last_submission_distance_before_cut_frames": {
+              "2": 29
+            }
+          }
+        },
+        "two_slot_overlap": {
+          "R": {
+            "sampler_status_rows": 114,
+            "last_submitted_frames_reconstructed": [
+              0,
+              3599
+            ],
+            "total_skips": 11,
+            "skip_windows": 4,
+            "skip_windows_with_backward_cut_strictly_inside": 1,
+            "distinct_backward_cuts_inside_skip_windows": 1,
+            "skips_in_windows_with_backward_cut_strictly_inside": 1,
+            "cut_windows_witnessed_with_clock_at_or_past_cut_while_submission_precedes_it": 0,
+            "nearest_observed_last_submission_distance_before_cut_frames": {}
+          },
+          "F": {
+            "sampler_status_rows": 90,
+            "last_submitted_frames_reconstructed": [
+              0,
+              3599
+            ],
+            "total_skips": 1066,
+            "skip_windows": 41,
+            "skip_windows_with_backward_cut_strictly_inside": 39,
+            "distinct_backward_cuts_inside_skip_windows": 39,
+            "skips_in_windows_with_backward_cut_strictly_inside": 1035,
+            "cut_windows_witnessed_with_clock_at_or_past_cut_while_submission_precedes_it": 23,
+            "nearest_observed_last_submission_distance_before_cut_frames": {
+              "2": 20,
+              "4": 1,
+              "7": 1,
+              "10": 1
+            }
+          }
+        }
+      },
+      "outgoing_tail_question": "The stalled-at-cut-minus-two observation places the last submitted frame before the final outgoing picture. These receipts do not tell whether that outgoing picture had a proved source interval or an eligible completed transfer during the stall."
+    }
   }
 }
