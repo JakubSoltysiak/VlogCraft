@@ -147,8 +147,13 @@ public:
 
     // No capacity wait and no GPU-completion wait. The producer still takes
     // FFmpeg's recursive lock to use the immediate context.
+    int trySubmit(const AVFrame* frame, uint64_t generation) {
+        return trySubmit(frame, generation, {}, []{return true;});
+    }
+
+    template<class StillWanted>
     int trySubmit(const AVFrame* frame, uint64_t generation,
-                  const std::weak_ptr<AVFrame>& sourceIdentity = {}) {
+                  const std::weak_ptr<AVFrame>& sourceIdentity, StillWanted&& stillWanted) {
         {
             std::lock_guard<std::mutex> lock(mutex_);
             if (!current(generation)) return -1;
@@ -181,7 +186,7 @@ public:
         Clock::time_point submitted{};
         {
             ProducerLock lock(producer_);
-            if (active(generation)) {
+            if (active(generation) && stillWanted()) {
                 acquired = slot.producerKey->AcquireSync(producerKey, 0);
                 if (acquired == S_OK) {
                     auto* context = producer_->device_context;

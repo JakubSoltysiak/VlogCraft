@@ -35,6 +35,39 @@ std::array<int64_t, 3> bufferedTicks(Producer& producer, Clip& clip) {
     return {first, second, third};
 }
 
+void checkSupersededCopy(Producer& producer, ID3D11Device* consumer, int64_t generation) {
+    using State = PictureHandoff::State;
+    Frame first, second, third;
+    {
+        std::lock_guard<std::mutex> lock(producer.guard);
+        first = producer.current;
+        second = producer.queue[0];
+        third = producer.queue[1];
+    }
+    PlaybackPictureLane lane(first, "superseded", consumer);
+    {
+        DeviceLock blockCopy(producer);
+        require(!lane.select(first, first, second, generation), "blocked floor acquired before selection changed");
+        const auto deadline = Clock::now() + 5s;
+        while (lane.snapshot().slots[0].state != State::CopySubmitting) {
+            require(Clock::now() < deadline, "floor did not reach copy submission");
+            Sleep(1);
+        }
+        require(!lane.select(second, second, third, generation), "new floor acquired while device lock held");
+    }
+    const auto deadline = Clock::now() + 5s;
+    auto state = lane.snapshot();
+    while (state.submissions < 2) {
+        require(Clock::now() < deadline, "updated floor and successor did not submit");
+        Sleep(1);
+        state = lane.snapshot();
+    }
+    const auto a = state.slots[0].sourceIdentity.lock();
+    const auto b = state.slots[1].sourceIdentity.lock();
+    require(state.submissions == 2 && ((a == second && b == third) || (a == third && b == second)),
+            "superseded floor was copied after the lock became available");
+}
+
 void run(const char* fixture) {
     Clip primaryClip, peerClip;
     primaryClip.asset = "primary";
@@ -57,6 +90,7 @@ void run(const char* fixture) {
           D3D11_SDK_VERSION, &consumer, nullptr, nullptr), "consumer device");
     PlaybackHandoff handoff;
     constexpr int64_t playing = 1, seek = 2;
+    checkSupersededCopy(primary, consumer.Get(), playing);
 
     auto service = [&](int64_t frame, int64_t tick, int64_t generation) {
         bool ready = false;
@@ -161,7 +195,7 @@ void run(const char* fixture) {
     // with an outstanding or freshly prepared copy. Ring teardown owns drain.
     handoff.trim({});
     std::cout << "{\"scheduler\":\"passed\",\"clock_advanced_while_copy_blocked\":true,"
-                 "\"two_slots_submitted_before_consumer_poll\":true,"
+                 "\"two_slots_submitted_before_consumer_poll\":true,\"superseded_copy_suppressed\":true,"
                  "\"successor_prepared_while_peer_unavailable\":true,\"slot_reused\":true,"
                  "\"seek_invalidated_picture\":true,\"teardown_completed\":true}\n";
 }

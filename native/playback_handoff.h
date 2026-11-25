@@ -16,6 +16,11 @@ class PlaybackPictureLane {
     PictureHandoff::Picture lease_;
     std::thread worker_;
 
+    bool requests(const Frame& picture) const {
+        return std::any_of(desired_.begin(),desired_.end(),
+                           [&](const auto& frame){return frame.lock() == picture;});
+    }
+
     Frame missing(const PictureHandoff::Snapshot& state) const {
         using State = PictureHandoff::State;
         if (std::none_of(state.slots.begin(),state.slots.end(),
@@ -41,9 +46,14 @@ class PlaybackPictureLane {
                 if (auto frame = missing(state)) {
                     const auto generation = generation_;
                     lock.unlock();
-                    const auto slot = ring_.trySubmit(frame.get(),generation,frame);
+                    const auto slot = ring_.trySubmit(frame.get(),generation,frame,[&]{
+                        // The decoder lock can delay enqueue until the clock has
+                        // moved on. Recheck the exact request after acquiring it.
+                        std::lock_guard<std::mutex> guard(guard_);
+                        return !stopping_ && generation == generation_ && requests(frame);
+                    });
                     lock.lock();
-                    if (slot < 0 && !stopping_ && generation == generation_)
+                    if (slot < 0 && !stopping_ && generation == generation_ && requests(frame))
                         changed_.wait_for(lock,std::chrono::milliseconds(1));
                     // Both slots can be submitted before the first completes.
                     continue;
