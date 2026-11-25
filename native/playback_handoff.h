@@ -80,9 +80,10 @@ class PlaybackPictureLane {
 public:
     const void* const pool;
     const std::string asset;
-    PlaybackPictureLane(const Frame& prototype, const std::string& source, ID3D11Device* consumer)
+    PlaybackPictureLane(const Frame& prototype, const std::string& source, ID3D11Device* consumer,
+                        PictureHandoffTrace* trace = nullptr, int lane = -1)
         : ring_(static_cast<AVD3D11VADeviceContext*>(reinterpret_cast<AVHWFramesContext*>(
-              prototype->hw_frames_ctx->data)->device_ctx->hwctx),consumer,prototype.get(),0,true),
+              prototype->hw_frames_ctx->data)->device_ctx->hwctx),consumer,prototype.get(),0,true,trace,lane),
           pool(prototype->hw_frames_ctx->data), asset(source) {
         worker_ = std::thread([this]{transfer();});
     }
@@ -120,7 +121,9 @@ public:
             changed_.notify_one();
         }
     }
-    PictureHandoff::Picture select(const Frame& selected, const Frame& floor, const Frame& next, int64_t transport) {
+    PictureHandoff::Picture select(const Frame& selected, const Frame& floor, const Frame& next, int64_t transport,
+                                   int64_t sequence = -1) {
+        ring_.traceSelection("select",sequence,transport,selected.get());
         retire();
         std::lock_guard<std::mutex> lock(guard_);
         if (failure_) std::rethrow_exception(failure_);
@@ -137,6 +140,7 @@ public:
         auto first = selected ? selected : floor;
         bool updated = desired_[0].lock() != first || desired_[1].lock() != next;
         desired_ = {first,next};
+        if (updated) ring_.traceSelection("lookahead",sequence,transport,next.get());
         bool discard = false;
         for (int i = 0; i < PictureHandoff::slotCount; ++i) {
             const auto& slot = state.slots[i];
@@ -159,8 +163,10 @@ public:
 };
 
 struct PlaybackHandoff {
+    PictureHandoffTrace* trace;
     std::array<std::unique_ptr<PlaybackPictureLane>,3> lanes;
     std::array<PictureHandoff::Picture,3> pictures{};
+    explicit PlaybackHandoff(PictureHandoffTrace* capture = nullptr) : trace(capture) {}
     void trim(const std::map<std::string,bool>& wanted) {
         for (auto& lane : lanes) if (lane && !wanted.count(lane->asset)) lane.reset();
     }
@@ -175,11 +181,11 @@ struct PlaybackHandoff {
                 throw std::runtime_error("independent handoff requires hardware decode");
             if (!lane || lane->pool != prototype->hw_frames_ctx->data) {
                 lane.reset();
-                lane = std::make_unique<PlaybackPictureLane>(prototype,clip.asset,device);
+                lane = std::make_unique<PlaybackPictureLane>(prototype,clip.asset,device,trace,(int)i);
             }
             if (next && (!next->hw_frames_ctx || next->hw_frames_ctx->data != lane->pool)) next.reset();
         }
-        pictures[i] = lane ? lane->select(selected,floor,next,generation) : PictureHandoff::Picture{};
+        pictures[i] = lane ? lane->select(selected,floor,next,generation,frame) : PictureHandoff::Picture{};
         return bool(pictures[i]);
     }
 };

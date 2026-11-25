@@ -1,6 +1,7 @@
 #pragma once
 
 #include "media.h"
+#include "picture_handoff_trace.h"
 #include <d3d11_4.h>
 #include <dxgi1_2.h>
 #include <wrl/client.h>
@@ -54,8 +55,10 @@ public:
     };
 
     PictureHandoff(AVD3D11VADeviceContext* producer, ID3D11Device* consumer,
-                   const AVFrame* prototype, uint64_t generation = 1, bool preferFence = false)
-        : producer_(producer), consumer_(consumer) {
+                   const AVFrame* prototype, uint64_t generation = 1, bool preferFence = false,
+                   PictureHandoffTrace* trace = nullptr, int lane = -1)
+        : producer_(producer), consumer_(consumer), trace_(trace),
+          traceRing_(trace ? trace->openRing() : 0), traceLane_(lane) {
         const auto* frames = sourceFrames(prototype);
         if (!producer_ || !consumer_ || !frames || !producer_->device ||
             frames->device_ctx->hwctx != producer_ || !producer_->device_context ||
@@ -115,6 +118,10 @@ public:
 
     bool usingFence() const { return bool(copyFence_) && !signalFailed_.load(); }
 
+    void traceSelection(const char* event, int64_t sequence, int64_t transport, const AVFrame* frame) const {
+        if (trace_) trace_->add(event,traceRing_,traceLane_,transport,sequence,-1,0,frame);
+    }
+
     Snapshot snapshot() const {
         std::lock_guard<std::mutex> lock(mutex_);
         return state_;
@@ -161,11 +168,13 @@ public:
         auto* texture = validatedTexture(frame);
         const UINT slice = static_cast<UINT>(reinterpret_cast<intptr_t>(frame->data[1]));
         int index;
+        uint64_t serial;
         {
             std::lock_guard<std::mutex> lock(mutex_);
             if (!current(generation)) return -1;
             index = reserve(frame, generation, sourceIdentity);
             if (index < 0) return -1;
+            serial = state_.slots[index].serial;
         }
         auto& slot = slots_[index];
         const int ref = av_frame_ref(slot.source.get(), frame);
@@ -184,8 +193,13 @@ public:
         double cpuMs = 0;
         UINT64 fencePoint = 0;
         Clock::time_point submitted{};
+        auto traceSubmission = [&](const char* step, int64_t value = 0) {
+            if (trace_) trace_->add(step,traceRing_,traceLane_,generation,-1,index,serial,nullptr,value);
+        };
         {
+            traceSubmission("producer_lock_begin");
             ProducerLock lock(producer_);
+            traceSubmission("producer_lock_return");
             if (active(generation) && stillWanted()) {
                 acquired = slot.producerKey->AcquireSync(producerKey, 0);
                 if (acquired == S_OK) {
@@ -194,6 +208,7 @@ public:
                     context->End(slot.copyBegin.Get());
                     const auto began = Clock::now();
                     context->CopySubresourceRegion(slot.local.Get(), 0, 0, 0, 0, texture, slice, nullptr);
+                    traceSubmission("copy_issued");
                     cpuMs = seconds(began) * 1000;
                     context->End(slot.copyEnd.Get());
                     context->End(slot.copyDisjoint.Get());
@@ -207,12 +222,14 @@ public:
                     // The consumer cannot acquire this slot until CPU-side
                     // fence observation separately publishes Ready.
                     slot.keyReleaseResult = fencePoint ? slot.producerKey->ReleaseSync(consumerKey) : S_OK;
+                    traceSubmission("producer_key_release",slot.keyReleaseResult);
                     context->Flush();
                     submitted = Clock::now();
                 }
             }
         }
         if (acquired != S_OK) {
+            traceSubmission("copy_abort",acquired);
             if (acquired != WAIT_TIMEOUT && acquired != S_FALSE) {
                 markFailed();
                 recycle(index);
@@ -229,6 +246,7 @@ public:
             status.fencePoint = fencePoint;
             status.submitted = submitted;
             status.state = State::CopyPending;
+            traceSlot("copy_pending",index,fencePoint);
             ++state_.submissions;
             nextSlot_ = (index + 1) % slotCount;
         }
@@ -294,8 +312,10 @@ public:
     void discardReady(uint64_t generation, int index) {
         std::lock_guard<std::mutex> lock(mutex_);
         auto& status = state_.slots.at(index);
-        if (status.state == State::Ready && status.generation == generation)
+        if (status.state == State::Ready && status.generation == generation) {
             status.state = State::DiscardReady;
+            traceSlot("discard_ready",index);
+        }
     }
 
     // Requesting a specific slot never queues a consumer dependency for an
@@ -322,6 +342,7 @@ public:
                 status.state = State::ConsumerHeld;
                 status.acquired = Clock::now();
                 ++state_.acquisitions;
+                traceSlot("acquire",index);
                 return picture(index);
             }
         }
@@ -346,6 +367,7 @@ public:
         auto& status = state_.slots[lease.slot];
         status.consumerSubmitted = submitted;
         status.state = State::ConsumerPending;
+        traceSlot("consumer_pending",lease.slot);
     }
 
     int pollConsumer() {
@@ -439,6 +461,15 @@ private:
     std::array<Slot, slotCount> slots_;
     mutable std::mutex mutex_;
     Snapshot state_;
+    PictureHandoffTrace* trace_;
+    int traceRing_, traceLane_;
+
+    // Caller holds the metadata mutex.
+    void traceSlot(const char* event, int index, int64_t value = 0) {
+        if (!trace_) return;
+        const auto& status = state_.slots[index];
+        trace_->add(event,traceRing_,traceLane_,status.generation,-1,index,status.serial,nullptr,value);
+    }
 
     static const AVHWFramesContext* sourceFrames(const AVFrame* frame) {
         if (!frame || frame->format != AV_PIX_FMT_D3D11 || !frame->hw_frames_ctx ||
@@ -567,9 +598,12 @@ private:
     }
 
     void discardStaleReady() {
-        for (auto& status : state_.slots) {
-            if (status.state == State::Ready && !current(status.generation))
+        for (int i = 0; i < slotCount; ++i) {
+            auto& status = state_.slots[i];
+            if (status.state == State::Ready && !current(status.generation)) {
                 status.state = State::DiscardReady;
+                traceSlot("discard_stale",i);
+            }
         }
     }
 
@@ -584,6 +618,7 @@ private:
             status.serial = ++serial_;
             status.pts = frame->best_effort_timestamp;
             status.sourceIdentity = sourceIdentity;
+            if (trace_) trace_->add("reserve",traceRing_,traceLane_,generation,-1,i,status.serial,frame);
             unsigned inUse = 0;
             for (const auto& entry : state_.slots) inUse += entry.state != State::Free;
             state_.peakSlots = (std::max)(state_.peakSlots, inUse);
@@ -636,8 +671,10 @@ private:
             status.published = Clock::now();
             status.state = State::Ready;
             ++state_.publications;
+            traceSlot("copy_ready",index);
         } else {
             status.state = State::DiscardReady;
+            traceSlot("copy_ready_stale",index);
         }
         return true;
     }
@@ -655,6 +692,7 @@ private:
             auto& status = state_.slots[index];
             status.state = !discard && current(status.generation) ? State::Ready : State::DiscardReady;
             ++state_.keyTimeouts;
+            traceSlot("consumer_key_timeout",index,discard);
             return false;
         }
         markFailed();
@@ -682,6 +720,7 @@ private:
         status.reusable = Clock::now();
         status.state = State::Free;
         if (discard) ++state_.discarded;
+        traceSlot("recycle",index,discard);
     }
 
     void recoverQuery(int index, ID3D11Device* device, HRESULT query, const char* label) {

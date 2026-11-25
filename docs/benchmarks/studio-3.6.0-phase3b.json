@@ -6880,9 +6880,9 @@
       "cause": "The old binding checked the historical Phase 3A measurement against changed Phase 3B source. CI now verifies Phase 3A using its archived commit, then checks the new record."
     }
   ],
-  "source_fingerprint": "e1d274fb96a37a4baffa374f123e7abc93cd73e15c0c567bb6b5beb9b14a87b2",
+  "source_fingerprint": "778f07d2ca02cd2de4b8c4eda224f0222700a2e2af2f138b37d5ba2cc6700ff6",
   "fingerprint_method": "SHA256 sorted relevant relative path + NUL + LF-normalized source + NUL",
-  "benchmark_protocol_fingerprint": "a2fef20a26d2d7723f6b68d5a243e055c0bdbace4ac3f015ae1be2e17e572d18",
+  "benchmark_protocol_fingerprint": "68fee7823b556a47c02a4be9150fb8787e8fd43ff384a318d600bed4c515d47f",
   "benchmark_protocol_fingerprint_method": "SHA256 sorted benchmark driver/observer relative path + NUL + LF-normalized source + NUL",
   "follow_up": {
     "status": "development checkpoint",
@@ -84573,6 +84573,533 @@
       },
       "interpretation": "The outgoing rewind gate moved the common last submitted witness from cut minus two to cut minus one. The ordinary trial still fails all timing screens. The retained status rows give no incoming transfer slot timeline."
     }
+  },
+  "exact_incoming_handoff_trace": {
+    "source_commit": "ddfc83255f2c994017c835afa481cd008b3dbec9",
+    "build": {
+      "head_at_build": "ddfc83255f2c994017c835afa481cd008b3dbec9",
+      "native_build_inputs_sha256": "59ca73aaf909113ca1fa16f55bdc91bc87e19115214fd5b67c144603ab33e228",
+      "toolchain_archive_sha256": {
+        "zig": "b03f477a1943673e02aca0f570e8030dffd536ce1f45cbc4d3326ec31159562e",
+        "ffmpeg-shared": "4d2060a8b34a940aa47d785142055bb92a63053781e55f2ace4546edd519a8f5"
+      },
+      "worker": {
+        "bytes": 1203712,
+        "sha256": "58931df2a9c41f1cafda7dc427e0ef0fde114f857d0188e272051f3f47a38cfa",
+        "machine": "AMD64"
+      }
+    },
+    "trace": {
+      "capacity": 65536,
+      "stored": 37985,
+      "dropped": 0
+    },
+    "trace_sha256": "6906aff3913b6f2162c4ad2ca7c3c0fbcc49e1ba2ffa62d2a9068734b44fe749",
+    "event_counts": {
+      "select": 14930,
+      "lookahead": 2171,
+      "reserve": 2047,
+      "producer_lock_begin": 2047,
+      "producer_lock_return": 2047,
+      "copy_issued": 2046,
+      "producer_key_release": 2046,
+      "copy_pending": 2046,
+      "copy_ready": 2046,
+      "acquire": 1840,
+      "draw": 604,
+      "consumer_pending": 1840,
+      "recycle": 2047,
+      "discard_ready": 203,
+      "copy_abort": 1,
+      "prime_rewind": 21,
+      "discard_stale": 3
+    },
+    "lifetimes": 2047,
+    "watchdog_requests": [
+      724,
+      724,
+      0
+    ],
+    "physical_preview": [
+      958,
+      539
+    ],
+    "distinct_fps": 48.93778143281436,
+    "skips": 118,
+    "max_active_gap_ms": 495.503,
+    "pcm_sample_frames": 576000,
+    "underruns": 0,
+    "last_frame": 719,
+    "acquired_enqueue_to_observation_ms": {
+      "min": 1.232,
+      "median": 10.107,
+      "max": 70.39
+    },
+    "cut_enqueue_to_observation_ms": {
+      "min": 34.709,
+      "median": 63.264,
+      "max": 121.21
+    },
+    "cut_producer_lock_wait_ms": {
+      "min": 0.0,
+      "median": 0.002,
+      "max": 0.044
+    },
+    "cut_maximum_selection_poll_gap_ms": 5.707,
+    "cut_maximum_last_selection_to_observed_fence_ms": 0.002,
+    "cut_recycle_after_discard_ms": {
+      "min": 0.039,
+      "median": 0.074,
+      "max": 0.416
+    },
+    "cut_copies_enqueued_before_selection": 18,
+    "cuts": [
+      {
+        "first_incoming_frame": 90,
+        "last_draw_before_cut": 89,
+        "next_draw_after_cut": 119,
+        "layers": [
+          {
+            "lane": 1,
+            "selected_pts": 0,
+            "same_pts_exact_identity_changes_on_target": 0,
+            "submitted_ms_relative_to_matching_selection": -10.963,
+            "producer_lock_wait_ms": 0.001,
+            "producer_lock_return_to_copy_issued_ms": 0.048,
+            "copy_issued_to_key_release_ms": 0.248,
+            "enqueue_to_observed_fence_ms": 52.106,
+            "observed_fence_ms_relative_to_matching_selection": 41.143,
+            "largest_selection_poll_gap_ms": 5.573,
+            "last_selection_to_observed_fence_ms": 0.0,
+            "polls_during_pending_copy": 34,
+            "recycle_after_discard_ms": 0.127
+          },
+          {
+            "lane": 2,
+            "selected_pts": 0,
+            "same_pts_exact_identity_changes_on_target": 0,
+            "submitted_ms_relative_to_matching_selection": -11.284,
+            "producer_lock_wait_ms": 0.003,
+            "producer_lock_return_to_copy_issued_ms": 0.068,
+            "copy_issued_to_key_release_ms": 0.175,
+            "enqueue_to_observed_fence_ms": 63.264,
+            "observed_fence_ms_relative_to_matching_selection": 51.98,
+            "largest_selection_poll_gap_ms": 5.579,
+            "last_selection_to_observed_fence_ms": 0.001,
+            "polls_during_pending_copy": 42,
+            "recycle_after_discard_ms": 0.069
+          },
+          {
+            "lane": 3,
+            "selected_pts": 0,
+            "same_pts_exact_identity_changes_on_target": 1,
+            "submitted_ms_relative_to_matching_selection": 0.288,
+            "producer_lock_wait_ms": 0.0,
+            "producer_lock_return_to_copy_issued_ms": 0.042,
+            "copy_issued_to_key_release_ms": 0.17,
+            "enqueue_to_observed_fence_ms": 75.318,
+            "observed_fence_ms_relative_to_matching_selection": 75.606,
+            "largest_selection_poll_gap_ms": 1.772,
+            "last_selection_to_observed_fence_ms": 0.001,
+            "polls_during_pending_copy": 52,
+            "recycle_after_discard_ms": 0.164
+          }
+        ]
+      },
+      {
+        "first_incoming_frame": 180,
+        "last_draw_before_cut": 179,
+        "next_draw_after_cut": 198,
+        "layers": [
+          {
+            "lane": 1,
+            "selected_pts": 0,
+            "same_pts_exact_identity_changes_on_target": 0,
+            "submitted_ms_relative_to_matching_selection": -13.826,
+            "producer_lock_wait_ms": 0.002,
+            "producer_lock_return_to_copy_issued_ms": 0.074,
+            "copy_issued_to_key_release_ms": 0.351,
+            "enqueue_to_observed_fence_ms": 65.445,
+            "observed_fence_ms_relative_to_matching_selection": 51.619,
+            "largest_selection_poll_gap_ms": 5.56,
+            "last_selection_to_observed_fence_ms": 0.0,
+            "polls_during_pending_copy": 39,
+            "recycle_after_discard_ms": 0.145
+          },
+          {
+            "lane": 2,
+            "selected_pts": 0,
+            "same_pts_exact_identity_changes_on_target": 0,
+            "submitted_ms_relative_to_matching_selection": -13.982,
+            "producer_lock_wait_ms": 0.001,
+            "producer_lock_return_to_copy_issued_ms": 0.061,
+            "copy_issued_to_key_release_ms": 0.295,
+            "enqueue_to_observed_fence_ms": 108.577,
+            "observed_fence_ms_relative_to_matching_selection": 94.595,
+            "largest_selection_poll_gap_ms": 5.707,
+            "last_selection_to_observed_fence_ms": 0.001,
+            "polls_during_pending_copy": 69,
+            "recycle_after_discard_ms": 0.074
+          },
+          {
+            "lane": 3,
+            "selected_pts": 0,
+            "same_pts_exact_identity_changes_on_target": 0,
+            "submitted_ms_relative_to_matching_selection": 0.383,
+            "producer_lock_wait_ms": 0.013,
+            "producer_lock_return_to_copy_issued_ms": 0.034,
+            "copy_issued_to_key_release_ms": 0.104,
+            "enqueue_to_observed_fence_ms": 121.21,
+            "observed_fence_ms_relative_to_matching_selection": 121.593,
+            "largest_selection_poll_gap_ms": 2.055,
+            "last_selection_to_observed_fence_ms": 0.001,
+            "polls_during_pending_copy": 82,
+            "recycle_after_discard_ms": 0.062
+          }
+        ]
+      },
+      {
+        "first_incoming_frame": 270,
+        "last_draw_before_cut": 269,
+        "next_draw_after_cut": 277,
+        "layers": [
+          {
+            "lane": 1,
+            "selected_pts": 0,
+            "same_pts_exact_identity_changes_on_target": 0,
+            "submitted_ms_relative_to_matching_selection": -14.837,
+            "producer_lock_wait_ms": 0.003,
+            "producer_lock_return_to_copy_issued_ms": 0.09,
+            "copy_issued_to_key_release_ms": 0.29,
+            "enqueue_to_observed_fence_ms": 34.709,
+            "observed_fence_ms_relative_to_matching_selection": 19.872,
+            "largest_selection_poll_gap_ms": 5.44,
+            "last_selection_to_observed_fence_ms": 0.0,
+            "polls_during_pending_copy": 17,
+            "recycle_after_discard_ms": 0.061
+          },
+          {
+            "lane": 2,
+            "selected_pts": 0,
+            "same_pts_exact_identity_changes_on_target": 0,
+            "submitted_ms_relative_to_matching_selection": -15.097,
+            "producer_lock_wait_ms": 0.002,
+            "producer_lock_return_to_copy_issued_ms": 0.089,
+            "copy_issued_to_key_release_ms": 0.26,
+            "enqueue_to_observed_fence_ms": 42.589,
+            "observed_fence_ms_relative_to_matching_selection": 27.492,
+            "largest_selection_poll_gap_ms": 5.448,
+            "last_selection_to_observed_fence_ms": 0.0,
+            "polls_during_pending_copy": 22,
+            "recycle_after_discard_ms": 0.119
+          },
+          {
+            "lane": 3,
+            "selected_pts": 0,
+            "same_pts_exact_identity_changes_on_target": 0,
+            "submitted_ms_relative_to_matching_selection": -5.051,
+            "producer_lock_wait_ms": 0.035,
+            "producer_lock_return_to_copy_issued_ms": 0.056,
+            "copy_issued_to_key_release_ms": 0.236,
+            "enqueue_to_observed_fence_ms": 59.801,
+            "observed_fence_ms_relative_to_matching_selection": 54.75,
+            "largest_selection_poll_gap_ms": 5.051,
+            "last_selection_to_observed_fence_ms": 0.001,
+            "polls_during_pending_copy": 39,
+            "recycle_after_discard_ms": 0.044
+          }
+        ]
+      },
+      {
+        "first_incoming_frame": 360,
+        "last_draw_before_cut": 359,
+        "next_draw_after_cut": 377,
+        "layers": [
+          {
+            "lane": 1,
+            "selected_pts": 0,
+            "same_pts_exact_identity_changes_on_target": 0,
+            "submitted_ms_relative_to_matching_selection": -14.3,
+            "producer_lock_wait_ms": 0.002,
+            "producer_lock_return_to_copy_issued_ms": 0.073,
+            "copy_issued_to_key_release_ms": 0.347,
+            "enqueue_to_observed_fence_ms": 51.939,
+            "observed_fence_ms_relative_to_matching_selection": 37.639,
+            "largest_selection_poll_gap_ms": 5.369,
+            "last_selection_to_observed_fence_ms": 0.0,
+            "polls_during_pending_copy": 33,
+            "recycle_after_discard_ms": 0.22
+          },
+          {
+            "lane": 2,
+            "selected_pts": 0,
+            "same_pts_exact_identity_changes_on_target": 0,
+            "submitted_ms_relative_to_matching_selection": -14.404,
+            "producer_lock_wait_ms": 0.001,
+            "producer_lock_return_to_copy_issued_ms": 0.059,
+            "copy_issued_to_key_release_ms": 0.357,
+            "enqueue_to_observed_fence_ms": 60.081,
+            "observed_fence_ms_relative_to_matching_selection": 45.677,
+            "largest_selection_poll_gap_ms": 5.37,
+            "last_selection_to_observed_fence_ms": 0.001,
+            "polls_during_pending_copy": 38,
+            "recycle_after_discard_ms": 0.088
+          },
+          {
+            "lane": 3,
+            "selected_pts": 0,
+            "same_pts_exact_identity_changes_on_target": 1,
+            "submitted_ms_relative_to_matching_selection": 0.357,
+            "producer_lock_wait_ms": 0.002,
+            "producer_lock_return_to_copy_issued_ms": 0.139,
+            "copy_issued_to_key_release_ms": 0.157,
+            "enqueue_to_observed_fence_ms": 64.589,
+            "observed_fence_ms_relative_to_matching_selection": 64.946,
+            "largest_selection_poll_gap_ms": 1.906,
+            "last_selection_to_observed_fence_ms": 0.0,
+            "polls_during_pending_copy": 43,
+            "recycle_after_discard_ms": 0.058
+          }
+        ]
+      },
+      {
+        "first_incoming_frame": 450,
+        "last_draw_before_cut": 449,
+        "next_draw_after_cut": 461,
+        "layers": [
+          {
+            "lane": 1,
+            "selected_pts": 0,
+            "same_pts_exact_identity_changes_on_target": 0,
+            "submitted_ms_relative_to_matching_selection": -14.914,
+            "producer_lock_wait_ms": 0.001,
+            "producer_lock_return_to_copy_issued_ms": 0.069,
+            "copy_issued_to_key_release_ms": 0.238,
+            "enqueue_to_observed_fence_ms": 81.39,
+            "observed_fence_ms_relative_to_matching_selection": 66.476,
+            "largest_selection_poll_gap_ms": 5.523,
+            "last_selection_to_observed_fence_ms": 0.001,
+            "polls_during_pending_copy": 49,
+            "recycle_after_discard_ms": 0.218
+          },
+          {
+            "lane": 2,
+            "selected_pts": 0,
+            "same_pts_exact_identity_changes_on_target": 0,
+            "submitted_ms_relative_to_matching_selection": -15.364,
+            "producer_lock_wait_ms": 0.002,
+            "producer_lock_return_to_copy_issued_ms": 0.063,
+            "copy_issued_to_key_release_ms": 0.19,
+            "enqueue_to_observed_fence_ms": 87.684,
+            "observed_fence_ms_relative_to_matching_selection": 72.32,
+            "largest_selection_poll_gap_ms": 5.521,
+            "last_selection_to_observed_fence_ms": 0.0,
+            "polls_during_pending_copy": 53,
+            "recycle_after_discard_ms": 0.042
+          },
+          {
+            "lane": 3,
+            "selected_pts": 0,
+            "same_pts_exact_identity_changes_on_target": 0,
+            "submitted_ms_relative_to_matching_selection": -6.416,
+            "producer_lock_wait_ms": 0.044,
+            "producer_lock_return_to_copy_issued_ms": 0.049,
+            "copy_issued_to_key_release_ms": 0.182,
+            "enqueue_to_observed_fence_ms": 75.431,
+            "observed_fence_ms_relative_to_matching_selection": 69.015,
+            "largest_selection_poll_gap_ms": 5.208,
+            "last_selection_to_observed_fence_ms": 0.001,
+            "polls_during_pending_copy": 49,
+            "recycle_after_discard_ms": 0.098
+          }
+        ]
+      },
+      {
+        "first_incoming_frame": 540,
+        "last_draw_before_cut": 539,
+        "next_draw_after_cut": 550,
+        "layers": [
+          {
+            "lane": 1,
+            "selected_pts": 0,
+            "same_pts_exact_identity_changes_on_target": 0,
+            "submitted_ms_relative_to_matching_selection": -9.588,
+            "producer_lock_wait_ms": 0.003,
+            "producer_lock_return_to_copy_issued_ms": 0.078,
+            "copy_issued_to_key_release_ms": 0.971,
+            "enqueue_to_observed_fence_ms": 61.579,
+            "observed_fence_ms_relative_to_matching_selection": 51.991,
+            "largest_selection_poll_gap_ms": 5.041,
+            "last_selection_to_observed_fence_ms": 0.002,
+            "polls_during_pending_copy": 38,
+            "recycle_after_discard_ms": 0.077
+          },
+          {
+            "lane": 2,
+            "selected_pts": 0,
+            "same_pts_exact_identity_changes_on_target": 0,
+            "submitted_ms_relative_to_matching_selection": -9.703,
+            "producer_lock_wait_ms": 0.002,
+            "producer_lock_return_to_copy_issued_ms": 0.055,
+            "copy_issued_to_key_release_ms": 1.003,
+            "enqueue_to_observed_fence_ms": 69.273,
+            "observed_fence_ms_relative_to_matching_selection": 59.57,
+            "largest_selection_poll_gap_ms": 5.016,
+            "last_selection_to_observed_fence_ms": 0.001,
+            "polls_during_pending_copy": 43,
+            "recycle_after_discard_ms": 0.045
+          },
+          {
+            "lane": 3,
+            "selected_pts": 0,
+            "same_pts_exact_identity_changes_on_target": 0,
+            "submitted_ms_relative_to_matching_selection": -4.782,
+            "producer_lock_wait_ms": 0.001,
+            "producer_lock_return_to_copy_issued_ms": 0.053,
+            "copy_issued_to_key_release_ms": 0.167,
+            "enqueue_to_observed_fence_ms": 73.112,
+            "observed_fence_ms_relative_to_matching_selection": 68.33,
+            "largest_selection_poll_gap_ms": 4.782,
+            "last_selection_to_observed_fence_ms": 0.001,
+            "polls_during_pending_copy": 48,
+            "recycle_after_discard_ms": 0.059
+          }
+        ]
+      },
+      {
+        "first_incoming_frame": 630,
+        "last_draw_before_cut": 629,
+        "next_draw_after_cut": 636,
+        "layers": [
+          {
+            "lane": 1,
+            "selected_pts": 0,
+            "same_pts_exact_identity_changes_on_target": 0,
+            "submitted_ms_relative_to_matching_selection": -15.826,
+            "producer_lock_wait_ms": 0.004,
+            "producer_lock_return_to_copy_issued_ms": 0.131,
+            "copy_issued_to_key_release_ms": 0.318,
+            "enqueue_to_observed_fence_ms": 51.017,
+            "observed_fence_ms_relative_to_matching_selection": 35.191,
+            "largest_selection_poll_gap_ms": 5.533,
+            "last_selection_to_observed_fence_ms": 0.001,
+            "polls_during_pending_copy": 27,
+            "recycle_after_discard_ms": 0.416
+          },
+          {
+            "lane": 2,
+            "selected_pts": 0,
+            "same_pts_exact_identity_changes_on_target": 0,
+            "submitted_ms_relative_to_matching_selection": -16.008,
+            "producer_lock_wait_ms": 0.002,
+            "producer_lock_return_to_copy_issued_ms": 0.083,
+            "copy_issued_to_key_release_ms": 0.351,
+            "enqueue_to_observed_fence_ms": 58.651,
+            "observed_fence_ms_relative_to_matching_selection": 42.643,
+            "largest_selection_poll_gap_ms": 5.537,
+            "last_selection_to_observed_fence_ms": 0.001,
+            "polls_during_pending_copy": 32,
+            "recycle_after_discard_ms": 0.039
+          },
+          {
+            "lane": 3,
+            "selected_pts": 0,
+            "same_pts_exact_identity_changes_on_target": 0,
+            "submitted_ms_relative_to_matching_selection": -7.137,
+            "producer_lock_wait_ms": 0.002,
+            "producer_lock_return_to_copy_issued_ms": 0.04,
+            "copy_issued_to_key_release_ms": 0.168,
+            "enqueue_to_observed_fence_ms": 56.93,
+            "observed_fence_ms_relative_to_matching_selection": 49.793,
+            "largest_selection_poll_gap_ms": 5.304,
+            "last_selection_to_observed_fence_ms": 0.0,
+            "polls_during_pending_copy": 35,
+            "recycle_after_discard_ms": 0.04
+          }
+        ]
+      }
+    ],
+    "setup": {
+      "recorder_on": true,
+      "qualification_comparison": false,
+      "seconds": 12,
+      "physical_desktop": [
+        2880,
+        1800
+      ],
+      "refresh_Hz": 120,
+      "ac_power": true,
+      "video_layers": 3,
+      "audio_layers": 3,
+      "source_resolution": [
+        3840,
+        2160
+      ],
+      "rate": "60/1",
+      "cut_period_frames": 30,
+      "synchronized_backward_cut_period_frames": 90,
+      "owned_processes_remaining": 0
+    },
+    "focused_checks": {
+      "scheduler": {
+        "passed": true,
+        "formats": [
+          "nv12",
+          "p010"
+        ],
+        "binary_sha256": "f1c3cc108e0b0e9f942254a037a16c2272fd6ff60876d00634448810d79bccdb"
+      },
+      "fenced_pixel_verification_and_pending_cancellation": {
+        "passed": true,
+        "verified_pictures_per_format": 8,
+        "formats": [
+          "nv12",
+          "p010"
+        ],
+        "binary_sha256": "57bee69641adb55cf68eb8cfd8ecb5bf21c255ed3363eb4c48a490f16c5bc663"
+      },
+      "vfr_floor_and_backward_cut": true,
+      "pending_rewind": {
+        "passed": true,
+        "source_frame_pairs": 129,
+        "exact_seek_during_pending_rewind": true,
+        "closed_during_another_pending_rewind": true,
+        "close_ms": 62.0
+      },
+      "fp16_parity": [
+        {
+          "format": "nv12",
+          "color": "SDR",
+          "matched_draws": 6,
+          "bytes_per_draw": 460800,
+          "last_pts": 512,
+          "fallbacks": 0
+        },
+        {
+          "format": "p010",
+          "color": "SDR",
+          "matched_draws": 6,
+          "bytes_per_draw": 460800,
+          "last_pts": 1001,
+          "fallbacks": 0
+        }
+      ],
+      "trace_enabled_nv12_parity": {
+        "passed": true,
+        "trace_off_matches_fp16_frames": [
+          0,
+          5
+        ],
+        "draws_in_order": 6,
+        "slot_lifetimes_validated": 8,
+        "stored_events": 133,
+        "dropped_events": 0
+      }
+    },
+    "coverage": "All retained event indices are contiguous in nondecreasing monotonic timestamp order. Each slot serial has one reservation and one recycle, and every enqueue follows the producer lock and copy call. All 21 exact incoming transfers match the selected retained frame references and complete after the first incoming request. Every one is discarded after its deadline, without an acquisition. Eighteen enqueues precede the corresponding request. Two layer-three incoming selections switch exact references at equal PTS before their final exact copies are reserved. These switches do not explain the late already-enqueued copies in the other layers.",
+    "interpretation": "The compositor continues polling while the copy fence is pending. The measured interval includes prior queued GPU work and fence observation, so it cannot assign duration to the copy command itself, execution on a particular engine, or driver submission. No consumer keyed-mutex timeout occurs. Copy and fence scheduling is unchanged.",
+    "next_measurement": "In one serial cut trace, align the submitted copy and signal fence points to same-context DxgKrnl queue packet timestamps. After each tested copy completes, read the existing D3D11 GPU timestamp pair under the producer context lock outside the copy deadline path to separate copy execution from queued work and fence completion. Verify exact matching and event coverage before changing scheduling.",
+    "scope": "Raw slot serials and frame or texture identity keys stay in ignored local evidence. Recorder-on results are diagnostic; use the existing recorder-off ordinary pair for any timing qualification."
   },
   "camera_first_export_sdr48": {
     "source_checkpoint": "20379dae9e1cedb97d3688da8828c9cad3469409",
