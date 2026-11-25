@@ -1,7 +1,11 @@
 """Boundary tests for repair and first-export admission."""
 from copy import deepcopy
 from fractions import Fraction
+import json
 from pathlib import Path
+import struct
+import subprocess
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -10,6 +14,7 @@ import native_project_plan as plan
 import native_project_render as renderer
 import native_project_verification as verification
 import server
+from benchmarks.phase3a_camera_range import camera_range, verify_original_requests
 from test_hdr_color import CONTRACT
 
 
@@ -45,6 +50,131 @@ class ExportPolicyTests(unittest.TestCase):
         with patch.object(verification,"source_ids",return_value=[*ticks[:-1],23]):
             with self.assertRaisesRegex(plan.Ineligible,"different presentation timestamp"):
                 verification.verify_source_clocks(self.program,clock,lambda:False)
+
+    def test_camera_profile_requires_explicit_opt_in_and_preserves_the_saved_settings(self):
+        self.state["output"].update(preset="slow",crf=20,bitrate=60)
+        self.assertEqual(verification.eligible(self.state,self.program,camera_range=True)[1],CONTRACT)
+        with self.assertRaisesRegex(plan.Ineligible,"Ultrafast CRF 15"):
+            verification.eligible(self.state,self.program)
+        self.state["output"]["crf"]=19
+        with self.assertRaisesRegex(plan.Ineligible,"Slow CRF 20"):
+            verification.eligible(self.state,self.program,camera_range=True)
+
+    def test_hevc_sdr_camera_requires_the_probed_main_profile_and_source_geometry(self):
+        src=self.program.sources[0]
+        src.requests.update({1:Fraction(1,60),2:Fraction(1,30)})
+        stream=dict(width=3840,height=2160,codec_name="hevc",profile="Main",pix_fmt="yuv420p",time_base="1/90000",
+                    color_primaries="bt709",color_transfer="bt709",color_space="bt709",color_range="tv",
+                    field_order="progressive")
+        probe={"streams":[stream],"frames":[{"best_effort_timestamp":p} for p in (0,1499,3033,4501)]}
+        with tempfile.TemporaryFile() as output,patch.object(plan,"run_capture") as capture:
+            capture.return_value=(json.dumps(probe).encode(),b"")
+            with self.assertRaises(plan.Ineligible):
+                plan.append_video(output,0,src,3,lambda:False,first_time=True)
+            plan.append_video(output,0,src,3,lambda:False,first_time=True,camera_range=True)
+            output.seek(-12,2)
+            self.assertEqual(struct.unpack("<3i",output.read()),(0,1,1))
+            for extra in ({"profile":"Main 10"},{"side_data_list":[{"rotation":-90}]},{"color_range":"pc"}):
+                with self.subTest(extra=extra):
+                    modified={**probe,"streams":[{**stream,**extra}]}
+                    capture.return_value=(json.dumps(modified).encode(),b"")
+                    with self.assertRaises(plan.Ineligible):
+                        plan.append_video(output,0,src,3,lambda:False,first_time=True,camera_range=True)
+
+    def test_camera_excerpt_keeps_source_ticks_and_the_original_document(self):
+        asset=self.program.sources[0].asset
+        asset["timeBase"]="1/90000"
+        self.state["assets"]=[asset]
+        self.state["output"]["fps"]=60
+        self.clip.update(position=10,start=1,end=3)
+        original=deepcopy(self.state)
+        result=camera_range(self.state,600,640)
+        clip=result["tracks"][0]["clips"][0]
+        self.assertEqual(clip["position"],0)
+        self.assertEqual(clip["start"],1)
+        self.assertEqual(clip["end"],float(Fraction(5,3)))
+        self.assertEqual(result["output"],self.state["output"])
+        self.assertEqual(self.state,original)
+        self.program.spans=[(0,40)]
+        requests=self.program.sources[0].requests
+        requests.update({frame:1+Fraction(frame,60) for frame in range(40)})
+        self.assertEqual(verify_original_requests(self.state,self.program,600,640),40)
+        requests[17]+=Fraction(1,90000)
+        with self.assertRaisesRegex(ValueError,"Picture 617 changed"):
+            verify_original_requests(self.state,self.program,600,640)
+        with self.assertRaisesRegex(ValueError,"original render-span boundary"):
+            camera_range(self.state,660,700)
+        self.clip["fadeIn"]=.1
+        with self.assertRaisesRegex(ValueError,"trim behavior"):
+            camera_range(self.state,600,640)
+
+    def test_camera_mp4_packet_clock_sorts_reordered_pictures_and_rejects_ambiguity(self):
+        src=self.program.sources[0]
+        src.asset["codec"]="hevc"
+        src.requests={0:Fraction(1,60),1:Fraction(1,30),2:Fraction(1,20)}
+        stream=dict(width=3840,height=2160,codec_name="hevc",profile="Main",pix_fmt="yuv420p",time_base="1/90000",
+                    color_primaries="bt709",color_transfer="bt709",color_space="bt709",color_range="tv",
+                    field_order="progressive")
+        probe={"streams":[stream],"format":{"start_time":"0","format_name":"mov,mp4,m4a,3gp,3g2,mj2"},
+               "packets":[{"pts":p,"flags":"___"} for p in (0,3033,1499,6000,4511)]}
+        with tempfile.TemporaryFile() as output,patch.object(plan,"run_capture") as capture:
+            capture.return_value=(json.dumps(probe).encode(),b"")
+            clock=plan.append_video(output,0,src,3,lambda:False,first_time=True,camera_range=True)
+            self.assertEqual(clock[2:],([0,1499,3033],[1,1,2]))
+            self.assertTrue(any("packet=pts,flags" in arg for arg in capture.call_args.args[0]))
+            for modify in ({"flags":"__D"},{"pts":None},{"pts":1499},{"pts":-1}):
+                with self.subTest(modify=modify):
+                    changed={**probe,"packets":[{**probe["packets"][0],**modify},*probe["packets"][1:]]}
+                    capture.return_value=(json.dumps(changed).encode(),b"")
+                    with self.assertRaises(plan.Ineligible):
+                        plan.append_video(output,0,src,3,lambda:False,first_time=True,camera_range=True)
+            changed={**probe,"format":{**probe["format"],"start_time":"-.02"}}
+            capture.return_value=(json.dumps(changed).encode(),b"")
+            with self.assertRaisesRegex(plan.Ineligible,"nonnegative"):
+                plan.append_video(output,0,src,3,lambda:False,first_time=True,camera_range=True)
+
+    def test_direct_worker_pipe_delivers_exact_bytes_and_detects_trailing_output(self):
+        payload=bytes(range(48))
+        self.program.width,self.program.height=2,2
+        self.program.spans=[(0,4)]
+        self.program.frames=self.program.frames[:4]
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder)
+            target=root/"received"
+            video_command=["ffmpeg","-/filter_complex",str(root/"hdr_graph_clip.txt"),"-map","[finished]",
+                           "-an","-frames:v","4","-c:v","libx265",str(target)]
+            spawn=subprocess.Popen
+            reader=("import os,sys; data=b''\n"
+                    "if os.name=='nt':\n"
+                    " import msvcrt; msvcrt.setmode(0,os.O_BINARY)\n"
+                    "while len(data)<48:\n"
+                    " part=os.read(0,48-len(data))\n"
+                    " if not part: sys.exit(2)\n"
+                    " data+=part\n"
+                    "open(sys.argv[1],'wb').write(data)")
+
+            def subprocess_for_test(command,**kwargs):
+                if command[0]=="ffmpeg":
+                    self.assertIn("-xerror",command)
+                    command=[sys.executable,"-c",reader,str(target)]
+                return spawn(command,**kwargs)
+
+            for trailing in (b"",b"x"):
+                with self.subTest(trailing=trailing),patch.object(renderer.subprocess,"Popen",side_effect=subprocess_for_test):
+                    receipt={"wall_ms":1,"samples":[{}]*4}
+                    child=(f"import sys; sys.stdout.buffer.write({payload+trailing!r}); "
+                           f"sys.stderr.write({json.dumps(receipt)!r})")
+                    with renderer.ProjectVideo(self.program,root,Path(__file__),None,10,lambda:False,
+                                               "gpu32-first-export",None,direct_pipe=True) as video:
+                        video.command=[sys.executable,"-c",child]
+                        video(video_command,root)
+                        self.assertEqual(target.read_bytes(),payload)
+                        if trailing:
+                            with self.assertRaisesRegex(renderer.NativeFailure,"end-of-stream"):
+                                video.receipt()
+                        else:
+                            self.assertEqual(video.receipt()["frames"],4)
+                    self.assertIsNotNone(video.producer.poll())
 
     def test_only_one_bounded_quality_rejection_can_enter_repair(self):
         self.program.spans=[(0,4),(4,6),(6,12)]

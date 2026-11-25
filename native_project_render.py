@@ -11,7 +11,7 @@ import time
 
 import numpy as np
 
-from native_project_plan import compile_project, run_capture, write_plan, write_sources
+from native_project_plan import Ineligible, compile_project, run_capture, write_plan, write_sources
 import hdr10plus_export
 from hdr10plus_index import SIDE_DATA
 import hdr10plus_master
@@ -75,7 +75,7 @@ def temporary_work(parent):
 class ProjectVideo:
     """Supply picture segments as requested by the existing timeline exporter."""
 
-    def __init__(self, program, work, executable, runtime, timeout, cancelled, mode, fault):
+    def __init__(self, program, work, executable, runtime, timeout, cancelled, mode, fault, *, direct_pipe=False):
         self.program = program
         self.work = work
         self.cancelled = cancelled
@@ -85,9 +85,12 @@ class ProjectVideo:
         self.producer = self.active = None
         self.encoder_seconds = 0.
         self.encoder_cpu_seconds = 0.
+        self.fault_requested = fault is not None
+        self.fault_injected = False
         self.reason = None
         self.thread = Thread(target=self.watch, daemon=True)
-        self.buffer = memoryview(bytearray(1024*1024))
+        self.direct_pipe = direct_pipe and len(program.spans)==1
+        self.buffer = None if self.direct_pipe else memoryview(bytearray(1024*1024))
         self.environment = dict(os.environ)
         if runtime:
             self.environment["PATH"] = str(runtime.resolve(strict=True))+os.pathsep+self.environment.get("PATH","")
@@ -119,6 +122,9 @@ class ProjectVideo:
         stop(self.producer)
         if self.producer:
             self.producer.stdout.close()
+            log=self.work/"native.log"
+            if self.fault_requested and log.is_file():
+                self.fault_injected = b"Injected D3D11 device removal" in log.read_bytes()
 
     def __call__(self, command, cwd):
         self.check()
@@ -140,28 +146,36 @@ class ProjectVideo:
         width,height = self.program.width,self.program.height
         encoder = raw_input(width,height,str(self.program.fps))
         encoder[1:1] = ["-benchmark","-nostats"]
+        if self.direct_pipe:
+            encoder.insert(1,"-xerror")
         encoder += ["-map","0:v:0","-vf","setsar=1,"+PQ_TAGS,*command[command.index("-an",script+1):]]
         log_path = self.work/f"encoder-{self.step}.log"
         began = time.perf_counter()
         with log_path.open("wb") as log:
-            self.active = subprocess.Popen(encoder,stdin=subprocess.PIPE,stdout=subprocess.DEVNULL,
+            # A single encoder can consume the worker's pipe to EOF. Multiple
+            # encoders still need the relay to enforce their segment boundaries.
+            source = self.producer.stdout if self.direct_pipe else subprocess.PIPE
+            self.active = subprocess.Popen(encoder,stdin=source,stdout=subprocess.DEVNULL,
                                            stderr=log,cwd=cwd,creationflags=CREATE_FLAGS)
             try:
-                remaining = width*height*3*count
-                while remaining:
-                    self.check()
-                    read = self.producer.stdout.readinto(self.buffer[:min(len(self.buffer),remaining)])
-                    if not read:
-                        raise NativeFailure("The native worker stopped before delivering all pictures")
-                    self.active.stdin.write(self.buffer[:read])
-                    remaining -= read
-                self.active.stdin.close()
+                self.check()
+                if not self.direct_pipe:
+                    remaining = width*height*3*count
+                    while remaining:
+                        self.check()
+                        read = self.producer.stdout.readinto(self.buffer[:min(len(self.buffer),remaining)])
+                        if not read:
+                            raise NativeFailure("The native worker stopped before delivering all pictures")
+                        self.active.stdin.write(self.buffer[:read])
+                        remaining -= read
+                    self.active.stdin.close()
                 if self.active.wait():
                     raise NativeFailure("The qualified x265 encoder rejected the native segment")
             finally:
                 stop(self.active)
-                with suppress(BrokenPipeError):
-                    self.active.stdin.close()
+                if self.active.stdin is not None:
+                    with suppress(BrokenPipeError):
+                        self.active.stdin.close()
                 self.active = None
         self.encoder_seconds += time.perf_counter()-began
         stats = re.search(rb"utime=([\d.]+)s stime=([\d.]+)s",log_path.read_bytes())
@@ -274,14 +288,15 @@ def repair_gop(state,program,work,index,static,native,cancelled):
 
 def export_native(state,destination,reference,executable,runtime,*,authoring=None,timeout=240,
                   cancelled=lambda:False,progress=lambda *_:None,mode="gpu32",fault=None,diagnostics=None,
-                  fallback=None,record=None,scratch=None,publish=os.link,repair=True,first_time=False):
+                  fallback=None,record=None,scratch=None,publish=os.link,repair=True,first_time=False,
+                  camera_range=False):
     destination = destination.resolve()
     if publish is os.link and destination.exists():
         raise FileExistsError("Choose a new output path")
     if cancelled():
         raise RuntimeError("Export cancelled")
     destination.parent.mkdir(parents=True,exist_ok=True)
-    if first_time != (reference is None):
+    if first_time != (reference is None) or (camera_range and not first_time):
         raise ValueError("Select either first-export verification or a comparison master")
     if reference is not None:
         reference=reference.resolve(strict=True)
@@ -290,8 +305,11 @@ def export_native(state,destination,reference,executable,runtime,*,authoring=Non
     result = record if record is not None else {}
     result["requested_backend"] = "d3d11"
     result["verification_policy"] = "first-export-sampled" if first_time else "full-master"
+    if camera_range:
+        result["camera_range_experiment"] = True
     started = time.perf_counter()
     publishing = False
+    native = None
     try:
         with temporary_work(scratch or destination.parent) as work:
             count = hdr10plus_master.preflight(state)
@@ -300,17 +318,20 @@ def export_native(state,destination,reference,executable,runtime,*,authoring=Non
                 raise NativeFailure("The planned frame count differs from the HDR10+ contract")
             if first_time:
                 from native_project_verification import eligible, source_snapshot, verify_delivery
-                flat,contract=eligible(state,program)
+                flat,contract=eligible(state,program,camera_range=camera_range)
                 original_sources=source_snapshot(flat)
                 if destination in original_sources or (destination.exists() and
                     any(destination.samefile(source) for source in original_sources)):
                     raise ValueError("Choose a destination different from source media")
             write_plan(work/"plan.bin",program)
-            clocks=write_sources(work/"sources.bin",program,cancelled,first_time=first_time)
+            clocks=write_sources(work/"sources.bin",program,cancelled,first_time=first_time,camera_range=camera_range)
             result.update(frames=count,prepare_seconds=time.perf_counter()-started)
             static,master = work/"static.mp4",work/"master.mp4"
             worker_mode="gpu32-first-export" if first_time else mode
-            with ProjectVideo(program,work,executable,runtime,timeout,cancelled,worker_mode,fault) as native:
+            with ProjectVideo(program,work,executable,runtime,timeout,cancelled,worker_mode,fault,
+                              direct_pipe=camera_range) as native:
+                if camera_range:
+                    result["picture_transport"] = "direct" if native.direct_pipe else "python-relay"
                 render_started = time.perf_counter()
                 render_engine.render(state,static,work/"render",popen=native,cancelled=cancelled,
                                      on_progress=lambda p,m:progress(round(p*.8),m))
@@ -352,9 +373,13 @@ def export_native(state,destination,reference,executable,runtime,*,authoring=Non
                     result["repair"]["verification_seconds"]=time.perf_counter()-began
                 if diagnostics:
                     diagnostics.mkdir(exist_ok=True)
-                    names=("native.log","master.mp4") if first_time else ("native.log","psnr.log","master.mp4")
-                    for name in names:
-                        os.replace(work/name,diagnostics/name)
+                    logs=[work/"native.log",master]
+                    if camera_range:
+                        logs.extend(sorted(work.glob("encoder-*.log")))
+                    if not first_time:
+                        logs.append(work/"psnr.log")
+                    for path in logs:
+                        os.replace(path,diagnostics/path.name)
                     master = diagnostics/"master.mp4"
                 if not result["comparison"]["passed"]:
                     raise NativeFailure("The delivered candidate did not match the reference acceptance contract")
@@ -369,6 +394,10 @@ def export_native(state,destination,reference,executable,runtime,*,authoring=Non
             result["scratch_cleanup_failure"] = type(error).__name__
         else:
             result["native_failure"] = type(error).__name__
+            if camera_range and isinstance(error,(Ineligible,RuntimeError)):
+                result["native_rejection"] = str(error)
+            if camera_range and fault is not None:
+                result["native_fault_injected"] = native is not None and native.fault_injected
             if publishing or not fallback or cancelled():
                 raise
             fallback()

@@ -222,12 +222,20 @@ def run_capture(command,timeout=90,*,cancelled=lambda:False,cwd=None):
                 process.kill()
 
 
-def append_video(output,slot,src,frame_count,cancelled,*,first_time=False):
+def append_video(output,slot,src,frame_count,cancelled,*,first_time=False,camera_range=False):
     limit = max(src.requests.values())+2
     if limit>122:
         raise Ineligible("Source selection exceeds the qualified resident preroll window")
+    # The resident decoder checks this index against every decoded PTS in its
+    # prefix. An independent software trace still checks the selected pictures.
+    packet_index = (camera_range and (src.asset or {}).get("codec")=="hevc" and src.path.suffix.lower()==".mp4" and
+                    min(src.requests.values())>0)
+    clock_fields = "packet=pts,flags" if packet_index else "frame=best_effort_timestamp"
+    format_fields = "start_time,format_name" if packet_index else "start_time"
     fields = ("stream=width,height,time_base,codec_name,profile,pix_fmt,color_primaries,color_transfer,color_space,"
-              "color_range,field_order:frame=best_effort_timestamp:format=start_time")
+              f"color_range,field_order:{clock_fields}:format={format_fields}")
+    if camera_range:
+        fields += ":stream_side_data=rotation"
     info = json.loads(run_capture(["ffprobe","-v","error","-read_intervals",f"%+{float(limit):.8f}",
                                    "-select_streams","v:0","-show_entries",fields,"-of","json",src.path],
                                   cancelled=cancelled)[0])
@@ -235,11 +243,23 @@ def append_video(output,slot,src,frame_count,cancelled,*,first_time=False):
     if len(streams)!=1:
         raise Ineligible("The resident probe found no unambiguous video stream")
     video = streams[0]
+    if packet_index and (video.get("codec_name")!="hevc" or
+                         "mp4" not in info.get("format",{}).get("format_name","").split(",")):
+        raise Ineligible("Camera packet indexing requires a probed HEVC MP4 stream")
+    if camera_range:
+        coded_size=src.size[::-1] if src.orientation else src.size
+        rotation=90 if src.orientation=="transpose=clock" else 0
+        actual_angles=[(-row["rotation"])%360 for row in video.get("side_data_list",()) if "rotation" in row]
+        if ((video.get("width"),video.get("height"))!=coded_size or (actual_angles or [0])!=[rotation]):
+            raise Ineligible("The camera stream dimensions or orientation differ from the project")
     tags = tuple(video.get(key) for key in ("color_primaries","color_transfer","color_space"))
     pq = tags==("bt2020","smpte2084","bt2020nc")
-    if first_time and (video.get("codec_name"),video.get("pix_fmt"),pq) not in (
-            ("h264","yuv420p",False),("hevc","yuv420p10le",True)):
-        raise Ineligible("First export requires qualified H.264 SDR or HEVC Main10 PQ video")
+    codec=(video.get("codec_name"),video.get("pix_fmt"),pq)
+    camera_sdr=(camera_range and src.orientation=="" and video.get("profile")=="Main" and
+                codec==("hevc","yuv420p",False))
+    if first_time and not camera_sdr and codec not in (("h264","yuv420p",False),("hevc","yuv420p10le",True)):
+        detail="the selected H.264 SDR or HEVC SDR/PQ scope" if camera_range else "qualified H.264 SDR or HEVC Main10 PQ video"
+        raise Ineligible("First export requires "+detail)
     if first_time and pq and video.get("profile")!="Main 10":
         raise Ineligible("First export requires the qualified HEVC Main10 profile")
     if (video.get("codec_name") not in ("h264","hevc") or video.get("pix_fmt") not in ("yuv420p","yuv420p10le") or
@@ -248,11 +268,21 @@ def append_video(output,slot,src,frame_count,cancelled,*,first_time=False):
             video.get("color_range")!=({"limited":"tv","full":"pc"}.get(src.interpretation[3])) or
             pq!=(src.interpretation[4]=="pq2020")):
         raise Ineligible("Resident codec, range or source metadata differs from the managed color contract")
-    stamps = [row.get("best_effort_timestamp") for row in info.get("frames",())]
+    if packet_index:
+        packets=info.get("packets",())
+        if any(not isinstance(row.get("flags"),str) or "D" in row["flags"] for row in packets):
+            raise Ineligible("Camera trim has ambiguous or discarded packets outside the packet-index experiment")
+        stamps=[row.get("pts") for row in packets]
+    else:
+        stamps=[row.get("best_effort_timestamp") for row in info.get("frames",())]
     if not stamps or any(type(stamp) is not int for stamp in stamps):
         raise Ineligible("The resident probe did not return integer source presentation timestamps")
+    if packet_index:
+        stamps.sort()
     base = Fraction(video.get("time_base") or 0)
     origin = Fraction(info.get("format",{}).get("start_time","0"))
+    if packet_index and (origin<0 or stamps[0]<0):
+        raise Ineligible("Camera packet indexing requires a nonnegative source clock")
     if any(a>=b for a,b in zip(stamps,stamps[1:])) or base<=0:
         raise Ineligible("Resident source has an ambiguous presentation clock")
     selected = [-1]*frame_count
@@ -298,14 +328,15 @@ def append_still(output,slot,src,program,cancelled):
     rgba.tofile(output)
 
 
-def write_sources(path,program,cancelled=lambda:False,*,first_time=False):
+def write_sources(path,program,cancelled=lambda:False,*,first_time=False,camera_range=False):
     clocks={}
     with path.open("wb") as output:
         videos = [(n,src) for n,src in enumerate(program.sources) if src.kind=="video"]
         stills = [(n,src) for n,src in enumerate(program.sources) if src.kind!="video"]
         output.write(struct.pack("<4s2I",b"VSD2",len(videos),len(stills)))
         for slot,src in videos:
-            clocks[slot]=append_video(output,slot,src,len(program.frames),cancelled,first_time=first_time)
+            clocks[slot]=append_video(output,slot,src,len(program.frames),cancelled,
+                                      first_time=first_time,camera_range=camera_range)
         for slot,src in stills:
             append_still(output,slot,src,program,cancelled)
     return clocks

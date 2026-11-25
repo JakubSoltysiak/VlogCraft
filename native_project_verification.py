@@ -20,7 +20,7 @@ READ = re.compile(rb"Read frame with in pts (-?\d+), out pts (-?\d+)")
 WRITE = re.compile(rb"Writing frame with pts (-?\d+) to pts (-?\d+)")
 
 
-def eligible(state,program):
+def eligible(state,program,*,camera_range=False):
     flat=sequences.playback(state)
     output=flat["output"]
     contract=color_management.validate_output(output["color"])
@@ -28,7 +28,10 @@ def eligible(state,program):
         not 2<=len(program.frames)<=120 or len(program.spans)>2 or
         not ("mastering" in contract and "maxCLL" in contract)):
         raise Ineligible("First export requires a short UHD60 project with complete HDR mastering declarations")
-    if (output.get("preset"),output.get("crf"),output.get("bitrate",0))!=("ultrafast",15,0):
+    profile=(output.get("preset"),output.get("crf"),output.get("bitrate",0))
+    if camera_range and profile!=("slow",20,60):
+        raise Ineligible("Camera-range first export requires the saved Slow CRF 20 and 60 Mb/s settings")
+    if not camera_range and profile!=("ultrafast",15,0):
         raise Ineligible("First export requires the qualified Ultrafast CRF 15 output profile")
     video=[(track,clip) for track in flat["tracks"] if track["type"]=="video" and not track.get("hidden")
            for clip in track["clips"]]
