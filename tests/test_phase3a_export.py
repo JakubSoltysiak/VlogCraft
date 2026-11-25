@@ -82,6 +82,17 @@ class ExportPolicyTests(unittest.TestCase):
                     with self.assertRaises(plan.Ineligible):
                         plan.append_video(output,0,src,3,lambda:False,first_time=True,camera_range=True)
 
+    def test_long_camera_ranges_require_qualification(self):
+        self.state["output"].update(preset="slow",crf=20,bitrate=60)
+        self.program.frames=[(-1,[None])]*600
+        self.program.spans=[(0,600)]
+        with self.assertRaises(plan.Ineligible):
+            verification.eligible(self.state,self.program,camera_range=True)
+        verification.eligible(self.state,self.program,camera_range=True,qualification=True)
+        self.program.frames*=7
+        with self.assertRaises(plan.Ineligible):
+            verification.eligible(self.state,self.program,camera_range=True,qualification=True)
+
     def test_camera_excerpt_keeps_source_ticks_and_the_original_document(self):
         asset=self.program.sources[0].asset
         asset["timeBase"]="1/90000"
@@ -177,6 +188,17 @@ class ExportPolicyTests(unittest.TestCase):
             baseline.write_bytes(b"verified managed master")
             self.assertEqual(retained_reference(root,current,prior,{original:identity},pin,digest),
                              (baseline.resolve(strict=True),prior["reference"]))
+            prior.update(passed=False,reference={"frames":10,"seconds":5},
+                         conforming_hdr10plus_blocks={"reference":10},
+                         independent_comparison=dict(passed=False,exact_video_pts=True,exact_decoded_pcm=True,
+                                                     static_hdr_matches=True,video_declaration_matches=True,
+                                                     per_frame_psnr_db=["49"]*10))
+            (root/"qualification.json").write_text(json.dumps(prior),encoding="utf8")
+            self.assertEqual(retained_reference(root,current,prior,{original:identity},pin,digest)[0],baseline.resolve())
+            prior["independent_comparison"]["exact_decoded_pcm"]=False
+            (root/"qualification.json").write_text(json.dumps(prior),encoding="utf8")
+            with self.assertRaisesRegex(ValueError,"no verified managed reference"):
+                retained_reference(root,current,prior,{original:identity},pin,digest)
 
     def test_direct_worker_pipe_delivers_exact_bytes_and_detects_trailing_output(self):
         payload=bytes(range(48))

@@ -24,11 +24,11 @@ WRITE = re.compile(rb"Writing frame with pts (-?\d+) to pts (-?\d+)")
 CAMERA_RANGE_FRAMES = 3600
 
 
-def eligible(state,program,*,camera_range=False):
+def eligible(state,program,*,camera_range=False,qualification=False):
     flat=sequences.playback(state)
     output=flat["output"]
     contract=color_management.validate_output(output["color"])
-    frame_limit=CAMERA_RANGE_FRAMES if camera_range else 120
+    frame_limit=CAMERA_RANGE_FRAMES if camera_range and qualification else 120
     if ((program.width,program.height,program.fps)!=(3840,2160,60) or
         not 2<=len(program.frames)<=frame_limit or len(program.spans)>2 or
         not ("mastering" in contract and "maxCLL" in contract)):

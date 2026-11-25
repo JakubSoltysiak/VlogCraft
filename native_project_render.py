@@ -313,7 +313,7 @@ def repair_gop(state,program,work,index,static,native,cancelled):
 def export_native(state,destination,reference,executable,runtime,*,authoring=None,timeout=240,
                   cancelled=lambda:False,progress=lambda *_:None,mode="gpu32",fault=None,diagnostics=None,
                   fallback=None,record=None,scratch=None,publish=os.link,repair=True,first_time=False,
-                  camera_range=False,parallel_x265=False,keyframe_seek=True):
+                  camera_range=False,parallel_x265=False,keyframe_seek=True,qualification=False):
     destination = destination.resolve()
     if publish is os.link and destination.exists():
         raise FileExistsError("Choose a new output path")
@@ -322,6 +322,8 @@ def export_native(state,destination,reference,executable,runtime,*,authoring=Non
     destination.parent.mkdir(parents=True,exist_ok=True)
     if parallel_x265 and not camera_range:
         raise ValueError("The wider x265 pool requires the explicit camera-range policy")
+    if qualification and not (first_time and camera_range and diagnostics):
+        raise ValueError("Long camera trials require the first-export qualification workspace")
     if first_time != (reference is None) or (camera_range and not first_time):
         raise ValueError("Select either first-export verification or a comparison master")
     if reference is not None:
@@ -346,7 +348,7 @@ def export_native(state,destination,reference,executable,runtime,*,authoring=Non
                 raise NativeFailure("The planned frame count differs from the HDR10+ contract")
             if first_time:
                 from native_project_verification import eligible, source_snapshot, verify_delivery
-                flat,contract=eligible(state,program,camera_range=camera_range)
+                flat,contract=eligible(state,program,camera_range=camera_range,qualification=qualification)
                 original_sources=source_snapshot(flat)
                 if destination in original_sources or (destination.exists() and
                     any(destination.samefile(source) for source in original_sources)):

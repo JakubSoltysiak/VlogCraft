@@ -122,7 +122,19 @@ def retained_reference(folder,project_copy,receipt,originals,pin,expected_hash):
     backend=prior.get("first_export",{}).get("delivered_backend")
     if backend=="reference":
         master,timing_record=folder/"first-export.mp4",prior["fallback"]
-    elif backend=="d3d11" and prior.get("passed") and prior.get("independent_comparison",{}).get("passed"):
+    elif backend=="d3d11":
+        comparison=prior.get("independent_comparison",{})
+        # A picture-quality failure belongs to the candidate. A separately
+        # generated managed oracle can still be reused with its pinned hash.
+        n=receipt["frames"]
+        complete_reference=(
+            not prior.get("reused_verified_reference") and prior.get("reference",{}).get("frames")==n and
+            prior.get("conforming_hdr10plus_blocks",{}).get("reference")==n and
+            comparison.get("exact_video_pts") and comparison.get("exact_decoded_pcm") and
+            comparison.get("static_hdr_matches") and comparison.get("video_declaration_matches") and
+            len(comparison.get("per_frame_psnr_db",[]))==n)
+        if not (prior.get("passed") and comparison.get("passed") or complete_reference):
+            raise ValueError("The prior run has no verified managed reference for this range")
         master,timing_record=folder/"reference.mp4",prior["reference"]
     else:
         raise ValueError("The prior run has no verified managed reference for this range")
@@ -152,7 +164,7 @@ def qualify(project,folder,first,last,worker,runtime,author_dll,*,plan_only=Fals
         if recovered or state is None or hdr10plus_master.preflight(state)!=last-first:
             raise ValueError("Saved range did not reopen at the requested picture count")
         program=compile_project(state,folder)
-        eligible(state,program,camera_range=True)
+        eligible(state,program,camera_range=True,qualification=True)
         original_clock=verify_original_requests(full,program,first,last)
         receipt.update(planned=True,spans=program.spans,
                        selected_source_count=len(program.sources),original_source_requests_matched=original_clock,
@@ -161,7 +173,8 @@ def qualify(project,folder,first,last,worker,runtime,author_dll,*,plan_only=Fals
             return receipt
 
         options=author_options(author_dll) if author_dll else None
-        candidate=folder/"first-export.mp4"
+        published=folder/"first-export.mp4"
+        candidate=folder/"qualification-candidate.mp4"
         reference=folder/"reference.mp4"
         diagnostics=folder/"native"
         record=receipt["first_export"]={}
@@ -176,7 +189,11 @@ def qualify(project,folder,first,last,worker,runtime,author_dll,*,plan_only=Fals
 
         export_native(state,candidate,None,worker,runtime,first_time=True,camera_range=True,parallel_x265=parallel_x265,
                       authoring=options,record=record,fallback=fallback,fault=fault,progress=report,
-                      diagnostics=diagnostics,timeout=max(240,3*(last-first)),keyframe_seek=keyframe_seek)
+                      diagnostics=diagnostics,timeout=max(240,3*(last-first)),keyframe_seek=keyframe_seek,
+                      qualification=True)
+        if record["delivered_backend"]=="reference":
+            candidate.rename(published)
+            candidate=published
         if record["delivered_backend"]=="reference" and fault is None:
             # A rejected encode can be compared with the managed fallback that
             # just rendered. If it failed earlier, there is no encode to compare.
@@ -201,7 +218,12 @@ def qualify(project,folder,first,last,worker,runtime,author_dll,*,plan_only=Fals
         expected=record["delivered_backend"]==("d3d11" if fault is None else "reference")
         if fault is not None:
             expected=expected and record.get("native_fault_injected") is True
-        receipt["passed"]=expected and comparison["passed"]
+        passed=expected and comparison["passed"]
+        if passed and record["delivered_backend"]=="d3d11":
+            if original!=project.read_bytes() or originals!=source_snapshot(full):
+                raise ValueError("Original source identity changed before publication")
+            candidate.rename(published)
+        receipt["passed"]=passed
         return receipt
     finally:
         unchanged=original==project.read_bytes() and originals==source_snapshot(full)
