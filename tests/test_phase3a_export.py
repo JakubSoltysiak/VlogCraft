@@ -163,7 +163,7 @@ class ExportPolicyTests(unittest.TestCase):
             master.write_bytes(b"verified managed master")
             digest=sha256(master.read_bytes()).hexdigest()
             self.assertEqual(retained_reference(root,current,prior,{original:identity},pin,digest),
-                             (master,prior["fallback"]))
+                             (master.resolve(strict=True),prior["fallback"]))
             with self.assertRaisesRegex(ValueError,"pinned sources"):
                 retained_reference(root,current,prior,{original:(1,2,3,4,6)},pin,digest)
             master.write_bytes(b"different master")
@@ -176,7 +176,7 @@ class ExportPolicyTests(unittest.TestCase):
             baseline=root/"reference.mp4"
             baseline.write_bytes(b"verified managed master")
             self.assertEqual(retained_reference(root,current,prior,{original:identity},pin,digest),
-                             (baseline,prior["reference"]))
+                             (baseline.resolve(strict=True),prior["reference"]))
 
     def test_direct_worker_pipe_delivers_exact_bytes_and_detects_trailing_output(self):
         payload=bytes(range(48))
