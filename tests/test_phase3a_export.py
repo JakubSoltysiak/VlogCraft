@@ -134,6 +134,16 @@ class ExportPolicyTests(unittest.TestCase):
             with self.assertRaisesRegex(plan.Ineligible,"nonnegative"):
                 plan.append_video(output,0,src,3,lambda:False,first_time=True,camera_range=True)
 
+    def test_wider_encoder_pool_preserves_the_saved_quality_and_frame_settings(self):
+        original=["-preset","slow","-crf","20","-x265-params",
+                  "hdr10=1:repeat-headers=1:pools=2:frame-threads=2:max-cll=1000,200"]
+        widened=renderer.parallel_camera_x265(original)
+        self.assertEqual(widened[:-1],original[:-1])
+        self.assertEqual(widened[-1].replace("pools=8","pools=2"),original[-1])
+        self.assertIn("pools=8",widened[-1].split(":"))
+        with self.assertRaises(plan.Ineligible):
+            renderer.parallel_camera_x265([*original[:-1],original[-1].replace("frame-threads=2","frame-threads=4")])
+
     def test_retained_reference_requires_the_matching_project_media_and_master(self):
         with tempfile.TemporaryDirectory() as folder:
             root=Path(folder)
@@ -159,6 +169,14 @@ class ExportPolicyTests(unittest.TestCase):
             master.write_bytes(b"different master")
             with self.assertRaisesRegex(ValueError,"recorded master hash"):
                 retained_reference(root,current,prior,{original:identity},pin,digest)
+
+            prior.update(passed=True, first_export={"delivered_backend":"d3d11"},
+                         independent_comparison={"passed":True}, reference={"seconds":5})
+            (root/"qualification.json").write_text(json.dumps(prior),encoding="utf8")
+            baseline=root/"reference.mp4"
+            baseline.write_bytes(b"verified managed master")
+            self.assertEqual(retained_reference(root,current,prior,{original:identity},pin,digest),
+                             (baseline,prior["reference"]))
 
     def test_direct_worker_pipe_delivers_exact_bytes_and_detects_trailing_output(self):
         payload=bytes(range(48))

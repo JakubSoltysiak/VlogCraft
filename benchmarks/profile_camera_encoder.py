@@ -14,7 +14,7 @@ from benchmarks.phase3a_camera_range import camera_range
 from benchmarks.phase3a_encoder_probe import format_raw, run_to_file
 import hdr_render
 from native_project_plan import run_capture
-from native_project_render import PQ_TAGS, raw_input
+from native_project_render import PQ_TAGS, parallel_camera_x265, raw_input
 from native_project_verification import source_snapshot
 import server
 
@@ -46,12 +46,8 @@ def profile(project, first, last, output):
             movie = work / (label + ".mov")
             encode = [*raw_args, "-vf", "setsar=1," + PQ_TAGS, *command[command.index("-c:v"):-1], str(movie)]
             encode[encode.index("-preset") + 1] = preset
-            options = encode.index("-x265-params") + 1
-            fields = encode[options].split(":")
-            if fields.count("pools=2") != 1 or "frame-threads=2" not in fields:
-                raise ValueError("The frozen managed encoder thread settings have changed")
-            fields[fields.index("pools=2")] = f"pools={pool}"
-            encode[options] = ":".join(fields)
+            if pool == 8:
+                encode = parallel_camera_x265(encode)
             started = time.perf_counter()
             run_capture(encode, timeout=240, cwd=work)
             seconds = time.perf_counter() - started

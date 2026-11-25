@@ -113,18 +113,24 @@ def verify_hdr10plus_packets(path,program):
 def retained_reference(folder,project_copy,receipt,originals,pin,expected_hash):
     prior=json.loads((folder/"qualification.json").read_bytes())
     signatures=json.loads(pin.read_bytes())["source_signatures"]
-    if (not prior.get("original_files_match") or prior.get("first_export",{}).get("delivered_backend")!="reference" or
+    if (not prior.get("original_files_match") or
         any(prior.get(key)!=receipt[key] for key in ("source_project_sha256","range","frames","output")) or
         any(signatures.get(str(path))!=list(identity) for path,identity in originals.items()) or
         (folder/"range.vlogcraft").read_bytes()!=project_copy.read_bytes()):
         raise ValueError("The retained reference does not match the pinned sources, range, or profile")
-    master=folder/"first-export.mp4"
+    backend=prior.get("first_export",{}).get("delivered_backend")
+    if backend=="reference":
+        master,timing_record=folder/"first-export.mp4",prior["fallback"]
+    elif backend=="d3d11" and prior.get("passed") and prior.get("independent_comparison",{}).get("passed"):
+        master,timing_record=folder/"reference.mp4",prior["reference"]
+    else:
+        raise ValueError("The prior run has no verified managed reference for this range")
     if sha256(master.read_bytes()).hexdigest()!=expected_hash.lower():
         raise ValueError("The retained reference differs from the recorded master hash")
-    return master,prior["fallback"]
+    return master,timing_record
 
 
-def qualify(project,folder,first,last,worker,runtime,author_dll,*,plan_only=False,fault=None,retained=None):
+def qualify(project,folder,first,last,worker,runtime,author_dll,*,plan_only=False,fault=None,retained=None,parallel_x265=False):
     import server
 
     original=project.read_bytes()
@@ -167,7 +173,7 @@ def qualify(project,folder,first,last,worker,runtime,author_dll,*,plan_only=Fals
             receipt["fallback"]=export_project(state,candidate,authoring=options)
             receipt["fallback"]["seconds"]=time.perf_counter()-began
 
-        export_native(state,candidate,None,worker,runtime,first_time=True,camera_range=True,
+        export_native(state,candidate,None,worker,runtime,first_time=True,camera_range=True,parallel_x265=parallel_x265,
                       authoring=options,record=record,fallback=fallback,fault=fault,progress=report,
                       diagnostics=diagnostics)
         if record["delivered_backend"]=="reference" and fault is None:
@@ -213,6 +219,8 @@ if __name__=="__main__":
     parser.add_argument("--runtime",type=Path)
     parser.add_argument("--author-dll",type=Path)
     parser.add_argument("--plan-only",action="store_true")
+    parser.add_argument("--parallel-x265",action="store_true",
+                        help="Use eight x265 pool workers with the saved Slow preset and two frame threads")
     parser.add_argument("--fault-frame",type=int)
     parser.add_argument("--retained-reference",type=Path,metavar="RUN",
                         help="Compare against a previous verified fallback after the native attempt")
@@ -227,6 +235,6 @@ if __name__=="__main__":
     if any(retained) and (not all(retained) or args.fault_frame is not None or args.plan_only):
         parser.error("Reference reuse requires its run directory, pinned source receipt and SHA-256")
     result=qualify(args.project,args.output,*args.frames,args.worker,args.runtime,args.author_dll,
-                   plan_only=args.plan_only,fault=args.fault_frame,retained=retained if all(retained) else None)
+                   plan_only=args.plan_only,fault=args.fault_frame,parallel_x265=args.parallel_x265,retained=retained if all(retained) else None)
     print(json.dumps(result))
     sys.exit(0 if result["original_files_match"] and (args.plan_only or result["passed"]) else 1)

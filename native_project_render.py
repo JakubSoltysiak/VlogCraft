@@ -28,6 +28,16 @@ def raw_input(width,height,rate):
             "-video_size",f"{width}x{height}","-framerate",rate,"-i","pipe:0"]
 
 
+def parallel_camera_x265(command):
+    """Widen the WPP pool while keeping the qualified frame threads and picture settings."""
+    options = command.index("-x265-params") + 1
+    fields = command[options].split(":")
+    if fields.count("pools=2") != 1 or "frame-threads=2" not in fields:
+        raise Ineligible("Unexpected x265 threading settings for the camera-range experiment")
+    fields[fields.index("pools=2")] = "pools=8"
+    return [*command[:options], ":".join(fields), *command[options+1:]]
+
+
 def collect(path):
     lines = path.read_text(encoding="utf8",errors="replace").splitlines()
     receipts = [line for line in lines if line.startswith('{"wall_ms":')]
@@ -75,7 +85,7 @@ def temporary_work(parent):
 class ProjectVideo:
     """Supply picture segments as requested by the existing timeline exporter."""
 
-    def __init__(self, program, work, executable, runtime, timeout, cancelled, mode, fault, *, direct_pipe=False):
+    def __init__(self, program, work, executable, runtime, timeout, cancelled, mode, fault, *, direct_pipe=False, parallel_x265=False):
         self.program = program
         self.work = work
         self.cancelled = cancelled
@@ -89,6 +99,7 @@ class ProjectVideo:
         self.fault_injected = False
         self.reason = None
         self.thread = Thread(target=self.watch, daemon=True)
+        self.parallel_x265 = parallel_x265
         self.direct_pipe = direct_pipe and len(program.spans)==1
         self.buffer = None if self.direct_pipe else memoryview(bytearray(1024*1024))
         self.environment = dict(os.environ)
@@ -149,6 +160,8 @@ class ProjectVideo:
         if self.direct_pipe:
             encoder.insert(1,"-xerror")
         encoder += ["-map","0:v:0","-vf","setsar=1,"+PQ_TAGS,*command[command.index("-an",script+1):]]
+        if self.parallel_x265:
+            encoder = parallel_camera_x265(encoder)
         log_path = self.work/f"encoder-{self.step}.log"
         began = time.perf_counter()
         with log_path.open("wb") as log:
@@ -289,13 +302,15 @@ def repair_gop(state,program,work,index,static,native,cancelled):
 def export_native(state,destination,reference,executable,runtime,*,authoring=None,timeout=240,
                   cancelled=lambda:False,progress=lambda *_:None,mode="gpu32",fault=None,diagnostics=None,
                   fallback=None,record=None,scratch=None,publish=os.link,repair=True,first_time=False,
-                  camera_range=False):
+                  camera_range=False,parallel_x265=False):
     destination = destination.resolve()
     if publish is os.link and destination.exists():
         raise FileExistsError("Choose a new output path")
     if cancelled():
         raise RuntimeError("Export cancelled")
     destination.parent.mkdir(parents=True,exist_ok=True)
+    if parallel_x265 and not camera_range:
+        raise ValueError("The wider x265 pool requires the explicit camera-range policy")
     if first_time != (reference is None) or (camera_range and not first_time):
         raise ValueError("Select either first-export verification or a comparison master")
     if reference is not None:
@@ -307,6 +322,7 @@ def export_native(state,destination,reference,executable,runtime,*,authoring=Non
     result["verification_policy"] = "first-export-sampled" if first_time else "full-master"
     if camera_range:
         result["camera_range_experiment"] = True
+        result["requested_x265_pool_workers"] = 8 if parallel_x265 else 2
     started = time.perf_counter()
     publishing = False
     native = None
@@ -329,7 +345,7 @@ def export_native(state,destination,reference,executable,runtime,*,authoring=Non
             static,master = work/"static.mp4",work/"master.mp4"
             worker_mode="gpu32-first-export" if first_time else mode
             with ProjectVideo(program,work,executable,runtime,timeout,cancelled,worker_mode,fault,
-                              direct_pipe=camera_range) as native:
+                              direct_pipe=camera_range,parallel_x265=parallel_x265) as native:
                 if camera_range:
                     result["picture_transport"] = "direct" if native.direct_pipe else "python-relay"
                 render_started = time.perf_counter()
