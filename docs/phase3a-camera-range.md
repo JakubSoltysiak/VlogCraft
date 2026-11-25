@@ -13,11 +13,21 @@ The tool accepts a v4 saved test copy with the audited PQ mastering contract and
 | Export through verification and publication | 84.183 s | 105.123 s |
 | Delivered bytes | 675,727 | 678,911 |
 
-The D3D11 first export took 19.9% less wall time. The independent full comparison took 3.590 s and measured 54.59 dB overall and 53.47 dB minimum PQ PSNR. Both deliveries had matching picture PTS, static HDR, 48 HDR10+ picture records and decoded stereo PCM through exactly 38,400 samples per channel. The native and software cadence checks agreed on all original source pictures. The pinned project and the linked media identities matched after both exports.
+The D3D11 first export took 19.9% less wall time. The independent full comparison took 3.590 s and measured 54.59 dB overall and 53.47 dB minimum PQ PSNR. Both deliveries had matching picture PTS, static HDR, 48 conforming HDR10+ picture records and decoded stereo PCM through exactly 38,400 samples per channel. The native and software cadence checks agreed on all original source pictures. The pinned project and the linked media identities matched after both exports.
 
 Preparation took 9.573 s. The native worker spent 3.949 s including direct pipe backpressure, with 0.054 s in resident decode and 0.221 s of source normalization, and reported zero CPU source-frame transfers. The render took 58.924 s, including 58.359 s feeding and waiting for x265. Authoring took 1.930 s and the additional first-export delivery checks took 13.743 s. x265 reported CRF 20 and an average video rate of 6,495 kb/s for the native encode. This export still runs below one output picture per wall second. The pair measures resident rendering and direct transport together.
 
-The initial 120-picture PQ attempt reached the 90-second software source probe limit and entered the reference workflow. The managed fallback delivered in 190.193 s. The failed attempt and fallback took 280.266 s together. Late HEVC MP4 trims now have an experimental bounded packet index. The index sorts integer presentation timestamps into display order and rejects missing, duplicate, discarded or negative clock records. The resident decoder checks every decoded prefix PTS before it can use the index. The independent software cadence and picture-quality checks remain in force.
+## 120-picture result across a rotated PQ straight cut
+
+The initial attempt reached the 90-second software source probe limit and entered the reference workflow. The managed fallback delivered in 190.193 s. The failed attempt and fallback took 280.266 s together. Late HEVC MP4 trims now have an experimental bounded packet index. The index sorts integer presentation timestamps into display order and rejects missing, duplicate, discarded or negative clock records. The resident decoder checks every decoded prefix PTS before it can use the index. The independent software cadence and picture-quality checks remain in force.
+
+The packet-index retry delivered the same range in **127.513 s**, 33.0% less wall time than the retained managed fallback. Preparation took 1.539 s, render 84.406 s, authoring 3.527 s, and runtime delivery verification 38.029 s. The two resident decoders validated 9,303 source pictures from the start of the recording to reach the requested 120 pictures. Their decode time totaled 49.672 s with zero CPU source-frame transfers. Keyframe seeking or reuse across monotonic trims could reduce that repeated work. The measured render and encoder wait stages overlap native decoding and cannot be added to it.
+
+The independent full comparison and direct packet conformance check took 5.198 s. They measured 56.30 dB overall and 52.62 dB minimum PQ PSNR, exact video PTS and decoded stereo PCM with 96,000 samples per channel, matching static HDR and 120 conforming HDR10+ picture records in each master. The candidate was 1,310,956 bytes and the reference was 1,300,770 bytes. The pinned project, range project and linked media identities matched. The first independent comparison could not resolve a relative reference path. Resolving it and checking the two retained masters completed the comparison without another encode.
+
+## Device-removal control
+
+The 12-picture SDR control injected device removal at output picture 2. The direct pipeline stopped before publication. The managed fallback delivered all 12 pictures with matching PTS and static HDR, 12 conforming HDR10+ records and exact decoded stereo PCM through 9,600 samples per channel. Every decoded picture matched a separately rendered reference exactly. The attempt and fallback took 35.126 s. The standalone reference took 26.575 s. The original media identities matched.
 
 ## Serial qualification on Radeon 890M
 
