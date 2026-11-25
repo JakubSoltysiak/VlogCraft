@@ -17,6 +17,18 @@ The D3D11 first export took 19.9% less wall time. The independent full compariso
 
 Preparation took 9.573 s. The native worker spent 3.949 s including direct pipe backpressure, with 0.054 s in resident decode and 0.221 s of source normalization, and reported zero CPU source-frame transfers. The render took 58.924 s, including 58.359 s feeding and waiting for x265. Authoring took 1.930 s and the additional first-export delivery checks took 13.743 s. x265 reported CRF 20 and an average video rate of 6,495 kb/s for the native encode. This export still runs below one output picture per wall second. The pair measures resident rendering and direct transport together.
 
+## Encoder and graph isolation on 24 original camera pictures
+
+Writing the managed PQ graph to planar UHD Main10 took 30.805 s for pictures [2314, 2338) of the audited minute, including raw-file I/O. Each encoder then read those same 24 pictures. All three kept CRF 20, two frame threads, the same static metadata and UHD60 clock. These separate stages overlap in a normal render, so their times cannot be added to estimate the full export.
+
+| x265 preset and wavefront pool | Encode plus video mux | Video file | Minimum decoded-to-raw PQ PSNR |
+|---|---:|---:|---:|
+| Saved Slow, 2 workers | 25.605 s | 313,619 B | 51.58 dB |
+| Slow, 8 workers | 11.080 s | 313,619 B | 51.58 dB |
+| Medium, 2 workers | 7.775 s | 222,845 B | 51.36 dB |
+
+The eight-worker Slow encode reconstructed exactly the same 24 pictures as the saved profile. Medium produced different decoded pictures. Both encoder-only times exclude audio, HDR10+ authoring and delivery validation. The explicit `--parallel-x265` camera-range option retains Slow and increases only the x265 pool on this 12-core, 24-thread workstation. No preference or project migration is required. [Encoder implementation](../native_project_render.py) · [FFmpeg rate-control behavior](phase3b-vlog-export.md#effective-encoder-settings).
+
 ## 120-picture result across a rotated PQ straight cut
 
 The initial attempt reached the 90-second software source probe limit and entered the reference workflow. The managed fallback delivered in 190.193 s. The failed attempt and fallback took 280.266 s together. Late HEVC MP4 trims now have an experimental bounded packet index. The index sorts integer presentation timestamps into display order and rejects missing, duplicate, discarded or negative clock records. The resident decoder checks every decoded prefix PTS before it can use the index. The independent software cadence and picture-quality checks remain in force.

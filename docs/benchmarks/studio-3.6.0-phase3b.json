@@ -6880,9 +6880,9 @@
       "cause": "The old binding checked the historical Phase 3A measurement against changed Phase 3B source. CI now verifies Phase 3A using its archived commit, then checks the new record."
     }
   ],
-  "source_fingerprint": "1b99bbf648915497f3cddcb53b323bea15931e7a7cd8509586ced791caa9c0bc",
+  "source_fingerprint": "a026c7cb90798a5db656270ac30278ee76777ed0989ed27ece4ded79947e46d6",
   "fingerprint_method": "SHA256 sorted relevant relative path + NUL + LF-normalized source + NUL",
-  "benchmark_protocol_fingerprint": "dc5b629abcb9893fc192586a2da60d292722568229a726349dcbe6ff5d9de291",
+  "benchmark_protocol_fingerprint": "88a7a358cfec0b0c6c61a0b093f2f45ca712a9db646bcbc82c31ca6e010bc88b",
   "benchmark_protocol_fingerprint_method": "SHA256 sorted benchmark driver/observer relative path + NUL + LF-normalized source + NUL",
   "follow_up": {
     "status": "development checkpoint",
@@ -82915,5 +82915,65 @@
     "source_identities_preserved": true,
     "source_software_frame_transfers": 0,
     "scope_note": "Measured prior to the long-PQ-packet-index extension on the same upright SDR implementation. Health of a complete 78,427-picture project remains unverified."
+  },
+  "camera_first_export_pq120_and_fault": {
+    "source_checkpoint": "5afa5e2",
+    "experimental_backend": "D3D11 FP32 to CPU x265 Slow CRF 20, 2 pool and 2 frame threads",
+    "deep_pq_initial_attempt": {
+      "frames": 120,
+      "native_source_index_timed_out": true,
+      "fallback_seconds": 190.193,
+      "total_seconds": 280.266
+    },
+    "packet_index_retry": {
+      "source_prefix_pictures": 9303,
+      "selected_source_clocks_verified": 120,
+      "native_decode_seconds": 49.672,
+      "native_preparation_seconds": 1.539,
+      "native_delivery_seconds": 127.513,
+      "managed_delivery_seconds": 190.193,
+      "independent_verification_seconds": 5.198,
+      "whole_picture_psnr_db": 56.299,
+      "minimum_picture_psnr_db": 52.62,
+      "exact_pts": true,
+      "exact_pcm": true,
+      "samples_per_channel": 96000,
+      "conforming_metadata_blocks": 120,
+      "original_files_match": true,
+      "comparison_first_attempt": "Relative baseline path failed in the comparison child. Rechecked both completed masters using absolute paths."
+    },
+    "injected_device_removal": {
+      "frame": 2,
+      "output_frames": 12,
+      "backend": "reference",
+      "total_seconds": 35.126,
+      "separate_reference_seconds": 26.575,
+      "decoded_pictures_identical": true,
+      "exact_pcm": true,
+      "samples_per_channel": 9600,
+      "conforming_metadata_blocks": 12
+    }
+  },
+  "camera_x265_isolation_24": {
+    "frames": 24,
+    "managed_pq_raw_file_seconds": 30.805,
+    "scope": "Same managed raw UHD Main10 pictures from original upright SDR span, identical CRF 20 and two frame threads, encode wall includes raw input and mux, audio/author/verification excluded.",
+    "saved_slow_two_pool": {
+      "seconds": 25.605,
+      "bytes": 313619,
+      "minimum_pq_psnr_db": 51.58
+    },
+    "slow_eight_pool": {
+      "seconds": 11.08,
+      "bytes": 313619,
+      "minimum_pq_psnr_db": 51.58,
+      "decoded_pictures_equal_saved": true
+    },
+    "medium_two_pool": {
+      "seconds": 7.775,
+      "bytes": 222845,
+      "minimum_pq_psnr_db": 51.36,
+      "decoded_pictures_equal_saved": false
+    }
   }
 }
