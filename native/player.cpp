@@ -51,7 +51,10 @@ int main(int argc,char** argv){
   std::map<std::string,std::unique_ptr<Producer>> producers;
   const char* handoffOption=std::getenv("VLOGCRAFT_EXPERIMENTAL_PICTURE_HANDOFF");
   bool useHandoff=!software&&handoffOption&&std::strcmp(handoffOption,"1")==0;
-  PlaybackHandoff handoff;
+  std::unique_ptr<PictureHandoffTrace> handoffTrace;
+  if(const char* path=std::getenv("VLOGCRAFT_HANDOFF_TRACE_FILE");useHandoff&&path&&*path)
+   handoffTrace=std::make_unique<PictureHandoffTrace>(path);
+  PlaybackHandoff handoff(handoffTrace.get());
   uint64_t handoffDraws=0,handoffFallbacks=0;
   std::map<std::string,std::string> currentClip;std::map<std::string,const Clip*> clipLookup;for(auto& c:plan.clips)clipLookup[c.id]=&c;
   std::map<std::string,int> sourceIds;int nextDecoderId=0;
@@ -167,11 +170,13 @@ int main(int argc,char** argv){
     const bool simultaneous=std::any_of(selected.begin(),selected.end(),[&](const auto& other){
      return other.first!=c&&other.first->end==c->end&&rewinds.count(other.first);
     });
-    if(simultaneous&&input.stillPlaying(epoch))
-     producers.at(c->asset)->primeRewind(plan,*c,*next->second,frame,epoch,[&](const auto& outgoing){
+    if(simultaneous&&input.stillPlaying(epoch)){
+     const bool primed=producers.at(c->asset)->primeRewind(plan,*c,*next->second,frame,epoch,[&](const auto& outgoing){
       const auto& lane=handoff.lanes[layer];
       return !useHandoff||(lane&&lane->coversRemaining(outgoing,epoch));
      });
+     if(primed&&handoffTrace)handoffTrace->add("prime_rewind",0,(int)layer,epoch,frame);
+    }
    }
   };
   while(!input.stop){
@@ -376,6 +381,7 @@ int main(int argc,char** argv){
    if(flight&&retireWithDraw&&renderer.submitted!=renderer.completed)combinedPollOpportunities++;
    {SourceStage timer("draw_and_present");renderer.draw(*slot,plan,frame,generation,selected,playing,retireWithDraw,
       useHandoff?&handoff.pictures:nullptr);}
+   if(handoffTrace)handoffTrace->add("draw",0,-1,generation,frame);
    selectedForDrawnFrame=true;retrySharedPicture=false;
    if(useHandoff&&!selected.empty())++handoffDraws;
    if(flight&&(previous!=frame||drawnGeneration!=epoch))flight->submit.set({frame,epoch,flight->now()});
