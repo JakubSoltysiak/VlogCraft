@@ -1,5 +1,21 @@
 # VlogCraft Studio 3.6.0 Phase 3B playback and editing
 
+## Exact incoming picture after a backward cut
+
+All three measured workers below preserve bounded resources, rational source selection and the shared-device default. Each valid recorder-off R→F trial used the original three-video/three-audio UHD60 workload. Every arm reached frame 3,599 with 2,880,000 PCM frames, zero underruns and zero surviving owned processes.
+
+| Change and source | Frozen FPS / skips / max gap | Candidate FPS / skips / max gap |
+|---|---|---|
+| Two outstanding copies, `57309c1` | 59.444 / 11 / 79.721 ms | 41.804 / 1,066 / 1,427.330 ms |
+| Drop withdrawn copy before enqueue, `4313b88` | 59.146 / 32 / 382.660 ms | 43.133 / 973 / 685.071 ms |
+| Confirm remaining outgoing copies enqueued before early rewind, `d541564` | 59.135 / 36 / 455.956 ms | 43.860 / 947 / 660.611 ms |
+
+The final worker passed the two-slot scheduler, fence ownership/cancellation, VFR, pending rewind (129 layer/frame positions, 94 ms close) and six byte-exact FP16 draws per format for NV12 and P010. Both arms of the earliest pair used two warm frames and 31 decoder surfaces per producer. Both arms of the two later pairs used six and 35. Conditions matched within each pair. The comparisons are individual trials.
+
+The 12-second diagnostic of `4313b88` missed the last outgoing picture at all seven synchronized backward cuts. In 73 of 73 recorded due requests across the longest three stalls, all three exact decoded floors and a compositor slot were available. In the next ordinary trial, the outgoing admission guard moved the common last successful submission from cut−2 to cut−1. Twenty of 22 qualifying windows now ended on that last outgoing picture. All 39 backward cuts still fell inside windows charging skips, accounting for 895 of 947. The remaining delay is in delivering the incoming pictures through the handoff. The ordinary counters cannot distinguish late enqueue, late fence observation, or a discarded exact copy.
+
+The warm cache has no source-sample identity across a seek. With two different pictures at the same PTS, its strictly increasing cache can keep the earlier picture while the live selector returns the later one. Reusing an old texture on timestamps alone can display the wrong pixels. The next targeted experiment is to tie one incoming selected frame's decoder epoch and pool/slice to its two slot serials through enqueue, fence observation, acquisition, last sampling draw and recycling. Keep the existing ordinary gate. Reversal, physical package, 600-second playback and 30-minute editing remain gated. [Full receipts including every arm](benchmarks/studio-3.6.0-phase3b.json).
+
 ## Two outstanding picture copies on Radeon 890M
 
 Candidate source `57309c174955d061f72649f4f4de3347cb68c89d` occupies the same two transfer slots per layer as its predecessor. The original transfer thread waited for each submitted copy to complete before considering its second slot. The compositor now observes completed producer fences while the worker can submit the other picture. Query fallback stays with the producer worker. The held-clock path refreshes the decoded successor and the proved cut tail without advancing the source selector. Unused ready copies can return their keyed ownership directly. Source ranges, lease lifetime through GPU use, transport generation and the production shared-device preference are preserved. [Design precedents](phase3b-upstream.md).

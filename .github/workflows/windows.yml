@@ -174,7 +174,7 @@ jobs:
         run: node --test tests/timeline_commands.test.js tests/native_audio_worklet.test.js tests/native_clock.test.js tests/meter.test.js tests/recovery.test.js tests/flight_recorder.test.js tests/color_controls.test.js tests/motion_presets.test.js
   native-compile:
     runs-on: windows-2022
-    timeout-minutes: 20
+    timeout-minutes: 35
     needs: regression
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
@@ -183,6 +183,13 @@ jobs:
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: "3.11"
+      - name: Cache pinned SDK archives
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: |
+            build/tools/architecture/zig-*.zip
+            build/tools/architecture/ffmpeg-*.7z
+          key: windows-native-archives-${{ hashFiles('tools/setup_architecture_lab.py') }}
       - name: Compile isolated native experiment (no GPU execution)
         run: python tools/setup_architecture_lab.py --component zig --component ffmpeg-shared --build-native
       - name: Verify native stall watchdog without a GPU
@@ -262,6 +269,13 @@ jobs:
           New-Item -ItemType Directory -Force build/tools/wix | Out-Null
           Invoke-WebRequest https://github.com/wixtoolset/wix3/releases/download/wix3141rtm/wix314-binaries.zip -OutFile build/tools/wix.zip
           Expand-Archive build/tools/wix.zip build/tools/wix -Force
+      - name: Cache pinned SDK archives
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: |
+            build/tools/architecture/zig-*.zip
+            build/tools/architecture/ffmpeg-*.7z
+          key: windows-native-archives-${{ hashFiles('tools/setup_architecture_lab.py') }}
       - name: Build optional native runtime for packaging (no GPU execution)
         run: python tools/setup_architecture_lab.py --component zig --component ffmpeg-shared --build-native --build-project-export
       - name: Build Windows installer
