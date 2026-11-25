@@ -58,7 +58,7 @@ The upright source decoded 48 pictures in both cases (0.071 s previously, 0.061 
 
 For 600 pictures, the native path decoded 705 source pictures (0.958 s at eight workers and 0.840 s at two). A separate raw comparison rendered all 600 again with both VSD2 prefix decoding and VSD3 indexing. Prefix decoding consumed 9,783 source pictures. All 600 packed Main10 input frames delivered to x265 had identical SHA-256 frame hashes and packet clocks. The original source-identity checks passed. Both encodes maintained correct source selection, video PTS, static HDR, all 600 dynamic picture records and identical stereo PCM through sample 480,000.
 
-### Why the 600-picture gate stays closed
+### Why these packed exports failed the 600-picture gate
 
 The sampled checks passed at frames 0, 51, 102, 103, 351 and 599. The complete comparison caught discrepancies elsewhere. An independent diagnosis decoded the exact source PTS for each of three failing pictures, rendered them through the managed float graph, and compared the native packed output before encoding, the managed encode, and both native encodes. Scores are in PQ code-value PSNR.
 
@@ -70,7 +70,7 @@ The sampled checks passed at frames 0, 51, 102, 103, 351 and 599. The complete c
 
 For these pictures the large divergence appears after separate lossy encodes. The smaller raw conversion differences merit investigation as potential inputs to different x265 decisions. Returning to two workers did not restore the all-picture gate. An isolated generated test also exercised closed H.264 IDR and open-GOP HEVC CRA with B-frames, variable picture spacing and a 2 s stream start. Both formats produced 36 byte-identical packed pictures and exact selection ticks for 32 decoded source pictures versus 152 with the prefix decoder. The first generated fixture lacked the requested transfer tags and was rejected; the rerun set explicit frame color properties.
 
-The native 3,600-picture first export remains gated on a passing 600-picture comparison. The camera qualification tool keeps longer outputs private until the full comparison and source checks pass. The ordinary first-export cap remains 120 pictures. The managed renderer remains available. A practical next experiment is to feed x265 the same verified sequence of reference-quantized Main10 pictures, compare encoder input and output per frame, and qualify a conservative native/managed segment choice before retrying 600. Preserve the observed quality failures in that comparison.
+At this checkpoint the native 3,600-picture first export was gated on a passing 600-picture comparison. The subsequent [encoder-input investigation](phase3a-camera-raster.md) qualified a corrected 600-picture raster. The camera qualification tool keeps longer outputs private until the full comparison and source checks pass. The ordinary first-export cap remains 120 pictures. The managed renderer remains available. A practical next experiment is to feed x265 the same verified sequence of reference-quantized Main10 pictures, compare encoder input and output per frame, and qualify a conservative native/managed segment choice before retrying 600. Preserve the observed quality failures in that comparison.
 
 ### GPU transfer and memory
 

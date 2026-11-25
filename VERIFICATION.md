@@ -1,10 +1,14 @@
 # VlogCraft Studio development qualification
 
+## Real-camera Main10 encoder input and 600-picture gate, 25 November 2026
+
+All 600 independently decoded pictures and all 600 HDR10+ records matched the managed master. Original source selections, packet PTS, static mastering, Rec.2020/PQ and stereo PCM through sample 480,000 passed. Indexed D3D11 decode plus the neutral zimg raster took 688.461 s, with 24.671 s of additional independent checks. The archived reference took 870.989 s. A four-arm full-context experiment reproduced both historical encodes and isolated one-code input changes causing different x265 picture decisions. Cancellation left zero surviving owned processes, scratch directories or published outputs. [Input comparison and qualification](docs/phase3a-camera-raster.md) · [Measured stages](docs/benchmarks/studio-3.6.0-camera-raster.json).
+
 ## Indexed camera export and restart recovery, 25 November 2026
 
 The 120-picture rotated UHD60 cut decoded 225 pictures versus 9,303, with delivery in 71.333 s versus 110.166 s at the previous eight-worker checkpoint. The entire 48- and 120-picture delivered files matched those previous candidates byte for byte. The first live-reseek attempt was rejected and fell back. New H.264 IDR and HEVC CRA tests verified exact reordered VFR output at a nonzero stream start. The six-span reassembly of the verified reference minute preserved every encoded packet and independently decoded picture.
 
-**Long first export remains unqualified.** Both 600-picture encodes preserved timing, HDR10+, exact PCM and source identities but failed the minimum per-picture PSNR gate (48.07 / 48.09 dB). All 600 pre-encode native pictures matched the prefix decoder byte for byte. The native 3,600-picture first export was withheld. The complete vlog was never restarted. Editor startup now identifies interrupted exports from durable owner receipts. [Measured results and source study](docs/phase3a-indexed-export.md) · [Recovery and checkpoint design](docs/export-upstream-recovery.md).
+**Historical packed-shader result.** Both 600-picture encodes preserved timing, HDR10+, exact PCM and source identities but failed the minimum per-picture PSNR gate (48.07 / 48.09 dB). All 600 pre-encode native pictures matched the prefix decoder byte for byte. The native 3,600-picture first export was withheld. The complete vlog was never restarted. Editor startup now identifies interrupted exports from durable owner receipts. [Measured results and source study](docs/phase3a-indexed-export.md) · [Recovery and checkpoint design](docs/export-upstream-recovery.md).
 
 ## Saved camera range export at x265 Slow
 

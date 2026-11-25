@@ -1,0 +1,251 @@
+{
+  "protocol": "UHD60 Main10 PQ, x265 Slow CRF 20, serial on AC, Radeon 890M; external whole-picture check shown separately",
+  "matrix": {
+    "span": [
+      103,
+      600
+    ],
+    "planes": [
+      {
+        "exact_planes": 0,
+        "changed_percent": 7.866312749180267,
+        "biggest": 1,
+        "psnr": 71.2398005830977
+      },
+      {
+        "exact_planes": 0,
+        "changed_percent": 4.845033647098641,
+        "biggest": 1,
+        "psnr": 73.34454470000688
+      },
+      {
+        "exact_planes": 0,
+        "changed_percent": 3.3265547179683037,
+        "biggest": 1,
+        "psnr": 74.97756595942792
+      }
+    ],
+    "pairs": {
+      "A-B": {
+        "vcl_sha256": 497,
+        "decoded_md5": 497,
+        "key": 497
+      },
+      "C-D": {
+        "vcl_sha256": 497,
+        "decoded_md5": 497,
+        "key": 497
+      },
+      "A-D": {
+        "vcl_sha256": 0,
+        "decoded_md5": 0,
+        "key": 497
+      },
+      "A-reference": {
+        "vcl_sha256": 497,
+        "decoded_md5": 497,
+        "key": 497
+      },
+      "D-previous": {
+        "vcl_sha256": 497,
+        "decoded_md5": 497,
+        "key": 497
+      }
+    }
+  },
+  "slice_changes_at_fixed_input_profile": {
+    "comparison": "Managed vs GPU input, two pool workers, 497 pictures",
+    "slice_types": 92,
+    "slice_qp_deltas": 150
+  },
+  "pool_only_changes_on_same_gpu_input": {
+    "pictures": 600,
+    "slice_types": 94,
+    "slice_qp_deltas": 164
+  },
+  "cancellation": {
+    "active_cancel": true,
+    "owned_processes": 4,
+    "survivors": 0,
+    "published": false,
+    "temp_directories": 0,
+    "sources_match": true
+  },
+  "historical_managed_seconds": {
+    "600": 870.989,
+    "3600": 6321.394
+  },
+  "attempts": {
+    "rejected_600_eight": {
+      "frames": 600,
+      "passed": false,
+      "delivered_backend": "d3d11",
+      "raster": "gpu-fp32-ordered",
+      "decoded_source_pictures": 705,
+      "decode_seconds": 0.958,
+      "seek_seconds": 0.018,
+      "visible_source_plane_bytes": 0,
+      "stage_seconds": {
+        "prepare_seconds": 1.247,
+        "render_seconds": 127.28,
+        "encoder_feed_and_wait_seconds": 126.543,
+        "encoder_cpu_seconds": 982.719,
+        "author_seconds": 16.008,
+        "verification_seconds": 87.324,
+        "total_seconds": 231.874
+      },
+      "median_ms": {
+        "gpu_ms": 4.23648,
+        "color_gpu_ms": 2.4705,
+        "pq_copy_gpu_ms": 0.70358,
+        "source_normalization_ms": 9.23775,
+        "readback_ms": 3.87455,
+        "write_ms": 144.8305
+      },
+      "encoders": [
+        {
+          "frames": 103,
+          "seconds": 18.49,
+          "fps": 5.57
+        },
+        {
+          "frames": 497,
+          "seconds": 106.67,
+          "fps": 4.66
+        }
+      ],
+      "encoder_combined_fps": 4.794,
+      "independent_comparison_seconds": 25.348,
+      "through_independent_check_seconds": 257.223,
+      "minimum_psnr_db": 48.07,
+      "overall_psnr_db": "53.925019",
+      "identical_decoded_pictures": 0,
+      "below_50": 21,
+      "original_requests": 600,
+      "verified_source_pictures": 600,
+      "exact_video_pts": true,
+      "pcm_matches": true,
+      "end_samples": 480000,
+      "dynamic_records": 600,
+      "dynamic_equals_reference": null,
+      "static_hdr_matches": true,
+      "source_identities_match": true,
+      "worker_peak_mib": 763.6,
+      "peak_local_gpu_mib": 774.4,
+      "tree_peak_gib": 5.694
+    },
+    "rejected_600_two": {
+      "frames": 600,
+      "passed": false,
+      "delivered_backend": "d3d11",
+      "raster": "gpu-fp32-ordered",
+      "decoded_source_pictures": 705,
+      "decode_seconds": 0.84,
+      "seek_seconds": 0.018,
+      "visible_source_plane_bytes": 0,
+      "stage_seconds": {
+        "prepare_seconds": 1.208,
+        "render_seconds": 268.629,
+        "encoder_feed_and_wait_seconds": 267.982,
+        "encoder_cpu_seconds": 542.89,
+        "author_seconds": 16.0,
+        "verification_seconds": 76.604,
+        "total_seconds": 362.456
+      },
+      "median_ms": {
+        "gpu_ms": 4.2589,
+        "color_gpu_ms": 2.50248,
+        "pq_copy_gpu_ms": 0.6796,
+        "source_normalization_ms": 9.1576,
+        "readback_ms": 3.7954,
+        "write_ms": 306.906
+      },
+      "encoders": [
+        {
+          "frames": 103,
+          "seconds": 37.51,
+          "fps": 2.75
+        },
+        {
+          "frames": 497,
+          "seconds": 229.3,
+          "fps": 2.17
+        }
+      ],
+      "encoder_combined_fps": 2.249,
+      "independent_comparison_seconds": 25.591,
+      "through_independent_check_seconds": 388.047,
+      "minimum_psnr_db": 48.09,
+      "overall_psnr_db": "54.150396",
+      "identical_decoded_pictures": 0,
+      "below_50": 19,
+      "original_requests": 600,
+      "verified_source_pictures": 600,
+      "exact_video_pts": true,
+      "pcm_matches": true,
+      "end_samples": 480000,
+      "dynamic_records": 600,
+      "dynamic_equals_reference": null,
+      "static_hdr_matches": true,
+      "source_identities_match": true,
+      "worker_peak_mib": 764.5,
+      "peak_local_gpu_mib": 774.7,
+      "tree_peak_gib": 3.809
+    },
+    "corrected600": {
+      "frames": 600,
+      "passed": true,
+      "delivered_backend": "d3d11-zimg",
+      "raster": "indexed-d3d11-decode-zimg",
+      "decoded_source_pictures": 705,
+      "decode_seconds": 0.832,
+      "seek_seconds": 0.017,
+      "visible_source_plane_bytes": 14929920000,
+      "stage_seconds": {
+        "prepare_seconds": 0.991,
+        "render_seconds": 564.363,
+        "encoder_feed_and_wait_seconds": 563.671,
+        "encoder_cpu_seconds": 1195.766,
+        "author_seconds": 15.287,
+        "verification_seconds": 107.799,
+        "total_seconds": 688.461
+      },
+      "median_ms": {
+        "source_normalization_ms": 0.0,
+        "readback_ms": 8.145,
+        "write_ms": 891.8635
+      },
+      "encoders": [
+        {
+          "frames": 103,
+          "seconds": 100.84,
+          "fps": 1.02
+        },
+        {
+          "frames": 497,
+          "seconds": 460.25,
+          "fps": 1.08
+        }
+      ],
+      "encoder_combined_fps": 1.069,
+      "independent_comparison_seconds": 24.671,
+      "through_independent_check_seconds": 713.132,
+      "minimum_psnr_db": "inf",
+      "overall_psnr_db": "inf",
+      "identical_decoded_pictures": 600,
+      "below_50": 0,
+      "original_requests": 600,
+      "verified_source_pictures": 600,
+      "exact_video_pts": true,
+      "pcm_matches": true,
+      "end_samples": 480000,
+      "dynamic_records": 600,
+      "dynamic_equals_reference": 600,
+      "static_hdr_matches": true,
+      "source_identities_match": true,
+      "worker_peak_mib": 364.0,
+      "peak_local_gpu_mib": 361.3,
+      "tree_peak_gib": 4.322
+    }
+  }
+}
