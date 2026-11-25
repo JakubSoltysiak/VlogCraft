@@ -111,6 +111,7 @@ def verify_hdr10plus_packets(path,program):
 
 
 def retained_reference(folder,project_copy,receipt,originals,pin,expected_hash):
+    folder=folder.resolve(strict=True)
     prior=json.loads((folder/"qualification.json").read_bytes())
     signatures=json.loads(pin.read_bytes())["source_signatures"]
     if (not prior.get("original_files_match") or
@@ -223,7 +224,7 @@ if __name__=="__main__":
                         help="Use eight x265 pool workers with the saved Slow preset and two frame threads")
     parser.add_argument("--fault-frame",type=int)
     parser.add_argument("--retained-reference",type=Path,metavar="RUN",
-                        help="Compare against a previous verified fallback after the native attempt")
+                        help="Use the matching managed baseline from a previous run after the native attempt")
     parser.add_argument("--pinned-sources",type=Path,metavar="RECEIPT")
     parser.add_argument("--reference-sha256")
     args=parser.parse_args()
