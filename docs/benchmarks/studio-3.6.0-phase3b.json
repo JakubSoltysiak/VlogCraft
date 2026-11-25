@@ -82303,5 +82303,35 @@
         "changed_originals": 0
       }
     }
+  },
+  "reference_vlog_qualification": {
+    "route": "reference edited HDR10+ master",
+    "used_assets_available": 24,
+    "output": "3840x2160 60/1 HEVC Main10 Rec.2020 PQ",
+    "representative_seconds": 60,
+    "elapsed_seconds": 6321.393890700012,
+    "verification_seconds": 454.10320529999444,
+    "frames": 3600,
+    "metadata_blocks": 3600,
+    "samples_per_channel": 2880000,
+    "decoded_pcm_matches_isolated_graph": true,
+    "file_bytes": 37208960,
+    "unchanged_source_stat": true,
+    "unchanged_original_project": true,
+    "source_floor_mismatches": 0,
+    "valid_repeated_source_pictures": 70,
+    "visual_samples": 18,
+    "visual_psnr_db_range": [
+      50.21683922919219,
+      58.412076560183294
+    ],
+    "section_peak_scratch_bytes": 157515196,
+    "projected_full_export_seconds": 137713.32185164717,
+    "projection_basis": "Equal average seconds per output picture. The full mix of stills, camera footage, audio and cuts can alter work per picture.",
+    "nominal_full_output_bytes": 9803375000,
+    "full_disk_budget_bytes": 49338111992,
+    "measured_free_bytes": 191915241472,
+    "full_project_pictures": 78427,
+    "full_export_gate": "passed and full encoder started; final file verification pending"
   }
 }
