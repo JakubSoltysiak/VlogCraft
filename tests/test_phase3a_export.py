@@ -1,6 +1,7 @@
 """Boundary tests for repair and first-export admission."""
 from copy import deepcopy
 from fractions import Fraction
+from hashlib import sha256
 import json
 from pathlib import Path
 import struct
@@ -14,7 +15,7 @@ import native_project_plan as plan
 import native_project_render as renderer
 import native_project_verification as verification
 import server
-from benchmarks.phase3a_camera_range import camera_range, verify_original_requests
+from benchmarks.phase3a_camera_range import camera_range, retained_reference, verify_original_requests
 from test_hdr_color import CONTRACT
 
 
@@ -132,6 +133,32 @@ class ExportPolicyTests(unittest.TestCase):
             capture.return_value=(json.dumps(changed).encode(),b"")
             with self.assertRaisesRegex(plan.Ineligible,"nonnegative"):
                 plan.append_video(output,0,src,3,lambda:False,first_time=True,camera_range=True)
+
+    def test_retained_reference_requires_the_matching_project_media_and_master(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder)
+            original=root/"camera.mp4"
+            identity=(1,2,3,4,5)
+            prior={"source_project_sha256":"fixture","range":[2,12],"frames":10,"output":{"fps":60},
+                   "original_files_match":True,"first_export":{"delivered_backend":"reference"},
+                   "fallback":{"seconds":3}}
+            current=root/"current.vlogcraft"
+            project=root/"range.vlogcraft"
+            master=root/"first-export.mp4"
+            pin=root/"source-pin.json"
+            (root/"qualification.json").write_text(json.dumps(prior),encoding="utf8")
+            pin.write_text(json.dumps({"source_signatures":{str(original):list(identity)}}),encoding="utf8")
+            current.write_bytes(b"same saved project")
+            project.write_bytes(current.read_bytes())
+            master.write_bytes(b"verified managed master")
+            digest=sha256(master.read_bytes()).hexdigest()
+            self.assertEqual(retained_reference(root,current,prior,{original:identity},pin,digest),
+                             (master,prior["fallback"]))
+            with self.assertRaisesRegex(ValueError,"pinned sources"):
+                retained_reference(root,current,prior,{original:(1,2,3,4,6)},pin,digest)
+            master.write_bytes(b"different master")
+            with self.assertRaisesRegex(ValueError,"recorded master hash"):
+                retained_reference(root,current,prior,{original:identity},pin,digest)
 
     def test_direct_worker_pipe_delivers_exact_bytes_and_detects_trailing_output(self):
         payload=bytes(range(48))

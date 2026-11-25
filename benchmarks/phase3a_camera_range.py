@@ -110,7 +110,21 @@ def verify_hdr10plus_packets(path,program):
     return count
 
 
-def qualify(project,folder,first,last,worker,runtime,author_dll,*,plan_only=False,fault=None):
+def retained_reference(folder,project_copy,receipt,originals,pin,expected_hash):
+    prior=json.loads((folder/"qualification.json").read_bytes())
+    signatures=json.loads(pin.read_bytes())["source_signatures"]
+    if (not prior.get("original_files_match") or prior.get("first_export",{}).get("delivered_backend")!="reference" or
+        any(prior.get(key)!=receipt[key] for key in ("source_project_sha256","range","frames","output")) or
+        any(signatures.get(str(path))!=list(identity) for path,identity in originals.items()) or
+        (folder/"range.vlogcraft").read_bytes()!=project_copy.read_bytes()):
+        raise ValueError("The retained reference does not match the pinned sources, range, or profile")
+    master=folder/"first-export.mp4"
+    if sha256(master.read_bytes()).hexdigest()!=expected_hash.lower():
+        raise ValueError("The retained reference differs from the recorded master hash")
+    return master,prior["fallback"]
+
+
+def qualify(project,folder,first,last,worker,runtime,author_dll,*,plan_only=False,fault=None,retained=None):
     import server
 
     original=project.read_bytes()
@@ -163,6 +177,9 @@ def qualify(project,folder,first,last,worker,runtime,author_dll,*,plan_only=Fals
             if not candidate.is_file():
                 return receipt
             receipt["reference"]=receipt["fallback"]
+        elif retained:
+            reference,receipt["reference"]=retained_reference(retained[0],path,receipt,originals,*retained[1:])
+            receipt["reused_verified_reference"]=True
         else:
             began=time.perf_counter()
             receipt["reference"]=export_project(state,reference,authoring=options)
@@ -197,12 +214,19 @@ if __name__=="__main__":
     parser.add_argument("--author-dll",type=Path)
     parser.add_argument("--plan-only",action="store_true")
     parser.add_argument("--fault-frame",type=int)
+    parser.add_argument("--retained-reference",type=Path,metavar="RUN",
+                        help="Compare against a previous verified fallback after the native attempt")
+    parser.add_argument("--pinned-sources",type=Path,metavar="RECEIPT")
+    parser.add_argument("--reference-sha256")
     args=parser.parse_args()
     if not args.plan_only and (not args.worker or not args.runtime):
         parser.error("Qualification requires the D3D11 project worker and its DLL directory")
     if args.fault_frame is not None and (args.plan_only or not 1<=args.fault_frame<args.frames[1]-args.frames[0]):
         parser.error("The fault must be injected after the first picture and within the rendered range")
+    retained=(args.retained_reference,args.pinned_sources,args.reference_sha256)
+    if any(retained) and (not all(retained) or args.fault_frame is not None or args.plan_only):
+        parser.error("Reference reuse requires its run directory, pinned source receipt and SHA-256")
     result=qualify(args.project,args.output,*args.frames,args.worker,args.runtime,args.author_dll,
-                   plan_only=args.plan_only,fault=args.fault_frame)
+                   plan_only=args.plan_only,fault=args.fault_frame,retained=retained if all(retained) else None)
     print(json.dumps(result))
     sys.exit(0 if result["original_files_match"] and (args.plan_only or result["passed"]) else 1)
