@@ -59,7 +59,7 @@ PROTOCOL_FILES=(
  'benchmarks/phase3b_completion.py','tests/test_native_completion_trace.py',
  'benchmarks/phase3b_mixed_preview.py','benchmarks/profile_preview_proxy.py','tests/native_source_timebase.py','tests/native_source_rewind.py',
  'benchmarks/phase3a_camera_range.py','benchmarks/phase3a_segment_assembly.py','benchmarks/phase3a_indexed_seek.py',
- 'benchmarks/profile_camera_encoder.py',
+ 'benchmarks/profile_camera_encoder.py','benchmarks/phase3a_encoder_matrix.py','tests/test_camera_raster.py',
  'tests/test_native_source_seek.py','tests/test_export_jobs.py','tests/test_segment_assembly.py',
  'benchmarks/phase3a_encoder_probe.py','benchmarks/phase3a_first_project.py',
  'tests/test_phase3a_export.py','tests/windows_phase3a_export.py',
@@ -91,6 +91,9 @@ def main():
  data=json.loads(a.record.read_text('utf8'))
  if a.historical_record:
   check_history(data,json.loads(a.historical_record.read_text('utf8')))
+ for name,expected in data.get('measurement_files',{}).items():
+  if fingerprint([name])!=expected:
+   raise ValueError(f'Performance measurement file differs from its recorded evidence: {name}')
  if a.stamp:
   data['source_fingerprint']=fingerprint();data['fingerprint_method']='SHA256 sorted relevant relative path + NUL + LF-normalized source + NUL'
   data['benchmark_protocol_fingerprint']=fingerprint(PROTOCOL_FILES)
