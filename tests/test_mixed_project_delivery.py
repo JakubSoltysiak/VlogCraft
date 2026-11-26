@@ -31,7 +31,8 @@ class MixedExportEndpointTests(unittest.TestCase):
                     arguments = thread.call_args.kwargs
                     self.assertEqual(arguments["kwargs"], {"mixed": True} if mixed_mode else {})
                     if comparison or first:
-                        self.assertEqual(arguments["args"][-2:], (comparison, first))
+                        resolved_master = comparison.resolve() if comparison else None
+                        self.assertEqual(arguments["args"][-2:], (resolved_master, first))
                     self.assertEqual(options.get("experimental_mixed_export", False), mixed_mode)
 
     def test_mixed_option_requires_runtime_an_existing_master_and_separate_mode(self):
@@ -105,13 +106,13 @@ class MixedExportPrivateDeliveryTests(unittest.TestCase):
 
     def render_candidate(self, state, candidate, reference, executable, runtime, **options):
         self.assertIsNone(reference)
-        self.assertTrue(candidate.is_relative_to(self.scratch))
+        self.assertTrue(candidate.resolve().is_relative_to(self.scratch.resolve()))
         self.assertEqual(self.destination.read_bytes(), b"original destination")
         candidate.write_bytes(b"verified mixed candidate")
         return {"delivered_backend": "mixed-d3d11-zimg-managed"}
 
     def verify_candidate(self, reference, candidate, *_args):
-        self.assertEqual(reference, self.reference)
+        self.assertTrue(reference.samefile(self.reference))
         self.assertEqual(candidate.read_bytes(), b"verified mixed candidate")
         self.assertEqual(self.destination.read_bytes(), b"original destination")
         return self.verification
