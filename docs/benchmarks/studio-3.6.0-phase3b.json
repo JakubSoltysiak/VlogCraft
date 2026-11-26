@@ -86078,7 +86078,8 @@
   },
   "measurement_files": {
     "docs/benchmarks/studio-3.6.0-camera-raster.json": "c0ec5e0ebe5f7231bdb620c6bf16f8edde56b2c88b3d982e3c21c022aa0ec693",
-    "docs/benchmarks/studio-3.6.0-mixed-export.json": "21e400a2a68041f84ce0d777ad1f3e32c457c7cab0c1549b5a96753f4243de84"
+    "docs/benchmarks/studio-3.6.0-mixed-export.json": "21e400a2a68041f84ce0d777ad1f3e32c457c7cab0c1549b5a96753f4243de84",
+    "docs/benchmarks/studio-3.6.0-mixed-qualification.json": "435fc0e85fa056c2c43f31a863d2ca89cd5549183bcd77d9467ef02b40cabba9"
   },
   "camera_raster_corrected3600": {
     "implementation": "5638eb8",
@@ -86094,6 +86095,10 @@
   "mixed_project_export_nov26": {
     "measurement_file": "docs/benchmarks/studio-3.6.0-mixed-export.json",
     "format": "UHD60 HDR10+",
+    "draft_pr": 22
+  },
+  "mixed_project_export_qualification": {
+    "measurement_file": "docs/benchmarks/studio-3.6.0-mixed-qualification.json",
     "draft_pr": 22
   }
 }
