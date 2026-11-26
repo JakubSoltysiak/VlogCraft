@@ -64,13 +64,18 @@ def clip_range(document, first, last):
             if base!=timing.base_for(asset) or position+timing.nearest((stamp["outTick"]-stamp["inTick"])*base*fps)!=finish:
                 raise ValueError("The saved clip clock does not match its asset or rendered frame boundary")
             start_ticks = Fraction(start-position)/fps/base
-            end_ticks = Fraction(stop-position)/fps/base
-            if start_ticks.denominator!=1 or (stop!=finish and end_ticks.denominator!=1):
-                raise ValueError("An excerpt boundary is outside the source tick grid")
             original_in = stamp["inTick"]
-            stamp.update(positionFrame=start-first,inTick=original_in+int(start_ticks))
-            if stop!=finish:
-                stamp["outTick"] = original_in+int(end_ticks)
+            end_ticks = (Fraction(stamp["outTick"]-original_in) if stop==finish
+                         else Fraction(stop-position)/fps/base)
+            if clip["kind"]=="image" and start!=position:
+                # The same still supplies every picture. v4 stores its hold
+                # length in outTick and always keeps its source in-point at zero.
+                start_ticks = Fraction(0)
+                end_ticks = Fraction(stop-start)/fps/base
+            if start_ticks.denominator!=1 or end_ticks.denominator!=1:
+                raise ValueError("An excerpt boundary is outside the source tick grid")
+            stamp.update(positionFrame=start-first,inTick=original_in+int(start_ticks),
+                         outTick=original_in+int(end_ticks))
             saved.update(position=float(stamp["positionFrame"]/fps),
                          start=float(stamp["inTick"]*base),end=float(stamp["outTick"]*base))
             clips.append(saved)

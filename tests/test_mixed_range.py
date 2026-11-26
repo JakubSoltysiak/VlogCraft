@@ -63,6 +63,27 @@ class MixedRangeTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,"time-dependent"):
                 excerpts.clip_range(original,6,30)
 
+    def test_cut_into_a_static_still_shortens_the_hold_without_seeking_the_image(self):
+        with TemporaryDirectory() as temp:
+            original = self.saved_project(Path(temp))
+            _,photo,right = original["tracks"][0]["clips"]
+            photo.update(end=.4)
+            photo["timing"]["outTick"] = 10
+            right.update(position=.6)
+            right["timing"]["positionFrame"] = 36
+            snapshot = deepcopy(original)
+            for first,last in ((24,42),(13,25)):
+                with self.subTest(first=first,last=last):
+                    excerpt = excerpts.clip_range(original,first,last)
+                    hold = excerpt["tracks"][0]["clips"][0]
+                    self.assertEqual(hold["assetId"],photo["assetId"])
+                    self.assertEqual(hold["timing"],dict(photo["timing"],positionFrame=0,inTick=0,outTick=5))
+                    self.assertEqual((hold["start"],hold["end"]),(0,.2))
+                    self.assertEqual(excerpts.validate_v4(excerpt)["tracks"][0]["clips"][0]["end"],.2)
+            self.assertEqual(original,snapshot)
+            with self.assertRaisesRegex(ValueError,"source tick grid"):
+                excerpts.clip_range(original,25,42)
+
     def test_camera_floor_rejects_a_rebase_that_changes_the_source_picture(self):
         clock = {"streams":[{"time_base":"1/1000"}],"format":{"start_time":"0"}}
         index = clock,[0,16,20,50],[]

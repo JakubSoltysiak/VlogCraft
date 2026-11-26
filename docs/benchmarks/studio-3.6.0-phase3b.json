@@ -6882,7 +6882,7 @@
   ],
   "source_fingerprint": "f880f1abcf013cfc9fda00fc2f682458689e97f3952e466429ffb31c3b0d7a24",
   "fingerprint_method": "SHA256 sorted relevant relative path + NUL + LF-normalized source + NUL",
-  "benchmark_protocol_fingerprint": "16d25084f0b3115e99a26aecc801ff0d0c5a290faf7fc3bc1cfbf3c50081e542",
+  "benchmark_protocol_fingerprint": "04e96bdad6c697f038b97aeac8420bbddaee762ed8eba95db37f4baff8466f7c",
   "benchmark_protocol_fingerprint_method": "SHA256 sorted benchmark driver/observer relative path + NUL + LF-normalized source + NUL",
   "follow_up": {
     "status": "development checkpoint",
