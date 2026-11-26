@@ -83,6 +83,16 @@ class SegmentResumeTests(unittest.TestCase):
             self.assertFalse((lane / "verified.mp4").exists())
             self.assertFalse((lane / "video-001.json").exists())
             self.assertEqual(json.loads((lane / "video-000.json").read_bytes())["verification"]["state"], "passed")
+            spec = json.loads((work / "session.json").read_bytes())
+            source_root = Path(__file__).resolve().parents[1]
+            for name in ("native_source_seek.py", "audio_edit.py", "encoders.py"):
+                self.assertEqual(spec["implementation"][name], sha256((source_root/name).read_bytes()).hexdigest())
+            # A different numerical runtime must not resume a verified image transform.
+            with patch("benchmarks.phase3a_segment_resume.version",
+                       side_effect=lambda name: "different" if name == "numpy" else spec["pillow_version"]):
+                with self.assertRaisesRegex(ValueError, "pinned identities or configuration changed"):
+                    qualify(saved, work, 0, 12, archived, pins[archived], progress=lambda _: None)
+            self.assertFalse((lane / "video-001.json").exists())
 
             # Terminate a separate owner after moving media and before committing its receipt.
             interrupted_run = """

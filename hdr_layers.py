@@ -39,6 +39,7 @@ D65_TO_D50 = np.array([[1.0478112, .0228866, -.0501270],
 SRGB_CHROMATICITY = (.3127, .3290, .64, .33, .30, .60, .15, .06)
 SRGB_TRC = (2.4, 1/1.055, .055/1.055, 1/12.92, .04045)
 ICC_TOLERANCE = .001
+P3_PCS_TOLERANCE = .0003
 
 
 def parameter(clip, name, initial, start):
@@ -105,6 +106,7 @@ def photograph_icc(profile):
         raise ValueError('ICC transfer curves are not sRGB')
     white=icc_fixed(tags[b'wtpt'],b'XYZ ',3)
     colorants=np.column_stack([icc_fixed(tags[key],b'XYZ ',3) for key in (b'rXYZ',b'gXYZ',b'bXYZ')])
+    tolerance=ICC_TOLERANCE
     if b'chad' in tags:
         adaptation=icc_fixed(tags[b'chad'],b'sf32',9).reshape((3,3))
         if not np.allclose(adaptation@D65,D50,rtol=0,atol=ICC_TOLERANCE):
@@ -116,12 +118,19 @@ def photograph_icc(profile):
         # white in wtpt. Require the standard D50-adapted sRGB colorants.
         candidates=((D65_TO_D50@SRGB_XYZ_D65,SRGB),)
     else:
-        raise ValueError('ICC has no explicit chromatic adaptation')
+        # Some v4 Display P3 profiles store the full Bradford-adapted transform
+        # in the D50 colorants without recording the adaptation separately.
+        illuminant=np.frombuffer(profile[68:80],dtype='>i4')/65536
+        if (not np.allclose(illuminant,D50,rtol=0,atol=P3_PCS_TOLERANCE)
+                or not np.allclose(white,D50,rtol=0,atol=P3_PCS_TOLERANCE)):
+            raise ValueError('ICC without explicit chromatic adaptation requires a D50 PCS and media white')
+        candidates=((D65_TO_D50@P3_XYZ_D65,DISPLAY_P3),)
+        tolerance=P3_PCS_TOLERANCE
     if (not np.allclose(white,D50,rtol=0,atol=ICC_TOLERANCE)
             and (profile[8]!=2 or not np.allclose(white,D65,rtol=0,atol=ICC_TOLERANCE))):
         raise ValueError('ICC white point is outside the qualified profiles')
     for expected,color in candidates:
-        if np.allclose(colorants,expected,rtol=0,atol=ICC_TOLERANCE):
+        if np.allclose(colorants,expected,rtol=0,atol=tolerance):
             if b'cicp' in tags:
                 primaries=1 if color==SRGB else 12
                 if tags[b'cicp']!=b'cicp'+bytes(4)+bytes((primaries,13,0,1)):

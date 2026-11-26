@@ -1,3 +1,4 @@
+from io import BytesIO
 import struct
 from pathlib import Path
 import tempfile
@@ -36,18 +37,30 @@ def icc_offsets(profile):
              for index in range(struct.unpack_from(">I", profile, 128)[0]))}
 
 
-def matrix_profile(primaries):
+def matrix_profile(primaries, *, with_chad=True):
     source = ImageCms.ImageCmsProfile(ImageCms.createProfile("sRGB")).tobytes()
     profile = bytearray(source)
     offsets = icc_offsets(profile)
     # Keep the original sRGB description to demonstrate that a label cannot
     # select the matrix. Rebuild the colorants using the embedded adaptation.
-    adaptation = np.array(struct.unpack_from(">9i", profile, offsets[b"chad"]+8)).reshape(3, 3)/65536
+    cone_response = np.array([[.8951, .2664, -.1614], [-.7502, 1.7135, .0367], [.0389, -.0685, 1.0296]])
+    d65 = native_xyz(SRGB_PRIMARIES).sum(axis=1)
+    x, y = .34567, .35850
+    d50 = np.array([x/y, 1, (1-x-y)/y])
+    adaptation = np.linalg.solve(cone_response, np.diag((cone_response @ d50)/(cone_response @ d65))
+                                 @ cone_response)
+    struct.pack_into(">9i", profile, offsets[b"chad"]+8, *np.rint(adaptation*65536).astype(int).ravel())
     xyz = adaptation @ native_xyz(primaries)
     for column, tag in enumerate((b"rXYZ", b"gXYZ", b"bXYZ")):
         struct.pack_into(">3i", profile, offsets[tag]+8, *np.rint(xyz[:, column]*65536).astype(int))
     struct.pack_into(">6I", profile, offsets[b"chrm"]+12,
                      *(round(value*65536) for xy in primaries for value in xy))
+    if not with_chad:
+        count = struct.unpack_from(">I", profile, 128)[0]
+        table_end = 132+12*count
+        entry = next(index for index in range(132, table_end, 12) if profile[index:index+4] == b"chad")
+        profile[entry:table_end] = profile[entry+12:table_end]+bytes(12)
+        struct.pack_into(">I", profile, 128, count-1)
     return bytes(profile)
 
 
@@ -159,3 +172,41 @@ class StillICCTests(unittest.TestCase):
                 expected = np.linalg.solve(native_xyz(REC2020_PRIMARIES), native_xyz(primaries) @ rgb)
                 np.testing.assert_allclose(actual, expected, atol=.8, rtol=0)
             self.assertGreater(actual_p3[0]-actual_srgb[0], 4)
+
+    def test_p3_matrix_modes_agree_with_littlecms_relative_colorimetry(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            swatch = (226, 105, 65)
+            cms_target = ImageCms.getOpenProfile(BytesIO(matrix_profile(REC2020_PRIMARIES)))
+            previous = None
+            for with_chad in (True, False):
+                with self.subTest(with_chad=with_chad):
+                    profile = matrix_profile(P3_PRIMARIES, with_chad=with_chad)
+                    self.assertEqual(hdr_layers.photograph_icc(profile), hdr_layers.DISPLAY_P3)
+                    image = Image.new("RGB", (128, 72), swatch)
+                    expected = ImageCms.profileToProfile(
+                        image, ImageCms.getOpenProfile(BytesIO(profile)), cms_target,
+                        renderingIntent=ImageCms.Intent.RELATIVE_COLORIMETRIC, outputMode="RGB")
+                    expected = 100*((np.array(expected.getpixel((0, 0)))/255+.055)/1.055)**2.4
+                    source = root/f"swatch-{with_chad}.png"
+                    image.save(source, icc_profile=profile)
+                    photo = {"id": "swatch", "kind": "image", "name": source.name, "path": str(source)}
+                    decoded = raw_picture(project([photo]), root)
+                    # LittleCMS's RGB output is quantized to eight bits.
+                    np.testing.assert_allclose(decoded, expected, atol=.8, rtol=0)
+                    if previous is not None:
+                        np.testing.assert_array_equal(decoded, previous)
+                    previous = decoded
+
+        no_chad = bytearray(matrix_profile(P3_PRIMARIES, with_chad=False))
+        offsets = icc_offsets(no_chad)
+        for index, tag in enumerate((b"rXYZ", b"gXYZ", b"bXYZ")):
+            coordinates = np.rint(native_xyz(P3_PRIMARIES)[:, index]*65536).astype(int)
+            struct.pack_into(">3i", no_chad, offsets[tag]+8, *coordinates)
+        with self.assertRaisesRegex(ValueError, "colorants"):
+            hdr_layers.photograph_icc(bytes(no_chad))
+
+        wrong_pcs = bytearray(matrix_profile(P3_PRIMARIES, with_chad=False))
+        struct.pack_into(">i", wrong_pcs, 68, round(.95045*65536))
+        with self.assertRaisesRegex(ValueError, "D50 PCS"):
+            hdr_layers.photograph_icc(bytes(wrong_pcs))

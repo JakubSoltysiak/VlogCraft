@@ -519,7 +519,9 @@ def qualify(project, folder, first, last, reference, reference_sha256, *, contin
                        "hdr_layers.py", "hdr10plus_authoring.py", "hdr10plus_bitstream.py", "hdr10plus_export.py",
                        "hdr10plus_fast.py", "hdr10plus_master.py", "native_project_plan.py", "native_project_render.py",
                        "native_project_verification.py", "render_engine.py", "sequences.py", "timeline_transitions.py",
-                       "timing.py", "video_effects.py","mixed_export.py","export_raster_options.py",
+                       "timing.py", "video_effects.py", "mixed_export.py", "export_raster_options.py",
+                       "native_source_seek.py", "hdr10plus_index.py", "audio_edit.py", "grading.py",
+                       "encoders.py", "server.py", "project_store.py", "export_scratch.py",
                        "benchmarks/phase3a_segment_provider.py")}
     spec = {"version": VERSION, "project": str(project), "pins": {str(path): value for path, value in pins.items()},
             "reference": str(reference), "continuous_reference": str(continuous) if continuous else None,
@@ -528,7 +530,7 @@ def qualify(project, folder, first, last, reference, reference_sha256, *, contin
             "spans": [span.binding for span in spans], "tool_versions": tool_versions,
             "x265_parameters": color_management.x265_metadata(state["output"]["color"]),
             "filter_threads_per_worker": min(4, os.cpu_count() or 1), "pillow_version": version("pillow"),
-            "implementation": implementation, "quality_floor_db": MIN_PSNR}
+            "numpy_version": version("numpy"), "implementation": implementation, "quality_floor_db": MIN_PSNR}
     spec_digest = sha256(canonical(spec)).hexdigest()
     program = SimpleNamespace(fps=spans[0].rate, frames=range(last-first))
     folder = Path(folder).absolute()

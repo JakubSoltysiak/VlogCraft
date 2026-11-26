@@ -14,6 +14,8 @@ The archived 48-picture mixed excerpt used 12 photograph pictures with standalon
 
 Inspecting the ICC tags disclosed a shared color error in that reference. The real JPEGs use P3-D65 colorants and sRGB transfer curves. The old renderer recognized “sRGB” in the ICC description and selected BT.709 primaries. Reproducing its pixels alone could not detect the mistake. These legacy measurements remain comparisons to that historical interpretation. The corrected managed and accelerated qualification uses the actual embedded primaries, including the three EXIF-orientation-6 photographs in the longer range. Generic transparent PNGs, a nontrivial opacity and the saved explicit sRGB interpretation have separate regression coverage. The numeric checks use the registered Display P3 primaries, D65 white and piecewise transfer function. [ICC Display P3 definition](https://registry.color.org/rgb-registry/displayp3) · [FFmpeg zscale mapping](https://ffmpeg.org/doxygen/trunk/vf__zscale_8c_source.html).
 
+An explicit saved sRGB override reproduced the original real-camera excerpt's 48 coded/decoded pictures, all 48 original dynamic records and its PCM. With embedded P3 enabled, exactly the 12 photograph pictures and their 12 records changed. All 36 camera pictures and their records stayed identical. The corrected and archived masters still scored 53.43 dB or higher on every picture, illustrating why the colorant and pixel-identity checks are needed in addition to PSNR.
+
 ## Raster and encoding measured separately
 
 One 36-picture interval from the failing historical encoder span supplied the same actual Main10 input on disk to each encoder. Capturing the indexed source planes took 1.693 s. The control raster including sequential raw output took 39.496 s. The RGB-only raster with cached margins took 34.114 s and produced identical bytes. Encoding the prepared pictures without the raster took 31.318 s with two pool workers and 9.101 s with eight. Both used two frame threads, WPP and the same mastering declarations. These are isolated stage timings. Rasterization and encoding overlap during delivery.
@@ -27,11 +29,18 @@ All 48 pictures matched their corrected managed master in both the original edit
 | Corrected mixed excerpt | Delivery or qualification time | Sampled peak process-tree working set |
 |---|---:|---:|
 | Managed, original edit boundaries | 88.789 s | 3.41 GiB |
+| Indexed camera, original raster and verifier, including independent checks | 145.739 s | 2.32 GiB |
 | Indexed camera and prepared still, including independent checks | 119.205 s | 2.50 GiB |
+| Managed, original edit boundaries, eight x265 pool workers | 78.527 s | 3.43 GiB |
+| Indexed camera and prepared still, eight x265 pool workers, including independent checks | 107.914 s | 2.61 GiB |
 | Managed, one uninterrupted x265 context with a disk-backed raw oracle | 96.957 s including control preparation | 2.72 GiB |
 | Indexed camera and prepared still, one uninterrupted context with full checks | 117.920 s | 2.98 GiB |
 | Cold independent segments, serial, both references checked | 103.764 s | 2.50 GiB |
 | Cold independent segments, two workers, both references checked | 75.778 s | 3.65 GiB |
+
+An independent decode of every 10-bit Y/U/V sample measured minimum/overall compression PSNR of 51.830/53.788 dB for the edit-boundary encode and 51.847/53.722 dB for the uninterrupted encode. Neither had a picture below 50 dB. The repeated managed uninterrupted control reproduced both the earlier control file and the complete uncompressed input byte for byte.
+
+At a fixed two-worker x265 pool the new raster and still reuse reduced the matched 48-picture wall time, including independent checks, from 145.739 s to 119.205 s (18.2%). At eight x265 workers it took 107.914 s and matched its separately rendered eight-worker reference. These are one physical run per configuration.
 
 Independent segments started at pictures 0, 12 and 30. The joined output preserved all 48 original segment packets and isolated segment decodes. Against the uninterrupted encode, the minimum per-picture PSNR was 54.24 dB and overall PSNR was 55.892 dB. All 48 pictures matched the separately managed encode with the same cuts. Its 48 HDR10+ records matched exactly. The uninterrupted encode reconstructed slightly different pixels in every frame, and its 48 dynamic records accordingly differed. PCM, sample endpoints and static HDR matched both references.
 
@@ -39,11 +48,23 @@ A separate serial export was stopped immediately after its first verified segmen
 
 The optional project-export runtime exposes **Mixed cameras and stills · exact master** in the export dialog. The user selects a matched local master. The editor uses the saved Slow CRF 20 profile, checks every decoded picture, audio sample, video and AAC packet clock, and final HDR10+ payload, and publishes only an accepted candidate. The existing managed renderer handles unsupported projects and verification failures. The uninterrupted and restartable segment experiments remain accessible through their qualification commands.
 
+## Second source format on the original timeline
+
+Original frames [2400, 2736) contain a 300-picture PNG hold and 36 pictures from a different rotated SDR camera, with standalone music and camera audio. This PNG stores an RGBA channel layout with fully opaque alpha. Synthetic tests exercise fractional alpha, opacity, rotation and masking. At eight x265 pool workers, the matched managed export took 299.533 s. The optimized delivery including independent checks took 105.708 s. All 336 coded and decoded pictures, 336 HDR10+ records and 268,800 PCM sample positions matched. The lowest of six uncompressed visual samples was 59.466 dB.
+
 ## Contiguous 936-picture first export
 
 The edited source interval contains three EXIF-rotated P3-D65 photographs, standalone 44.1 kHz audio, and a rotated HEVC SDR camera with its own 48 kHz audio. The managed control took 552.828 s. The indexed camera and prepared-still route reached the authored master in 245.599 s and completed its own checks in 293.290 s. Independent decoding and coded-picture comparison extended elapsed time to 324.872 s, 41.2% below the original managed delivery time even with this extra check. Both trials peaked near 5.09 GiB of sampled process-tree working set.
 
 All 936 coded pictures, 936 independent picture decodes, 936 HDR10+ records, static declarations and 748,800 decoded PCM samples per channel matched the managed master. The provider separately checked all 36 original camera selections, including four repeated PTS selections. The lowest of 13 comparisons with uncompressed input was 52.457 dB. The three eligible static holds and a one-picture still interval accounted for 190.138 s of picture encoding. Indexed camera encoder feed and wait consumed 27.678 s. Final metadata authoring took 25.726 s.
+
+## Full-project scope
+
+The saved edit has 78,427 pictures, 62,741,600 stereo sample positions and 30 original render intervals. Camera footage supplies 72,427 pictures (92.3%). Static photographs supply 6,000. Six individual intervals exceed the 3,600-picture qualification budget, including one 30,682-picture camera interval. The longest mixed comparison is photograph-heavy. These measurements do not support a full-project delivery estimate.
+
+Inspecting all 18 still files found a second form of Display P3 profile in the closing PNG. Its ICC v4 matrix contains the D50-adapted P3 colorants, with no separate chromatic adaptation tag. The importer now additionally recognizes that numeric matrix, both D50 white declarations and the sRGB transfer curves. All 18 still files pass color admission, 11 as Display P3 and seven as sRGB. Four swatches bearing the actual closing PNG profile agreed with independent LittleCMS relative colorimetry to within 0.543 cd/m² per linear Rec.2020 component. This class has a tighter matrix tolerance of 0.0003. Unknown matrices and alternate transforms are rejected.
+
+Before starting the full render, qualify subdivisions of an actual long camera interval with original seek and resampling context, preserve verified checkpoints through a longer owner/process interruption, and measure sustained shared-memory and scratch use. The prior 3,600-picture camera gate and the current mixed gates cover different parts of the saved edit. Physical device loss, other drivers and creative multilayer timelines remain open. The complete project was not rendered.
 
 ## Reproduction on private media
 

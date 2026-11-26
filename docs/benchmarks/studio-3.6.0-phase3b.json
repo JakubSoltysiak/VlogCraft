@@ -6880,9 +6880,9 @@
       "cause": "The old binding checked the historical Phase 3A measurement against changed Phase 3B source. CI now verifies Phase 3A using its archived commit, then checks the new record."
     }
   ],
-  "source_fingerprint": "97b6d877a826be8bd0e4d971c0b2fa0a839b2629ab903d8549ae8346907bd7b9",
+  "source_fingerprint": "f880f1abcf013cfc9fda00fc2f682458689e97f3952e466429ffb31c3b0d7a24",
   "fingerprint_method": "SHA256 sorted relevant relative path + NUL + LF-normalized source + NUL",
-  "benchmark_protocol_fingerprint": "550835189aa7e77a6d5edbd93d5b4acea618768775c6b7f0d2108aaabeee29d7",
+  "benchmark_protocol_fingerprint": "16d25084f0b3115e99a26aecc801ff0d0c5a290faf7fc3bc1cfbf3c50081e542",
   "benchmark_protocol_fingerprint_method": "SHA256 sorted benchmark driver/observer relative path + NUL + LF-normalized source + NUL",
   "follow_up": {
     "status": "development checkpoint",

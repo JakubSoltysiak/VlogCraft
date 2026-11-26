@@ -15,6 +15,7 @@ sys.path[:0] = [str(ROOT),str(ROOT/"benchmarks"),str(ROOT/"tests")]
 from native_project_render import compare_project
 from native_project_plan import compile_project
 import project_store
+import sequences
 import server
 from windows_session import session
 
@@ -41,7 +42,13 @@ def qualify(executable,project,reference,results,*,mixed=False):
     shutil.copyfile(project,local)
     state,recovered=project_store.load(local,server.validate_document)
     assert not recovered
-    protected = [local,reference,*[Path(asset["path"]) for asset in state["assets"]]]
+    linked = {clip.get(key) for track in sequences.playback(state)["tracks"] for clip in track["clips"]
+              for key in ("assetId", "lutId")}
+    library = {Path(asset["path"]) for asset in state["assets"]}
+    missing = {path for path in library if not path.exists()}
+    assert not any(asset["id"] in linked and Path(asset["path"]) in missing for asset in state["assets"]), (
+        "A required timeline source is missing")
+    protected = [local, reference, *(library-missing)]
     before = {path:digest(path) for path in protected}
     delivered = results/"Projekt próbny.mp4"
     cancelled = results/"Anulowany.mp4"
@@ -106,6 +113,7 @@ def qualify(executable,project,reference,results,*,mixed=False):
         values=compare_project(reference,delivered,program,results)
         assert values["passed"],values
     assert all(digest(path)==expected for path,expected in before.items())
+    assert all(not path.exists() for path in missing)
     assert not list(results.glob(".vlogcraft_*"))
     receipt=json.loads((results/"installed/process-ownership.json").read_text())
     assert receipt["job_members_at_cleanup"]==0
