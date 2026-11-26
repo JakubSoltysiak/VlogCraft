@@ -144,6 +144,34 @@ struct Decoder {
             }
         }
     }
+    void seek_indexed_packet(int64_t pts,int64_t dts,int64_t position){
+        av_frame_unref(frame);
+        av_packet_unref(packet);
+        // MOV seeks on presentation time while searching a decoding-time
+        // index. It may land at a nearby sync sample because of composition
+        // offsets and edit lists. Only the verified packet may enter the codec.
+        for(int64_t tick:{pts,dts}){
+            if(av_seek_frame(file,stream,tick,AVSEEK_FLAG_BACKWARD)<0) continue;
+            for(int n=0;n<4096;++n){
+                const int read=av_read_frame(file,packet);
+                if(read==AVERROR_EOF) break;
+                avcheck(read,"read indexed source packet");
+                if(packet->stream_index!=stream){av_packet_unref(packet);continue;}
+                if(packet->pts==pts&&packet->dts==dts&&packet->pos==position&&
+                   (packet->flags&AV_PKT_FLAG_KEY)&&!(packet->flags&(AV_PKT_FLAG_DISCARD|AV_PKT_FLAG_CORRUPT))){
+                    avcodec_flush_buffers(codec);
+                    eof=drained=false;
+                    avcheck(avcodec_send_packet(codec,packet),"decode verified random-access packet");
+                    av_packet_unref(packet);
+                    return;
+                }
+                const bool passed=packet->dts!=AV_NOPTS_VALUE&&packet->dts>=dts;
+                av_packet_unref(packet);
+                if(passed) break;
+            }
+        }
+        throw std::runtime_error("The demuxer could not establish the verified random-access packet");
+    }
     void seek(double at){
         {WatchStage watch("seek_demux");avcheck(av_seek_frame(file,stream,(int64_t)(at/av_q2d(file->streams[stream]->time_base)),AVSEEK_FLAG_BACKWARD),"seek");}
         {WatchStage watch("flush_codec");avcodec_flush_buffers(codec);}eof=drained=false;

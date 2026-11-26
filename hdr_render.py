@@ -8,6 +8,10 @@ import hdr_layers
 import timeline_transitions
 
 
+PQ_QUANTIZE = ('zscale=threads=1:agamma=0:pin=2020:tin=linear:min=gbr:rin=full:'
+               'p=2020:t=smpte2084:m=2020_ncl:r=limited:npl=100:dither=error_diffusion,format=yuv420p10le')
+
+
 def final_clock(files, fps, frames, cancelled):
  """Give the concatenated video a continuous decode clock across closed GOPs."""
  ticks=int(Fraction(120000)/fps)
@@ -37,10 +41,15 @@ def layer_contract(assets,c,w,h):
   return None,(w,h),'',hdr_layers.SRGB
  a=assets[c['assetId']]
  if kind=='image':
-  if c.get('inputColor') or Path(a['path']).suffix.lower() not in hdr_layers.STILL_SUFFIXES:
-   raise ValueError('Managed HDR photographs use sRGB PNG or JPEG')
-  aw,ah,orientation=hdr_layers.photo_info(a['path'])
-  return a,(aw,ah),orientation,hdr_layers.SRGB
+  if Path(a['path']).suffix.lower() not in hdr_layers.STILL_SUFFIXES:
+   raise ValueError('Managed stills use PNG or JPEG')
+  aw,ah,orientation,interpretation=hdr_layers.photo_contract(a['path'])
+  if c.get('inputColor'):
+   override=color.validate_input(c['inputColor'])
+   if override['profile']!=color.STILL_SRGB_OVERRIDE:
+    raise ValueError('Managed stills support an explicit sRGB interpretation override')
+   interpretation=hdr_layers.SRGB
+  return a,(aw,ah),orientation,interpretation
  if kind!='video':raise ValueError('Unsupported layer in managed HDR')
  angle=(-float(a.get('rotation',0)))%360
  if angle not in hdr_layers.VIDEO_ORIENTATION:raise ValueError('Only exact right-angle source orientation is qualified in managed HDR')
@@ -83,7 +92,7 @@ def command(state,start,end,target,jobdir,quality='final'):
   alpha=hdr_layers.parameter(c,'opacity',1,alpha_start);off=alpha_start-c['position']
   if c.get('fadeIn',0):alpha+=f'*min(1,max(0,(T+{engine._num(off)})/{engine._num(c["fadeIn"])}))'
   if c.get('fadeOut',0):alpha+=f'*min(1,max(0,({engine._num(engine.clip_length(c)-off)}-T)/{engine._num(c["fadeOut"])}))'
-  gain=2**color.number(c.get('hdrExposure',0),-8,8)*(contract['sdrWhiteNits']/100 if profile in ('rec709','srgb') else 1)
+  gain=2**color.number(c.get('hdrExposure',0),-8,8)*(contract['sdrWhiteNits']/100 if profile in ('rec709','srgb','display-p3') else 1)
   cadence=f'setpts=PTS/{engine._num(c.get("speed",1))},fps={fps}:start_time=0:round=up,'
   convert=hdr_layers.luma_linear(p,t,m,r)
   oriented=(orientation+',' if orientation else '')+'setsar=1'
@@ -148,7 +157,7 @@ def command(state,start,end,target,jobdir,quality='final'):
  tail=',sidedata=mode=delete'
  hdr=contract['output']=='hdr10' and quality=='final'
  if hdr:
-  tail+=',zscale=threads=1:agamma=0:pin=2020:tin=linear:min=gbr:rin=full:p=2020:t=smpte2084:m=2020_ncl:r=limited:npl=100:dither=error_diffusion,format=yuv420p10le'
+  tail+=','+PQ_QUANTIZE
  else:
   tail+=',zscale=threads=1:agamma=0:pin=2020:tin=linear:min=gbr:rin=full:p=709:t=linear:m=gbr:r=full,format=gbrpf32le,tonemap=hable:desat=0:peak=100,zscale=threads=1:agamma=0:pin=709:tin=linear:min=gbr:rin=full:p=709:t=709:m=709:r=limited:npl=100:dither=error_diffusion,format=yuv420p'
  filters.append(f'[{back}]trim=end_frame={last-first}{tail}[finished]')

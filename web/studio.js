@@ -177,8 +177,10 @@ async function openExport(){
   choice.disabled=true;choice.replaceChildren(new Option('Checking local encoders…',''));
   $('startRender').disabled=true;
   try{
-    const [available,nativeProject]=await Promise.all([request('encoders'),request('export/native-project')]);
+    const [available,nativeProject,jobs]=await Promise.all([request('encoders'),request('export/native-project'),request('jobs')]);
     $('exportWorkflow').dataset.nativeProjectAvailable=nativeProject.available&&available.libx265?'yes':'';
+    $('nativeProjectMixedNote').textContent=nativeProject.available
+      ? `Radeon 890M · UHD60 Slow CRF 20 · 60 Mb/s project setting · two x265 pool workers. Up to ${nativeProject.mixedMaxFrames} pictures and ${nativeProject.mixedMaxSpans} render spans. Studio compares every decoded picture, HDR10+ payload and audio sample with your master.` : '';
     choice.replaceChildren(...Object.entries(available).map(([id,label])=>new Option(label,id)));
     for(const option of $('exportWorkflow').options){
       if(['hdr10plus-master','samsung-hdr10plus','youtube-hdr'].includes(option.value))option.disabled=!available.libx265;
@@ -186,7 +188,8 @@ async function openExport(){
     choice.value=available[out.encoder]?out.encoder:'libx264';
     if(!choice.value)choice.selectedIndex=0;
     if(state.output.color?.output==='hdr10')choice.value='libx265';
-    $('startRender').disabled=!choice.value || (await request('jobs')).export.status==='rendering';
+    $('startRender').disabled=!choice.value || jobs.export.status==='rendering';
+    if(jobs.export.status==='interrupted')paintExportJob(jobs.export);
   }catch(error){toast('Encoder check failed: '+error.message,true);}
   finally{updateExportWorkflow();}
 }
@@ -202,16 +205,17 @@ function updateExportWorkflow(){
   $('nativeProjectExport').hidden=mode!=='hdr10plus-master'||!workflow.dataset.nativeProjectAvailable;
   const native=$('useNativeProjectExport').checked;
   const first=$('nativeProjectPolicy').value==='first';
+  const mixed=$('nativeProjectPolicy').value==='mixed';
   $('nativeProjectPolicyRow').hidden=!native;
   $('nativeProjectComparison').hidden=!native||first;
   $('nativeProjectFirstNote').hidden=!native||!first;
+  $('nativeProjectMixedNote').hidden=!native||!mixed;
   $('exportProfileNote').hidden=!profile;
   $('exportProfileNote').textContent=samsung
     ? '3840 × 2160 at 60 fps · HEVC Main10 HDR10+ · CRF 17 · Samsung device playback is pending.'
-    : youtube ? '3840 × 2160 at 60 fps · HEVC Main10 HDR10 · 75 Mb/s target · AAC stereo. YouTube processes its own HDR versions.' : '';
+    : youtube ? '3840 × 2160 at 60 fps · HEVC Main10 HDR10 · CRF 20 · AAC stereo. YouTube processes its own HDR versions.' : '';
   $('exportResolution').closest('label').hidden=profile;
   $('exportFps').closest('label').hidden=profile;
-  $('outputBitrate').closest('label').hidden=profile;
   $('customDimensions').hidden=profile||$('exportResolution').value!=='custom';
   $('applyColorSetup').hidden=managed;
   $('colorOutput').disabled=managed;
@@ -280,10 +284,11 @@ function updateEncoderControls(){
   const cpu=hdr || ['libx264','libx265','libsvtav1'].includes($('encoderChoice').value);
   $('cpuExportPreset').hidden=!cpu;
   const fixed=['samsung-hdr10plus','youtube-hdr'].includes($('exportWorkflow').value);
+  $('outputBitrate').closest('label').hidden=hdr || fixed;
   $('cpuExportQuality').hidden=fixed || !cpu || (!hdr && $('outputBitrate').valueAsNumber>0);
   $('exportBitrateNote').hidden=fixed;
   $('exportBitrateNote').textContent=hdr
-    ? 'HDR10 uses the HEVC CPU encoder. CRF controls quality. A nonzero bitrate also sets an encoder target.'
+    ? 'HDR10 uses HEVC Main10 constant-quality encoding. CRF sets quality and the picture content determines file size.'
     : cpu ? 'Set 0 to use CRF quality mode. A nonzero value sets the target bitrate instead.'
           : 'Hardware encoding uses a target bitrate. Set 0 to use 35 Mb/s.';
 }

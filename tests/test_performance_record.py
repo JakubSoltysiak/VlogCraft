@@ -23,6 +23,19 @@ class EvidenceBindingTests(unittest.TestCase):
    path=self.root/name;path.write_bytes(path.read_bytes().replace(b'\n',b'\r\n'))
   self.invoke();data=json.loads(self.path.read_text());self.assertIn('benchmark_protocol_fingerprint',data)
 
+ def test_detailed_measurements_cannot_change_during_a_restamp(self):
+  self.invoke(True)
+  data=json.loads(self.path.read_text())
+  name='delivery.json'
+  (self.root/name).write_text('{"subthreshold_pictures":19}')
+  data['measurement_files']={name:record.fingerprint([name])}
+  self.path.write_text(json.dumps(data))
+  self.invoke()
+  (self.root/name).write_text('{"subthreshold_pictures":0}')
+  for stamp in (False,True):
+   with self.assertRaisesRegex(ValueError,'measurement file'):
+    self.invoke(stamp)
+
  def test_follow_up_can_update_bindings_and_append_results_without_replacing_trials(self):
   previous={'source_fingerprint':'old','benchmark_protocol_fingerprint':'old protocol',
             'playback':{'failed':{'skipped_frames':152}},'unavailable':None}
@@ -34,3 +47,10 @@ class EvidenceBindingTests(unittest.TestCase):
   del candidate['unavailable']
   with self.assertRaisesRegex(ValueError,'unavailable'):
    record.check_history(candidate,previous)
+
+ def test_append_a_new_measurement_file_preserves_every_previous_digest(self):
+  previous={'measurement_files':{'camera.json':'previous'}}
+  record.check_history({'measurement_files':{'camera.json':'previous','mixed.json':'new'}},previous)
+  for revised in ({'mixed.json':'new'},{'camera.json':'changed'}):
+   with self.assertRaisesRegex(ValueError,'measurement_files'):
+    record.check_history({'measurement_files':revised},previous)

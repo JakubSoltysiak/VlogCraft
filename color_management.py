@@ -4,6 +4,7 @@ from fractions import Fraction
 import numpy as np
 
 WORKING='linear-rec2020-100nits'
+STILL_SRGB_OVERRIDE='srgb'
 PROFILES={'rec709':('bt709','bt709','bt709'),'pq2020':('bt2020','smpte2084','bt2020nc'),
           'hlg2020':('bt2020','arib-std-b67','bt2020nc'),'samsung-log':None}
 def number(value,low,high):
@@ -15,7 +16,8 @@ def number(value,low,high):
 
 def validate_input(value):
  if not isinstance(value,dict) or set(value)-{'profile','range','pixelAspect'}:raise ValueError('Invalid technical input transform')
- if value.get('profile') not in {*PROFILES,'source'} or value.get('range','auto') not in ('auto','limited','full') or value.get('pixelAspect','source') not in ('source','square'):raise ValueError('Unknown technical input transform')
+ if value.get('profile') not in {*PROFILES,'source',STILL_SRGB_OVERRIDE} or value.get('range','auto') not in ('auto','limited','full') or value.get('pixelAspect','source') not in ('source','square'):raise ValueError('Unknown technical input transform')
+ if value['profile']==STILL_SRGB_OVERRIDE and value.get('range','auto')=='limited':raise ValueError('An sRGB still override requires full range')
  out={'profile':value['profile'],'range':value.get('range','auto')}
  if 'pixelAspect' in value:out['pixelAspect']=value['pixelAspect']
  return out
@@ -53,6 +55,7 @@ def interpretation(asset,clip):
  override=clip.get('inputColor')
  if override and override.get('profile')!='source':
   override=validate_input(override);profile=override['profile']
+  if profile==STILL_SRGB_OVERRIDE:raise ValueError('The sRGB interpretation override applies to still pictures')
   if PROFILES[profile] is None:raise ValueError('Samsung Log input transform is not implemented; original/profile association is preserved')
   p,t,m=PROFILES[profile];r=override['range']
  else:

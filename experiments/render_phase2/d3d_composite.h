@@ -126,6 +126,7 @@ class GpuCompositor {
     Com<ID3D11Buffer> constants, edges;
     Com<ID3D11ComputeShader> shader;
     Com<ID3D11Query> completed, disjoint, gpuStart, gpuEnd;
+    Com<ID3D11Query> copyStart, copyEnd;
     unsigned width, height, sourceCount, outputStride;
 
     void query(D3D11_QUERY type,Com<ID3D11Query>& result) {
@@ -158,6 +159,8 @@ class GpuCompositor {
     }
 
     void setup_pq() {
+        query(D3D11_QUERY_TIMESTAMP,copyStart);
+        query(D3D11_QUERY_TIMESTAMP,copyEnd);
         compile(pq_shader_source,"phase2b-pq",pqShader);
         require(device->CreateShaderResourceView(output.get(),nullptr,pqInput.init()),"Create PQ input view");
         pqBytes=3*width*height;
@@ -175,13 +178,13 @@ class GpuCompositor {
     }
 
 public:
-    double uploadMs=0, dispatchMs=0, shaderMs=0, mapMs=0, colorMs=0, outputMs=0;
+    double uploadMs=0, dispatchMs=0, shaderMs=0, mapMs=0, colorMs=0, copyMs=0, outputMs=0;
     bool gpuClockValid=false;
     unsigned long long localBytes=0, sharedBytes=0, currentLocal=0, currentShared=0;
     std::string adapterName;
 
     GpuCompositor(unsigned w,unsigned h,unsigned count,const Pixel* pixels,bool half,bool download,bool warp,
-                  bool pq=false,bool resident=false)
+                  bool pq=false,bool resident=false,bool decodeOnly=false)
         :width(w),height(h),sourceCount(count),outputStride(half?8:16) {
         D3D_FEATURE_LEVEL level=D3D_FEATURE_LEVEL_11_0;
         require(D3D11CreateDevice(nullptr,warp?D3D_DRIVER_TYPE_WARP:D3D_DRIVER_TYPE_HARDWARE,
@@ -197,6 +200,7 @@ public:
         WideCharToMultiByte(CP_UTF8,0,adapterInfo.Description,-1,adapterText,sizeof(adapterText),nullptr,nullptr);
         for (char c:std::string(adapterText)) if(c>=32 && c!='"' && c!='\\') adapterName+=c;
 
+        if(decodeOnly) return;
         compile(shader_source,"phase2-composite",shader);
         const D3D11_BUFFER_DESC buffer={sizeof(Frame),D3D11_USAGE_DEFAULT,D3D11_BIND_CONSTANT_BUFFER,0,0,0};
         require(device->CreateBuffer(&buffer,nullptr,constants.init()),"Create frame parameters");
@@ -352,14 +356,16 @@ public:
         context->End(gpuStart.get());
         context->Dispatch((width+31)/32,(height+15)/16,1);
         context->End(gpuEnd.get());
-        context->End(disjoint.get());
         sink=nullptr;
         sensor=nullptr;
         context->CSSetUnorderedAccessViews(0,1,&sink,nullptr);
         context->CSSetShaderResources(2,1,&sensor);
         context->CSSetShader(shader.get(),nullptr,0);
         const auto transfer=Clock::now();
+        context->End(copyStart.get());
         context->CopyResource(pqReadback.get(),pqOutput.get());
+        context->End(copyEnd.get());
+        context->End(disjoint.get());
         D3D11_MAPPED_SUBRESOURCE mapped{};
         require(context->Map(pqReadback.get(),0,D3D11_MAP_READ,0,&mapped),"Map packed PQ picture");
         mapMs=milliseconds(transfer);
@@ -371,6 +377,9 @@ public:
         const auto clock=wait<D3D11_QUERY_DATA_TIMESTAMP_DISJOINT>(disjoint.get());
         const auto start=wait<UINT64>(gpuStart.get()),end=wait<UINT64>(gpuEnd.get());
         colorMs=(!clock.Disjoint && clock.Frequency)?1000.*double(end-start)/double(clock.Frequency):-1;
+        const auto copyBegin=wait<UINT64>(copyStart.get()), copyFinish=wait<UINT64>(copyEnd.get());
+        copyMs=(!clock.Disjoint && clock.Frequency && copyFinish>=copyBegin)
+            ?1000.*double(copyFinish-copyBegin)/double(clock.Frequency):-1;
     }
 };
 

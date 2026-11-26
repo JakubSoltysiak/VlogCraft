@@ -141,7 +141,16 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python -c "import json,sys; from tools.performance_record import check_history; check_history(json.load(open(sys.argv[1], encoding='utf8')), json.load(open(sys.argv[2], encoding='utf8')))" $timestampedRecord $pictureRecord
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          python tools/performance_record.py docs/benchmarks/studio-3.6.0-phase3b.json --historical-record $timestampedRecord
+          $exportRecord = $timestampedRecord
+          foreach ($checkpoint in @('bbc1c3db5b3df0644e8c5e7362c0b306f8c619ad','43d8cad82bb08fccaacd52e3ab0287569f329113')) {
+            $nextRecord = "build/qa/export-$checkpoint.json"
+            git show "${checkpoint}:docs/benchmarks/studio-3.6.0-phase3b.json" | Set-Content -Encoding utf8 $nextRecord
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            python -c "import json,sys; from tools.performance_record import check_history; check_history(json.load(open(sys.argv[1], encoding='utf8')), json.load(open(sys.argv[2], encoding='utf8')))" $nextRecord $exportRecord
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            $exportRecord = $nextRecord
+          }
+          python tools/performance_record.py docs/benchmarks/studio-3.6.0-phase3b.json --historical-record $exportRecord
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python tests/icon_assets.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

@@ -10,6 +10,7 @@ import argparse
 import hashlib
 import collections
 import json
+import logging
 import math
 import mimetypes
 import os
@@ -29,6 +30,7 @@ from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutureTimeout
 from app_version import VERSION
+import export_jobs
 import export_scratch
 import project_store
 import animation
@@ -358,7 +360,10 @@ def validate_state(d, base=None):
                'fadeOut':_number(src.get('fadeOut',0),'Fade out',0,30),
                'locked':bool(src.get('locked',False))}
             import color_management
-            if 'inputColor' in src:c['inputColor']=color_management.validate_input(src['inputColor'])
+            if 'inputColor' in src:
+                c['inputColor']=color_management.validate_input(src['inputColor'])
+                if c['inputColor']['profile']==color_management.STILL_SRGB_OVERRIDE and kind!='image':
+                    raise ValueError('The sRGB interpretation override applies to still pictures')
             if 'hdrExposure' in src:c['hdrExposure']=_number(src['hdrExposure'],'HDR linear exposure',-8,8)
             for prop,default in [('rotation',0),('brightness',0),('contrast',1),('saturation',1),('maskRadius',.5)]:
                 c[prop]=_number(src.get(prop,default),prop,*animation.LIMITS[prop])
@@ -555,8 +560,37 @@ def choose_save_path(suggested=''):
     try:return filedialog.asksaveasfilename(defaultextension='.mp4',initialfile=name,initialdir=str(folder),filetypes=[('MP4','*.mp4')]) or None
     finally:tk.destroy()
 
+def reconcile_export_jobs():
+    with JOB_LOCK:
+        try:
+            status = export_jobs.reconcile(WORK)
+        except (OSError, ValueError):
+            logging.exception('Reconciling local export receipts')
+            return
+        if JOBS['export']['status'] == 'idle' and status and status['status'] == 'interrupted':
+            JOBS['export'] = status
+
+
+def record_export_progress(job, force=False):
+    record = job.get('_receipt')
+    now = time.monotonic()
+    if record is None or (not force and now - job['_last_receipt'] < 5):
+        return
+    job['_last_receipt'] = now
+    status = {key: value for key, value in job.items() if not key.startswith('_')}
+    status['elapsedSeconds'] = round(job.get('_finished', now) - job['_started'], 1)
+    try:
+        export_jobs.write(WORK, record, status)
+    except (OSError, ValueError):
+        logging.exception('Saving local export progress')
+
+
 def job_status(which,**kw):
-    with JOB_LOCK:JOBS[which].update(kw)
+    with JOB_LOCK:
+        job = JOBS[which]
+        job.update(kw)
+        if which == 'export':
+            record_export_progress(job, force=job['status'] != 'rendering')
 
 def exec_process(command,cwd,which):
     if CANCEL[which].is_set():raise RuntimeError('Cancelled')
@@ -634,6 +668,7 @@ def update_export_progress(fields):
             job['frames'] = job['_first'] + round(job['_frames'] * fraction)
             job['encodedSeconds'] = job['_start'] + segment_length * fraction
             job['fps'] = fps if math.isfinite(fps) and fps > 0 else None
+        record_export_progress(job)
 
 
 def publish_export(part, dest, assets, overwrite):
@@ -646,7 +681,7 @@ def publish_export(part, dest, assets, overwrite):
         os.link(part,dest)  # Atomic no-clobber publication on POSIX.
 
 
-def run_export(snapshot,path,review=False,overwrite=False,delivery='render',authored_frames=0,comparison=None,first_time=False):
+def run_export(snapshot,path,review=False,overwrite=False,delivery='render',authored_frames=0,comparison=None,first_time=False,*,mixed=False):
     dest=Path(path)
     owned=ExitStack()
     try:
@@ -683,6 +718,9 @@ def run_export(snapshot,path,review=False,overwrite=False,delivery='render',auth
                                         CANCEL['export'].is_set,own_analysis)
                 if CANCEL['export'].is_set():raise RuntimeError('Export cancelled')
                 part=authored
+            if mixed:
+                from mixed_project_delivery import protect_comparison_master
+                protect_comparison_master(target,comparison)
             publish_export(part,target,snapshot['assets'],overwrite)
         def deliver():
             return engine.render(snapshot,dest,temp,review=review,cancelled=CANCEL['export'].is_set,
@@ -701,6 +739,15 @@ def run_export(snapshot,path,review=False,overwrite=False,delivery='render',auth
                            fallback='Reference fallback after GPU admission or verification',
                            message='Rendering with the reference backend')
                 deliver()
+            if mixed:
+                from mixed_project_delivery import export_mixed_editor
+                progress(1,'Preparing mixed GPU project render')
+                receipt=export_mixed_editor(snapshot,dest,comparison,runtime,temp,
+                                            cancelled=CANCEL['export'].is_set,progress=progress,
+                                            fallback=reference_fallback,
+                                            publish=lambda part,target:publish_export(part,target,snapshot['assets'],overwrite))
+                job_status('export',**receipt)
+                return
             progress(1,'Preparing GPU project render')
             try:
                 authoring=author_options(runtime/'hdr-statistics.dll')
@@ -1021,7 +1068,12 @@ class Handler(BaseHTTPRequestHandler):
             if path=='/api/source/status':
                 return self.json_response(FRAME_INDEX.status(parse_qs(parsed.query).get('assetId',[''])[0]))
             if path=='/api/encoders':return self.json_response(encoders.available())
-            if path=='/api/export/native-project':return self.json_response({'available':NATIVE_PROJECT_RUNTIME is not None})
+            if path=='/api/export/native-project':
+                available=NATIVE_PROJECT_RUNTIME is not None
+                if available:
+                    from mixed_export import MAX_FRAMES, MAX_SPANS
+                    return self.json_response({'available':True,'mixedMaxFrames':MAX_FRAMES,'mixedMaxSpans':MAX_SPANS})
+                return self.json_response({'available':False})
             if path=='/api/storage':
                 with LOCK:snapshot=deepcopy(STATE)
                 return self.json_response({'bytes':storage_usage(snapshot)})
@@ -1385,11 +1437,17 @@ class Handler(BaseHTTPRequestHandler):
                     raise ValueError('Output already exists. Confirm replacement to export.')
                 comparison=None
                 first_time=data.get('experimentalFirstExport') is True
+                mixed=data.get('experimentalMixedExport') is True
                 if 'experimentalFirstExport' in data and (
                     not first_time or delivery!='hdr10plus-master' or NATIVE_PROJECT_RUNTIME is None or
                     'comparisonMaster' in data
                 ):
                     raise ValueError('Experimental first export requires an edited HDR10+ master and its own verification mode')
+                if 'experimentalMixedExport' in data and (
+                    not mixed or delivery!='hdr10plus-master' or NATIVE_PROJECT_RUNTIME is None or
+                    'comparisonMaster' not in data or 'experimentalFirstExport' in data
+                ):
+                    raise ValueError('Mixed GPU export requires an edited HDR10+ delivery and its matching comparison master')
                 if 'comparisonMaster' in data:
                     if delivery!='hdr10plus-master' or NATIVE_PROJECT_RUNTIME is None:
                         raise ValueError('Experimental GPU project export is unavailable for this delivery')
@@ -1406,8 +1464,15 @@ class Handler(BaseHTTPRequestHandler):
                 with JOB_LOCK:
                     if JOBS['export']['status']=='rendering':raise ValueError('Another export is active')
                     CANCEL['export'].clear()
-                    JOBS['export'] = dict(status='rendering',percent=0,path=None,error=None,message='Preparing export',
-                                          stage='preparing',frames=0,encodedSeconds=0,delivery=delivery,_started=time.monotonic())
+                    status = dict(status='rendering',percent=0,path=None,error=None,message='Preparing export',
+                                  stage='preparing',frames=0,encodedSeconds=0,delivery=delivery)
+                    receipt = export_jobs.start(WORK,snap,dest,{
+                        'review':review, 'overwrite':overwrite, 'experimental_first_export':first_time,
+                        'comparison_master':str(comparison) if comparison is not None else None,
+                        **({'experimental_mixed_export':True} if mixed else {}),
+                    },status)
+                    started = time.monotonic()
+                    JOBS['export'] = dict(status,_started=started,_last_receipt=started,_receipt=receipt)
                     if delivery=='hdr10plus-copy':
                         target,args=run_hdr10plus_copy,(snap,str(dest),overwrite)
                     else:
@@ -1415,9 +1480,14 @@ class Handler(BaseHTTPRequestHandler):
                     native=first_time or comparison is not None
                     if native:
                         args=(*args,comparison,first_time)
-                    thread=threading.Thread(target=target,args=args,daemon=True)
+                    thread=threading.Thread(target=target,args=args,kwargs={'mixed':True} if mixed else {},daemon=True)
                     NATIVE_EXPORT_THREAD=thread if native else None
-                    thread.start()
+                    try:
+                        thread.start()
+                    except RuntimeError:
+                        NATIVE_EXPORT_THREAD=None
+                        job_status('export',status='error',message='Could not start the export worker',_finished=time.monotonic())
+                        raise
                 if not review:remember_export_folder(dest)
                 return self.json_response({'started':True,'url':'/download/'+dest.name if review else None})
             if path=='/api/job/cancel':
@@ -1486,6 +1556,7 @@ def main():
     for app in ('ffmpeg','ffprobe'):
         if not shutil.which(app):raise SystemExit(f'{app} not in PATH. Windows: winget install Gyan.FFmpeg')
     for p in (MEDIA,THUMBS,PROXIES,REVIEWS,EXPORTS):p.mkdir(parents=True,exist_ok=True)
+    reconcile_export_jobs()
     server=ThreadingHTTPServer(('127.0.0.1',args.port),Handler)
     server.daemon_threads=True
     url='http://127.0.0.1:'+str(server.server_address[1])+'/'

@@ -58,6 +58,13 @@ PROTOCOL_FILES=(
  'tests/native_refill_liveness.cpp','tests/test_native_refill_liveness.py',
  'benchmarks/phase3b_completion.py','tests/test_native_completion_trace.py',
  'benchmarks/phase3b_mixed_preview.py','benchmarks/profile_preview_proxy.py','tests/native_source_timebase.py','tests/native_source_rewind.py',
+ 'benchmarks/phase3a_camera_range.py','benchmarks/phase3a_segment_assembly.py','benchmarks/phase3a_indexed_seek.py',
+ 'benchmarks/profile_camera_encoder.py','benchmarks/phase3a_encoder_matrix.py','tests/test_camera_raster.py',
+ 'benchmarks/phase3a_mixed_project.py','benchmarks/phase3a_mixed_reference.py','benchmarks/phase3a_raster_throughput.py',
+ 'benchmarks/phase3a_segment_resume.py','tests/test_mixed_export.py','tests/test_export_still_hold.py','tests/test_segment_resume.py',
+ 'benchmarks/phase3a_segment_provider.py','benchmarks/phase3a_mixed_range.py','tests/test_mixed_range.py',
+ 'tests/test_mixed_continuous.py','tests/test_mixed_reference_quality.py','tests/test_mixed_project_delivery.py','tests/test_still_icc.py',
+ 'tests/test_native_source_seek.py','tests/test_export_jobs.py','tests/test_segment_assembly.py',
  'benchmarks/phase3a_encoder_probe.py','benchmarks/phase3a_first_project.py',
  'tests/test_phase3a_export.py','tests/windows_phase3a_export.py',
  'tests/verify_bundle.py','tools/setup_architecture_lab.py',
@@ -78,6 +85,8 @@ def check_history(current, historical):
  for field, value in historical.items():
   if field in ('source_fingerprint','benchmark_protocol_fingerprint'):
    continue
+  if field=='measurement_files' and all(current.get(field,{}).get(k)==v for k,v in value.items()):
+   continue
   if field not in current or current[field] != value:
    raise ValueError(f'Historical performance evidence changed in field {field!r}')
 
@@ -88,6 +97,9 @@ def main():
  data=json.loads(a.record.read_text('utf8'))
  if a.historical_record:
   check_history(data,json.loads(a.historical_record.read_text('utf8')))
+ for name,expected in data.get('measurement_files',{}).items():
+  if fingerprint([name])!=expected:
+   raise ValueError(f'Performance measurement file differs from its recorded evidence: {name}')
  if a.stamp:
   data['source_fingerprint']=fingerprint();data['fingerprint_method']='SHA256 sorted relevant relative path + NUL + LF-normalized source + NUL'
   data['benchmark_protocol_fingerprint']=fingerprint(PROTOCOL_FILES)

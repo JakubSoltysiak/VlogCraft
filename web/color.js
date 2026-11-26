@@ -45,6 +45,10 @@ function initColorControls(){
  $('colorOutput').onchange();
 }
 function inputColorControls(c,a){
+ if(c.kind==='image')return '<details class="fx-panel"><summary>Technical input color</summary>'+
+ '<label>Interpretation<select id="inputColorProfile"><option value="">Embedded profile</option><option value="srgb">Interpret as sRGB</option></select></label>'+
+ '<p class="dialog-note">Managed color reads embedded sRGB and Display P3 profiles. Untagged photographs use sRGB.</p>'+
+ (state.output.color?field('Linear exposure (stops)','hdrExposure',c.hdrExposure||0,-8,8,.1):'')+'</details>';
  const m=a?.colorMetadata;
  const index=a?.codec==='hevc' && a.colorTransfer==='smpte2084' && a.colorPrimaries==='bt2020';
  const observed=m?.dynamicHDR10PlusDetected?'HDR10+ sample detected':'';
@@ -55,17 +59,22 @@ function inputColorControls(c,a){
  (state.output.color?field('Linear exposure (stops)','hdrExposure',c.hdrExposure||0,-8,8,.1):'')+'</details>';
 }
 function bindInputColor(){
- const c=sel()?.clip;if(!$('inputColorProfile')||!c)return;
- $('inputColorProfile').value=c.inputColor?.profile==='source'?'':c.inputColor?.profile||'';$('inputColorRange').value=c.inputColor?.range||'auto';$('inputPixelAspect').value=c.inputColor?.pixelAspect||'source';
+ const c=sel()?.clip,profileControl=$('inputColorProfile'),rangeControl=$('inputColorRange'),aspectControl=$('inputPixelAspect');
+ if(!profileControl||!c)return;
+ profileControl.value=c.inputColor?.profile==='source'?'':c.inputColor?.profile||'';
+ if(rangeControl)rangeControl.value=c.inputColor?.range||'auto';
+ if(aspectControl)aspectControl.value=c.inputColor?.pixelAspect||'source';
  const change=()=>{
   const hit=sel();if(!hit||hit.track.locked||hit.clip.locked)return;
   if(!state.output.color){toast('Apply a managed color setup in Export before overriding input color.',true);renderInspector();return;}
-  snapshot();const profile=$('inputColorProfile').value;
-  const range=$('inputColorRange').value,pixelAspect=$('inputPixelAspect').value;
+  snapshot();const profile=profileControl.value;
+  const range=rangeControl?.value||(profile==='srgb'?'full':'auto'),pixelAspect=aspectControl?.value||'source';
   if(profile||range!=='auto'||pixelAspect!=='source')hit.clip.inputColor={profile:profile||'source',range,pixelAspect};else delete hit.clip.inputColor;
   redraw();save();syncPreview(true);
  };
- $('inputColorProfile').onchange=change;$('inputColorRange').onchange=change;$('inputPixelAspect').onchange=change;
+ profileControl.onchange=change;
+ if(rangeControl)rangeControl.onchange=change;
+ if(aspectControl)aspectControl.onchange=change;
  const scan=$('indexHdr10Plus');
  if(scan)bindHdr10PlusScan(c.assetId,scan,$('cancelHdr10Plus'),$('hdr10PlusStatus'));
 }

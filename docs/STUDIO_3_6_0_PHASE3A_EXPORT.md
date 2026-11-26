@@ -1,5 +1,7 @@
 # VlogCraft Studio 3.6.0 Phase 3A export qualification
 
+The later [indexed camera export qualification](phase3a-indexed-export.md) measures random-access decoding, the longer range trials and HDR segment assembly. The measurements below describe the preceding checkpoint.
+
 Phase 3A starts at `2520ce60149bdff3392a3e895498af54c1e48b39`, the verified Phase 2D checkpoint. The reference exporter remains the default. The optional development runtime offers full-master comparison and a separate first-export experiment.
 
 ## Frame 193

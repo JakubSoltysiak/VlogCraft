@@ -24,3 +24,23 @@ test('failed project publication keeps color edit, undo and recovery draft consi
  c.initColorControls();c.$('colorOutput').value='hdr10';await c.$('applyColorSetup').onclick();
  assert.equal(c.state.output.color?.output,'hdr10');assert.equal(c.undoStack.length,1);assert.deepEqual(JSON.parse(JSON.stringify(c.state.output)),durableDraft);assert.equal(warnings.at(-1).warning,true);
 });
+
+test('managed HDR shows CRF and preserves the saved bitrate when returning to SDR', () => {
+ const label = {};
+ const nodes = {
+  colorOutput: {value:'hdr10'}, encoderChoice: {value:'libx265'},
+  exportWorkflow: {value:'render'}, cpuExportPreset: {}, cpuExportQuality: {},
+  exportBitrateNote: {}, outputBitrate: {valueAsNumber:60, closest:() => label}
+ };
+ const ctx = vm.createContext({$:id => nodes[id], localStorage:{getItem:() => null}});
+ vm.runInContext(fs.readFileSync('web/studio.js','utf8'), ctx);
+ ctx.updateEncoderControls();
+ assert.equal(label.hidden, true);
+ assert.equal(nodes.cpuExportQuality.hidden, false);
+ assert.match(nodes.exportBitrateNote.textContent, /CRF/);
+ nodes.colorOutput.value = 'legacy';
+ ctx.updateEncoderControls();
+ assert.equal(label.hidden, false);
+ assert.equal(nodes.outputBitrate.valueAsNumber, 60);
+ assert.equal(nodes.cpuExportQuality.hidden, true);
+});

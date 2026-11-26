@@ -1,18 +1,20 @@
 """Alpha-bearing layers for the float32 linear Rec.2020 reference compositor."""
 from functools import lru_cache
 import hashlib
-import io
 import os
 from pathlib import Path
 import re
+import struct
 
-from PIL import Image, ImageCms, ImageDraw, ImageFont
+import numpy as np
+from PIL import Image, ImageDraw, ImageFont
 
 import animation
 
 
 FLOAT_ALPHA = 'gbrapf32le'
 SRGB = ('bt709','iec61966-2-1','gbr','full','srgb')
+DISPLAY_P3 = ('smpte432','iec61966-2-1','gbr','full','display-p3')
 STILL_SUFFIXES = {'.png','.jpg','.jpeg'}
 EXIF_ORIENTATION = {
     1:'',2:'hflip',3:'hflip,vflip',4:'vflip',
@@ -21,6 +23,23 @@ EXIF_ORIENTATION = {
 VIDEO_ORIENTATION = {0:'',90:'transpose=clock',180:'hflip,vflip',270:'transpose=cclock'}
 GEOMETRY = {'x':0,'y':0,'scale':1,'rotation':0}
 TITLE_FONTS = {'segoe':'segoeui.ttf','arial':'arial.ttf','georgia':'georgia.ttf'}
+
+# Linear RGB to XYZ relative to D65. ICC colorants are expressed in D50 PCS.
+D65 = np.array([.9504559271, 1., 1.0890577508])
+D50 = np.array([.9642, 1., .8249])
+SRGB_XYZ_D65 = np.array([[.41239080, .35758434, .18048079],
+                        [.21263901, .71516868, .07219232],
+                        [.01933082, .11919478, .95053215]])
+P3_XYZ_D65 = np.array([[.48657095, .26566769, .19821729],
+                      [.22897456, .69173852, .07928691],
+                      [0., .04511338, 1.04394437]])
+D65_TO_D50 = np.array([[1.0478112, .0228866, -.0501270],
+                      [.0295424, .9904844, -.0170491],
+                      [-.0092345, .0150436, .7521316]])
+SRGB_CHROMATICITY = (.3127, .3290, .64, .33, .30, .60, .15, .06)
+SRGB_TRC = (2.4, 1/1.055, .055/1.055, 1/12.92, .04045)
+ICC_TOLERANCE = .001
+P3_PCS_TOLERANCE = .0003
 
 
 def parameter(clip, name, initial, start):
@@ -39,35 +58,128 @@ def still_needs_frame_clock(clip, *, include_opacity=True):
     return include_opacity and bool(clip.get('fadeIn') or clip.get('fadeOut') or keys.get('opacity'))
 
 
+def icc_tags(profile):
+    if (len(profile) < 132 or struct.unpack_from('>I',profile)[0] != len(profile) or profile[36:40] != b'acsp'
+            or profile[8] not in (2,4) or profile[12:16] not in (b'mntr',b'scnr',b'spac')
+            or profile[16:24]!=b'RGB XYZ '):
+        raise ValueError('Expected a matrix RGB ICC profile with XYZ connection space')
+    tags={}
+    count=struct.unpack_from('>I',profile,128)[0]
+    end=132+12*count
+    if end>len(profile):
+        raise ValueError('Truncated ICC tag table')
+    for idx in range(count):
+        name,offset,size=struct.unpack_from('>4sII',profile,132+12*idx)
+        if (name in tags or offset%4 or offset<end or size<8 or offset+size>len(profile)
+                or name.startswith((b'A2B',b'B2A',b'D2B',b'B2D'))):
+            raise ValueError('Unsupported ICC tag table or alternate LUT transform')
+        tags[name]=profile[offset:offset+size]
+    return tags
+
+
+def icc_fixed(tag,kind,count,offset=8):
+    if len(tag)!=offset+count*4 or tag[:4]!=kind or tag[4:8]!=bytes(4):
+        raise ValueError('Invalid ICC numeric tag')
+    return np.frombuffer(tag[offset:],dtype='>i4').astype(np.float64)/65536
+
+
+def is_srgb_curve(tag):
+    if tag[:8]==b'para'+bytes(4):
+        kind=tag[8:12]
+        expected={b'\0\3\0\0':SRGB_TRC,b'\0\4\0\0':(*SRGB_TRC,0.,0.)}.get(kind)
+        return expected is not None and np.allclose(
+            icc_fixed(tag,b'para',len(expected),12),expected,rtol=0,atol=2/65536)
+    if tag[:8]==b'curv'+bytes(4) and len(tag)>=12:
+        count=struct.unpack_from('>I',tag,8)[0]
+        if count>=256 and len(tag)==12+2*count:
+            encoded=np.linspace(0.,1.,count)
+            expected=np.where(encoded<=.04045,encoded/12.92,((encoded+.055)/1.055)**2.4)
+            actual=np.frombuffer(tag[12:],dtype='>u2')/65535
+            return np.allclose(actual,expected,rtol=0,atol=2/65535)
+    return False
+
+
+def photograph_icc(profile):
+    """Recognize the colorants and transfer function, independent of the ICC description."""
+    tags=icc_tags(profile)
+    if not all(is_srgb_curve(tags[key]) for key in (b'rTRC',b'gTRC',b'bTRC')):
+        raise ValueError('ICC transfer curves are not sRGB')
+    white=icc_fixed(tags[b'wtpt'],b'XYZ ',3)
+    colorants=np.column_stack([icc_fixed(tags[key],b'XYZ ',3) for key in (b'rXYZ',b'gXYZ',b'bXYZ')])
+    tolerance=ICC_TOLERANCE
+    if b'chad' in tags:
+        adaptation=icc_fixed(tags[b'chad'],b'sf32',9).reshape((3,3))
+        if not np.allclose(adaptation@D65,D50,rtol=0,atol=ICC_TOLERANCE):
+            raise ValueError('ICC chromatic adaptation does not connect D65 to D50')
+        colorants=np.linalg.solve(adaptation,colorants)
+        candidates=((SRGB_XYZ_D65,SRGB),(P3_XYZ_D65,DISPLAY_P3))
+    elif profile[8]==2:
+        # Legacy IEC sRGB profiles sometimes omit chad and declare the native
+        # white in wtpt. Require the standard D50-adapted sRGB colorants.
+        candidates=((D65_TO_D50@SRGB_XYZ_D65,SRGB),)
+    else:
+        # Some v4 Display P3 profiles store the full Bradford-adapted transform
+        # in the D50 colorants without recording the adaptation separately.
+        illuminant=np.frombuffer(profile[68:80],dtype='>i4')/65536
+        if (not np.allclose(illuminant,D50,rtol=0,atol=P3_PCS_TOLERANCE)
+                or not np.allclose(white,D50,rtol=0,atol=P3_PCS_TOLERANCE)):
+            raise ValueError('ICC without explicit chromatic adaptation requires a D50 PCS and media white')
+        candidates=((D65_TO_D50@P3_XYZ_D65,DISPLAY_P3),)
+        tolerance=P3_PCS_TOLERANCE
+    if (not np.allclose(white,D50,rtol=0,atol=ICC_TOLERANCE)
+            and (profile[8]!=2 or not np.allclose(white,D65,rtol=0,atol=ICC_TOLERANCE))):
+        raise ValueError('ICC white point is outside the qualified profiles')
+    for expected,color in candidates:
+        if np.allclose(colorants,expected,rtol=0,atol=tolerance):
+            if b'cicp' in tags:
+                primaries=1 if color==SRGB else 12
+                if tags[b'cicp']!=b'cicp'+bytes(4)+bytes((primaries,13,0,1)):
+                    raise ValueError('ICC video color signaling conflicts with its RGB colorants or transfer')
+            return color
+    raise ValueError('ICC colorants do not match the qualified sRGB or Display P3 primaries')
+
+
 def photo_info(path):
-    stat=Path(path).stat()
-    return _photo_info(path,stat.st_size,stat.st_mtime_ns)
+    return photo_contract(path)[:3]
+
+
+def photo_contract(path):
+    path=Path(path).resolve(strict=True)
+    stat=path.stat()
+    return _photo_contract(path,stat.st_size,stat.st_mtime_ns,stat.st_ctime_ns,stat.st_ino)
 
 
 @lru_cache(maxsize=128)
-def _photo_info(path, size, modified):
+def _photo_contract(path, size, modified, changed, inode):
     with Image.open(path) as photo:
         if photo.format not in ('PNG','JPEG') or getattr(photo,'is_animated',False):
             raise ValueError('Managed HDR stills require a single PNG or JPEG picture')
         if photo.mode=='CMYK':
             raise ValueError('Convert CMYK stills to sRGB before using them in managed HDR')
-        profile=photo.info.get('icc_profile')
-        if profile:
+        color=SRGB
+        if 'icc_profile' in photo.info:
+            profile=photo.info['icc_profile']
+            if not isinstance(profile,bytes):
+                raise ValueError('The photograph has an unreadable ICC profile')
             try:
-                detail=ImageCms.getProfileDescription(ImageCms.ImageCmsProfile(io.BytesIO(profile))).strip()
-            except (OSError,ValueError) as error:
-                raise ValueError('The photograph has an unreadable color profile') from error
-            if 'srgb' not in detail.lower():
-                raise ValueError('Convert this embedded photograph profile to sRGB before managed HDR export')
-        gamma=photo.info.get('gamma')
-        if (gamma is not None and not profile and 'srgb' not in photo.info
-            and abs(gamma-.45455)>.002):
-            raise ValueError('This PNG has a non-sRGB gamma declaration')
+                color=photograph_icc(profile)
+            except (KeyError,ValueError,np.linalg.LinAlgError) as error:
+                raise ValueError('Managed stills require a supported sRGB or Display P3 ICC profile') from error
+        elif 'srgb' not in photo.info:
+            gamma=photo.info.get('gamma')
+            if gamma is not None and abs(gamma-.45455)>.002:
+                raise ValueError('This PNG has a non-sRGB gamma declaration')
+            chromaticity=photo.info.get('chromaticity')
+            if chromaticity is not None and not np.allclose(
+                    chromaticity,SRGB_CHROMATICITY,rtol=0,atol=ICC_TOLERANCE):
+                raise ValueError('This PNG has non-sRGB chromaticities without a supported ICC profile')
         orientation=photo.getexif().get(274,1)
         if orientation not in EXIF_ORIENTATION:
             raise ValueError('Unsupported photograph orientation')
         w,h=photo.size
-        return (h,w,EXIF_ORIENTATION[orientation]) if orientation>=5 else (w,h,EXIF_ORIENTATION[orientation])
+        if orientation>=5:
+            w,h=h,w
+        return w,h,EXIF_ORIENTATION[orientation],color
 
 
 def title_image(clip, width, height, folder):
@@ -136,13 +248,14 @@ def luma_linear(p,t,m,r):
     return f'zscale=threads=1:agamma=0:pin={p}:tin={t}:min={m}:rin={r}:p=2020:t=linear:m=gbr:r=full:npl=100'
 
 
-def canvas_fit(filters, chain, label, *, source, canvas, fit, fps):
+def canvas_fit(filters, chain, label, *, source, canvas, fit, fps, opaque_camera=False):
     sw,sh=source
     w,h=canvas
     scale=(max if fit=='cover' else min)(w/sw,h/sh)
     rw,rh=max(1,round(sw*scale)),max(1,round(sh*scale))
+    pixel_format = 'gbrpf32le' if opaque_camera else FLOAT_ALPHA
     if (rw,rh)!=(sw,sh):
-        chain+=f',zscale=threads=1:w={rw}:h={rh}:filter=bilinear,format={FLOAT_ALPHA}'
+        chain+=f',zscale=threads=1:w={rw}:h={rh}:filter=bilinear,format={pixel_format}'
     if fit=='cover':
         return chain+f',crop={w}:{h}'
     if (rw,rh)==(w,h):
@@ -155,8 +268,9 @@ def canvas_fit(filters, chain, label, *, source, canvas, fit, fps):
             if extent:
                 ww,hh=sizes(extent)
                 name=label+('h' if horizontal else 'v')+suffix
+                hold = f',trim=end_frame=1,loop=loop=-1:size=1:start=0,setpts=N/(({fps})*TB)' if opaque_camera else ''
                 filters.append(f'color=black@0:s={ww}x{hh}:r={fps},format=gbrap16le,{matte},'
-                               f'format={FLOAT_ALPHA}[{name}]')
+                               f'format={pixel_format}{hold}[{name}]')
                 pads.append(f'[{name}]')
             else:
                 pads.append('')

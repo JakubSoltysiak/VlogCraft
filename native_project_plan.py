@@ -15,6 +15,7 @@ import animation
 import color_management
 import hdr_layers
 import hdr_render
+import native_source_seek
 import render_engine
 import sequences
 import timeline_transitions
@@ -83,6 +84,8 @@ def value_at(clip, name, source_time, default):
 
 def admitted_layer(assets,clip,width,height):
     asset,size,orientation,interpretation = hdr_render.layer_contract(assets,clip,width,height)
+    if clip["kind"]=="image" and interpretation!=hdr_layers.SRGB:
+        raise Ineligible("Display P3 stills require the managed renderer")
     if timing.rational(clip.get("speed",1))!=1:
         raise Ineligible("Changing clip speed requires the managed renderer")
     if any(clip.get(key,1)!=1 or clip.get("keys",{}).get(key) for key in ("contrast","saturation")):
@@ -102,7 +105,7 @@ def fitted_size(size,canvas,fit):
     return max(1,round(sx*ratio)),max(1,round(sy*ratio))
 
 
-def compile_project(state,work):
+def compile_project(state,work,*,camera_raster=False,camera_spans=None):
     state = sequences.playback(state)
     output = state["output"]
     contract = color_management.validate_output(output["color"])
@@ -113,9 +116,14 @@ def compile_project(state,work):
     if width%4 or height%2 or not width or not height or width>7680 or height>4320:
         raise Ineligible("The project dimensions are outside packed Main10 support")
     spans = render_engine.frame_spans(state,fps)
-    if not spans or not 0<spans[-1][1]<=7200:
+    if camera_spans is not None:
+        selected = set(camera_spans)
+        if not camera_raster or selected.difference(spans):
+            raise Ineligible("Indexed camera spans must retain their original render boundaries")
+        spans = [span for span in spans if span in selected]
+    if not spans or sum(end-start for start,end in spans)>7200 or spans[0][0]<0:
         raise Ineligible("The native timeline is outside its current instruction budget")
-    program = Program(width,height,fps,contract["sdrWhiteNits"]/100,spans)
+    program = Program(width,height,fps,contract["sdrWhiteNits"]/100,[])
     assets = {asset["id"]:asset for asset in state["assets"]}
     pairs = timeline_transitions.plan(state)[0]
     slots = {}
@@ -142,8 +150,12 @@ def compile_project(state,work):
             seek = timing.rational(clip["start"])+(first-timing.frame_at(clip["position"],fps))/fps
             # The managed decoder requests this microsecond-rounded preroll at
             # each rendering span. Keep the selection in the original clock.
-            seek = Fraction(math.ceil(seek*1000000-Fraction(1,100000000)),1000000)
-            program.sources[slot].requests[frame] = seek+(frame-first)/fps
+            if camera_spans is None:
+                seek = Fraction(math.ceil(seek*1000000-Fraction(1,100000000)),1000000)
+            else:
+                managed_seek = float(clip["start"])+max(0,float(first/fps)-float(clip["position"]))
+                seek = Fraction(render_engine.media_seek_microseconds(managed_seek),1_000_000)
+            program.sources[slot].requests[len(program.frames)] = seek+(frame-first)/fps
         values = {name:value_at(clip,name,clock,default) for name,default in MOTION.items()}
         opacity = values["opacity"]
         if clip.get("fadeIn"):
@@ -161,6 +173,8 @@ def compile_project(state,work):
         return packed,geo
 
     for start,end in spans:
+        output_first = len(program.frames)
+        program.spans.append((output_first,output_first+end-start))
         video,_ = render_engine.active_clips(state,float(start/fps),float(end/fps))
         matching = [pair for pair in pairs if pair.end>start and pair.start<end]
         if len(matching)>1:
@@ -182,7 +196,7 @@ def compile_project(state,work):
             if len(rows)>LAYER_BUDGET:
                 raise Ineligible("Project exceeds the experimental simultaneous layer budget")
             program.frames.append((weight,rows))
-    if not program.sources or sum(src.kind=="video" for src in program.sources)>4:
+    if not program.sources or sum(src.kind=="video" for src in program.sources)>(LAYER_BUDGET if camera_raster else 4):
         raise Ineligible("The native project requires between one and eight sources, with up to four videos")
     return program
 
@@ -222,24 +236,54 @@ def run_capture(command,timeout=90,*,cancelled=lambda:False,cwd=None):
                 process.kill()
 
 
-def append_video(output,slot,src,frame_count,cancelled,*,first_time=False):
+def append_video(output,slot,src,frame_count,cancelled,*,first_time=False,camera_range=False,keyframe_seek=False,camera_raster=False):
     limit = max(src.requests.values())+2
-    if limit>122:
-        raise Ineligible("Source selection exceeds the qualified resident preroll window")
-    fields = ("stream=width,height,time_base,codec_name,profile,pix_fmt,color_primaries,color_transfer,color_space,"
-              "color_range,field_order:frame=best_effort_timestamp:format=start_time")
-    info = json.loads(run_capture(["ffprobe","-v","error","-read_intervals",f"%+{float(limit):.8f}",
-                                   "-select_streams","v:0","-show_entries",fields,"-of","json",src.path],
-                                  cancelled=cancelled)[0])
+    stream_fields = ("stream=width,height,time_base,codec_name,profile,pix_fmt,color_primaries,color_transfer,"
+                     "color_space,color_range,field_order,nb_frames,start_pts,duration_ts")
+    indexed = None
+    if keyframe_seek and src.path.suffix.lower() in (".mp4",".mov",".m4v"):
+        indexed = native_source_seek.probe(src.path,limit,stream_fields,run_capture,cancelled)
+    # The resident decoder checks this index against every decoded PTS in its
+    # prefix. An independent software trace still checks the selected pictures.
+    packet_index = False
+    access_points = []
+    if indexed is not None:
+        info,stamps,access_points=indexed
+    else:
+        if limit>122:
+            raise Ineligible("Source selection exceeds the qualified resident preroll window")
+        packet_index = (not keyframe_seek and camera_range and (src.asset or {}).get("codec")=="hevc" and
+                        src.path.suffix.lower()==".mp4" and min(src.requests.values())>0)
+        clock_fields = "packet=pts,flags" if packet_index else "frame=best_effort_timestamp"
+        format_fields = "start_time,format_name" if packet_index else "start_time"
+        fields = f"{stream_fields}:{clock_fields}:format={format_fields}"
+        if camera_range:
+            fields += ":stream_side_data=rotation"
+        info = json.loads(run_capture(["ffprobe","-v","error","-read_intervals",f"%+{float(limit):.8f}",
+                                       "-select_streams","v:0","-show_entries",fields,"-of","json",src.path],
+                                      cancelled=cancelled)[0])
     streams = info.get("streams",())
     if len(streams)!=1:
         raise Ineligible("The resident probe found no unambiguous video stream")
     video = streams[0]
+    if packet_index and (video.get("codec_name")!="hevc" or
+                         "mp4" not in info.get("format",{}).get("format_name","").split(",")):
+        raise Ineligible("Camera packet indexing requires a probed HEVC MP4 stream")
+    if camera_range:
+        coded_size=src.size[::-1] if src.orientation else src.size
+        rotation=90 if src.orientation=="transpose=clock" else 0
+        actual_angles=[(-row["rotation"])%360 for row in video.get("side_data_list",()) if "rotation" in row]
+        if ((video.get("width"),video.get("height"))!=coded_size or (actual_angles or [0])!=[rotation]):
+            raise Ineligible("The camera stream dimensions or orientation differ from the project")
     tags = tuple(video.get(key) for key in ("color_primaries","color_transfer","color_space"))
     pq = tags==("bt2020","smpte2084","bt2020nc")
-    if first_time and (video.get("codec_name"),video.get("pix_fmt"),pq) not in (
-            ("h264","yuv420p",False),("hevc","yuv420p10le",True)):
-        raise Ineligible("First export requires qualified H.264 SDR or HEVC Main10 PQ video")
+    codec=(video.get("codec_name"),video.get("pix_fmt"),pq)
+    camera_sdr=(camera_range and (src.orientation=="" or (camera_raster and src.orientation=="transpose=clock"))
+                and video.get("profile")=="Main" and
+                codec==("hevc","yuv420p",False))
+    if first_time and not camera_sdr and codec not in (("h264","yuv420p",False),("hevc","yuv420p10le",True)):
+        detail="the selected H.264 SDR or HEVC SDR/PQ scope" if camera_range else "qualified H.264 SDR or HEVC Main10 PQ video"
+        raise Ineligible("First export requires "+detail)
     if first_time and pq and video.get("profile")!="Main 10":
         raise Ineligible("First export requires the qualified HEVC Main10 profile")
     if (video.get("codec_name") not in ("h264","hevc") or video.get("pix_fmt") not in ("yuv420p","yuv420p10le") or
@@ -248,20 +292,44 @@ def append_video(output,slot,src,frame_count,cancelled,*,first_time=False):
             video.get("color_range")!=({"limited":"tv","full":"pc"}.get(src.interpretation[3])) or
             pq!=(src.interpretation[4]=="pq2020")):
         raise Ineligible("Resident codec, range or source metadata differs from the managed color contract")
-    stamps = [row.get("best_effort_timestamp") for row in info.get("frames",())]
+    if packet_index:
+        packets=info.get("packets",())
+        if any(not isinstance(row.get("flags"),str) or "D" in row["flags"] for row in packets):
+            raise Ineligible("Camera trim has ambiguous or discarded packets outside the packet-index experiment")
+        stamps=[row.get("pts") for row in packets]
+    elif indexed is None:
+        stamps=[row.get("best_effort_timestamp") for row in info.get("frames",())]
     if not stamps or any(type(stamp) is not int for stamp in stamps):
         raise Ineligible("The resident probe did not return integer source presentation timestamps")
+    if packet_index:
+        stamps.sort()
     base = Fraction(video.get("time_base") or 0)
     origin = Fraction(info.get("format",{}).get("start_time","0"))
+    if packet_index and (origin<0 or stamps[0]<0):
+        raise Ineligible("Camera packet indexing requires a nonnegative source clock")
     if any(a>=b for a,b in zip(stamps,stamps[1:])) or base<=0:
         raise Ineligible("Resident source has an ambiguous presentation clock")
     selected = [-1]*frame_count
+    terminal=0
     for frame,target in src.requests.items():
         tick = (target+origin)/base
         if tick>=stamps[-1]:
-            raise Ineligible("The selected range extends beyond the available source pictures")
+            end_pts=video.get("start_pts",0)
+            duration=video.get("duration_ts")
+            if not (camera_raster and indexed is not None and str(len(stamps))==video.get("nb_frames")
+                    and type(end_pts) is int and type(duration) is int and duration>0 and end_pts+duration>stamps[-1]):
+                raise Ineligible("The selected range extends beyond the available source pictures")
+            if tick>=end_pts+duration:
+                terminal+=1
+                if terminal>6 or (tick-end_pts-duration)*base>=Fraction(6,60):
+                    raise Ineligible("The camera hold exceeds the qualified video endpoint")
         selected[frame] = max(0,bisect_right(stamps,tick)-1)
     last = max(selected)+1
+    access_points = [point for point in access_points if 0 < point.picture < last]
+    if limit>122:
+        first = min(picture for picture in selected if picture>=0)
+        if not any(point.picture<=first for point in access_points):
+            raise Ineligible("A late source range requires a verified preceding random-access picture")
     angle = next(code for code,orientation in hdr_layers.VIDEO_ORIENTATION.items() if orientation==src.orientation)
     name = str(src.path.resolve()).encode("utf-8")
     output.write(struct.pack("<11I",slot,len(name),video["width"],video["height"],*src.fitted,
@@ -269,6 +337,12 @@ def append_video(output,slot,src,frame_count,cancelled,*,first_time=False):
     output.write(name)
     np.asarray(stamps[:last],dtype="<i8").tofile(output)
     np.asarray(selected,dtype="<i4").tofile(output)
+    if keyframe_seek:
+        output.write(struct.pack("<I",len(access_points)))
+        for point in access_points:
+            output.write(struct.pack("<qqII",point.dts,point.position,point.picture,point.kind))
+            output.write(struct.pack("<I",len(point.decodable_leading)))
+            np.asarray(point.decodable_leading,dtype="<i8").tofile(output)
     return base,origin,stamps[:last],selected
 
 
@@ -298,14 +372,16 @@ def append_still(output,slot,src,program,cancelled):
     rgba.tofile(output)
 
 
-def write_sources(path,program,cancelled=lambda:False,*,first_time=False):
+def write_sources(path,program,cancelled=lambda:False,*,first_time=False,camera_range=False,keyframe_seek=False,camera_raster=False):
     clocks={}
     with path.open("wb") as output:
         videos = [(n,src) for n,src in enumerate(program.sources) if src.kind=="video"]
         stills = [(n,src) for n,src in enumerate(program.sources) if src.kind!="video"]
-        output.write(struct.pack("<4s2I",b"VSD2",len(videos),len(stills)))
+        output.write(struct.pack("<4s2I",b"VSD3" if keyframe_seek else b"VSD2",len(videos),len(stills)))
         for slot,src in videos:
-            clocks[slot]=append_video(output,slot,src,len(program.frames),cancelled,first_time=first_time)
+            clocks[slot]=append_video(output,slot,src,len(program.frames),cancelled,
+                                      first_time=first_time,camera_range=camera_range,keyframe_seek=keyframe_seek,
+                                      camera_raster=camera_raster)
         for slot,src in stills:
             append_still(output,slot,src,program,cancelled)
     return clocks
