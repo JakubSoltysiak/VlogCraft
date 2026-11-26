@@ -140,6 +140,19 @@ trial.qualify(project, work, 0, 12, reference, sys.argv[4], progress=lambda _: N
                         workers=2, progress=lambda _: None)
             self.assertFalse((root / "unqualified-two" / "two-workers").exists())
 
+            # A real receipt from the same project cannot certify a substituted movie.
+            (root / "control.json").write_text(json.dumps({
+                "passed": True, "continuous": True, "pool": 2, "frames": 12,
+                "project_hash": pins[saved], "master_sha256": pins[archived],
+                "prepared_main10_sha256": "0"*64,
+                "encoder_contexts": [{"-frames:v": "12", "-preset": "slow", "-crf": "20"}],
+            }))
+            with self.assertRaisesRegex(ValueError, "uninterrupted encoder receipt"):
+                qualify(saved, root / "substituted-control", 0, 12, archived, pins[archived],
+                        continuous_reference=pending_control,
+                        continuous_sha256=sha256(pending_control.read_bytes()).hexdigest(),
+                        progress=lambda _: None)
+
             # A modified linked source invalidates the whole checkpoint specification.
             sound_stamp = wav.stat()
             sound_bytes = bytearray(wav.read_bytes())

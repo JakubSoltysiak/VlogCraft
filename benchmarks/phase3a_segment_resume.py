@@ -492,6 +492,7 @@ def qualify(project, folder, first, last, reference, reference_sha256, *, contin
         control = read_record(receipt_path)
         contexts = control.get("encoder_contexts", [])
         require(control.get("passed") and control.get("continuous") and control.get("pool") == 2 and
+                control.get("master_sha256") == identity["sha256"] and
                 control.get("project_hash") == original["sha256"] and control.get("frames") == last-first and
                 len(contexts) == 1 and int(contexts[0].get("-frames:v", 0)) == last-first and
                 contexts[0].get("-preset") == state["output"]["preset"] and

@@ -6,6 +6,7 @@ ROOT=Path(__file__).resolve().parents[1]
 MODULES=['app_version','server','export_scratch','render_engine','color_management','hdr_render','hdr_layers','hdr10plus_index','hdr10plus_export','hdr10plus_bitstream',
          'hdr10plus_authoring','hdr10plus_fast','hdr10plus_master','native_project_plan','native_project_render',
          'native_project_verification','native_source_seek','export_jobs',
+         'mixed_project_delivery','mixed_export','export_raster_options',
          'preview_cache','preview_dependencies','source_frames','timing','timeline_transitions','project_store',
          'animation','sequences','video_effects','grading','audio_cache','audio_edit','waveform',
          'motion','review_packet','timeline_proposal','ai_bridge','encoders','native_plan','native_playback','performance_profile','desktop_recovery']

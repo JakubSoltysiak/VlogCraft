@@ -35,6 +35,7 @@ def qualify(project, folder, reference, reference_project, reference_sha256, wor
     if control.is_file():
         spec = json.loads(control.read_bytes())
         if (not spec["passed"] or spec["continuous"] or spec["pool"] != pool or
+                spec.get("master_sha256", reference_sha256) != reference_sha256 or
                 spec["project_hash"] != hashlib.sha256(original).hexdigest()):
             raise ValueError("Mismatched managed export reference or encoder configuration")
     elif pool != 2:

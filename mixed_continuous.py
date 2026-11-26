@@ -394,6 +394,7 @@ def qualify(project, destination, work, worker, runtime, continuous_control, *, 
     fps = timing.rate(state["output"]["fps"])
     expected_spans = [list(span) for span in render_engine.frame_spans(sequences.playback(state),fps)]
     if (not control.get("passed") or not control.get("continuous") or
+            control.get("master_sha256") != reference_sha256 or
             control.get("project_hash") != project_hash or control.get("pool") != pool or
             control.get("spans") != expected_spans):
         raise ValueError("The managed continuous control does not match the exact edit or pool")

@@ -486,6 +486,70 @@
       ],
       "wall_s": 89.55904450000162
     },
+    "p3-managed48-8": {
+      "continuous": false,
+      "encoder_contexts": 3,
+      "exit": 0,
+      "frames": 48,
+      "on_ac": true,
+      "passed": true,
+      "peak_tree_rss_bytes": 3684306944,
+      "pool": 8,
+      "render_seconds": 76.58813190000001,
+      "seconds": 78.52661989999979,
+      "spans": [
+        [
+          0,
+          12
+        ],
+        [
+          12,
+          30
+        ],
+        [
+          30,
+          48
+        ]
+      ],
+      "through_master_seconds": 78.52055339999788,
+      "wall_s": 79.02515880000283
+    },
+    "p3-managed936": {
+      "continuous": false,
+      "encoder_contexts": 5,
+      "exit": 0,
+      "frames": 936,
+      "on_ac": true,
+      "passed": true,
+      "peak_tree_rss_bytes": 5467054080,
+      "pool": 2,
+      "render_seconds": 526.5098126999983,
+      "seconds": 552.8278541999971,
+      "spans": [
+        [
+          0,
+          300
+        ],
+        [
+          300,
+          600
+        ],
+        [
+          600,
+          899
+        ],
+        [
+          899,
+          900
+        ],
+        [
+          900,
+          936
+        ]
+      ],
+      "through_master_seconds": 552.8205754999981,
+      "wall_s": 553.3369648999978
+    },
     "p3-mixed48": {
       "author_seconds": 1.952485900001193,
       "camera_pictures": 36,
@@ -564,6 +628,180 @@
       "verification_seconds": 50.11575520000042,
       "wall_s": 119.74350290000075,
       "wall_seconds": 119.20523260000118
+    },
+    "p3-mixed48-8": {
+      "author_seconds": 1.983915100001468,
+      "camera_pictures": 36,
+      "encoder_cpu_seconds": 121.17099999999999,
+      "encoder_feed_and_wait_seconds": 44.455690000002505,
+      "equal_coded_pictures": 48,
+      "exit": 0,
+      "frames": 48,
+      "gpu_local_bytes": 140554240,
+      "independent": {
+        "audio_endpoint_samples": 38400,
+        "decoded_pq_psnr_db": "inf",
+        "exact_decoded_pcm": true,
+        "exact_decoded_pictures": 48,
+        "exact_video_pts": true,
+        "hdr10plus_picture_associations": 48,
+        "hdr10plus_records_matching_reference": 48,
+        "minimum_psnr_db": "inf",
+        "passed": true,
+        "pictures_below_50_db": 0,
+        "static_hdr_matches": true,
+        "video_declaration_matches": true
+      },
+      "independent_seconds": 3.288877399998455,
+      "managed_picture_encode_seconds": 4.4362962000013795,
+      "managed_pictures": 12,
+      "on_ac": true,
+      "passed": true,
+      "peak_rss_bytes": 268189696,
+      "peak_tree_rss_bytes": 2802794496,
+      "pool": 8,
+      "prepare_seconds": 1.0045070000014675,
+      "prepared_still_spans": 1,
+      "render_seconds": 49.90045939999982,
+      "sampled_decoded_to_raw_db": [
+        {
+          "frame": 0,
+          "psnr_db": 51.82967812642323
+        },
+        {
+          "frame": 5,
+          "psnr_db": 51.836677536140044
+        },
+        {
+          "frame": 11,
+          "psnr_db": 51.836291432779234
+        },
+        {
+          "frame": 12,
+          "psnr_db": 56.58375721567593
+        },
+        {
+          "frame": 20,
+          "psnr_db": 56.73557383187534
+        },
+        {
+          "frame": 29,
+          "psnr_db": 58.53230106043667
+        },
+        {
+          "frame": 30,
+          "psnr_db": 53.1847145143771
+        },
+        {
+          "frame": 38,
+          "psnr_db": 54.168977706163034
+        },
+        {
+          "frame": 47,
+          "psnr_db": 53.274519132243896
+        }
+      ],
+      "sources_unchanged": true,
+      "through_master_seconds": 52.8919206999999,
+      "total_seconds": 104.61455230000138,
+      "verification_seconds": 51.70343239999784,
+      "wall_s": 108.70673440000246,
+      "wall_seconds": 107.91381589999946
+    },
+    "p3-mixed936": {
+      "author_seconds": 25.72583840000152,
+      "camera_pictures": 36,
+      "encoder_cpu_seconds": 48.172,
+      "encoder_feed_and_wait_seconds": 27.677627400000347,
+      "equal_coded_pictures": 936,
+      "exit": 0,
+      "frames": 936,
+      "gpu_local_bytes": 88223744,
+      "independent": {
+        "audio_endpoint_samples": 748800,
+        "decoded_pq_psnr_db": "inf",
+        "exact_decoded_pcm": true,
+        "exact_decoded_pictures": 936,
+        "exact_video_pts": true,
+        "hdr10plus_picture_associations": 936,
+        "hdr10plus_records_matching_reference": 936,
+        "minimum_psnr_db": "inf",
+        "passed": true,
+        "pictures_below_50_db": 0,
+        "static_hdr_matches": true,
+        "video_declaration_matches": true
+      },
+      "independent_seconds": 31.572357100001682,
+      "managed_picture_encode_seconds": 190.1375689000015,
+      "managed_pictures": 900,
+      "on_ac": true,
+      "passed": true,
+      "peak_rss_bytes": 166199296,
+      "peak_tree_rss_bytes": 5467258880,
+      "pool": 2,
+      "prepare_seconds": 0.15406010000151582,
+      "prepared_still_spans": 3,
+      "render_seconds": 219.71840990000055,
+      "sampled_decoded_to_raw_db": [
+        {
+          "frame": 0,
+          "psnr_db": 56.204197936722345
+        },
+        {
+          "frame": 149,
+          "psnr_db": 56.268951153550745
+        },
+        {
+          "frame": 299,
+          "psnr_db": 56.61640407201398
+        },
+        {
+          "frame": 300,
+          "psnr_db": 57.269627332681935
+        },
+        {
+          "frame": 449,
+          "psnr_db": 57.298882158134745
+        },
+        {
+          "frame": 599,
+          "psnr_db": 57.68824336195578
+        },
+        {
+          "frame": 600,
+          "psnr_db": 57.66134122061085
+        },
+        {
+          "frame": 749,
+          "psnr_db": 57.69055942918182
+        },
+        {
+          "frame": 898,
+          "psnr_db": 58.05000847262727
+        },
+        {
+          "frame": 899,
+          "psnr_db": 52.4571713819607
+        },
+        {
+          "frame": 900,
+          "psnr_db": 56.32695170915448
+        },
+        {
+          "frame": 917,
+          "psnr_db": 55.506637399711714
+        },
+        {
+          "frame": 935,
+          "psnr_db": 55.207574468994565
+        }
+      ],
+      "sources_unchanged": true,
+      "through_master_seconds": 245.59945169999992,
+      "total_seconds": 293.2898916999984,
+      "verification_seconds": 47.65751209999871,
+      "wall_s": 325.5354273999983,
+      "wall_seconds": 324.8720308000011
     },
     "p3-nativecontinuous48": {
       "audio_mux_seconds": 0.32350059999953373,

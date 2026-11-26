@@ -184,7 +184,7 @@ def managed_control(project, folder, *, continuous=False, pool=2, author_dll=Non
         raise ValueError("Prepared Main10 audits require the uninterrupted managed control")
     original = project.read_bytes()
     state = server.validate_document(json.loads(original))
-    sources = source_snapshot(state)
+    sources = source_snapshot(state, include_hidden_audio=True)
     count = hdr10plus_master.preflight(state)
     o = state["output"]
     rate = timing.rate(o["fps"])
@@ -252,8 +252,10 @@ def managed_control(project, folder, *, continuous=False, pool=2, author_dll=Non
             master = work/"output.mp4"
             hdr10plus_master.author(static, master, work, rate, count, run, lambda *_:None, lambda:False,
                                     **(author_options(author_dll) if author_dll else {}))
-            if source_snapshot(state) != sources or project.read_bytes() != original:
+            if source_snapshot(state, include_hidden_audio=True) != sources or project.read_bytes() != original:
                 raise ValueError("The original inputs changed during the reference export")
+            with master.open("rb") as encoded:
+                receipt["master_sha256"] = file_digest(encoded, "sha256").hexdigest()
             os.link(master, folder/"reference.mp4")
             receipt["master_rendered"] = True
             receipt["through_master_seconds"] = time.perf_counter()-start
@@ -262,7 +264,7 @@ def managed_control(project, folder, *, continuous=False, pool=2, author_dll=Non
                 receipt["raw_audit_passed"] = audit_masters(
                     raw,master,compare_raw_master,o,rate,count,spans,receipt["prepared_main10_sha256"],receipt)
                 receipt["raw_audit_seconds"] = time.perf_counter()-audit_start
-                if source_snapshot(state)!=sources or project.read_bytes()!=original:
+                if source_snapshot(state, include_hidden_audio=True)!=sources or project.read_bytes()!=original:
                     raise ValueError("The original inputs changed during the raw quality audit")
                 receipt["passed"] = receipt["raw_audit_passed"]
             else:

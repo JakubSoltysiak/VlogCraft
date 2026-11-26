@@ -12,7 +12,7 @@ The faster path keeps three FP32 color planes for an opaque rotated camera and r
 
 The archived 48-picture mixed excerpt used 12 photograph pictures with standalone audio, 18 rotated PQ camera pictures and 18 upright SDR camera pictures. Its original managed export took 136.190 s. The initial mixed provider reproduced all 48 coded/decoded pictures, all dynamic records and 38,400 stereo samples per channel. Its delivery took 132.370 s, including 55.456 s of first-export checks. This established equivalence with the archived edit.
 
-Inspecting the ICC tags disclosed a shared color error in that reference. The real JPEGs use P3-D65 colorants and sRGB transfer curves. The old renderer recognized “sRGB” in the ICC description and selected BT.709 primaries. Reproducing its pixels alone could not detect the mistake. These legacy measurements remain comparisons to that historical interpretation. The corrected managed and accelerated qualification uses the actual embedded primaries, including the three EXIF-orientation-6 photographs in the longer range. Generic transparent PNGs, a nontrivial opacity and the saved explicit sRGB interpretation have separate regression coverage.
+Inspecting the ICC tags disclosed a shared color error in that reference. The real JPEGs use P3-D65 colorants and sRGB transfer curves. The old renderer recognized “sRGB” in the ICC description and selected BT.709 primaries. Reproducing its pixels alone could not detect the mistake. These legacy measurements remain comparisons to that historical interpretation. The corrected managed and accelerated qualification uses the actual embedded primaries, including the three EXIF-orientation-6 photographs in the longer range. Generic transparent PNGs, a nontrivial opacity and the saved explicit sRGB interpretation have separate regression coverage. The numeric checks use the registered Display P3 primaries, D65 white and piecewise transfer function. [ICC Display P3 definition](https://registry.color.org/rgb-registry/displayp3) · [FFmpeg zscale mapping](https://ffmpeg.org/doxygen/trunk/vf__zscale_8c_source.html).
 
 ## Raster and encoding measured separately
 
@@ -35,7 +35,15 @@ All 48 pictures matched their corrected managed master in both the original edit
 
 Independent segments started at pictures 0, 12 and 30. The joined output preserved all 48 original segment packets and isolated segment decodes. Against the uninterrupted encode, the minimum per-picture PSNR was 54.24 dB and overall PSNR was 55.892 dB. All 48 pictures matched the separately managed encode with the same cuts. Its 48 HDR10+ records matched exactly. The uninterrupted encode reconstructed slightly different pixels in every frame, and its 48 dynamic records accordingly differed. PCM, sample endpoints and static HDR matched both references.
 
+A separate serial export was stopped immediately after its first verified segment. Restart reused that segment, encoded the other two, and passed both references. The declared two-worker memory check requires twice the observed serial segment process-tree working set to be available.
+
 The optional project-export runtime exposes **Mixed cameras and stills · exact master** in the export dialog. The user selects a matched local master. The editor uses the saved Slow CRF 20 profile, checks every decoded picture, audio sample, video and AAC packet clock, and final HDR10+ payload, and publishes only an accepted candidate. The existing managed renderer handles unsupported projects and verification failures. The uninterrupted and restartable segment experiments remain accessible through their qualification commands.
+
+## Contiguous 936-picture first export
+
+The edited source interval contains three EXIF-rotated P3-D65 photographs, standalone 44.1 kHz audio, and a rotated HEVC SDR camera with its own 48 kHz audio. The managed control took 552.828 s. The indexed camera and prepared-still route reached the authored master in 245.599 s and completed its own checks in 293.290 s. Independent decoding and coded-picture comparison extended elapsed time to 324.872 s, 41.2% below the original managed delivery time even with this extra check. Both trials peaked near 5.09 GiB of sampled process-tree working set.
+
+All 936 coded pictures, 936 independent picture decodes, 936 HDR10+ records, static declarations and 748,800 decoded PCM samples per channel matched the managed master. The provider separately checked all 36 original camera selections, including four repeated PTS selections. The lowest of 13 comparisons with uncompressed input was 52.457 dB. The three eligible static holds and a one-picture still interval accounted for 190.138 s of picture encoding. Indexed camera encoder feed and wait consumed 27.678 s. Final metadata authoring took 25.726 s.
 
 ## Reproduction on private media
 
@@ -47,6 +55,8 @@ python benchmarks/phase3a_mixed_range.py $originalManagedV4 $excerpt 6301 7237 -
 ```
 
 The original interval [6301, 7237) preserves 900 pictures across three JPEGs and 36 pictures from a rotated SDR recording. The audit matched all camera packet floors to the managed decoder, preserved each still's source and EXIF orientation, and matched all 748,800 stereo PCM samples per channel to the corresponding intervals on the original timeline. The standalone track ends at frame 7200. Frame 7200 retains the last photograph with 800 silent samples per channel before the next camera and its own audio start at frame 7201.
+
+The actual HDR-to-SDR cut is at frame 50134. The next still starts at 57821, 7687 frames later. The 3600-picture camera minute covers that real cut. The 48-picture fixture combines both camera formats and the photograph, while the 936-picture contiguous range covers the original photo and audio boundaries.
 
 The provisional interval [6283, 7219) failed the audit. Its first seek is 50 ticks beyond the camera's video endpoint on a 1/90,000 clock. The original scene holds the last picture while its audio continues. The rebased managed seek produced too few pictures, and the original and rebased PCM differed in the first 18-picture interval. A later candidate [57785, 59657) also changed PCM when seeking into an ongoing camera span. The tool verifies sample values across the original render contexts before it writes an excerpt.
 
