@@ -130,6 +130,10 @@ def _single_still(asset):
     return asset['kind'] == 'image' and Path(asset['path']).suffix.lower() in ('.png', '.jpg', '.jpeg')
 
 
+def media_seek_microseconds(at):
+    return math.ceil(at*1_000_000-1e-8)
+
+
 def _media_input(cmd, path, kind, at, speed, dur, fps, media_type):
     if _single_still({'kind': kind, 'path': path}):
         cmd.extend(['-f', 'image2', '-pattern_type', 'none', '-framerate', str(fps), '-i', str(path)])
@@ -138,7 +142,7 @@ def _media_input(cmd, path, kind, at, speed, dur, fps, media_type):
     else:
         # Serial decoding avoids a reproduced multi-input FFmpeg drain stall.
         # Keep preroll intact so held VFR and fractional-frame cuts remain correct.
-        cmd.extend(['-ss',_num(math.ceil(at*1_000_000-1e-8)/1_000_000),'-noaccurate_seek',
+        cmd.extend(['-ss',_num(media_seek_microseconds(at)/1_000_000),'-noaccurate_seek',
                     '-threads','1','-an' if media_type=='video' else '-vn','-i',str(path)])
 
 def _fade_video(clip, start, dur):
@@ -339,7 +343,7 @@ def segment_command(state, start, end, target, jobdir, quality='final', stream=N
           '-threads',str(workers),'-ac','2','-ar','48000','-movie_timescale','120000','-video_track_timescale','120000','-movflags','+faststart',str(target)]
     return cmd
 
-def render_range(state,start,end,target,jobdir,quality='final',runner=None,stage=None):
+def render_range(state,start,end,target,jobdir,quality='final',runner=None,stage=None,*,picture_runner=None):
     """Drain video and audio independently before muxing complete streams."""
     runner=runner or _run
     video=jobdir/(target.stem+'_video'+target.suffix)
@@ -364,7 +368,12 @@ def render_range(state,start,end,target,jobdir,quality='final',runner=None,stage
         runner(['ffmpeg','-nostdin','-v','error','-y','-f','concat','-safe','0','-i',str(playlist),
                 '-map','0:v','-c','copy','-video_track_timescale','120000',str(video)],str(jobdir))
     else:
-        runner(segment_command(state,start,end,video,jobdir,quality,'video'),str(jobdir))
+        command=segment_command(state,start,end,video,jobdir,quality,'video')
+        if picture_runner is None:
+            runner(command,str(jobdir))
+        else:
+            fps=timing.rate(state['output']['fps'])
+            picture_runner(command,str(jobdir),timing.frame_at(start,fps),timing.frame_at(end,fps))
     if stage:stage('audio')
     runner(segment_command(state,start,end,audio,jobdir,quality,'audio'),str(jobdir))
     codec=['-c:a','aac','-b:a','192k'] if quality=='preview' else ['-c:a','copy']
@@ -376,10 +385,12 @@ def render_range(state,start,end,target,jobdir,quality='final',runner=None,stage
 
 
 def render(state, output, work, *, review=False, on_progress=None, on_stage=None,
-           cancelled=lambda:False, popen=None, publish=os.replace, audio_bitrate='192k'):
+           cancelled=lambda:False, popen=None, publish=os.replace, audio_bitrate='192k',
+           picture_runner=None):
     """Export a sequence using a bounded-memory segment renderer.
 
     popen is callback(command, cwd) that runs FFmpeg and handles cancellation.
+    picture_runner may override final picture commands at their original integer frame ranges.
     """
     state=sequences.playback(state)
     duration=sequence_duration(state)
@@ -399,7 +410,8 @@ def render(state, output, work, *, review=False, on_progress=None, on_stage=None
         if on_progress:on_progress(round(3+start/duration*91),f'Rendering scene {idx+1} / {len(segments)}')
         def report(stage):
             on_stage(stage,idx+1,len(segments),start,end,fps)
-        render_range(state,start,end,target,jobdir,'review' if review else 'final',runner,report if on_stage else None)
+        render_range(state,start,end,target,jobdir,'review' if review else 'final',runner,
+                     report if on_stage else None,picture_runner=picture_runner)
         parts.append(target)
     return finish_segments(state,output,jobdir,segments,parts,review=review,on_progress=on_progress,
                            on_stage=on_stage,cancelled=cancelled,runner=runner,publish=publish,

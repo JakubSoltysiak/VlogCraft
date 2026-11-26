@@ -113,8 +113,11 @@ def verify_source_clocks(program,clocks,cancelled,*,camera_raster=False):
     return checked
 
 
-def source_snapshot(flat):
+def source_snapshot(flat,*,include_hidden_audio=False):
     ids={clip.get("assetId") for track in flat["tracks"] if not track.get("hidden") for clip in track["clips"]}
+    if include_hidden_audio:
+        _,audio=render_engine.active_clips(flat,0,render_engine.sequence_duration(flat))
+        ids.update(clip.get("assetId") for _,clip in audio)
     paths=sorted({Path(asset["path"]).resolve(strict=True) for asset in flat["assets"] if asset["id"] in ids})
     result={}
     for path in paths:
@@ -164,6 +167,56 @@ def verify_audio(flat,candidate,program,work,runner,cancelled):
     return decoded(candidate)==decoded(isolated)
 
 
+def sample_reference(command,cancelled,*,frames=None,timeout=90):
+    if frames is not None:
+        # The original managed graph owns cadence, geometry and animation.
+        # Sample its completed PQ raster at the full span's original clock.
+        script=Path(command[command.index("-/filter_complex")+1])
+        graph=script.read_text(encoding="utf8").strip()
+        selection="+".join(f"eq(n,{frame})" for frame in frames)
+        script.write_text(graph+f";\n[finished]select='{selection}'[audit]\n",encoding="utf8")
+        command[command.index("[finished]")]="[audit]"
+        command[command.index("-frames:v")+1]=str(len(frames))
+        rate=command.index("-r")
+        command[rate:rate+2]=["-fps_mode","passthrough"]
+    return run_capture([*command[:command.index("-c:v")],"-c:v","rawvideo","-threads:v","1","-f","rawvideo","-"],
+                       cancelled=cancelled,timeout=timeout)[0]
+
+
+def camera_sample_reference(flat,index,picture,program,work,cancelled,clocks):
+    fps=program.fps
+    command=hdr_render.command(flat,float(index/fps),float((index+1)/fps),work/f"sample-{index}.mov",work)
+    if clocks is not None:
+        slot=program.frames[picture][1][0][0][8]
+        src=program.sources[slot]
+        base,origin,stamps,selected=clocks[slot]
+        tick=stamps[selected[picture]]
+        plane=work/"sample-source.yuv"
+        video=src.asset
+        # Seek the independently verified source PTS, including terminal holds.
+        run_capture(["ffmpeg","-v","error","-nostdin","-y","-ss",f"{max(0.,float(tick*base-origin)-2):.9f}",
+                     "-copyts","-noaccurate_seek","-noautorotate","-threads","1","-i",src.path,
+                     "-map","0:v:0","-vf",f"settb={base},select=eq(pts\\,{tick})","-frames:v","1","-an",
+                     "-pix_fmt",video["pixelFormat"],"-c:v","rawvideo","-threads:v","1","-f","rawvideo",plane],
+                    cancelled=cancelled)
+        first=command.index("-noautorotate")
+        last=command.index("-i",first)+1
+        if Path(command[last]).resolve()!=src.path.resolve():
+            raise Ineligible("The exact sample does not match the managed camera input")
+        command[first:last+1]=["-f","rawvideo","-chroma_sample_location","left","-pixel_format",video["pixelFormat"],"-video_size",
+                               f"{video['width']}x{video['height']}","-framerate",str(fps),"-i",str(plane)]
+    return sample_reference(command,cancelled)
+
+
+def sample_score(index,actual,desired):
+    if desired.shape!=actual.shape:
+        raise Ineligible("The independent renderer did not return exactly one sample picture")
+    error=actual.astype(np.float32)-desired
+    mse=np.mean(error**2,dtype=np.float64)
+    score=float(10*np.log10(1023**2/mse)) if mse else None
+    return {"frame":index,"decoded_to_managed_raw_psnr_db":score}
+
+
 def compare_samples(flat,candidate,program,work,cancelled,clocks=None):
     samples=sorted({index for first,last in program.spans for index in (first,(first+last-1)//2,last-1)})
     filters="select='"+"+".join(f"eq(n,{frame})" for frame in samples)+"'"
@@ -171,46 +224,16 @@ def compare_samples(flat,candidate,program,work,cancelled,clocks=None):
                       "-an","-fps_mode","passthrough","-c:v","rawvideo","-threads:v","1","-f","rawvideo","-"],
                      timeout=max(90,len(program.frames)//4),cancelled=cancelled)[0]
     values=np.frombuffer(data,dtype="<u2").reshape(len(samples),program.width*program.height*3//2)
-    scores=[]
-    for index,actual in zip(samples,values,strict=True):
-        fps=program.fps
-        command=hdr_render.command(flat,float(index/fps),float((index+1)/fps),work/f"sample-{index}.mov",work)
-        if clocks is not None:
-            slot=program.frames[index][1][0][0][8]
-            src=program.sources[slot]
-            base,origin,stamps,selected=clocks[slot]
-            tick=stamps[selected[index]]
-            plane=work/"sample-source.yuv"
-            video=src.asset
-            # Use the independently verified exact source PTS. Seeking by
-            # timeline seconds alone cannot produce a picture beyond video EOF.
-            run_capture(["ffmpeg","-v","error","-nostdin","-y","-ss",f"{max(0.,float(tick*base-origin)-2):.9f}",
-                         "-copyts","-noaccurate_seek","-noautorotate","-threads","1","-i",src.path,
-                         "-map","0:v:0","-vf",f"settb={base},select=eq(pts\\,{tick})","-frames:v","1","-an",
-                         "-pix_fmt",video["pixelFormat"],"-c:v","rawvideo","-threads:v","1","-f","rawvideo",plane],
-                        cancelled=cancelled)
-            first=command.index("-noautorotate")
-            last=command.index("-i",first)+1
-            if Path(command[last]).resolve()!=src.path.resolve():
-                raise Ineligible("The exact sample does not match the managed camera input")
-            command[first:last+1]=["-f","rawvideo","-chroma_sample_location","left","-pixel_format",video["pixelFormat"],"-video_size",
-                                   f"{video['width']}x{video['height']}","-framerate",str(fps),"-i",str(plane)]
-        raw=run_capture([*command[:command.index("-c:v")],"-c:v","rawvideo","-threads:v","1","-f","rawvideo","-"],
-                        cancelled=cancelled)[0]
-        desired=np.frombuffer(raw,dtype="<u2")
-        if desired.shape!=actual.shape:
-            raise Ineligible("The independent renderer did not return exactly one sample picture")
-        error=actual.astype(np.float32)-desired
-        mse=np.mean(error**2,dtype=np.float64)
-        score=float(10*np.log10(1023**2/mse)) if mse else None
-        scores.append({"frame":index,"decoded_to_managed_raw_psnr_db":score})
-    return scores
+    return [sample_score(index,actual,np.frombuffer(
+        camera_sample_reference(flat,index,index,program,work,cancelled,clocks),dtype="<u2"))
+        for index,actual in zip(samples,values,strict=True)]
 
 
-def verify_delivery(flat,contract,candidate,program,clocks,receipt,work,runner,cancelled,*,camera_raster=False):
+def verify_delivery(flat,contract,candidate,program,clocks,receipt,work,runner,cancelled,*,
+                    camera_raster=False,selection_program=None,sample_pictures=None):
     if receipt.get("adapter")!="AMD Radeon(TM) 890M Graphics":
         raise Ineligible("First-export delivery is qualified only on the Radeon 890M adapter")
-    clip_clocks=verify_source_clocks(program,clocks,cancelled,camera_raster=camera_raster)
+    clip_clocks=verify_source_clocks(selection_program or program,clocks,cancelled,camera_raster=camera_raster)
     video,audio=hdr10plus_export.media(candidate)
     frames=json.loads(run_capture(["ffprobe","-v","error","-select_streams","v:0","-show_frames",
                                    "-show_entries","frame=pts:frame_side_data","-of","json",candidate],
@@ -227,7 +250,8 @@ def verify_delivery(flat,contract,candidate,program,clocks,receipt,work,runner,c
     if any(sum(row.get("side_data_type")==SIDE_DATA for row in frame.get("side_data_list",()))!=1 for frame in frames):
         raise Ineligible("The first-export HDR10+ metadata count did not match the picture clock")
     audio_exact=verify_audio(flat,candidate,program,work,runner,cancelled)
-    sampled=compare_samples(flat,candidate,program,work,cancelled,clocks if camera_raster else None)
+    sampled=(sample_pictures(flat,candidate,program,work,cancelled,clocks) if sample_pictures else
+             compare_samples(flat,candidate,program,work,cancelled,clocks if camera_raster else None))
     quality=all(row["decoded_to_managed_raw_psnr_db"] is None or row["decoded_to_managed_raw_psnr_db"]>=50 for row in sampled)
     return dict(passed=audio_exact and quality,verified_source_pictures=clip_clocks,exact_video_pts=True,
                 exact_decoded_pcm=audio_exact,audio_endpoint_samples=end,static_hdr_matches=True,

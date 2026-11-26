@@ -41,10 +41,15 @@ def layer_contract(assets,c,w,h):
   return None,(w,h),'',hdr_layers.SRGB
  a=assets[c['assetId']]
  if kind=='image':
-  if c.get('inputColor') or Path(a['path']).suffix.lower() not in hdr_layers.STILL_SUFFIXES:
-   raise ValueError('Managed HDR photographs use sRGB PNG or JPEG')
-  aw,ah,orientation=hdr_layers.photo_info(a['path'])
-  return a,(aw,ah),orientation,hdr_layers.SRGB
+  if Path(a['path']).suffix.lower() not in hdr_layers.STILL_SUFFIXES:
+   raise ValueError('Managed stills use PNG or JPEG')
+  aw,ah,orientation,interpretation=hdr_layers.photo_contract(a['path'])
+  if c.get('inputColor'):
+   override=color.validate_input(c['inputColor'])
+   if override['profile']!=color.STILL_SRGB_OVERRIDE:
+    raise ValueError('Managed stills support an explicit sRGB interpretation override')
+   interpretation=hdr_layers.SRGB
+  return a,(aw,ah),orientation,interpretation
  if kind!='video':raise ValueError('Unsupported layer in managed HDR')
  angle=(-float(a.get('rotation',0)))%360
  if angle not in hdr_layers.VIDEO_ORIENTATION:raise ValueError('Only exact right-angle source orientation is qualified in managed HDR')
@@ -87,7 +92,7 @@ def command(state,start,end,target,jobdir,quality='final'):
   alpha=hdr_layers.parameter(c,'opacity',1,alpha_start);off=alpha_start-c['position']
   if c.get('fadeIn',0):alpha+=f'*min(1,max(0,(T+{engine._num(off)})/{engine._num(c["fadeIn"])}))'
   if c.get('fadeOut',0):alpha+=f'*min(1,max(0,({engine._num(engine.clip_length(c)-off)}-T)/{engine._num(c["fadeOut"])}))'
-  gain=2**color.number(c.get('hdrExposure',0),-8,8)*(contract['sdrWhiteNits']/100 if profile in ('rec709','srgb') else 1)
+  gain=2**color.number(c.get('hdrExposure',0),-8,8)*(contract['sdrWhiteNits']/100 if profile in ('rec709','srgb','display-p3') else 1)
   cadence=f'setpts=PTS/{engine._num(c.get("speed",1))},fps={fps}:start_time=0:round=up,'
   convert=hdr_layers.luma_linear(p,t,m,r)
   oriented=(orientation+',' if orientation else '')+'setsar=1'

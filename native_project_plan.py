@@ -84,6 +84,8 @@ def value_at(clip, name, source_time, default):
 
 def admitted_layer(assets,clip,width,height):
     asset,size,orientation,interpretation = hdr_render.layer_contract(assets,clip,width,height)
+    if clip["kind"]=="image" and interpretation!=hdr_layers.SRGB:
+        raise Ineligible("Display P3 stills require the managed renderer")
     if timing.rational(clip.get("speed",1))!=1:
         raise Ineligible("Changing clip speed requires the managed renderer")
     if any(clip.get(key,1)!=1 or clip.get("keys",{}).get(key) for key in ("contrast","saturation")):
@@ -103,7 +105,7 @@ def fitted_size(size,canvas,fit):
     return max(1,round(sx*ratio)),max(1,round(sy*ratio))
 
 
-def compile_project(state,work,*,camera_raster=False):
+def compile_project(state,work,*,camera_raster=False,camera_spans=None):
     state = sequences.playback(state)
     output = state["output"]
     contract = color_management.validate_output(output["color"])
@@ -114,9 +116,14 @@ def compile_project(state,work,*,camera_raster=False):
     if width%4 or height%2 or not width or not height or width>7680 or height>4320:
         raise Ineligible("The project dimensions are outside packed Main10 support")
     spans = render_engine.frame_spans(state,fps)
-    if not spans or not 0<spans[-1][1]<=7200:
+    if camera_spans is not None:
+        selected = set(camera_spans)
+        if not camera_raster or selected.difference(spans):
+            raise Ineligible("Indexed camera spans must retain their original render boundaries")
+        spans = [span for span in spans if span in selected]
+    if not spans or sum(end-start for start,end in spans)>7200 or spans[0][0]<0:
         raise Ineligible("The native timeline is outside its current instruction budget")
-    program = Program(width,height,fps,contract["sdrWhiteNits"]/100,spans)
+    program = Program(width,height,fps,contract["sdrWhiteNits"]/100,[])
     assets = {asset["id"]:asset for asset in state["assets"]}
     pairs = timeline_transitions.plan(state)[0]
     slots = {}
@@ -143,8 +150,12 @@ def compile_project(state,work,*,camera_raster=False):
             seek = timing.rational(clip["start"])+(first-timing.frame_at(clip["position"],fps))/fps
             # The managed decoder requests this microsecond-rounded preroll at
             # each rendering span. Keep the selection in the original clock.
-            seek = Fraction(math.ceil(seek*1000000-Fraction(1,100000000)),1000000)
-            program.sources[slot].requests[frame] = seek+(frame-first)/fps
+            if camera_spans is None:
+                seek = Fraction(math.ceil(seek*1000000-Fraction(1,100000000)),1000000)
+            else:
+                managed_seek = float(clip["start"])+max(0,float(first/fps)-float(clip["position"]))
+                seek = Fraction(render_engine.media_seek_microseconds(managed_seek),1_000_000)
+            program.sources[slot].requests[len(program.frames)] = seek+(frame-first)/fps
         values = {name:value_at(clip,name,clock,default) for name,default in MOTION.items()}
         opacity = values["opacity"]
         if clip.get("fadeIn"):
@@ -162,6 +173,8 @@ def compile_project(state,work,*,camera_raster=False):
         return packed,geo
 
     for start,end in spans:
+        output_first = len(program.frames)
+        program.spans.append((output_first,output_first+end-start))
         video,_ = render_engine.active_clips(state,float(start/fps),float(end/fps))
         matching = [pair for pair in pairs if pair.end>start and pair.start<end]
         if len(matching)>1:
@@ -265,7 +278,8 @@ def append_video(output,slot,src,frame_count,cancelled,*,first_time=False,camera
     tags = tuple(video.get(key) for key in ("color_primaries","color_transfer","color_space"))
     pq = tags==("bt2020","smpte2084","bt2020nc")
     codec=(video.get("codec_name"),video.get("pix_fmt"),pq)
-    camera_sdr=(camera_range and src.orientation=="" and video.get("profile")=="Main" and
+    camera_sdr=(camera_range and (src.orientation=="" or (camera_raster and src.orientation=="transpose=clock"))
+                and video.get("profile")=="Main" and
                 codec==("hevc","yuv420p",False))
     if first_time and not camera_sdr and codec not in (("h264","yuv420p",False),("hevc","yuv420p10le",True)):
         detail="the selected H.264 SDR or HEVC SDR/PQ scope" if camera_range else "qualified H.264 SDR or HEVC Main10 PQ video"

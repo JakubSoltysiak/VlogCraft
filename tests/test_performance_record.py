@@ -47,3 +47,10 @@ class EvidenceBindingTests(unittest.TestCase):
   del candidate['unavailable']
   with self.assertRaisesRegex(ValueError,'unavailable'):
    record.check_history(candidate,previous)
+
+ def test_append_a_new_measurement_file_preserves_every_previous_digest(self):
+  previous={'measurement_files':{'camera.json':'previous'}}
+  record.check_history({'measurement_files':{'camera.json':'previous','mixed.json':'new'}},previous)
+  for revised in ({'mixed.json':'new'},{'camera.json':'changed'}):
+   with self.assertRaisesRegex(ValueError,'measurement_files'):
+    record.check_history({'measurement_files':revised},previous)

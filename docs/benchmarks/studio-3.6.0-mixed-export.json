@@ -1,0 +1,923 @@
+{
+  "environment": {
+    "device": "Ryzen AI 9 HX 370, integrated Radeon 890M",
+    "encoder": "x265 Slow CRF 20, WPP, two frame threads",
+    "pixel_format": "yuv420p10le",
+    "power": "AC",
+    "primaries": "BT.2020",
+    "rate": "60/1",
+    "resolution": [
+      3840,
+      2160
+    ],
+    "rss": "Sampled sum of process-tree working sets. Shared pages may appear in multiple processes.",
+    "transfer": "ST 2084"
+  },
+  "historical_seconds": {
+    "corrected_camera_3600": 3860.448,
+    "corrected_camera_600": 688.461,
+    "managed_archived_48": 136.190302
+  },
+  "isolated_raster_and_encoder": {
+    "before-pq-4": {
+      "exact": false,
+      "exit": 4294967274,
+      "seconds": 0.06428969999979017
+    },
+    "capture_seconds": 1.6933255000003555,
+    "control": {
+      "exact": true,
+      "exit": 0,
+      "seconds": 39.49604040000122
+    },
+    "encode-2": {
+      "frames": 36,
+      "seconds": 31.317535100002715,
+      "settings": "hdr10=1:repeat-headers=1:pools=2:frame-threads=2:master-display=G(13250,34500)B(7500,3000)R(34000,16000)WP(15635,16450)L(10000000,50):max-cll=1000,200"
+    },
+    "encode-8": {
+      "frames": 36,
+      "seconds": 9.101153200001136,
+      "settings": "hdr10=1:repeat-headers=1:pools=8:frame-threads=2:master-display=G(13250,34500)B(7500,3000)R(34000,16000)WP(15635,16450)L(10000000,50):max-cll=1000,200"
+    },
+    "float-pad": {
+      "exact": false,
+      "exit": 4294967274,
+      "seconds": 0.07174509999822476
+    }
+  },
+  "optimized_raster": {
+    "rgb-cached": {
+      "exact": true,
+      "exit": 0,
+      "frames": 36,
+      "seconds": 34.1138056000018
+    }
+  },
+  "original_timeline_range": {
+    "camera_source_picture_selections": 36,
+    "fps": "60",
+    "frames": 936,
+    "original_first": 6301,
+    "original_last_exclusive": 7237,
+    "silent_spans": [
+      {
+        "original": [
+          7200,
+          7201
+        ],
+        "samples_per_channel": 800
+      }
+    ],
+    "source_media_unchanged": true,
+    "still_source_picture_selections": 900,
+    "verified_pcm_samples_per_channel": 748800,
+    "verified_still_sources": 3
+  },
+  "raster_alternatives": {
+    "all-t4": {
+      "exact": false,
+      "exit": 0,
+      "frames": 12,
+      "seconds": 4.172975299999962
+    },
+    "cached": {
+      "exact": true,
+      "exit": 0,
+      "frames": 12,
+      "seconds": 11.338303200001974
+    },
+    "final4": {
+      "exact": false,
+      "exit": 0,
+      "frames": 12,
+      "seconds": 8.545262300001923
+    },
+    "linear4": {
+      "exact": false,
+      "exit": 0,
+      "frames": 12,
+      "seconds": 6.4934811999992235
+    },
+    "reference": {
+      "exact": true,
+      "exit": 0,
+      "frames": 12,
+      "seconds": 12.120759900000849
+    },
+    "resize4": {
+      "exact": false,
+      "exit": 0,
+      "frames": 12,
+      "seconds": 11.013081599998259
+    },
+    "rgb-cached": {
+      "exact": true,
+      "exit": 0,
+      "frames": 12,
+      "seconds": 10.63771049999923
+    },
+    "rgb-cached-t4": {
+      "exact": false,
+      "exit": 0,
+      "frames": 12,
+      "seconds": 6.312671100000443
+    }
+  },
+  "rejected_excerpt_audits": [
+    {
+      "frames": [
+        6283,
+        7219
+      ],
+      "reason": "Post-EOF camera seek returned insufficient pictures and rebased camera audio differed."
+    },
+    {
+      "frames": [
+        57785,
+        59657
+      ],
+      "reason": "PCM after seeking into an active camera differed from the full original audio interval."
+    }
+  ],
+  "trials": {
+    "continuous48": {
+      "continuous": true,
+      "encoder_contexts": 1,
+      "exit": 0,
+      "frames": 48,
+      "on_ac": true,
+      "passed": true,
+      "peak_tree_rss_bytes": 3063558144,
+      "pool": 2,
+      "render_seconds": 88.0735276000014,
+      "seconds": 90.21603319999849,
+      "spans": [
+        [
+          0,
+          12
+        ],
+        [
+          12,
+          30
+        ],
+        [
+          30,
+          48
+        ]
+      ],
+      "wall_s": 90.75442029999977
+    },
+    "managed48-8": {
+      "continuous": false,
+      "encoder_contexts": 3,
+      "exit": 0,
+      "frames": 48,
+      "on_ac": true,
+      "passed": true,
+      "peak_tree_rss_bytes": 3483680768,
+      "pool": 8,
+      "render_seconds": 67.74317050000172,
+      "seconds": 69.7376144000009,
+      "spans": [
+        [
+          0,
+          12
+        ],
+        [
+          12,
+          30
+        ],
+        [
+          30,
+          48
+        ]
+      ],
+      "wall_s": 70.20962739999959
+    },
+    "mixed48-control": {
+      "author_seconds": 2.172294599997258,
+      "camera_pictures": 36,
+      "encoder_cpu_seconds": 84.891,
+      "encoder_feed_and_wait_seconds": 57.05262380000204,
+      "equal_coded_pictures": 48,
+      "exit": 0,
+      "frames": 48,
+      "gpu_local_bytes": 127971328,
+      "independent": {
+        "audio_endpoint_samples": 38400,
+        "decoded_pq_psnr_db": "inf",
+        "exact_decoded_pcm": true,
+        "exact_decoded_pictures": 48,
+        "exact_video_pts": true,
+        "hdr10plus_picture_associations": 48,
+        "hdr10plus_records_matching_reference": 48,
+        "minimum_psnr_db": "inf",
+        "passed": true,
+        "pictures_below_50_db": 0,
+        "static_hdr_matches": true,
+        "video_declaration_matches": true
+      },
+      "independent_seconds": 3.6019884000015736,
+      "managed_picture_encode_seconds": 15.538297300001432,
+      "managed_pictures": 12,
+      "on_ac": true,
+      "passed": true,
+      "peak_rss_bytes": 273010688,
+      "peak_tree_rss_bytes": 4128784384,
+      "pool": 2,
+      "prepare_seconds": 0.9978645000010147,
+      "prepared_still_spans": 0,
+      "render_seconds": 73.71984890000022,
+      "sampled_decoded_to_raw_db": [
+        {
+          "frame": 0,
+          "psnr_db": 51.901159821936545
+        },
+        {
+          "frame": 5,
+          "psnr_db": 51.91063570761534
+        },
+        {
+          "frame": 11,
+          "psnr_db": 51.91070246151399
+        },
+        {
+          "frame": 12,
+          "psnr_db": 56.58375721567593
+        },
+        {
+          "frame": 20,
+          "psnr_db": 56.73557383187534
+        },
+        {
+          "frame": 29,
+          "psnr_db": 58.53230106043667
+        },
+        {
+          "frame": 30,
+          "psnr_db": 53.1847145143771
+        },
+        {
+          "frame": 38,
+          "psnr_db": 54.168977706163034
+        },
+        {
+          "frame": 47,
+          "psnr_db": 53.274519132243896
+        }
+      ],
+      "sources_unchanged": true,
+      "through_master_seconds": 76.8938249999992,
+      "total_seconds": 132.36979040000006,
+      "verification_seconds": 55.4556307999992,
+      "wall_s": 136.67937990000064,
+      "wall_seconds": 136.02133609999873
+    },
+    "mixed48-fast2": {
+      "author_seconds": 1.9978133999975398,
+      "camera_pictures": 36,
+      "encoder_cpu_seconds": 80.828,
+      "encoder_feed_and_wait_seconds": 53.03960279999956,
+      "equal_coded_pictures": 48,
+      "exit": 0,
+      "frames": 48,
+      "gpu_local_bytes": 140554240,
+      "independent": {
+        "audio_endpoint_samples": 38400,
+        "decoded_pq_psnr_db": "inf",
+        "exact_decoded_pcm": true,
+        "exact_decoded_pictures": 48,
+        "exact_video_pts": true,
+        "hdr10plus_picture_associations": 48,
+        "hdr10plus_records_matching_reference": 48,
+        "minimum_psnr_db": "inf",
+        "passed": true,
+        "pictures_below_50_db": 0,
+        "static_hdr_matches": true,
+        "video_declaration_matches": true
+      },
+      "independent_seconds": 3.4868190999986837,
+      "managed_picture_encode_seconds": 6.352942400000757,
+      "managed_pictures": 12,
+      "on_ac": true,
+      "passed": true,
+      "peak_rss_bytes": 271659008,
+      "peak_tree_rss_bytes": 2589851648,
+      "pool": 2,
+      "prepare_seconds": 0.8872464000014588,
+      "prepared_still_spans": 1,
+      "render_seconds": 60.30753250000271,
+      "sampled_decoded_to_raw_db": [
+        {
+          "frame": 0,
+          "psnr_db": 51.901159821936545
+        },
+        {
+          "frame": 5,
+          "psnr_db": 51.91063570761534
+        },
+        {
+          "frame": 11,
+          "psnr_db": 51.91070246151399
+        },
+        {
+          "frame": 12,
+          "psnr_db": 56.58375721567593
+        },
+        {
+          "frame": 20,
+          "psnr_db": 56.73557383187534
+        },
+        {
+          "frame": 29,
+          "psnr_db": 58.53230106043667
+        },
+        {
+          "frame": 30,
+          "psnr_db": 53.1847145143771
+        },
+        {
+          "frame": 38,
+          "psnr_db": 54.168977706163034
+        },
+        {
+          "frame": 47,
+          "psnr_db": 53.274519132243896
+        }
+      ],
+      "sources_unchanged": true,
+      "through_master_seconds": 63.19392060000246,
+      "total_seconds": 109.98668530000214,
+      "verification_seconds": 46.77616020000278,
+      "wall_s": 114.27060650000203,
+      "wall_seconds": 113.48381230000086
+    },
+    "mixed48-fast8": {
+      "author_seconds": 2.0121244000001752,
+      "camera_pictures": 36,
+      "encoder_cpu_seconds": 116.25,
+      "encoder_feed_and_wait_seconds": 40.52556320000076,
+      "equal_coded_pictures": 48,
+      "exit": 0,
+      "frames": 48,
+      "gpu_local_bytes": 140554240,
+      "independent": {
+        "audio_endpoint_samples": 38400,
+        "decoded_pq_psnr_db": "inf",
+        "exact_decoded_pcm": true,
+        "exact_decoded_pictures": 48,
+        "exact_video_pts": true,
+        "hdr10plus_picture_associations": 48,
+        "hdr10plus_records_matching_reference": 48,
+        "minimum_psnr_db": "inf",
+        "passed": true,
+        "pictures_below_50_db": 0,
+        "static_hdr_matches": true,
+        "video_declaration_matches": true
+      },
+      "independent_seconds": 3.371839600000385,
+      "managed_picture_encode_seconds": 4.061859299999924,
+      "managed_pictures": 12,
+      "on_ac": true,
+      "passed": true,
+      "peak_rss_bytes": 272490496,
+      "peak_tree_rss_bytes": 2797416448,
+      "pool": 8,
+      "prepare_seconds": 1.0612122999991698,
+      "prepared_still_spans": 1,
+      "render_seconds": 45.60520159999942,
+      "sampled_decoded_to_raw_db": [
+        {
+          "frame": 0,
+          "psnr_db": 51.901159821936545
+        },
+        {
+          "frame": 5,
+          "psnr_db": 51.91063570761534
+        },
+        {
+          "frame": 11,
+          "psnr_db": 51.91070246151399
+        },
+        {
+          "frame": 12,
+          "psnr_db": 56.58375721567593
+        },
+        {
+          "frame": 20,
+          "psnr_db": 56.73557383187534
+        },
+        {
+          "frame": 29,
+          "psnr_db": 58.53230106043667
+        },
+        {
+          "frame": 30,
+          "psnr_db": 53.1847145143771
+        },
+        {
+          "frame": 38,
+          "psnr_db": 54.168977706163034
+        },
+        {
+          "frame": 47,
+          "psnr_db": 53.274519132243896
+        }
+      ],
+      "sources_unchanged": true,
+      "through_master_seconds": 48.679778999998234,
+      "total_seconds": 96.20024099999864,
+      "verification_seconds": 47.4893493999989,
+      "wall_s": 104.47874710000178,
+      "wall_seconds": 99.58212039999853
+    },
+    "p3-continuous48": {
+      "continuous": true,
+      "encoder_contexts": 1,
+      "exit": 0,
+      "frames": 48,
+      "on_ac": true,
+      "passed": true,
+      "peak_tree_rss_bytes": 2924449792,
+      "pool": 2,
+      "render_seconds": 94.74148210000203,
+      "seconds": 96.95748390000153,
+      "spans": [
+        [
+          0,
+          12
+        ],
+        [
+          12,
+          30
+        ],
+        [
+          30,
+          48
+        ]
+      ],
+      "wall_s": 97.60920450000049
+    },
+    "p3-managed48": {
+      "continuous": false,
+      "encoder_contexts": 3,
+      "exit": 0,
+      "frames": 48,
+      "on_ac": true,
+      "passed": true,
+      "peak_tree_rss_bytes": 3664846848,
+      "pool": 2,
+      "render_seconds": 86.82655750000049,
+      "seconds": 88.78944800000318,
+      "spans": [
+        [
+          0,
+          12
+        ],
+        [
+          12,
+          30
+        ],
+        [
+          30,
+          48
+        ]
+      ],
+      "wall_s": 89.55904450000162
+    },
+    "p3-mixed48": {
+      "author_seconds": 1.952485900001193,
+      "camera_pictures": 36,
+      "encoder_cpu_seconds": 82.267,
+      "encoder_feed_and_wait_seconds": 54.845914300000004,
+      "equal_coded_pictures": 48,
+      "exit": 0,
+      "frames": 48,
+      "gpu_local_bytes": 153137152,
+      "independent": {
+        "audio_endpoint_samples": 38400,
+        "decoded_pq_psnr_db": "inf",
+        "exact_decoded_pcm": true,
+        "exact_decoded_pictures": 48,
+        "exact_video_pts": true,
+        "hdr10plus_picture_associations": 48,
+        "hdr10plus_records_matching_reference": 48,
+        "minimum_psnr_db": "inf",
+        "passed": true,
+        "pictures_below_50_db": 0,
+        "static_hdr_matches": true,
+        "video_declaration_matches": true
+      },
+      "independent_seconds": 3.7205523000011453,
+      "managed_picture_encode_seconds": 6.775625199999922,
+      "managed_pictures": 12,
+      "on_ac": true,
+      "passed": true,
+      "peak_rss_bytes": 268288000,
+      "peak_tree_rss_bytes": 2681348096,
+      "pool": 2,
+      "prepare_seconds": 0.8295711999999185,
+      "prepared_still_spans": 1,
+      "render_seconds": 62.553143699999055,
+      "sampled_decoded_to_raw_db": [
+        {
+          "frame": 0,
+          "psnr_db": 51.82967812642323
+        },
+        {
+          "frame": 5,
+          "psnr_db": 51.836677536140044
+        },
+        {
+          "frame": 11,
+          "psnr_db": 51.836291432779234
+        },
+        {
+          "frame": 12,
+          "psnr_db": 56.58375721567593
+        },
+        {
+          "frame": 20,
+          "psnr_db": 56.73557383187534
+        },
+        {
+          "frame": 29,
+          "psnr_db": 58.53230106043667
+        },
+        {
+          "frame": 30,
+          "psnr_db": 53.1847145143771
+        },
+        {
+          "frame": 38,
+          "psnr_db": 54.168977706163034
+        },
+        {
+          "frame": 47,
+          "psnr_db": 53.274519132243896
+        }
+      ],
+      "sources_unchanged": true,
+      "through_master_seconds": 65.33676920000289,
+      "total_seconds": 115.47443349999958,
+      "verification_seconds": 50.11575520000042,
+      "wall_s": 119.74350290000075,
+      "wall_seconds": 119.20523260000118
+    },
+    "p3-nativecontinuous48": {
+      "audio_mux_seconds": 0.32350059999953373,
+      "author_seconds": 1.907757999997557,
+      "equal_coded_pictures": 48,
+      "exit": 0,
+      "frames": 48,
+      "gpu_local_bytes": 140554240,
+      "independent": {
+        "audio_endpoint_samples": 38400,
+        "decoded_pq_psnr_db": "inf",
+        "exact_decoded_pcm": true,
+        "exact_decoded_pictures": 48,
+        "exact_video_pts": true,
+        "hdr10plus_picture_associations": 48,
+        "hdr10plus_records_matching_reference": 48,
+        "minimum_psnr_db": "inf",
+        "passed": true,
+        "pictures_below_50_db": 0,
+        "static_hdr_matches": true,
+        "video_declaration_matches": true
+      },
+      "main10_bytes_relayed": 1194393600,
+      "on_ac": true,
+      "passed": true,
+      "peak_rss_bytes": 272416768,
+      "peak_tree_rss_bytes": 3195215872,
+      "pool": 2,
+      "sampled_decoded_to_raw_db": [
+        {
+          "frame": 0,
+          "psnr_db": 51.84718758948521
+        },
+        {
+          "frame": 5,
+          "psnr_db": 51.84836009283977
+        },
+        {
+          "frame": 11,
+          "psnr_db": 51.84693512234817
+        },
+        {
+          "frame": 12,
+          "psnr_db": 54.719624908332605
+        },
+        {
+          "frame": 20,
+          "psnr_db": 55.79301349170905
+        },
+        {
+          "frame": 29,
+          "psnr_db": 58.22688315299145
+        },
+        {
+          "frame": 30,
+          "psnr_db": 53.62872382700683
+        },
+        {
+          "frame": 38,
+          "psnr_db": 54.04951301000711
+        },
+        {
+          "frame": 47,
+          "psnr_db": 53.26880381468757
+        }
+      ],
+      "sources_unchanged": true,
+      "through_master_seconds": 64.61236189999909,
+      "verified_camera_pictures": 36,
+      "wall_s": 118.40629540000009,
+      "wall_seconds": 117.91988629999832
+    },
+    "p3-seg48-cold": {
+      "audio_endpoint_samples": 38400,
+      "audio_graph_seconds": 0.21953040000153123,
+      "authored_span_comparison": {
+        "audio_endpoint_samples": 38400,
+        "decoded_pq_psnr_db": "inf",
+        "exact_decoded_pcm": true,
+        "exact_decoded_pictures": 48,
+        "exact_video_pts": true,
+        "hdr10plus_picture_associations": 48,
+        "hdr10plus_records_matching_reference": 48,
+        "minimum_psnr_db": "inf",
+        "passed": true,
+        "pictures_below_50_db": 0,
+        "static_hdr_matches": true,
+        "video_declaration_matches": true
+      },
+      "continuous_comparison": {
+        "audio_endpoint_samples": 38400,
+        "decoded_pq_psnr_db": "55.892116",
+        "exact_decoded_pcm": true,
+        "exact_decoded_pictures": 0,
+        "exact_video_pts": true,
+        "hdr10plus_picture_associations": 48,
+        "hdr10plus_records_matching_reference": 0,
+        "minimum_psnr_db": "54.24",
+        "passed": true,
+        "pictures_below_50_db": 0,
+        "static_hdr_matches": true,
+        "video_declaration_matches": true
+      },
+      "exact_assembled_video_packets": 48,
+      "exit": 0,
+      "frames": 48,
+      "hdr10plus_author_and_verify_seconds": 2.0468928999980562,
+      "isolated_and_joined_decode_match": 48,
+      "join_and_audio_encode_seconds": 0.15578820000155247,
+      "on_ac": true,
+      "peak_tree_rss_bytes": 2680016896,
+      "sampled_peak_tree_bytes": 2688843776,
+      "seams": [
+        12,
+        30
+      ],
+      "segment_seconds": 75.90012099999876,
+      "segments": [
+        {
+          "encode_seconds": 7.1935018000003765,
+          "exact_decoded_pictures": 12,
+          "frames": [
+            0,
+            12
+          ],
+          "min_psnr_db": "inf",
+          "provider": "prepared-still",
+          "reused": false,
+          "verify_seconds": 1.605563400000392
+        },
+        {
+          "encode_seconds": 25.947853400000895,
+          "exact_decoded_pictures": 18,
+          "frames": [
+            12,
+            30
+          ],
+          "min_psnr_db": "inf",
+          "peak_gpu_local_bytes": 141860864,
+          "provider": "indexed-camera",
+          "reused": false,
+          "verified_source_pictures": 18,
+          "verify_seconds": 2.0218674999996438
+        },
+        {
+          "encode_seconds": 36.77862269999969,
+          "exact_decoded_pictures": 18,
+          "frames": [
+            30,
+            48
+          ],
+          "min_psnr_db": "inf",
+          "peak_gpu_local_bytes": 102903808,
+          "provider": "indexed-camera",
+          "reused": false,
+          "verified_source_pictures": 18,
+          "verify_seconds": 2.297172299997328
+        }
+      ],
+      "state": "passed",
+      "total_seconds": 103.76393919999828,
+      "wall_s": 104.17483809999976,
+      "workers": 1
+    },
+    "p3-seg48-resume": {
+      "audio_endpoint_samples": 38400,
+      "audio_graph_seconds": 0.24188860000140266,
+      "authored_span_comparison": {
+        "audio_endpoint_samples": 38400,
+        "decoded_pq_psnr_db": "inf",
+        "exact_decoded_pcm": true,
+        "exact_decoded_pictures": 48,
+        "exact_video_pts": true,
+        "hdr10plus_picture_associations": 48,
+        "hdr10plus_records_matching_reference": 48,
+        "minimum_psnr_db": "inf",
+        "passed": true,
+        "pictures_below_50_db": 0,
+        "static_hdr_matches": true,
+        "video_declaration_matches": true
+      },
+      "continuous_comparison": {
+        "audio_endpoint_samples": 38400,
+        "decoded_pq_psnr_db": "55.892116",
+        "exact_decoded_pcm": true,
+        "exact_decoded_pictures": 0,
+        "exact_video_pts": true,
+        "hdr10plus_picture_associations": 48,
+        "hdr10plus_records_matching_reference": 0,
+        "minimum_psnr_db": "54.24",
+        "passed": true,
+        "pictures_below_50_db": 0,
+        "static_hdr_matches": true,
+        "video_declaration_matches": true
+      },
+      "exact_assembled_video_packets": 48,
+      "exit": 0,
+      "frames": 48,
+      "hdr10plus_author_and_verify_seconds": 1.890493200000492,
+      "isolated_and_joined_decode_match": 48,
+      "join_and_audio_encode_seconds": 0.14301440000053844,
+      "on_ac": true,
+      "peak_tree_rss_bytes": 1790779392,
+      "sampled_peak_tree_bytes": 1790459904,
+      "seams": [
+        12,
+        30
+      ],
+      "segment_seconds": 66.39400849999947,
+      "segments": [
+        {
+          "encode_seconds": 6.641660700002831,
+          "exact_decoded_pictures": 12,
+          "frames": [
+            0,
+            12
+          ],
+          "min_psnr_db": "inf",
+          "provider": "prepared-still",
+          "reused": true,
+          "verify_seconds": 1.5372832999964885
+        },
+        {
+          "encode_seconds": 26.04002639999817,
+          "exact_decoded_pictures": 18,
+          "frames": [
+            12,
+            30
+          ],
+          "min_psnr_db": "inf",
+          "peak_gpu_local_bytes": 142438400,
+          "provider": "indexed-camera",
+          "reused": false,
+          "verified_source_pictures": 18,
+          "verify_seconds": 1.9779562000003352
+        },
+        {
+          "encode_seconds": 36.07164230000126,
+          "exact_decoded_pictures": 18,
+          "frames": [
+            30,
+            48
+          ],
+          "min_psnr_db": "inf",
+          "peak_gpu_local_bytes": 115486720,
+          "provider": "indexed-camera",
+          "reused": false,
+          "verified_source_pictures": 18,
+          "verify_seconds": 2.254036800000904
+        }
+      ],
+      "state": "passed",
+      "total_seconds": 91.78575289999935,
+      "wall_s": 92.36233580000044,
+      "workers": 1
+    },
+    "p3-seg48-stop": {
+      "exit": 0,
+      "on_ac": true,
+      "peak_tree_rss_bytes": 2586050560,
+      "planned_stop_after_verified_spans": 1,
+      "wall_s": 15.765870600000198
+    },
+    "p3-seg48-two": {
+      "audio_endpoint_samples": 38400,
+      "audio_graph_seconds": 0.24191419999988284,
+      "authored_span_comparison": {
+        "audio_endpoint_samples": 38400,
+        "decoded_pq_psnr_db": "inf",
+        "exact_decoded_pcm": true,
+        "exact_decoded_pictures": 48,
+        "exact_video_pts": true,
+        "hdr10plus_picture_associations": 48,
+        "hdr10plus_records_matching_reference": 48,
+        "minimum_psnr_db": "inf",
+        "passed": true,
+        "pictures_below_50_db": 0,
+        "static_hdr_matches": true,
+        "video_declaration_matches": true
+      },
+      "continuous_comparison": {
+        "audio_endpoint_samples": 38400,
+        "decoded_pq_psnr_db": "55.892116",
+        "exact_decoded_pcm": true,
+        "exact_decoded_pictures": 0,
+        "exact_video_pts": true,
+        "hdr10plus_picture_associations": 48,
+        "hdr10plus_records_matching_reference": 0,
+        "minimum_psnr_db": "54.24",
+        "passed": true,
+        "pictures_below_50_db": 0,
+        "static_hdr_matches": true,
+        "video_declaration_matches": true
+      },
+      "exact_assembled_video_packets": 48,
+      "exit": 0,
+      "frames": 48,
+      "hdr10plus_author_and_verify_seconds": 1.9604824000016379,
+      "isolated_and_joined_decode_match": 48,
+      "join_and_audio_encode_seconds": 0.15505680000205757,
+      "on_ac": true,
+      "peak_tree_rss_bytes": 3914268672,
+      "sampled_peak_tree_bytes": 3913871360,
+      "seams": [
+        12,
+        30
+      ],
+      "segment_seconds": 50.42930180000258,
+      "segments": [
+        {
+          "encode_seconds": 7.934595899998385,
+          "exact_decoded_pictures": 12,
+          "frames": [
+            0,
+            12
+          ],
+          "min_psnr_db": "inf",
+          "provider": "prepared-still",
+          "reused": false,
+          "verify_seconds": 1.827994999999646
+        },
+        {
+          "encode_seconds": 29.017444299999624,
+          "exact_decoded_pictures": 18,
+          "frames": [
+            12,
+            30
+          ],
+          "min_psnr_db": "inf",
+          "peak_gpu_local_bytes": 142438400,
+          "provider": "indexed-camera",
+          "reused": false,
+          "verified_source_pictures": 18,
+          "verify_seconds": 2.62878599999749
+        },
+        {
+          "encode_seconds": 38.341721900000266,
+          "exact_decoded_pictures": 18,
+          "frames": [
+            30,
+            48
+          ],
+          "min_psnr_db": "inf",
+          "peak_gpu_local_bytes": 128069632,
+          "provider": "indexed-camera",
+          "reused": false,
+          "verified_source_pictures": 18,
+          "verify_seconds": 2.293022199999541
+        }
+      ],
+      "state": "passed",
+      "total_seconds": 75.77832259999923,
+      "wall_s": 76.42892090000169,
+      "workers": 2
+    }
+  }
+}

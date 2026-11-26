@@ -57,5 +57,7 @@ def project(state,first,last,width,proxy_paths=None):
               'luts':{key:deepcopy(state.get('luts',{}).get(key)) for key in sorted(luts)}}
     if output.get('color'):snapshot['output']['color']=deepcopy(output['color'])
     payload=[FORMAT,first,last,snapshot,files]
+    if output.get('color') and any(clip['kind']=='image' for track in tracks for clip in track['clips']):
+        payload.append('managed-still-icc-v1')
     key=hashlib.sha256(json.dumps(payload,sort_keys=True,allow_nan=False).encode()).hexdigest()
     return key,snapshot

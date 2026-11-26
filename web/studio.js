@@ -179,6 +179,8 @@ async function openExport(){
   try{
     const [available,nativeProject,jobs]=await Promise.all([request('encoders'),request('export/native-project'),request('jobs')]);
     $('exportWorkflow').dataset.nativeProjectAvailable=nativeProject.available&&available.libx265?'yes':'';
+    $('nativeProjectMixedNote').textContent=nativeProject.available
+      ? `Radeon 890M · UHD60 Slow CRF 20 · 60 Mb/s project setting · two x265 pool workers. Up to ${nativeProject.mixedMaxFrames} pictures and ${nativeProject.mixedMaxSpans} render spans. Studio compares every decoded picture, HDR10+ payload and audio sample with your master.` : '';
     choice.replaceChildren(...Object.entries(available).map(([id,label])=>new Option(label,id)));
     for(const option of $('exportWorkflow').options){
       if(['hdr10plus-master','samsung-hdr10plus','youtube-hdr'].includes(option.value))option.disabled=!available.libx265;
@@ -203,9 +205,11 @@ function updateExportWorkflow(){
   $('nativeProjectExport').hidden=mode!=='hdr10plus-master'||!workflow.dataset.nativeProjectAvailable;
   const native=$('useNativeProjectExport').checked;
   const first=$('nativeProjectPolicy').value==='first';
+  const mixed=$('nativeProjectPolicy').value==='mixed';
   $('nativeProjectPolicyRow').hidden=!native;
   $('nativeProjectComparison').hidden=!native||first;
   $('nativeProjectFirstNote').hidden=!native||!first;
+  $('nativeProjectMixedNote').hidden=!native||!mixed;
   $('exportProfileNote').hidden=!profile;
   $('exportProfileNote').textContent=samsung
     ? '3840 × 2160 at 60 fps · HEVC Main10 HDR10+ · CRF 17 · Samsung device playback is pending.'

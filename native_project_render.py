@@ -1,5 +1,6 @@
 """Opt-in D3D11 export of validated saved HDR10+ projects with reference fallback."""
 from contextlib import contextmanager,suppress
+from copy import deepcopy
 import json
 import os
 from pathlib import Path
@@ -12,6 +13,7 @@ import time
 
 import numpy as np
 
+import color_management
 from native_project_plan import Ineligible, compile_project, run_capture, write_plan, write_sources
 import hdr10plus_export
 from hdr10plus_index import SIDE_DATA
@@ -31,7 +33,7 @@ def raw_input(width,height,rate,pixel_format="yuv420p10le"):
             "-video_size",f"{width}x{height}","-framerate",rate,"-i","pipe:0"]
 
 
-def camera_raster_input(program, first, last):
+def camera_raster_input(program, first, last, *, fast=False):
     """Reconstruct neutral camera pictures from the indexed decoder's visible planes."""
     weight,layers=program.frames[first]
     if weight!=-1 or len(layers)!=1 or any(frame!=program.frames[first] for frame in program.frames[first:last]):
@@ -51,10 +53,11 @@ def camera_raster_input(program, first, last):
            f"format={src.asset['pixelFormat']},"+hdr_layers.luma_linear(*src.interpretation[:4]))
     filters=[]
     if src.orientation:
-        chain+=",format=gbrapf32le,"+src.orientation+",setsar=1"
+        chain+=(",format=gbrpf32le," if fast else ",format=gbrapf32le,")+src.orientation+",setsar=1"
         chain=hdr_layers.canvas_fit(filters,chain,"camera",source=src.size,canvas=(program.width,program.height),
-                                    fit="contain",fps=program.fps)
-        chain+=",mergeplanes=0x000102:format=gbrpf32le"
+                                    fit="contain",fps=program.fps,opaque_camera=fast)
+        if not fast:
+            chain+=",mergeplanes=0x000102:format=gbrpf32le"
     else:
         chain+=(f",format=gbrpf32le,setsar=1,zscale=threads=1:agamma=0:w={program.width}:h={program.height}:"
                 "filter=bilinear,format=gbrpf32le")
@@ -131,7 +134,7 @@ def temporary_work(parent,diagnostics=None):
 class ProjectVideo:
     """Supply picture segments as requested by the existing timeline exporter."""
 
-    def __init__(self, program, work, executable, runtime, timeout, cancelled, mode, fault, *, direct_pipe=False, parallel_x265=False):
+    def __init__(self, program, work, executable, runtime, timeout, cancelled, mode, fault, *, direct_pipe=False, parallel_x265=False, fast_raster=False):
         self.program = program
         self.work = work
         self.cancelled = cancelled
@@ -147,6 +150,7 @@ class ProjectVideo:
         self.thread = Thread(target=self.watch, daemon=True)
         self.parallel_x265 = parallel_x265
         self.camera_raster = mode=="gpu32-camera-raster"
+        self.fast_raster = fast_raster
         self.direct_pipe = direct_pipe and len(program.spans)==1
         self.buffer = None if self.direct_pipe else memoryview(bytearray(1024*1024))
         self.environment = dict(os.environ)
@@ -203,7 +207,7 @@ class ProjectVideo:
                                                  stderr=log,env=self.environment,creationflags=CREATE_FLAGS)
         width,height = self.program.width,self.program.height
         if self.camera_raster:
-            encoder,frame_bytes = camera_raster_input(self.program,start,end)
+            encoder,frame_bytes = camera_raster_input(self.program,start,end,fast=self.fast_raster)
         else:
             frame_bytes = width*height*3
             encoder = raw_input(width,height,str(self.program.fps))
@@ -363,7 +367,8 @@ def repair_gop(state,program,work,index,static,native,cancelled):
 def export_native(state,destination,reference,executable,runtime,*,authoring=None,timeout=240,
                   cancelled=lambda:False,progress=lambda *_:None,mode="gpu32",fault=None,diagnostics=None,
                   fallback=None,record=None,scratch=None,publish=os.link,repair=True,first_time=False,
-                  camera_range=False,parallel_x265=False,keyframe_seek=True,qualification=False,camera_raster=False):
+                  camera_range=False,parallel_x265=False,keyframe_seek=True,qualification=False,camera_raster=False,
+                  mixed=False,fast_raster=False):
     destination = destination.resolve()
     if publish is os.link and destination.exists():
         raise FileExistsError("Choose a new output path")
@@ -374,8 +379,12 @@ def export_native(state,destination,reference,executable,runtime,*,authoring=Non
         raise ValueError("The wider x265 pool requires the explicit camera-range policy")
     if qualification and not (first_time and camera_range and diagnostics):
         raise ValueError("Long camera trials require the first-export qualification workspace")
-    if camera_raster and not (qualification and keyframe_seek and not parallel_x265):
+    if camera_raster and not (qualification and keyframe_seek and (mixed or not parallel_x265)):
         raise ValueError("Exact camera raster requires indexed qualification and the reference encoder pool")
+    if mixed and not camera_raster:
+        raise ValueError("Mixed qualification requires the indexed exact camera raster")
+    if fast_raster and not camera_raster:
+        raise ValueError("Fast raster requires the explicitly qualified camera raster path")
     if first_time != (reference is None) or (camera_range and not first_time):
         raise ValueError("Select either first-export verification or a comparison master")
     if reference is not None:
@@ -389,24 +398,42 @@ def export_native(state,destination,reference,executable,runtime,*,authoring=Non
         result["camera_range_experiment"] = True
         result["keyframe_seek"] = keyframe_seek
         result["requested_x265_pool_workers"] = 8 if parallel_x265 else 2
+    if mixed:
+        from mixed_export import MixedVideo, compile_mixed, compare_mixed_samples
+
+        state=deepcopy(state)
+        flat=sequences.playback(state)
+        for asset in flat["assets"]:
+            source=Path(asset["path"]).resolve()
+            if destination==source or (destination.exists() and source.exists() and destination.samefile(source)):
+                raise ValueError("Choose a destination different from source media")
+        result["mixed_export_experiment"] = True
+    if fast_raster:
+        result["fast_raster_experiment"] = True
     started = time.perf_counter()
     publishing = False
     native = None
     try:
         with temporary_work(scratch or destination.parent,diagnostics) as work:
-            count = hdr10plus_master.preflight(state)
-            program = compile_project(state,work,camera_raster=camera_raster)
-            if count!=len(program.frames):
-                raise NativeFailure("The planned frame count differs from the HDR10+ contract")
             if first_time:
                 from native_project_verification import eligible, source_snapshot, verify_delivery
-                flat,contract=eligible(state,program,camera_range=camera_range,qualification=qualification,camera_raster=camera_raster)
+            if mixed:
+                original_sources=source_snapshot(flat,include_hidden_audio=True)
+                contract=color_management.validate_output(flat["output"]["color"])
+            count = hdr10plus_master.preflight(state)
+            program = compile_mixed(state,work) if mixed else compile_project(state,work,camera_raster=camera_raster)
+            camera_program = program.camera if mixed else program
+            if count!=len(program.frames):
+                raise NativeFailure("The planned frame count differs from the HDR10+ contract")
+            if first_time and not mixed:
+                flat,contract=eligible(state,program,camera_range=camera_range,
+                                       qualification=qualification,camera_raster=camera_raster)
                 original_sources=source_snapshot(flat)
                 if destination in original_sources or (destination.exists() and
                     any(destination.samefile(source) for source in original_sources)):
                     raise ValueError("Choose a destination different from source media")
-            write_plan(work/"plan.bin",program)
-            clocks=write_sources(work/"sources.bin",program,cancelled,first_time=first_time,camera_range=camera_range,
+            write_plan(work/"plan.bin",camera_program)
+            clocks=write_sources(work/"sources.bin",camera_program,cancelled,first_time=first_time,camera_range=camera_range,
                                  keyframe_seek=camera_range and keyframe_seek,camera_raster=camera_raster)
             result.update(frames=count,prepare_seconds=time.perf_counter()-started)
             static,master = work/"static.mp4",work/"master.mp4"
@@ -414,13 +441,22 @@ def export_native(state,destination,reference,executable,runtime,*,authoring=Non
             if camera_raster:
                 worker_mode="gpu32-camera-raster"
                 result["camera_raster"]="indexed-d3d11-decode-zimg"
-            with ProjectVideo(program,work,executable,runtime,timeout,cancelled,worker_mode,fault,
-                              direct_pipe=camera_range,parallel_x265=parallel_x265) as native:
+            raster_options={"fast_raster":True} if fast_raster else {}
+            with ProjectVideo(camera_program,work,executable,runtime,timeout,cancelled,worker_mode,fault,
+                              direct_pipe=camera_range,parallel_x265=parallel_x265,**raster_options) as native:
                 if camera_range:
                     result["picture_transport"] = "direct" if native.direct_pipe else "python-relay"
                 render_started = time.perf_counter()
-                render_engine.render(state,static,work/"render",popen=native,cancelled=cancelled,
-                                     on_progress=lambda p,m:progress(round(p*.8),m))
+                render_options={}
+                if mixed:
+                    dispatch=MixedVideo(flat,program,native,fast_raster=fast_raster,parallel_x265=parallel_x265)
+                    render_options.update(popen=native.run,picture_runner=dispatch)
+                else:
+                    render_options["popen"]=native
+                render_engine.render(state,static,work/"render",cancelled=cancelled,
+                                     on_progress=lambda p,m:progress(round(p*.8),m),**render_options)
+                if mixed:
+                    result["mixed"]=dispatch.receipt()
                 result["native"] = native.receipt()
                 result.update(render_seconds=time.perf_counter()-render_started,
                               encoder_feed_and_wait_seconds=native.encoder_seconds,
@@ -440,8 +476,14 @@ def export_native(state,destination,reference,executable,runtime,*,authoring=Non
                 verify_started = time.perf_counter()
                 if first_time:
                     progress(99,"Checking first-export source clocks, audio, HDR and sampled pictures")
+                    from functools import partial
+                    mixed_options=({"selection_program":camera_program,"sample_pictures":partial(
+                        compare_mixed_samples,sample_static_stills=fast_raster)}
+                                   if mixed else {})
+                    verification_cancelled=(lambda:cancelled() or time.monotonic()>=native.deadline) if mixed else cancelled
                     result["comparison"]=verify_delivery(flat,contract,master,program,clocks,result["native"],
-                                                         work,native.run,cancelled,camera_raster=camera_raster)
+                                                         work,native.run,verification_cancelled,
+                                                         camera_raster=camera_raster,**mixed_options)
                 else:
                     progress(99,"Comparing decoded picture, audio and HDR declarations")
                     result["comparison"]=compare_project(reference,master,program,work,cancelled)
@@ -471,17 +513,19 @@ def export_native(state,destination,reference,executable,runtime,*,authoring=Non
                     master = diagnostics/"master.mp4"
                 if not result["comparison"]["passed"]:
                     raise NativeFailure("The delivered candidate did not match the reference acceptance contract")
-                if first_time and source_snapshot(flat)!=original_sources:
+                if first_time and source_snapshot(flat,include_hidden_audio=mixed)!=original_sources:
                     raise NativeFailure("An original media file changed during the export")
                 native.check()
                 publishing = True
                 publish(master,destination)
-                if camera_raster:
+                if mixed:
+                    result["delivered_backend"]="mixed-d3d11-zimg-managed"
+                elif camera_raster:
                     result["delivered_backend"]="d3d11-zimg"
                 else:
                     result["delivered_backend"] = "hybrid" if "repair" in result else "d3d11"
     except (OSError,ValueError,AssertionError,RuntimeError,MemoryError,subprocess.SubprocessError) as error:
-        if result.get("delivered_backend") in ("d3d11","d3d11-zimg","hybrid"):
+        if result.get("delivered_backend") in ("d3d11","d3d11-zimg","mixed-d3d11-zimg-managed","hybrid"):
             result["scratch_cleanup_failure"] = type(error).__name__
         else:
             result["native_failure"] = type(error).__name__

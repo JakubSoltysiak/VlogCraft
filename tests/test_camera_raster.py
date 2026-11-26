@@ -53,3 +53,6 @@ class CameraRasterTests(unittest.TestCase):
                     actual=subprocess.run(cmd+tail,input=coded.tobytes(),capture_output=True,check=True).stdout
                     self.assertEqual(len(expected),w*h*3)
                     np.testing.assert_array_equal(np.frombuffer(actual,"<u2"),np.frombuffer(expected,"<u2"))
+                    fast, _ = camera_raster_input(program, 0, 1, fast=True)
+                    result = subprocess.run(fast+tail, input=coded.tobytes(), capture_output=True, check=True)
+                    self.assertEqual(result.stdout, expected)

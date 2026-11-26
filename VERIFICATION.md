@@ -1,5 +1,9 @@
 # VlogCraft Studio development qualification
 
+## Mixed camera, photograph and audio export
+
+The corrected 48-picture UHD60 excerpt matched all coded pictures, decoded pictures, 48 HDR10+ records and 38,400 stereo sample positions against its matched managed export. An independent uninterrupted encoder reproduced the complete canonical Main10 input and its encoded master. The serial and two-worker segmented exports passed all joins and the uninterrupted 50 dB per-picture floor. Two workers reduced cold qualification from 103.764 s to 75.778 s. Physical comparisons ran serially on AC on the Ryzen AI 9 HX 370 and Radeon 890M. [Measurements and limitations](docs/phase3a-mixed-project.md) · [Sanitized results](docs/benchmarks/studio-3.6.0-mixed-export.json).
+
 ## First export of the audited UHD60 camera minute, 25 November 2026
 
 The corrected Radeon 890M route delivered the saved six-span, 3,600-picture edit in 3,860.448 s compared with 6,321.394 s managed, a 38.9% reduction. Independent comparison took 158.236 s. All 3,600 source selections, coded pictures, independently decoded pictures, frame clocks and conforming HDR10+ records matched. The static HDR declarations and decoded 48 kHz stereo PCM through sample 2,880,000 passed. This includes the six source-end holds and the rotated-PQ-to-upright-SDR cut. Only 19 x265 diagnostic log-level digits differed in the complete MP4. Both original camera recordings passed their post-run SHA-256 checks. The rebuilt worker also reproduced every archived packed GPU input picture on the 600-picture control. [Experiment and timings](docs/phase3a-camera-raster.md#first-export-of-the-audited-minute) · [Measured stages](docs/benchmarks/studio-3.6.0-camera-raster.json)

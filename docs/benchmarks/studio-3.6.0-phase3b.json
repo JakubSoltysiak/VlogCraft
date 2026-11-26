@@ -6880,9 +6880,9 @@
       "cause": "The old binding checked the historical Phase 3A measurement against changed Phase 3B source. CI now verifies Phase 3A using its archived commit, then checks the new record."
     }
   ],
-  "source_fingerprint": "6f57d6095ccc10cd3da8c5c5d2684cee0521cb3e762d2202226222dd8f7438e2",
+  "source_fingerprint": "12bf21e676f83bf0f18f3031a0ece22ca92ce3b8b3c68a78c0708883c8519a4d",
   "fingerprint_method": "SHA256 sorted relevant relative path + NUL + LF-normalized source + NUL",
-  "benchmark_protocol_fingerprint": "28594cbfcc9d1066acb637d1ba29f75dac86c12c1cafe54091166f6e236be73f",
+  "benchmark_protocol_fingerprint": "f2e194792194285b41b4afe7b36845e6fd8b3cd0fa0079dc131cf40188e83d51",
   "benchmark_protocol_fingerprint_method": "SHA256 sorted benchmark driver/observer relative path + NUL + LF-normalized source + NUL",
   "follow_up": {
     "status": "development checkpoint",
@@ -86077,7 +86077,8 @@
     "through_independent_check_seconds": 713.132
   },
   "measurement_files": {
-    "docs/benchmarks/studio-3.6.0-camera-raster.json": "c0ec5e0ebe5f7231bdb620c6bf16f8edde56b2c88b3d982e3c21c022aa0ec693"
+    "docs/benchmarks/studio-3.6.0-camera-raster.json": "c0ec5e0ebe5f7231bdb620c6bf16f8edde56b2c88b3d982e3c21c022aa0ec693",
+    "docs/benchmarks/studio-3.6.0-mixed-export.json": "c0f808ecc7cada98fa9e09a5f567c8035f3c8b34ec7ef6b0c0d9ecc0fb95a3cb"
   },
   "camera_raster_corrected3600": {
     "implementation": "5638eb8",
@@ -86089,5 +86090,10 @@
     "identical_decoded_pictures": 3600,
     "dynamic_equals_reference": 3600,
     "through_independent_check_seconds": 4018.685
+  },
+  "mixed_project_export_nov26": {
+    "measurement_file": "docs/benchmarks/studio-3.6.0-mixed-export.json",
+    "format": "UHD60 HDR10+",
+    "draft_pr": 22
   }
 }

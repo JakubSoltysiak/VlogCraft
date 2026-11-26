@@ -34,7 +34,7 @@ def wait_until_done(page,timeout=180):
     raise TimeoutError("Installed GPU export did not reach a terminal state")
 
 
-def qualify(executable,project,reference,results):
+def qualify(executable,project,reference,results,*,mixed=False):
     results=results.resolve()
     results.mkdir(parents=True,exist_ok=False)
     local=results/"qualification.vlogcraft"
@@ -45,7 +45,13 @@ def qualify(executable,project,reference,results):
     before = {path:digest(path) for path in protected}
     delivered = results/"Projekt próbny.mp4"
     cancelled = results/"Anulowany.mp4"
-    program = compile_project(state,results)
+    if mixed:
+        from mixed_export import compile_mixed
+        from mixed_project_delivery import verify_master
+
+        program = compile_mixed(state,results)
+    else:
+        program = compile_project(state,results)
     with session(executable,results/"installed",offline=True,project_path=local) as (page,proc,_,errors):
         assert page.evaluate("request('export/native-project')")["available"]
         page.click("#exportBtn")
@@ -55,13 +61,24 @@ def qualify(executable,project,reference,results):
         assert page.locator("#nativeProjectExport").is_visible()
         assert not page.locator("#useNativeProjectExport").is_checked()
         page.check("#useNativeProjectExport")
+        if mixed:
+            page.select_option("#nativeProjectPolicy","mixed")
+            assert page.locator("#nativeProjectMixedNote").is_visible()
         page.evaluate("value=>$('comparisonMaster').value=value",str(reference))
         page.fill("#exportPath",str(delivered))
         with page.expect_response(lambda p:p.url.endswith("/api/export")) as submitted:
             page.click("#startRender")
         assert submitted.value.ok, submitted.value.json()
-        job = wait_until_done(page)
+        if mixed:
+            request = submitted.value.request.post_data_json
+            assert request.get("experimentalMixedExport") is True
+            assert request.get("comparisonMaster") == str(reference) and "experimentalFirstExport" not in request
+        job = wait_until_done(page,timeout=max(180,5*len(program.frames)) if mixed else 180)
         assert job["status"]=="done" and not job.get("fallback"),job
+        if mixed:
+            assert job["verificationPolicy"]=="mixed-exact-master",job
+            assert job["deliveredBackend"]=="mixed-d3d11-zimg-managed",job
+            assert job["verifiedFrames"]==len(program.frames) and job["x265PoolWorkers"]==2,job
         assert delivered.is_file()
         page.wait_for_function("!$('startRender').disabled")
         page.fill("#exportPath",str(cancelled))
@@ -83,8 +100,11 @@ def qualify(executable,project,reference,results):
         assert wait_until_done(page)["status"]=="cancelled"
         assert not cancelled.exists() and proc.poll() is None
         assert not errors,errors
-    values=compare_project(reference,delivered,program,results)
-    assert values["passed"],values
+    if mixed:
+        values=verify_master(reference,delivered,state,len(program.frames),results,lambda:False)
+    else:
+        values=compare_project(reference,delivered,program,results)
+        assert values["passed"],values
     assert all(digest(path)==expected for path,expected in before.items())
     assert not list(results.glob(".vlogcraft_*"))
     receipt=json.loads((results/"installed/process-ownership.json").read_text())
@@ -92,6 +112,8 @@ def qualify(executable,project,reference,results):
     report={"offline_msi_image_gpu_export":True,"default_reference":True,"native_opt_in":True,
             "active_native_worker_cancelled_without_publication":True,"originals_and_project_unchanged":True,
             "owned_survivors":0,"comparison":values}
+    if mixed:
+        report["mixed_exact_master_editor"]=True
     (results/"qualification.json").write_text(json.dumps(report,indent=2)+"\n",encoding="utf8")
     print(json.dumps(report))
 
@@ -150,9 +172,11 @@ if __name__=="__main__":
     parser.add_argument("project",type=Path)
     parser.add_argument("reference",type=Path)
     parser.add_argument("results",type=Path)
-    parser.add_argument("--fallback-only",action="store_true")
+    mode=parser.add_mutually_exclusive_group()
+    mode.add_argument("--fallback-only",action="store_true")
+    mode.add_argument("--mixed",action="store_true")
     args=parser.parse_args()
     if args.fallback_only:
         qualify_fallback(args.executable,args.results)
     else:
-        qualify(args.executable,args.project.resolve(),args.reference.resolve(),args.results)
+        qualify(args.executable,args.project.resolve(),args.reference.resolve(),args.results,mixed=args.mixed)
